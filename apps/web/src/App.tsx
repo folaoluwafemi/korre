@@ -1,10 +1,4 @@
-import {
-  lazy,
-  Suspense,
-  useEffect,
-  useState,
-  type MouseEvent,
-} from "react";
+import { lazy, Suspense, useEffect, useState, type MouseEvent } from "react";
 
 const CounterballPreview = lazy(() => import("./CounterballPreview.js"));
 
@@ -40,7 +34,13 @@ export default function App() {
 
   if (pathname === "/preview") {
     return (
-      <Suspense fallback={<main id="main" tabIndex={-1}>Loading scene preview…</main>}>
+      <Suspense
+        fallback={
+          <main id="main" tabIndex={-1}>
+            Loading scene preview…
+          </main>
+        }
+      >
         <CounterballPreview onNavigateHome={() => navigate("/")} />
       </Suspense>
     );

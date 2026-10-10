@@ -16,7 +16,10 @@ import {
 } from "@korre/game-protocol";
 import { describe, expect, it } from "vitest";
 import { initializeHavokRuntime, type HavokRuntime } from "./havokRuntime.js";
-import { createCounterballWorld, type CounterballWorld } from "./worldFactory.js";
+import {
+  createCounterballWorld,
+  type CounterballWorld,
+} from "./worldFactory.js";
 
 type Fixture = { states: { initial: unknown } };
 type ProbeKind = "direct-cap" | "restart-button";
@@ -64,9 +67,8 @@ const settleWindowSteps = Math.ceil(
 );
 
 async function readPinnedHavokWasm(): Promise<ArrayBuffer> {
-  const wasmPath = require.resolve(
-    "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
-  );
+  const wasmPath =
+    require.resolve("@babylonjs/havok/lib/esm/HavokPhysics.wasm");
   return new Uint8Array(await readFile(wasmPath)).buffer;
 }
 
@@ -269,7 +271,11 @@ function runTrial(
     const selectedCap = world.bodies.get(selectedCapId);
     const button = world.bodies.get("button");
     const surface = world.staticBodies[0];
-    if (selectedCap === undefined || button === undefined || surface === undefined) {
+    if (
+      selectedCap === undefined ||
+      button === undefined ||
+      surface === undefined
+    ) {
       throw new Error("Probe world is missing a selected body or surface.");
     }
     applyProbeMaterial(surface, friction, restitution);
@@ -417,7 +423,8 @@ function runTrial(
         restitution,
         impulse: impulseMagnitude,
         tiltDegrees,
-        azimuthRadians: kind === "restart-button" ? restartAzimuthRadians : null,
+        azimuthRadians:
+          kind === "restart-button" ? restartAzimuthRadians : null,
         selectedCapTravelledDistance,
         selectedCapFinalDistance: Vector3.Distance(
           selectedCap.transformNode.position,
@@ -444,129 +451,125 @@ function runTrial(
 }
 
 describe("real Havok calibration probe", () => {
-  it(
-    "records the full provisional coefficient, impulse, and restart-tilt matrix",
-    async () => {
-      expect(COUNTERBALL_CONFIG_V1.bodies.capMass).toBe(1);
-      expect(candidateTiltDegrees[4]).toBeLessThanOrEqual(
-        (COUNTERBALL_CONFIG_V1.restart.maxButtonTiltRadians * 180) / Math.PI,
-      );
+  it("records the full provisional coefficient, impulse, and restart-tilt matrix", async () => {
+    expect(COUNTERBALL_CONFIG_V1.bodies.capMass).toBe(1);
+    expect(candidateTiltDegrees[4]).toBeLessThanOrEqual(
+      (COUNTERBALL_CONFIG_V1.restart.maxButtonTiltRadians * 180) / Math.PI,
+    );
 
-      const havok = await initializeHavokRuntime({
-        wasmBinary: await readPinnedHavokWasm(),
-      });
-      const initial = await readInitialState();
-      const observations: TrialObservation[] = [];
+    const havok = await initializeHavokRuntime({
+      wasmBinary: await readPinnedHavokWasm(),
+    });
+    const initial = await readInitialState();
+    const observations: TrialObservation[] = [];
 
-      for (const friction of candidateFrictions) {
-        for (const restitution of candidateRestitutions) {
+    for (const friction of candidateFrictions) {
+      for (const restitution of candidateRestitutions) {
+        for (const impulse of candidateImpulses) {
+          observations.push(
+            runTrial(
+              havok,
+              initial,
+              "direct-cap",
+              friction,
+              restitution,
+              impulse,
+              null,
+            ),
+          );
+        }
+        for (const tiltDegrees of candidateTiltDegrees) {
           for (const impulse of candidateImpulses) {
             observations.push(
               runTrial(
                 havok,
                 initial,
-                "direct-cap",
+                "restart-button",
                 friction,
                 restitution,
                 impulse,
-                null,
+                tiltDegrees,
               ),
             );
           }
-          for (const tiltDegrees of candidateTiltDegrees) {
-            for (const impulse of candidateImpulses) {
-              observations.push(
-                runTrial(
-                  havok,
-                  initial,
-                  "restart-button",
-                  friction,
-                  restitution,
-                  impulse,
-                  tiltDegrees,
-                ),
-              );
-            }
-          }
         }
       }
+    }
 
-      expect(observations).toHaveLength(480);
-      expect(
-        observations.filter(({ kind }) => kind === "direct-cap"),
-      ).toHaveLength(80);
-      expect(
-        observations.filter(({ kind }) => kind === "restart-button"),
-      ).toHaveLength(400);
-      for (const observation of observations) {
-        for (const value of [
-          observation.friction,
-          observation.restitution,
-          observation.impulse,
-          observation.selectedCapTravelledDistance,
-          observation.selectedCapFinalDistance,
-          observation.selectedCapPeakRise,
-          observation.selectedCapMaximumSpeed,
-          observation.selectedCapFinalSpeed,
-          observation.buttonTravelledDistance,
-          observation.buttonFinalSpeed,
-          observation.simulatedSeconds,
-        ]) {
-          expect(Number.isFinite(value)).toBe(true);
-        }
-        expect(
-          observation.settledAtSeconds === null ||
-            Number.isFinite(observation.settledAtSeconds),
-        ).toBe(true);
-        expect(
-          observation.contacts.every(
-            ({ observations: count, firstStep, lastStep, firstPoint }) =>
-              Number.isFinite(count) &&
-              Number.isFinite(firstStep) &&
-              Number.isFinite(lastStep) &&
-              (firstPoint === null ||
-                [firstPoint.x, firstPoint.y, firstPoint.z].every(
-                  Number.isFinite,
-                )),
-          ),
-        ).toBe(true);
+    expect(observations).toHaveLength(480);
+    expect(
+      observations.filter(({ kind }) => kind === "direct-cap"),
+    ).toHaveLength(80);
+    expect(
+      observations.filter(({ kind }) => kind === "restart-button"),
+    ).toHaveLength(400);
+    for (const observation of observations) {
+      for (const value of [
+        observation.friction,
+        observation.restitution,
+        observation.impulse,
+        observation.selectedCapTravelledDistance,
+        observation.selectedCapFinalDistance,
+        observation.selectedCapPeakRise,
+        observation.selectedCapMaximumSpeed,
+        observation.selectedCapFinalSpeed,
+        observation.buttonTravelledDistance,
+        observation.buttonFinalSpeed,
+        observation.simulatedSeconds,
+      ]) {
+        expect(Number.isFinite(value)).toBe(true);
       }
       expect(
-        observations.some(
-          ({ kind, selectedCapTravelledDistance }) =>
-            kind === "direct-cap" && selectedCapTravelledDistance > 0.001,
-        ),
+        observation.settledAtSeconds === null ||
+          Number.isFinite(observation.settledAtSeconds),
       ).toBe(true);
       expect(
-        observations.some(
-          ({ kind, buttonCapContact }) =>
-            kind === "restart-button" && buttonCapContact,
+        observation.contacts.every(
+          ({ observations: count, firstStep, lastStep, firstPoint }) =>
+            Number.isFinite(count) &&
+            Number.isFinite(firstStep) &&
+            Number.isFinite(lastStep) &&
+            (firstPoint === null ||
+              [firstPoint.x, firstPoint.y, firstPoint.z].every(
+                Number.isFinite,
+              )),
         ),
       ).toBe(true);
+    }
+    expect(
+      observations.some(
+        ({ kind, selectedCapTravelledDistance }) =>
+          kind === "direct-cap" && selectedCapTravelledDistance > 0.001,
+      ),
+    ).toBe(true);
+    expect(
+      observations.some(
+        ({ kind, buttonCapContact }) =>
+          kind === "restart-button" && buttonCapContact,
+      ),
+    ).toBe(true);
 
-      console.info(
-        `COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify({
-          babylonCore: "9.30.0",
-          havokPackage: "1.3.14",
-          wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
-          fixedStepSeconds,
-          maximumProbeSeconds,
-          settleWindowSeconds:
-            COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
-          linearSettleThreshold:
-            COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
-          angularSettleThreshold:
-            COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
-          candidateFrictions,
-          candidateRestitutions,
-          candidateImpulses,
-          candidateTiltDegrees,
-          restartAzimuthRadians,
-          observedTrials: observations.length,
-          observations,
-        })}`,
-      );
-    },
-    600_000,
-  );
+    console.info(
+      `COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify({
+        babylonCore: "9.30.0",
+        havokPackage: "1.3.14",
+        wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
+        fixedStepSeconds,
+        maximumProbeSeconds,
+        settleWindowSeconds:
+          COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
+        linearSettleThreshold:
+          COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
+        angularSettleThreshold:
+          COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
+        candidateFrictions,
+        candidateRestitutions,
+        candidateImpulses,
+        candidateTiltDegrees,
+        restartAzimuthRadians,
+        observedTrials: observations.length,
+        observations,
+      })}`,
+    );
+  }, 600_000);
 });

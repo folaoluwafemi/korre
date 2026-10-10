@@ -238,6 +238,18 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 1,
           "detail": "All workspace and root test-project typechecks passed, including the calibration probe and both preview specs. Lint then failed only on @typescript-eslint/require-await at calibrationProbe.test.ts:237. Unit tests, 480-trial real-WASM probe, build, integration and E2E did not run."
+        },
+        {
+          "command": "GitHub Actions run #4: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Workspace/root typecheck and ESLint passed. Hosted Prettier reported exactly App.tsx, pieces.test.ts, and calibrationProbe.test.ts. Unit tests, actual-WASM probe, build, integration, and E2E did not run."
+        },
+        {
+          "command": "Independent source review: CI format repair 1",
+          "result": "PASS",
+          "report": "execution_state/reports/CI-format-repair-1-review.md",
+          "detail": "Independent review confirmed the three-file diff is formatting-only and preserves routes, scene assertions, probe order, all 480 trials, physics inputs, observations, teardown, and timeout."
         }
       ],
       "blocker": null,
@@ -273,7 +285,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Hosted run #2 passed the games/counterball package typecheck but failed root typecheck in preview E2E. Hosted run #3 passed all package/root typechecks, then lint found require-await on synchronous runTrial before tests/build or probe measurements. Repair 3 is independently source-reviewed PASS; hosted run #4 is required."
+          "evidence": "Probe source is saved. Run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports/narrows PhysicsEngineV2 and passes independent source review. Run #2 passed game package typecheck but failed root typecheck in preview E2E. Run #3 passed typechecks then lint found require-await on synchronous runTrial; repair 3 is independently reviewed PASS. Run #4 passed typechecks and ESLint, then Prettier reported three files including this probe before tests/build. No probe measurements exist. Formatting repair 1 is pending independent review and run #5."
         },
         {
           "id": "T02-B0-repair-1",
@@ -299,9 +311,18 @@
           "implementation_report": "execution_state/reports/T02-calibration-probe-repair-3-implementation.md",
           "review_report": "execution_state/reports/T02-calibration-probe-repair-3-review.md",
           "evidence": "Removed the unnecessary async/Promise wrapper and two awaits from the synchronous trial runner. Independent source review PASS. Hosted run #3 confirms all typechecks passed but lint failed before tests, so real-WASM measurements remain pending run #4. No local checks were run."
+        },
+        {
+          "id": "CI-format-repair-1",
+          "status": "IMPLEMENTED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/CI-format-repair-1.md",
+          "implementation_report": "execution_state/reports/CI-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/CI-format-repair-1-review.md",
+          "evidence": "Prettier was run locally only on the three files named by hosted run #4. Independent source review PASS confirms formatting-only changes. No local build/test/typecheck/lint ran. Hosted run #5 is required before measurements."
         }
       ],
-      "next_action": "Push the independently reviewed synchronous-runner lint repair and run hosted verification. If it reaches the real-WASM probe, capture its observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
+      "next_action": "Push the independently reviewed formatting-only repair and run hosted verification. If it reaches the real-WASM probe, capture observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
     },
     {
       "id": "T03",
@@ -321,10 +342,22 @@
           "detail": "Typecheck passed, including the preview test fixes. Lint failed on @typescript-eslint/require-await in the calibration probe; tests/build did not run. Integration and E2E were skipped."
         },
         {
+          "command": "GitHub Actions run #4: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Typecheck and ESLint passed. Prettier reported App.tsx, pieces.test.ts, and calibrationProbe.test.ts; unit tests/build did not run. Integration and E2E were skipped."
+        },
+        {
           "command": "Independent source review: T03 repair 2",
           "result": "PASS",
           "report": "execution_state/reports/T03-review-repair-2.md",
           "detail": "Reviewer confirmed both evaluate callback type annotations match the pinned Playwright API and preview/WebGL2 assertions remain intact. Hosted verification is still pending."
+        },
+        {
+          "command": "Independent source review: CI format repair 1",
+          "result": "PASS",
+          "report": "execution_state/reports/CI-format-repair-1-review.md",
+          "detail": "Independent review confirmed all source changes are formatting-only and preserve the route, preview, button, and calibration-probe behavior. Hosted verification is still pending."
         },
         {
           "command": "GitHub Actions run #2: pnpm verify",
@@ -389,9 +422,18 @@
           "implementation_report": "execution_state/reports/T03-repair-2-implementation.md",
           "review_report": "execution_state/reports/T03-review-repair-2.md",
           "evidence": "Removed the unsupported evaluate generic at both WebGL checks and annotated callback result types. Independent source review PASS. No local commands were run; hosted root verification, probe measurements, integration and browser E2E remain pending."
+        },
+        {
+          "id": "CI-format-repair-1",
+          "status": "IMPLEMENTED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/CI-format-repair-1.md",
+          "implementation_report": "execution_state/reports/CI-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/CI-format-repair-1-review.md",
+          "evidence": "Formatting-only changes cover App.tsx and the piece/probe tests flagged in hosted run #4. Independent review PASS. Run #4 still skipped tests, build, integration, and E2E; hosted run #5 is required."
         }
       ],
-      "next_action": "Run hosted pnpm verify, integration, and one-worker browser E2E on the independently reviewed repair 2 commit. If a gate fails, repair the confirmed cause and obtain a new independent review. Keep T05 blocked until T03 is ACCEPTED."
+      "next_action": "Push the independently reviewed formatting-only repair and run hosted pnpm verify, integration, and one-worker browser E2E. If a gate fails, repair the confirmed cause and obtain a new independent review. Keep T05 blocked until T03 is ACCEPTED."
     },
     {
       "id": "T04",

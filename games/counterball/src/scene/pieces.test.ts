@@ -121,12 +121,12 @@ describe("Counterball piece presentation", () => {
       expect(button.bodyMesh.name).toBe("counterball-button-perforated-body");
       expect(button.bodyMesh.material?.name).toBe("counterball-button-plastic");
       const buttonBounds = bounds(button.bodyMesh);
-      expect(buttonBounds.maximumWorld.x - buttonBounds.minimumWorld.x).toBeCloseTo(
-        COUNTERBALL_CONFIG_V1.geometry.buttonRadius * 2,
-      );
-      expect(buttonBounds.maximumWorld.y - buttonBounds.minimumWorld.y).toBeCloseTo(
-        COUNTERBALL_CONFIG_V1.geometry.buttonThickness,
-      );
+      expect(
+        buttonBounds.maximumWorld.x - buttonBounds.minimumWorld.x,
+      ).toBeCloseTo(COUNTERBALL_CONFIG_V1.geometry.buttonRadius * 2);
+      expect(
+        buttonBounds.maximumWorld.y - buttonBounds.minimumWorld.y,
+      ).toBeCloseTo(COUNTERBALL_CONFIG_V1.geometry.buttonThickness);
 
       button.root.computeWorldMatrix(true);
       button.bodyMesh.computeWorldMatrix(true);
