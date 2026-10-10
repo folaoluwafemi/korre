@@ -1081,7 +1081,7 @@
         },
         {
           "id": "C01",
-          "status": "IMPLEMENTING",
+          "status": "CHANGES_REQUIRED",
           "packet": "execution_state/packets/C01.md",
           "owner": "coordinator",
           "author_identity": "coordinator",
@@ -1132,9 +1132,94 @@
               "environment": "source-review",
               "report": "execution_state/reports/C01-review.md",
               "detail": "Workerd test wiring, generated protected secrets, hosted logs, and artifact inventories pass source review. Exact-head hosted execution and inventory/hash inspection remain pending. Diagnostic-browser acceptance remains open."
+            },
+            {
+              "command": "pnpm test:workers",
+              "result": "FAIL",
+              "environment": "GitHub Actions",
+              "run_id": "38082875529",
+              "attempt": 1,
+              "source_sha": "c8ae1eee9990ba792d491bceee18361d6ff1be35",
+              "report": "execution_state/reports/C01-runtime-run-38082875529.md",
+              "detail": "Miniflare rejected compatibility date 2026-10-10 before collection: 0 test files, 0 tests, 1 runtime error. Downstream app checks were skipped."
             }
           ],
-          "next_action": "Run the source-reviewed commit on GitHub, inspect logs and actual artifacts/hash inventories, and keep C01 IMPLEMENTING until exact-hosted evidence plus a real diagnostic browser producer are complete."
+          "next_action": "Run all required exact-head hosted checks using the source-reviewed C01-pool-repair-1 dependency update. Keep C01 CHANGES_REQUIRED until the named Worker smoke and artifact checks pass and diagnostic-browser producer evidence exists.",
+          "blocker": "The first hosted run failed before test collection because Miniflare did not support the unchanged 2026-10-10 Worker compatibility date. Diagnostic-browser evidence is also still unproduced."
+        },
+        {
+          "id": "C01-pool-repair-1",
+          "parent": "C01",
+          "status": "IMPLEMENTED",
+          "packet": "execution_state/packets/C01-pool-repair-1.md",
+          "owner": "coordinator implementing; /root/foundation_review independent review",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review (independent source/dependency review PASS)",
+          "attempt_count": 1,
+          "write_paths": [
+            "package.json",
+            "pnpm-lock.yaml",
+            "execution_state/packets/C01-pool-repair-1.md",
+            "execution_state/reports/C01-pool-repair-1-implementation.md",
+            "execution_state/packets/C01.md",
+            "execution_state/reports/C01-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/C01-pool-repair-1-implementation.md",
+          "review_report": "execution_state/reports/C01-pool-repair-1-review.md",
+          "checks": [
+            {
+              "command": "pnpm.cmd install --lockfile-only --ignore-scripts",
+              "result": "PASS",
+              "environment": "local-metadata",
+              "exit_code": 0,
+              "detail": "pnpm 10.33.0; 333 resolved, 0 downloaded, 0 added. Metadata-only update."
+            },
+            {
+              "command": "pnpm.cmd view @cloudflare/vitest-plugin@1.4.0 dependencies peerDependencies --json",
+              "result": "PASS",
+              "environment": "registry-metadata",
+              "detail": "Resolved Miniflare 5.20261006.1-alpha, Wrangler 4.149.0 and Vitest peer range ^4.1.0 || ^5.0.0."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "71 packet records and 21 remaining parents; consistency only."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C01",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact C01 catalogue record extracted."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact F01 catalogue record extracted."
+            },
+            {
+              "command": "Lockfile metadata inspection",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Plugin 1.4.0, Miniflare 5.20261006.1-alpha, root Wrangler 4.149.0 and Vitest 4.1.2 are recorded; app versions unchanged."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "detail": "No whitespace errors after package/lock, packet, report, task, ledger and ownership edits."
+            },
+            {
+              "command": "Independent C01 pool-repair-1 source/dependency review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-pool-repair-1-review.md",
+              "detail": "Exact plugin/lock diff reviewed; active dependencies match; unchanged Worker date; hosted runtime still unverified."
+            }
+          ],
+          "next_action": "Commit only the reviewed C01 pool-repair files and status evidence, then run the named Worker smoke and all C01 checks on GitHub at that exact SHA. Keep C01 open for diagnostic-browser evidence."
         },
         {
           "id": "T02-F01",
@@ -1182,18 +1267,25 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-F01-review.md",
               "detail": "Found stale goal-mouth classification at trailing support, and equal-sign endpoint clearances can hide a rotational exit/re-entry. Exact reproducers and required regressions are in the report; no local app checks ran."
+            },
+            {
+              "command": "Independent T02-F01 repair-1 source re-review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-repair-1-review.md",
+              "detail": "Found a finite ordinary y-axis yaw exit that throws before its descending root bracket. F01 and parent T02 remain unaccepted."
             }
           ],
-          "next_action": "Complete the bounded repair in execution_state/packets/T02-F01-repair-1.md; preserve the original API, dependencies and tests. Keep T02-F01 unaccepted until fresh independent review and hosted checks pass."
+          "next_action": "Complete final allowed focused repair 2 in execution_state/packets/T02-F01-repair-2.md. If repair 2 still fails, stop code changes and escalate with exact evidence."
         },
         {
           "id": "T02-F01-repair-1",
           "parent": "T02-F01",
-          "status": "RUNNING",
+          "status": "CHANGES_REQUIRED",
           "packet": "execution_state/packets/T02-F01-repair-1.md",
-          "owner": "/root/toolchain_audit implementing; /root/foundation_review independent re-review",
+          "owner": "/root/toolchain_audit implementation; /root/swarm_review independent review CHANGES_REQUIRED",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/foundation_review (independent re-review after implementation report)",
+          "reviewer_identity": "/root/swarm_review (independent repair-1 review CHANGES_REQUIRED)",
           "attempt_count": 1,
           "write_paths": [
             "games/counterball/src/simulation/facts.ts",
@@ -1202,10 +1294,38 @@
           ],
           "implementation_report": "execution_state/reports/T02-F01-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-F01-repair-1-review.md",
-          "next_action": "Repair both geometric defects and add the required regressions. Save the report, stop, and request independent re-review. All app checks run on GitHub."
+          "next_action": "Repair the reported boundary-root neighborhood/directional support bound in the final allowed attempt, T02-F01-repair-2. Preserve unresolved-interval fail-safe behavior; if repair 2 fails review or hosted checks, stop and escalate.",
+          "checks": [
+            {
+              "command": "Independent T02-F01 repair-1 source re-review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-repair-1-review.md",
+              "detail": "A conservative left-first root search can exhaust depth on a clear interval ending at an ordinary root and throw before visiting the adjacent sign bracket. Exact yaw reproducer and required regression are in the report; no app checks ran."
+            }
+          ]
+        },
+        {
+          "id": "T02-F01-repair-2",
+          "parent": "T02-F01",
+          "status": "RUNNING",
+          "packet": "execution_state/packets/T02-F01-repair-2.md",
+          "owner": "/root/toolchain_audit implementing; /root/foundation_review independent review",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review (independent repair-2 review; rotated reviewer)",
+          "attempt_count": 2,
+          "write_paths": [
+            "games/counterball/src/simulation/facts.ts",
+            "games/counterball/src/simulation/facts.test.ts",
+            "execution_state/reports/T02-F01-repair-2-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/T02-F01-repair-2-implementation.md",
+          "review_report": "execution_state/reports/T02-F01-repair-2-review.md",
+          "checks": [],
+          "next_action": "Repair the exact vertical-yaw ordinary crossing without weakening fail-safe isolation. Add the named regression, preserve every existing case, save the implementation report and stop for independent review. All app checks run on GitHub. This is the final allowed focused repair."
         }
       ],
-      "next_action": "C00 is ACCEPTED for contract/schema scope. T02-F01 pure fact producer is IMPLEMENTING on exact source/test paths; hosted checks and independent review are pending. Parent T02 remains RUNNING."
+      "next_action": "C01 pool-repair-1 source review PASS; exact-hosted run is next. T02-F01 repair 1 review found a second root-isolation defect; final allowed repair 2 is active. Parent T02 remains RUNNING."
     },
     {
       "id": "T03",
