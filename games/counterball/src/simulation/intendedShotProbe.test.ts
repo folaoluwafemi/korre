@@ -62,10 +62,14 @@ type TrialObservation = {
   obstacleStartPosition: Vec3;
   obstacleFinalPosition: Vec3;
   enteredObstacleCombinedHorizontalRadius: boolean;
-  clearanceEpsilon: number | null;
+  clearanceEpsilon: number;
   clearanceEpsilonSource: string;
-  clearsByConfiguredEpsilon: boolean | null;
+  peakExceedsConfiguredEpsilon: boolean | null;
+  sampledClearanceAlwaysAboveEpsilon: boolean | null;
+  minSampledClearance: number | null;
   maximumSignedClearanceWithinCombinedRadius: number | null;
+  continuousTraversalProven: false;
+  buttonObstacleContact: boolean;
   clearanceMeasurements: ClearanceMeasurement[];
   allBodiesSettledAtSeconds: number | null;
   simulatedSeconds: number;
@@ -92,9 +96,8 @@ const obstacleGap = 0.75;
 const candidateImpulses = [0.5, 1, 1.5, 2, 3, 4, 6, 8] as const;
 const candidateTiltDegrees = [0, 15, 30, 45, 60] as const;
 const measurementMotionFloor = 0.001;
-const clearanceEpsilon: number | null = null;
-const clearanceEpsilonSource =
-  "Unavailable: CounterballConfig has no clearanceEpsilon field; GAMEPLAY section 6 assigns this choice to T02.";
+const clearanceEpsilon = COUNTERBALL_CONFIG_V1.restart.clearanceEpsilon;
+const clearanceEpsilonSource = "COUNTERBALL_CONFIG_V1.restart.clearanceEpsilon";
 const fixedStepSeconds = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds;
 const maximumProbeSeconds =
   COUNTERBALL_CONFIG_V1.simulation.maxShotDurationSeconds;
@@ -534,7 +537,7 @@ function runTrial(
               COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
         );
         quietWindowCount = allBodiesQuiet ? quietWindowCount + 1 : 0;
-        if (quietWindowCount >= settleWindowSteps && step < maximumSteps) {
+        if (quietWindowCount >= settleWindowSteps) {
           allBodiesSettledAtSeconds = simulatedSeconds;
           break;
         }
@@ -555,11 +558,25 @@ function runTrial(
     const capButtonContact = contacts.some(
       ({ pair }) => pair.includes(selectedCapId) && pair.includes("button"),
     );
-    const clearsByConfiguredEpsilon =
-      clearanceEpsilon === null ||
+    const buttonObstacleContact = contacts.some(
+      ({ pair }) => pair.includes("button") && pair.includes(obstacleCapId),
+    );
+    const minSampledClearance =
+      clearanceMeasurements.length === 0
+        ? null
+        : Math.min(
+            ...clearanceMeasurements.map(
+              ({ signedVerticalClearance }) => signedVerticalClearance,
+            ),
+          );
+    const peakExceedsConfiguredEpsilon =
       maximumSignedClearanceWithinCombinedRadius === null
         ? null
         : maximumSignedClearanceWithinCombinedRadius >= clearanceEpsilon;
+    const sampledClearanceAlwaysAboveEpsilon =
+      minSampledClearance === null
+        ? null
+        : minSampledClearance >= clearanceEpsilon;
 
     result = {
       key: `tilt=${tiltDegrees}|impulse=${impulseMagnitude}`,
@@ -593,8 +610,14 @@ function runTrial(
       enteredObstacleCombinedHorizontalRadius,
       clearanceEpsilon,
       clearanceEpsilonSource,
-      clearsByConfiguredEpsilon,
+      peakExceedsConfiguredEpsilon,
+      sampledClearanceAlwaysAboveEpsilon,
+      minSampledClearance,
       maximumSignedClearanceWithinCombinedRadius,
+      // This probe does not persist a swept horizontal path, so sampled extrema
+      // cannot prove a complete, collision-free transit over the obstacle.
+      continuousTraversalProven: false,
+      buttonObstacleContact,
       clearanceMeasurements,
       allBodiesSettledAtSeconds,
       simulatedSeconds,
@@ -738,8 +761,58 @@ describe("real Havok intended cap-into-button probe", () => {
       if (observation.allBodiesSettledAtSeconds === null) {
         expect(observation.simulatedSeconds).toBe(maximumProbeSeconds);
       }
-      expect(observation.clearanceEpsilon).toBeNull();
-      expect(observation.clearsByConfiguredEpsilon).toBeNull();
+      expect(observation.clearanceEpsilon).toBe(
+        COUNTERBALL_CONFIG_V1.restart.clearanceEpsilon,
+      );
+      expect(Number.isFinite(observation.clearanceEpsilon)).toBe(true);
+      expect(observation.clearanceEpsilonSource).toBe(
+        "COUNTERBALL_CONFIG_V1.restart.clearanceEpsilon",
+      );
+      expect(
+        observation.minSampledClearance === null ||
+          Number.isFinite(observation.minSampledClearance),
+      ).toBe(true);
+      expect(
+        observation.maximumSignedClearanceWithinCombinedRadius === null ||
+          Number.isFinite(
+            observation.maximumSignedClearanceWithinCombinedRadius,
+          ),
+      ).toBe(true);
+      expect(observation.continuousTraversalProven).toBe(false);
+      expect(typeof observation.buttonObstacleContact).toBe("boolean");
+      if (observation.clearanceMeasurements.length === 0) {
+        expect(observation.peakExceedsConfiguredEpsilon).toBeNull();
+        expect(observation.sampledClearanceAlwaysAboveEpsilon).toBeNull();
+        expect(observation.minSampledClearance).toBeNull();
+        expect(
+          observation.maximumSignedClearanceWithinCombinedRadius,
+        ).toBeNull();
+      } else {
+        const sampleValues = observation.clearanceMeasurements.map(
+          ({ signedVerticalClearance }) => signedVerticalClearance,
+        );
+        const minimum = Math.min(...sampleValues);
+        const maximum = Math.max(...sampleValues);
+        expect(observation.minSampledClearance).toBe(minimum);
+        expect(
+          observation.maximumSignedClearanceWithinCombinedRadius,
+        ).toBe(maximum);
+        expect(observation.peakExceedsConfiguredEpsilon).toBe(
+          maximum >= observation.clearanceEpsilon,
+        );
+        expect(observation.sampledClearanceAlwaysAboveEpsilon).toBe(
+          minimum >= observation.clearanceEpsilon,
+        );
+      }
+      expect(
+        observation.allBodiesSettledAtSeconds === null ||
+          observation.allBodiesSettledAtSeconds >=
+            COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
+      ).toBe(true);
+      expect(
+        observation.allBodiesSettledAtSeconds === null ||
+          observation.allBodiesSettledAtSeconds <= observation.simulatedSeconds,
+      ).toBe(true);
       expect(
         observation.clearanceMeasurements.every((measurement) =>
           [
@@ -747,6 +820,17 @@ describe("real Havok intended cap-into-button probe", () => {
             measurement.obstacleTopY,
             measurement.signedVerticalClearance,
           ].every(Number.isFinite),
+        ),
+      ).toBe(true);
+      expect(
+        observation.contacts.every(
+          ({ step, pair, type, point }) =>
+            Number.isSafeInteger(step) &&
+            pair.length === 2 &&
+            pair[0] !== pair[1] &&
+            type.length > 0 &&
+            (point === null ||
+              [point.x, point.y, point.z].every(Number.isFinite)),
         ),
       ).toBe(true);
       expect(
@@ -794,7 +878,17 @@ describe("real Havok intended cap-into-button probe", () => {
       measurementMotionFloor,
       clearanceEpsilon,
       clearanceEpsilonSource,
-      clearanceClassificationAvailable: clearanceEpsilon !== null,
+      continuousTraversalProven: false,
+      clearanceClassificationNote:
+        "Peak and sampled-clearance comparisons are diagnostic only; the probe does not prove a complete swept obstacle traversal.",
+      potentialNoContactCandidates: observations
+        .filter(
+          (observation) =>
+            observation.capButtonContact &&
+            observation.enteredObstacleCombinedHorizontalRadius &&
+            !observation.buttonObstacleContact,
+        )
+        .map(({ key }) => key),
       observedTrials: observations.length,
       observations,
     };

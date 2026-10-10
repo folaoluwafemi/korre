@@ -42,6 +42,8 @@ const config = {
   restart: {
     anchorTolerance: 0.64,
     maxButtonTiltRadians: Math.PI / 3,
+    // Provisional diagnostic clearance in arbitrary game units, not a gameplay rule.
+    clearanceEpsilon: 0.005,
   },
   action: {
     minimumPower: 0,

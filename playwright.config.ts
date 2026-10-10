@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const webCommand = process.platform === "win32"
+const webCommand = process.env["COUNTERBALL_PREBUILT_PREVIEW"] === "1"
+  ? "node scripts/serve-preview.mjs apps/web/dist 5173"
+  : process.platform === "win32"
   ? "pnpm.cmd --filter @korre/web dev --host 127.0.0.1"
   : "pnpm --filter @korre/web dev --host 127.0.0.1";
 

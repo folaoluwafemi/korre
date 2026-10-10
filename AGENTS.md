@@ -10,7 +10,7 @@ Build Counterball for Korre. Seven caps per side, plastic button with visible ho
 
 The human explicitly requires a monorepo: pnpm workspace with apps/, games/counterball/, packages/, one lockfile, and controlled dependency direction. Do not split services into separate repositories.
 
-Current repository state is documentation only. Do not claim an application exists. The plan's task catalogue describes future work. If the human asks only for planning, update the plan and do not launch implementation.
+Implementation has started. Inspect current source and `execution_state/tasks.json` on resume; the original documentation-only baseline and seed are historical. Do not infer completed gameplay from scaffold or diagnostic tests. If the human asks only for planning, update the plan and do not launch implementation.
 
 ## Team
 

@@ -689,6 +689,7 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
     restart: z.strictObject({
       anchorTolerance: finiteNumber.positive(),
       maxButtonTiltRadians: finiteNumber.min(0).max(Math.PI / 3),
+      clearanceEpsilon: finiteNumber.positive(),
     }),
     action: z.strictObject({
       minimumPower: z.literal(0),

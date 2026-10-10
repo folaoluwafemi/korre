@@ -1,4 +1,5 @@
 export { Engine } from "@babylonjs/core";
+export type { ArcRotateCamera } from "@babylonjs/core";
 export { createCounterballScene } from "./scene/createScene.js";
 export { createPieces } from "./scene/pieces.js";
 export type {

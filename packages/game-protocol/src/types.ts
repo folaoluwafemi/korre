@@ -356,6 +356,7 @@ export type CounterballConfig = {
   restart: {
     anchorTolerance: number;
     maxButtonTiltRadians: number;
+    clearanceEpsilon: number;
   };
   action: {
     minimumPower: 0;

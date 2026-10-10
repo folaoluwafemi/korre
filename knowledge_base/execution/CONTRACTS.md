@@ -121,6 +121,8 @@ interface SimulationRunner {
 
 `CounterballConfig` is defined once in game-protocol, using DECISIONS numeric table and explicit adapter coefficients chosen in T02. Do not import Babylon to define it. A simulator failure throws typed `SimulationError` (`initialization`, `timeout`, `invalidBody`, `resourceLimit`). An unfinished or timed-out shot is not a settled successful result.
 
+`restart.clearanceEpsilon` is the provisional positive finite vertical diagnostic margin (D38, initially 0.005 game units). It participates in `configHash`; it is not a foul, placement permission, or source of artificial lift. Diagnostic peak clearance must never be labelled proof of a collision-free obstacle traversal.
+
 Each simulate creates an isolated world from the supplied snapshot and disposes it after the result. One module initialization may be cached as an immutable runtime promise if proven safe. No globally mutable match/world. Run fixed 1/120-second steps; capture beginning and ending frames, 30-Hz interpolable transforms, and all decisive contact/crossing facts. Facts order by step/time with stable tie-break IDs; do not derive rules from downsampled video frames. Same-step contact precedes same-step crossing for attribution only; it does not pretend to prove sub-step contact order.
 
 Rules are pure: `resolveShot(before, command, simulation, config): Resolution`. `Resolution` contains settled match state, domain events, optional restart, outcome, and any safe cap-return operations. Network lifecycle/revisions are applied by application orchestration, not physics.

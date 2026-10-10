@@ -230,7 +230,7 @@ Cap-return policy is provisional, not a confirmed traditional rule.
 The anchor is the incident point for a foul, the boundary exit for a throw, or the penalty-edge point.
 Project the original event onto y = 0. Keep the exact source event separately.
 For throws, place the button centre far enough inside the boundary for the whole button to be in play.
-The inward inset is the oriented button support radius plus clearance epsilon.
+The inward inset is the oriented button support radius plus a separately named horizontal placement margin chosen and added to the canonical config in T07. Do not reuse `restart.clearanceEpsilon`: D38 defines that field only for vertical physics diagnostics.
 This inset is a geometry requirement, not permission to move the restart across the pitch.
 
 Use a pure placement solver. Input includes state, selected cap, anchor, radial angle, tilt, and cap-centre choice.

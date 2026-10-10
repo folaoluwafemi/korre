@@ -119,17 +119,18 @@ export default function App() {
             <div className="status-intro">
               <p className="eyebrow">Build status</p>
               <h2 id="status-title">
-                The groundwork
+                The pitch
                 <br />
-                starts here.
+                is taking shape.
               </h2>
             </div>
             <div className="status-content">
-              <p className="workspace-label">Initial workspace build</p>
+              <p className="workspace-label">Pitch preview ready</p>
               <p className="status-message">The game is not playable yet.</p>
               <p className="status-detail">
-                This page is the first home for Counterball. Physics, matches,
-                and player accounts are still to come.
+                Explore the open green pitch, seven caps per side, and the
+                four-hole button. Physics and account checks are in progress;
+                flicks and matches are the next milestone.
               </p>
               <ol className="next-steps" aria-label="Upcoming work">
                 <li>

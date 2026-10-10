@@ -2,7 +2,18 @@
 
 Korre is the platform; Counterball is the first game. This repository is the pnpm TypeScript monorepo for the web client, API, Cloudflare realtime worker, shared packages, and game runtime.
 
-The current screen is the initial workspace scaffold. Counterball is **not playable yet**. The first playable flick is an early implementation milestone; the game must use the shared rules and physics packages for local and online play.
+The current build includes a real WebGL pitch preview at `/preview`, with seven caps per side and a four-hole plastic button. Counterball is **not playable yet**: physics diagnostics and the identity API exist, but the canonical shot runner, flick controls, rules, AI, and online matches remain unfinished. The game must use the shared rules and physics packages for local and online play.
+
+## Try the remotely built preview
+
+GitHub CI builds the browser and tests the built files. To try a passing build without installing dependencies or compiling on your laptop, download its `counterball-browser-preview` artifact:
+
+```text
+gh run download <passing-run-id> --name counterball-browser-preview --dir .artifacts/browser-preview
+node scripts/serve-preview.mjs
+```
+
+Open <http://127.0.0.1:4173/preview>. This lightweight local server serves the existing built files only. Press Ctrl+C to stop. The preview needs WebGL; it does not need a database, Railway, or Wrangler. It is a scene inspection, not an AI or online match. Use the camera controls to inspect the pieces and the button holes.
 
 ## Requirements
 
@@ -37,7 +48,7 @@ pnpm build
 pnpm verify
 ```
 
-`pnpm verify` runs typecheck, lint, unit tests, and all workspace builds. Integration and browser checks are separate so their results stay visible. The initial integration check uses the local API and does not require PostgreSQL. CI installs Chromium and runs every check above.
+`pnpm verify` runs typecheck, lint, unit tests, and all workspace builds. Integration and browser checks are separate so their results stay visible. CI provisions an isolated disposable PostgreSQL service, explicitly enables the real database tests, applies migrations twice, and tests the built browser files with Chromium. No Railway database is touched. Local database tests are skipped unless `IDENTITY_TEST_DATABASE_URL` points at an explicitly opted-in loopback database ending in `_test` and `IDENTITY_TEST_DATABASE_ALLOW=1`.
 
 ## Local identity API
 

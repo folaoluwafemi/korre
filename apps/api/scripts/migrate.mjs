@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import process from "node:process";
-import { URL } from "node:url";
+import { resolve } from "node:path";
+import { fileURLToPath, URL } from "node:url";
 import { Pool } from "pg";
 
-const migrationDirectory = new URL(
+const defaultMigrationDirectory = new URL(
   "../../../infrastructure/database/migrations/",
   import.meta.url,
 );
@@ -29,7 +30,12 @@ function getDatabaseUrl(environment) {
   return value;
 }
 
-async function migrate() {
+const digest = (sql) => createHash("sha256").update(sql, "utf8").digest("hex");
+
+// Exported for isolated child-process acceptance tests; importing does not run SQL.
+export async function migrate({
+  migrationDirectory = defaultMigrationDirectory,
+} = {}) {
   const pool = new Pool({
     connectionString: getDatabaseUrl(process.env),
     connectionTimeoutMillis: 5_000,
@@ -40,6 +46,8 @@ async function migrate() {
   let locked = false;
   try {
     client = await pool.connect();
+    await client.query("SET lock_timeout = '5s'");
+    await client.query("SET statement_timeout = '30s'");
     await client.query("SELECT pg_advisory_lock($1::bigint)", [lockId]);
     locked = true;
     await client.query(
@@ -51,8 +59,15 @@ async function migrate() {
       .sort();
     for (const name of files) {
       currentMigration = name;
-      const sql = await readFile(new URL(name, migrationDirectory), "utf8");
-      const checksum = createHash("sha256").update(sql, "utf8").digest("hex");
+      const rawSql = await readFile(new URL(name, migrationDirectory), "utf8");
+      const sql = rawSql.replaceAll("\r\n", "\n");
+      const checksum = digest(sql);
+      // Accept legacy byte checksums only for this exact content's LF/CRLF forms.
+      // Preserve the stored history instead of rewriting an applied migration.
+      const matchingChecksums = new Set([
+        checksum,
+        digest(sql.replaceAll("\n", "\r\n")),
+      ]);
       await client.query("BEGIN");
       try {
         const existing = await client.query(
@@ -61,7 +76,7 @@ async function migrate() {
         );
         const applied = existing.rows[0]?.checksum;
         if (typeof applied === "string") {
-          if (applied.trim() !== checksum)
+          if (!matchingChecksums.has(applied.trim()))
             throw new Error("An applied migration checksum has changed.");
         } else {
           await client.query(sql);
@@ -99,9 +114,14 @@ async function migrate() {
   }
 }
 
-await migrate().catch(() => {
-  process.stderr.write(
-    "Migration startup configuration is invalid or the migration runner could not start.\n",
-  );
-  process.exitCode = 1;
-});
+if (
+  process.argv[1] !== undefined &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+) {
+  await migrate().catch(() => {
+    process.stderr.write(
+      "Migration startup configuration is invalid or the migration runner could not start.\n",
+    );
+    process.exitCode = 1;
+  });
+}

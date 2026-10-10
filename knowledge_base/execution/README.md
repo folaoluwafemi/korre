@@ -1,6 +1,6 @@
 # Counterball execution plan
 
-Prepared 10 October 2026. This is an implementation handoff, not a claim that the game is implemented. The repository currently contains the knowledge base and original screenshot. No application, package workspace, CI, infrastructure, or deployed service has been created.
+Prepared 10 October 2026. This plan defines implementation gates, not proof that they passed. Implementation has started: inspect current source and `execution_state/tasks.json` before resuming. The original documentation-only baseline and immutable status seed are historical; completed work must not be reset.
 
 ## Start here
 

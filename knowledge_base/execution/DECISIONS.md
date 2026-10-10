@@ -41,6 +41,7 @@ Prepared 10 October 2026. `confirmed` means stated by the human. `default` means
 | D35 | default | Physical goal-frame radius is 0.06 world units and support slab thickness is 0.20; the slab top equals surfaceY. These initial collision proportions are tunable geometry defaults, not remembered traditional rules or measured pavement dimensions. |
 | D36 | default | Registration is limited to five requests per hour per client address; recovery is limited to five per hour per address and normalized username. Persist only keyed HMAC rate-limit buckets, not raw address or username. This is an operational security default, not a cultural rule. |
 | D37 | default | Initial gravity is `{x:0,y:-9.81,z:0}` game units/s², stored in canonical simulation config and included in configHash. World units are arbitrary; gravity and shot feel remain tunable and need actual Havok measurements/playtest. |
+| D38 | default | Diagnostic vertical clearance tolerance is 0.005 arbitrary game units, about one ninth of the button thickness. This engineering margin is provisional and config-hashed. A peak above this margin does not prove obstacle traversal; report sampled clearance and actual contacts separately. It is not a cultural rule or an input the user must provide. |
 
 ## Numeric tuning configuration v1
 

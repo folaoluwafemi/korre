@@ -237,6 +237,15 @@ describe("Counterball v1 protocol", () => {
     expect(COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius).toBe(0.06);
     expect(COUNTERBALL_CONFIG_V1.geometry.surfaceThickness).toBe(0.2);
     expect(COUNTERBALL_CONFIG_V1.physicsCalibration).toBeNull();
+    expect(COUNTERBALL_CONFIG_V1.restart.clearanceEpsilon).toBe(0.005);
+    for (const clearanceEpsilon of [0, -0.001, NaN, Infinity]) {
+      expect(
+        CounterballConfigSchema.safeParse({
+          ...COUNTERBALL_CONFIG_V1,
+          restart: { ...COUNTERBALL_CONFIG_V1.restart, clearanceEpsilon },
+        }).success,
+      ).toBe(false);
+    }
 
     const left = { z: [2, { b: true, a: 1 }], a: "counterball" };
     const right = { a: "counterball", z: [2, { a: 1, b: true }] };
