@@ -1,0 +1,647 @@
+{
+  "schemaVersion": 1,
+  "preparedDate": "2026-10-10",
+  "kind": "runtime-status",
+  "note": "Coordinator-maintained execution state. The immutable seed remains at knowledge_base/execution/status.json; each acceptance requires recorded implementation, independent review, and integration evidence.",
+  "project": "korre",
+  "game": "counterball",
+  "structure": "pnpm-typescript-monorepo",
+  "runtimeStates": [
+    "PLANNED",
+    "READY",
+    "RUNNING",
+    "IMPLEMENTED",
+    "REVIEWING",
+    "CHANGES_REQUIRED",
+    "VERIFIED",
+    "ACCEPTED",
+    "BLOCKED",
+    "SUPERSEDED"
+  ],
+  "tasks": [
+    {
+      "id": "T00",
+      "title": "workspace and reproducible checks",
+      "status": "ACCEPTED",
+      "dependencies": [],
+      "owner": "coordinator",
+      "implementation_report": "execution_state/reports/T00-implementation.md",
+      "review_report": "execution_state/reports/T00-review-repair-2.md",
+      "checks": [
+        {
+          "command": "pnpm.cmd install --frozen-lockfile",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 2
+        },
+        {
+          "command": "pnpm.cmd verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 2
+        },
+        {
+          "command": "pnpm.cmd test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 2
+        },
+        {
+          "command": "pnpm.cmd test:e2e",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 2
+        },
+        {
+          "command": "domain import boundary probe",
+          "result": "PASS",
+          "detail": "Rejected bare API/realtime packages and relative apps/api, apps/realtime, backend paths",
+          "repair": 2
+        },
+        {
+          "command": "independent T00 review",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T00-review.md"
+        },
+        {
+          "command": "independent T00 repair 1 review",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T00-review-repair-1.md"
+        },
+        {
+          "command": "post-review pnpm.cmd verify",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "post-review pnpm.cmd test:integration",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "post-review pnpm.cmd test:e2e",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "final independent T00 review",
+          "result": "PASS",
+          "report": "execution_state/reports/T00-review-repair-2.md"
+        }
+      ],
+      "blocker": null,
+      "next_action": "Accepted; T01 is unblocked."
+    },
+    {
+      "id": "T01",
+      "title": "canonical protocol, config, SDK, and fixtures",
+      "status": "ACCEPTED",
+      "dependencies": [
+        "T00"
+      ],
+      "owner": "coordinator; independent reviewer /root/swarm_review (complete)",
+      "implementation_report": "execution_state/reports/T01-implementation.md",
+      "review_report": "execution_state/reports/T01-review.md",
+      "checks": [
+        {
+          "command": "pnpm.cmd install --frozen-lockfile",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-protocol test",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "8 tests"
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-sdk test",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "3 tests"
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-protocol typecheck",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-sdk typecheck",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd typecheck",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd lint",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "21 tests; workspace and application builds passed"
+        },
+        {
+          "command": "pnpm.cmd test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 test"
+        },
+        {
+          "command": "pnpm.cmd test:e2e",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "Chromium shell smoke"
+        },
+        {
+          "command": "pnpm.cmd install --frozen-lockfile (final repair)",
+          "result": "PASS",
+          "exit_code": 0
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-protocol test (final repair)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "9 tests"
+        },
+        {
+          "command": "pnpm.cmd --filter @korre/game-sdk test (final repair)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "3 tests"
+        },
+        {
+          "command": "pnpm.cmd verify (final repair)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "typecheck, lint, 22 unit tests, builds including Wrangler local dry-run"
+        },
+        {
+          "command": "pnpm.cmd test:integration (final repair)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 test"
+        },
+        {
+          "command": "pnpm.cmd test:e2e (final repair)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 Chromium shell smoke"
+        },
+        {
+          "command": "independent T01 final repair re-review",
+          "result": "PASS",
+          "report": "execution_state/reports/T01-review.md",
+          "detail": "Protocol/SDK contract scope only; physics/deployment explicitly unverified"
+        },
+        {
+          "command": "pnpm.cmd install --frozen-lockfile (after final review)",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "9 workspace projects; lockfile current"
+        }
+      ],
+      "blocker": null,
+      "next_action": "Accepted; T02, T03, and T11 are unblocked.",
+      "packet": "execution_state/packets/T01.md"
+    },
+    {
+      "id": "T02",
+      "title": "isolated headless Havok shot runner",
+      "status": "RUNNING",
+      "dependencies": [
+        "T01"
+      ],
+      "owner": "coordinator integration; /root/toolchain_audit — independent T02-A repair 2 review",
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null,
+      "packet": "execution_state/packets/T02-A.md",
+      "packet_progress": [
+        {
+          "id": "T02-A",
+          "status": "VERIFIED",
+          "owner": "/root/toolchain_audit implemented; /root/swarm_review reviewed",
+          "packet": "execution_state/packets/T02-A.md",
+          "review_report": "execution_state/reports/T02-A-review.md",
+          "evidence": "The original Scene cleanup finding is repaired. Constructor repair 2 now covers real native-world allocation followed by collector construction failure; independent review PASS. Parent T02-A awaits integrated package/root checks."
+        },
+        {
+          "id": "T02-A-repair-1",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/swarm_review implemented; /root/toolchain_audit reviewing",
+          "packet": "execution_state/packets/T02-A-repair-1.md",
+          "review_report": "execution_state/reports/T02-A-review-repair-1.md",
+          "evidence": "Superseded by final repair 2, which closes the follow-on native-world leak found in this review."
+        },
+        {
+          "id": "T02-A-repair-2",
+          "status": "VERIFIED",
+          "owner": "/root/swarm_review",
+          "packet": "execution_state/packets/T02-A-repair-2.md",
+          "review_report": "execution_state/reports/T02-A-review-repair-2.md",
+          "evidence": "Independent review PASS at T02-A-review-repair-2.md. Focused real-WASM test 6/6, package typecheck, scoped ESLint, Prettier and diff-check all exit 0. Reviewer inspected successful-collector cleanup path; no separate injected-after-collector regression. Integrated package/root checks remain pending concurrent T03 completion."
+        },
+        {
+          "id": "T02-B0",
+          "status": "RUNNING",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B0-calibration-probe.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-review.md",
+          "evidence": "Probe source and implementation report are saved. Independent source review PASS confirms pinned actual Havok/WASM path, full 480-trial matrix, real contacts/impulses, and no config mutation. Runtime measurements plus typecheck/test/lint are NOT RUN under the laptop restriction; hosted CI must produce the 480 observations before this packet is VERIFIED."
+        }
+      ],
+      "next_action": "Run the bounded real-Havok coefficient/tilt probe in the GitHub runner without freezing shared config; capture its observations, then complete runtime review and coordinator coefficient decision before the canonical runner packet."
+    },
+    {
+      "id": "T03",
+      "title": "procedural pitch, caps, and button",
+      "status": "CHANGES_REQUIRED",
+      "dependencies": [
+        "T01"
+      ],
+      "owner": "/root/foundation_review — repair complete; /root/swarm_review — independent repair review",
+      "implementation_report": "execution_state/reports/T03-implementation.md",
+      "review_report": "execution_state/reports/T03-review-repair-1.md",
+      "checks": [
+        {
+          "command": "pnpm.cmd test:e2e",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "report": "execution_state/reports/T03-review-repair-1.md",
+          "detail": "Home passed; both preview tests timed out waiting for The open pitch while the app remained on Loading scene preview. Context teardown exceeded 60 seconds. The run was stopped and no further local checks are authorized."
+        }
+      ],
+      "blocker": null,
+      "packet": "execution_state/packets/T03-C.md",
+      "packet_progress": [
+        {
+          "id": "T03-A",
+          "status": "IMPLEMENTED",
+          "owner": "/root/foundation_review",
+          "evidence": "Worker report: typecheck, six scene files/six tests, and lint passed."
+        },
+        {
+          "id": "T03-B",
+          "status": "IMPLEMENTED",
+          "owner": "/root/foundation_review",
+          "packet": "execution_state/packets/T03-B.md",
+          "evidence": "Worker report: typecheck and six files/15 total scene tests passed after integration; seven caps per team and four-hole button assemblies."
+        },
+        {
+          "id": "T03-C",
+          "status": "IMPLEMENTED",
+          "owner": "/root/foundation_review",
+          "packet": "execution_state/packets/T03-C.md",
+          "evidence": "Real Chromium/WebGL2 E2E passed 2/2, screenshot saved, fixture count and unmount/remount verified; parent root lint had a failed run requiring coordinator repair."
+        },
+        {
+          "id": "T03-repair-1",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/foundation_review",
+          "packet": "execution_state/packets/T03-repair-1.md",
+          "review_report": "execution_state/reports/T03-review-repair-1.md",
+          "evidence": "Implementation report records a passing fresh-server one-worker Chromium run and actual inspection/narrow screenshots. Independent repair review confirms the source repairs but reports pnpm.cmd test:e2e exit 1: home passed, both preview tests stayed on the Suspense loading fallback and timed out; no root cause is confirmed. Counterball 17 tests and web 1 test passed before the laptop-build restriction. Supported-file lint passed; CSS lint is unsupported by current config. Do not accept pending diagnosed passing browser proof and remaining root gates."
+        }
+      ],
+      "next_action": "Push the reviewable branch to run the one-worker GitHub browser job; diagnose the preview route timeout from that run, repair only if a cause is confirmed, then complete required package/root integration gates and independent review. Keep T05 blocked until T03 is ACCEPTED."
+    },
+    {
+      "id": "T04",
+      "title": "Cloudflare actual WASM smoke",
+      "status": "PLANNED",
+      "dependencies": [
+        "T02"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null,
+      "next_action": "Await accepted T02; then use the user-authorized Wrangler session for the plan-designated staging Havok smoke only. Do not publish production or change plans."
+    },
+    {
+      "id": "T05",
+      "title": "first local flick, touch, and camera",
+      "status": "PLANNED",
+      "dependencies": [
+        "T02",
+        "T03"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T06",
+      "title": "pure referee and turn/scoring rules",
+      "status": "PLANNED",
+      "dependencies": [
+        "T01",
+        "T02"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T07",
+      "title": "formations and legal restarts",
+      "status": "PLANNED",
+      "dependencies": [
+        "T01",
+        "T06"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T08",
+      "title": "placed-shot interface and local match HUD",
+      "status": "PLANNED",
+      "dependencies": [
+        "T05",
+        "T07"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T09",
+      "title": "full local rule integration",
+      "status": "PLANNED",
+      "dependencies": [
+        "T06",
+        "T08"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T10",
+      "title": "one basic AI",
+      "status": "PLANNED",
+      "dependencies": [
+        "T09"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T11",
+      "title": "PostgreSQL migrations and identity service",
+      "status": "RUNNING",
+      "dependencies": [
+        "T01"
+      ],
+      "owner": "coordinator — API edge trust-boundary repair; /root/toolchain_audit — independent repair re-review",
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null,
+      "packet": "execution_state/packets/T11-B.md",
+      "packet_progress": [
+        {
+          "id": "T11-A",
+          "status": "IMPLEMENTED",
+          "owner": "/root/swarm_review",
+          "packet": "execution_state/packets/T11-A.md",
+          "evidence": "Repository/migration implementation exists; PostgreSQL tests remain skipped pending authorized disposable database."
+        },
+        {
+          "id": "T11-B",
+          "status": "VERIFIED",
+          "owner": "/root/swarm_review",
+          "packet": "execution_state/packets/T11-B.md",
+          "review_report": "execution_state/reports/T11-B-review-repair-1.md",
+          "evidence": "Independent repair review PASS; API typecheck PASS; API tests 19 passed and 8 PostgreSQL tests skipped."
+        },
+        {
+          "id": "T11-integration",
+          "status": "CHANGES_REQUIRED",
+          "owner": "coordinator",
+          "review_report": "execution_state/reports/T11-parent-review.md",
+          "evidence": "Independent parent review requires trusted forwarded client address behind the planned proxy; API typecheck/tests and migrator/format checks passed. PostgreSQL remains NOT RUN."
+        },
+        {
+          "id": "T11-parent-repair-1",
+          "status": "VERIFIED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T11-parent-repair-1.md",
+          "review_report": "execution_state/reports/T11-parent-review-repair-1.md",
+          "evidence": "Coordinator repair passed API typecheck, 22 API tests (8 PostgreSQL skipped), Prettier, scoped ESLint, migration syntax, diff check and in-memory boundary integration; independent narrow re-review PASS. No DB connected or migration applied."
+        }
+      ],
+      "next_action": "Provide an authorized disposable PostgreSQL service for real migration/identity checks; continue independently unblocked local implementation meanwhile."
+    },
+    {
+      "id": "T12",
+      "title": "same-origin identity UI and mandatory gate",
+      "status": "PLANNED",
+      "dependencies": [
+        "T11",
+        "T05"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T13",
+      "title": "edge proxy, authenticated rooms, and slots",
+      "status": "PLANNED",
+      "dependencies": [
+        "T04",
+        "T11",
+        "T12"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T14",
+      "title": "durable authoritative shot transaction",
+      "status": "PLANNED",
+      "dependencies": [
+        "T13",
+        "T06",
+        "T07"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T15",
+      "title": "client authority and shared playback",
+      "status": "PLANNED",
+      "dependencies": [
+        "T14",
+        "T09"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T16",
+      "title": "recovery, hibernation, and result persistence",
+      "status": "PLANNED",
+      "dependencies": [
+        "T14",
+        "T15"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T17",
+      "title": "authenticated two-browser online match",
+      "status": "PLANNED",
+      "dependencies": [
+        "T10",
+        "T12",
+        "T15",
+        "T16"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T18",
+      "title": "spectators, private waiting queue, and rematch",
+      "status": "PLANNED",
+      "dependencies": [
+        "T17"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T19",
+      "title": "share links and username invitations",
+      "status": "PLANNED",
+      "dependencies": [
+        "T18",
+        "T11"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T20",
+      "title": "public casual matchmaking",
+      "status": "PLANNED",
+      "dependencies": [
+        "T17",
+        "T18"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T21",
+      "title": "sound, cinematic, visual and mobile polish",
+      "status": "PLANNED",
+      "dependencies": [
+        "T09",
+        "T10",
+        "T15"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T22",
+      "title": "integrated security, reliability, and QA",
+      "status": "PLANNED",
+      "dependencies": [
+        "T17",
+        "T18",
+        "T19",
+        "T20",
+        "T21"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T23",
+      "title": "staging deployment and operational handoff",
+      "status": "PLANNED",
+      "dependencies": [
+        "T22"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    },
+    {
+      "id": "T24",
+      "title": "user playtest, production gate, and finish",
+      "status": "PLANNED",
+      "dependencies": [
+        "T23"
+      ],
+      "owner": null,
+      "implementation_report": null,
+      "review_report": null,
+      "checks": [],
+      "blocker": null
+    }
+  ]
+}

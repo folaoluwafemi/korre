@@ -1,0 +1,23 @@
+# Integration record
+
+## T00
+
+Workspace packages and entrypoints are under the `@korre/*` naming rule. Browser and headless Counterball exports are separate. Browser, Node, and Worker TypeScript configs use distinct ambient libraries; the API build emits only runtime JS/declarations and source maps. After repair 2, `pnpm install --frozen-lockfile`, `pnpm verify`, `pnpm test:integration`, `pnpm test:e2e`, and a five-path backend import probe passed. The domain lint rule rejects shared and relative UI/presentation imports and app/backend imports. Wrangler remains a 0.36 KiB local health-route dry run with no bindings; it is not deployed Havok evidence. Final independent repair-2 review passed at `execution_state/reports/T00-review-repair-2.md`.
+
+## T01 — accepted after independent review
+
+The first independent review at `execution_state/reports/T01-review.md` reproduced an own `__proto__` canonicalization collision and accepted a 606,802-byte playback chunk with an invalid index. Coordinator repair 1 adds a null-prototype canonical accumulator and fixed protocol-v1 bounds with negative tests, including snapshot metadata/index consistency and aggregate bytes. After the final test addition, frozen install, protocol/SDK package tests (9 and 3), full `pnpm verify` (22 tests/builds), integration, and Chromium E2E passed. The final independent re-review passed and the coordinator reran the frozen install successfully; T01 is `ACCEPTED`. The config carries `physicsCalibration: null` pending T02's pinned calibration; no simulation or deployed Cloudflare result is claimed.
+
+## External services
+
+- Git remote/hosted CI: none is configured in the initial repository.
+- As of 2026-10-10, read-only `wrangler whoami` and `railway whoami` checks both succeeded through existing sign-ins; identity/account details were withheld. Cloudflare staging has not yet been deployed; its concrete smoke artifact depends on accepted T02.
+- The workspace is not linked to a Railway project. One account project is visible, but its name does not match Counterball and its only environment is not labeled staging/development/test; it contains a PostgreSQL-named service. It was not linked, read for variables, migrated, deployed to, or otherwise changed.
+- Docker Engine is unavailable and `127.0.0.1:5432` is not accepting connections. T11's real-PostgreSQL acceptance remains unverified. Use a disposable local PostgreSQL service or an explicitly designated nonproduction Railway environment; do not use the unrelated project or production environment for tests.
+
+## Current packet wave
+
+- T03-A/B/C are implemented and an actual Chromium/WebGL2 preview exists, but parent T03 is not accepted. The independent review at `execution_state/reports/T03-review.md` confirmed the pitch/goals/caps, canonical fixture geometry, four real button openings, and unmount/remount cleanup. It returned CHANGES_REQUIRED because ordinary preview scale does not make the holes inspectable, narrow viewport/resize evidence was absent, and T03-B has an unused `Vector3` import. T03 repair 1 now adds an accessible static inspection/return affordance, 390×844 plus resize E2E evidence and two real-browser screenshots, and removes the import. No physical phone or gameplay proof is claimed.
+- T11-A/B and coordinator API composition/migration runner are locally implemented. The API edge-auth/trusted-client repair passed recorded API typecheck/tests (22 passed, 8 PostgreSQL cases skipped), formatter, scoped lint, migration syntax check, and in-memory boundary integration. Independent T11 parent repair re-review passed in `execution_state/reports/T11-parent-review-repair-1.md`. The migration has not been applied. Real PostgreSQL acceptance remains NOT RUN because no authorized disposable database is available; the unrelated Railway project was not touched.
+- T02-A repair 1 closed the Scene-allocation path, but its independent review found a second constructor boundary: pinned Babylon may allocate `HP_World_Create` before `HP_QueryCollector_Create` throws, before a plugin object exists to dispose. T02 final repair 2 passed independent review; the focused real-WASM test (6/6), typecheck, scoped lint and formatting passed. Parent T02-A still awaits integrated package/root checks; no shot simulation, calibration or deployed proof is claimed.
+- The user reports being logged into Wrangler and earlier authorized the requested staging deployment. Use that session only for the plan's T04 staging proof after accepted T02 and a real runner exist. No production deployment or plan change is authorized.

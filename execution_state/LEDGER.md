@@ -1,0 +1,47 @@
+# Execution ledger
+
+This file records evidence-backed task transitions. The immutable seed remains at `knowledge_base/execution/status.json`; its initial READY state is not implementation evidence.
+
+## Baseline
+
+- 2026-10-10: initial Git branch `master`, no commits, and no Git remote.
+- Before T00: documentation-only workspace: `AGENTS.md` and `knowledge_base/`; no source packages, workspace manifests, lockfile, CI, or runtime execution records.
+- Local tools: Node 25.2.0, pnpm 10.33.0, Docker CLI 29.3.1. Docker Desktop's Linux engine is unavailable from this workspace. No PostgreSQL client/server is installed or listening on port 5432.
+- At initial T00 start, task states matched the copied seed; evidence-backed transitions are recorded below and in tasks.json.
+
+## T00 review and repair
+
+- 2026-10-10: T00 is `ACCEPTED`. Independent reviews are recorded at [T00-review.md](reports/T00-review.md), [T00-review-repair-1.md](reports/T00-review-repair-1.md), and [T00-review-repair-2.md](reports/T00-review-repair-2.md). Repair 2 closes the relative app/backend import bypass. Frozen install, verification, integration, and Chromium E2E passed after final review; details are in [T00-implementation.md](reports/T00-implementation.md). T01 is now `REVIEWING`.
+- 2026-10-10: T01's first independent review found a canonical JSON `__proto__` collision and missing bounded playback/protocol validation; the initial findings and final repair PASS are preserved in [T01-review.md](reports/T01-review.md). Coordinator repair 1 is saved at [T01-implementation.md](reports/T01-implementation.md), with additional direct tests for snapshot metadata, duplicate indexes, and aggregate bytes. After the final test addition, full verify (22 tests/builds), integration, and Chromium E2E passed. The final independent protocol/SDK re-review passed; the coordinator reran the frozen install successfully. T01 is `ACCEPTED`; T02/T03/T11 are unblocked.
+
+## Catalogue snapshot
+
+Derived from execution_state/tasks.json; unassigned paths below are plan ceilings only and do not grant write permission.
+
+| ID | Milestone | Status | Owner | Dependencies | Owned files | Evidence | Next action |
+|---|---|---|---|---|---|---|---|
+| T00 | workspace and reproducible checks | ACCEPTED | coordinator | None | Root workspace/CI, eight packages, execution records; see T00 implementation report | execution_state/reports/T00-implementation.md; execution_state/reports/T00-review-repair-2.md | Accepted; T01 is unblocked. |
+| T01 | canonical protocol, config, SDK, and fixtures | ACCEPTED | coordinator; independent reviewer `/root/swarm_review` (complete) | T00 | First implementation paths plus `knowledge_base/execution/CONTRACTS.md` and coordinator-owned repair paths; reviewer report-only | execution_state/reports/T01-implementation.md; execution_state/reports/T01-review.md | Accepted; T02/T03/T11 are unblocked. |
+| T02 | isolated headless Havok shot runner | RUNNING | coordinator integration; `/root/toolchain_audit` — T02-B0 probe; `/root/foundation_review` — independent source reviewer | T01 | T02-A source; `games/counterball/src/simulation/calibrationProbe.test.ts` and report | `execution_state/reports/T02-calibration-probe.md`; `execution_state/reports/T02-calibration-probe-review.md` | T02-A repair 2 has independent PASS; focused real-WASM test (6/6), typecheck, scoped lint and formatting passed before the laptop-build restriction. T02-B0 now encodes 480 real-Havok trials; independent source review passes, but every runtime measurement and probe check is NOT RUN. GitHub CI must execute and return the full observation record before T02 can advance. No calibration or deployed proof is claimed. |
+| T03 | procedural pitch, caps, and button | CHANGES_REQUIRED | `/root/foundation_review` — repair 1; independent reviewer `/root/swarm_review` | T01 | T03-A/B/C implemented; repair files in `execution_state/packets/T03-repair-1.md` | `execution_state/reports/T03-repair-1-implementation.md`; `execution_state/reports/T03-review-repair-1.md` | Prior fresh-server one-worker Chromium evidence and screenshots support the camera inspection/narrow-view repairs. The independent default `pnpm.cmd test:e2e` run exited 1: home passed, both preview tests stayed on “Loading scene preview…” and timed out; cause not established. Package tests passed before the laptop restriction. Next: diagnose with remote one-worker E2E, then repair if confirmed and run remaining root gates. |
+| T04 | Cloudflare actual WASM smoke | PLANNED | Unassigned | T02 | No active assignment; TASKS.md path ceiling only | None | T02 remains unaccepted. User reports Wrangler login and earlier authorized T04 staging deployment. | Prepare reviewable staging artifacts locally; after T02 acceptance, use Wrangler for only the plan's staging smoke. No production deployment or plan change. |
+| T05 | first local flick, touch, and camera | PLANNED | Unassigned | T02, T03 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T06 | pure referee and turn/scoring rules | PLANNED | Unassigned | T01, T02 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T07 | formations and legal restarts | PLANNED | Unassigned | T01, T06 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T08 | placed-shot interface and local match HUD | PLANNED | Unassigned | T05, T07 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T09 | full local rule integration | PLANNED | Unassigned | T06, T08 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T10 | one basic AI | PLANNED | Unassigned | T09 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T11 | PostgreSQL migrations and identity service | RUNNING | coordinator — edge trust-boundary repair; `/root/toolchain_audit` — independent repair re-review complete | T01 | T11-A/B implementation; coordinator API composition/config, migration runner and app-boundary tests | `execution_state/reports/T11-parent-review-repair-1.md` | Narrow service-auth/trusted-IP repair independently PASS; API typecheck and 22 tests passed with 8 PostgreSQL cases skipped. T11 parent remains unaccepted until real checks run against an authorized disposable PostgreSQL service. | Obtain a designated disposable DB; migration has not been applied. |
+| T12 | same-origin identity UI and mandatory gate | PLANNED | Unassigned | T11, T05 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T13 | edge proxy, authenticated rooms, and slots | PLANNED | Unassigned | T04, T11, T12 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T14 | durable authoritative shot transaction | PLANNED | Unassigned | T13, T06, T07 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T15 | client authority and shared playback | PLANNED | Unassigned | T14, T09 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T16 | recovery, hibernation, and result persistence | PLANNED | Unassigned | T14, T15 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T17 | authenticated two-browser online match | PLANNED | Unassigned | T10, T12, T15, T16 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T18 | spectators, private waiting queue, and rematch | PLANNED | Unassigned | T17 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T19 | share links and username invitations | PLANNED | Unassigned | T18, T11 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T20 | public casual matchmaking | PLANNED | Unassigned | T17, T18 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T21 | sound, cinematic, visual and mobile polish | PLANNED | Unassigned | T09, T10, T15 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T22 | integrated security, reliability, and QA | PLANNED | Unassigned | T17, T18, T19, T20, T21 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T23 | staging deployment and operational handoff | PLANNED | Unassigned | T22 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
+| T24 | user playtest, production gate, and finish | PLANNED | Unassigned | T23 | No active assignment; TASKS.md path ceiling only | None | Await accepted dependencies; no work dispatched. |
