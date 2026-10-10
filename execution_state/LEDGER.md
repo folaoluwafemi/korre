@@ -102,3 +102,13 @@ Implementation for `T02-F01-ROTATION-1` is saved in its two assigned source/test
 ## T02-F01 rotational-support continuation — 2026-10-10
 
 The bounded source successor `T02-F01-ROTATION-1` now has an independent source-review PASS (`reports/T02-F01-ROTATION-1-review.md`). That review finds no source blocker and preserves the accepted rotational-support design; it does not establish execution. `tasks.json` records implementation and review evidence, with the exact reviewed-SHA GitHub command still NOT RUN. Coordinator owns publication and hosted verification. F01 and parent T02 remain open. No local application check, game flow, or deployed Havok proof is claimed.
+
+Run 38087201307 on exact SHA `21ab540352c88f11ba15c8a2f4bb883c2ad71c61` passed the hosted Worker smoke 1/1, protocol suite 11/11, two migration verifications, all workspace/root typechecks and ESLint. `pnpm verify` then failed Prettier on only `games/counterball/src/simulation/facts.ts` and `facts.test.ts`; no unit tests/build ran and integration/Chromium checks were skipped. Full masked log, uploaded payloads, provenance IDs/digests and extracted-file hashes are in `reports/T02-F01-ROTATION-1-run-38087201307.md` and its companion log/artifact paths. No deploy/gameplay/Havok proof resulted. The original card requires an independently reviewed escalation before any retry; its report-only gate is running now.
+
+
+## T02-F01 formatting repair authorization — 2026-10-10
+
+`T02-F01-ROTATION-1-FORMAT-ESCALATION-1` is ACCEPTED solely as a report/review authorization gate. Independent PASS permits one new exact-patch card; the source patch remains the run-38087201307 artifact with SHA-256 `7e9ff75e71a6fdee218317d253e07ffb339446d372e4ef44c9a5044c6db460aa`, limited to `facts.ts` and `facts.test.ts`. Current SHA/applicability checks and exact packet/full-plan checks passed. `T02-F01-ROTATION-1-FORMAT-REPAIR-1` is RUNNING: `/root/toolchain_audit` applies only that patch, `/root/foundation_review` reviews independently, and the coordinator owns publication and hosted verify/integration/Chromium checks. No local application test/build/format/browser/physics command ran. F01/T02 remain unaccepted pending fresh hosted verification; no real gameplay or deployed Havok proof is established.
+
+
+The independent exact-patch review passed at `reports/T02-F01-ROTATION-1-format-repair-1-review.md`. It confirms the pinned formatting-only patch and two-path scope; no application checks ran. Source ownership is released. The repair is IMPLEMENTED, not VERIFIED or ACCEPTED. Coordinator exact-SHA GitHub verify, integration, Chromium E2E and artifact review remain pending; no playability or deployed Havok result is claimed.

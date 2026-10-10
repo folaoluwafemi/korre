@@ -200,7 +200,9 @@ function validateGeometry(config: Readonly<CounterballConfig>): void {
     throw new TypeError("Fact derivation requires valid finite geometry.");
   }
   if (!Number.isFinite(simulation.maxShotDurationSeconds * 1_000)) {
-    throw new TypeError("Fact derivation requires a finite millisecond duration.");
+    throw new TypeError(
+      "Fact derivation requires a finite millisecond duration.",
+    );
   }
 }
 
@@ -209,7 +211,9 @@ function normalizeObservations(
   config: Readonly<CounterballConfig>,
 ): Observation[] {
   if (!Array.isArray(value) || value.length === 0) {
-    throw new TypeError("At least the initial physics observation is required.");
+    throw new TypeError(
+      "At least the initial physics observation is required.",
+    );
   }
 
   const maximumTimeMs = config.simulation.maxShotDurationSeconds * 1_000;
@@ -227,7 +231,9 @@ function normalizeObservations(
     const step = candidate["step"];
     const timeMs = candidate["timeMs"];
     if (!Number.isSafeInteger(step) || (step as number) < 0) {
-      throw new TypeError("Observation step must be a non-negative safe integer.");
+      throw new TypeError(
+        "Observation step must be a non-negative safe integer.",
+      );
     }
     if (
       typeof timeMs !== "number" ||
@@ -235,20 +241,28 @@ function normalizeObservations(
       timeMs < 0 ||
       timeMs > maximumTimeMs
     ) {
-      throw new TypeError("Observation time must be within the finite shot duration.");
+      throw new TypeError(
+        "Observation time must be within the finite shot duration.",
+      );
     }
     if (index === 0) {
       if (step !== 0 || timeMs !== 0) {
-        throw new TypeError("The initial observation must be step 0 at time 0.");
+        throw new TypeError(
+          "The initial observation must be step 0 at time 0.",
+        );
       }
     } else if ((step as number) < previousStep || timeMs <= previousTimeMs) {
-      throw new TypeError("Observation steps must not decrease and times must increase.");
+      throw new TypeError(
+        "Observation steps must not decrease and times must increase.",
+      );
     }
 
     const bodies = normalizeBodies(candidate["bodies"]);
     const contactStarts = normalizeContacts(candidate["contactStarts"]);
     if (index === 0 && contactStarts.length !== 0) {
-      throw new TypeError("The initial observation cannot contain contact starts.");
+      throw new TypeError(
+        "The initial observation cannot contain contact starts.",
+      );
     }
 
     observations.push({
@@ -342,9 +356,7 @@ function supportExtent(
   const radialProjection = Math.sqrt(
     Math.max(0, 1 - axialProjection * axialProjection),
   );
-  return (
-    radius * radialProjection + (height / 2) * Math.abs(axialProjection)
-  );
+  return radius * radialProjection + (height / 2) * Math.abs(axialProjection);
 }
 
 function supportPoint(
@@ -395,7 +407,12 @@ function leadingClearance(
 ): number {
   return (
     signedCenterDistance(pose, boundary) -
-    supportExtent(pose, inwardNormal(boundary), dimensions.radius, dimensions.height)
+    supportExtent(
+      pose,
+      inwardNormal(boundary),
+      dimensions.radius,
+      dimensions.height,
+    )
   );
 }
 
@@ -406,7 +423,12 @@ function trailingClearance(
 ): number {
   return (
     signedCenterDistance(pose, boundary) +
-    supportExtent(pose, inwardNormal(boundary), dimensions.radius, dimensions.height)
+    supportExtent(
+      pose,
+      inwardNormal(boundary),
+      dimensions.radius,
+      dimensions.height,
+    )
   );
 }
 
@@ -492,12 +514,7 @@ function interpolatePose(a: Pose, b: Pose, amount: number): Pose {
 
 function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
   const { cosine, end } = shortestArcEndpoints(a, b);
-  if (
-    a.x === end.x &&
-    a.y === end.y &&
-    a.z === end.z &&
-    a.w === end.w
-  ) {
+  if (a.x === end.x && a.y === end.y && a.z === end.z && a.w === end.w) {
     return 0;
   }
   const selectedCosine = Math.max(0, Math.min(1, cosine));
@@ -522,11 +539,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
 
   const angleFromDot = 2 * Math.acos(selectedCosine);
   const angleFromRelative =
-    2 *
-    Math.atan2(
-      relativeVectorLength,
-      Math.abs(relative.w) / relativeNorm,
-    );
+    2 * Math.atan2(relativeVectorLength, Math.abs(relative.w) / relativeNorm);
   const theta = Math.max(angleFromDot, angleFromRelative);
   if (!Number.isFinite(theta) || theta < 0 || theta > Math.PI + 1e-12) {
     throw new TypeError("Cylinder rotation angle bound is not finite.");
@@ -538,9 +551,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
   const rotationMargin = 64 * Number.EPSILON * Math.max(1, theta);
   const thetaUpper = Math.min(Math.PI, theta + rotationMargin);
   const nlerp = cosine > 0.9995;
-  const angularSpeed = nlerp
-    ? 4 * Math.tan(thetaUpper / 4)
-    : thetaUpper;
+  const angularSpeed = nlerp ? 4 * Math.tan(thetaUpper / 4) : thetaUpper;
   if (!Number.isFinite(angularSpeed) || angularSpeed < 0) {
     throw new TypeError("Cylinder angular speed bound is not finite.");
   }
@@ -575,8 +586,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
   // small rotations. Inflate |u x v0| by a conservative operation-count
   // allowance; near-degenerate axes took the full-angle fallback above.
   const axisSineMargin =
-    (128 * Number.EPSILON) / relativeVectorLength +
-    64 * Number.EPSILON;
+    (128 * Number.EPSILON) / relativeVectorLength + 64 * Number.EPSILON;
   const axisSineUpper = Math.min(1, axisSine + axisSineMargin);
   const travel = angularSpeed * axisSineUpper;
   if (!Number.isFinite(travel) || travel < 0) {
@@ -615,9 +625,7 @@ function supportClearanceLipschitz(
   dimensions: { radius: number; height: number },
 ): number {
   return clearanceLipschitzBound(
-    Math.abs(
-      after.position[boundary.axis] - before.position[boundary.axis],
-    ),
+    Math.abs(after.position[boundary.axis] - before.position[boundary.axis]),
     dimensions,
     cylinderAxisAngularTravelBound(before.rotation, after.rotation),
   );
@@ -684,8 +692,7 @@ function findDescendingRoot(
     // Signed centre distance is linear. A cylinder support point can move no
     // faster than its circumradius times the shortest physical rotation angle.
     // This Lipschitz lower bound proves intervals cannot contain a hidden exit.
-    const lowerBound =
-      middleValue - (lipschitzBound * (high - low)) / 2;
+    const lowerBound = middleValue - (lipschitzBound * (high - low)) / 2;
     if (lowerBound >= 0) {
       return undefined;
     }
@@ -956,7 +963,9 @@ export function deriveSimulationFacts(
       !Number.isFinite(point.y) ||
       !Number.isFinite(point.z)
     ) {
-      throw new TypeError("Derived fact must contain only finite protocol values.");
+      throw new TypeError(
+        "Derived fact must contain only finite protocol values.",
+      );
     }
     if (facts.length >= maximumFactCount) {
       throw new RangeError(
@@ -986,10 +995,7 @@ export function deriveSimulationFacts(
 
   for (const id of ENTITY_IDS) {
     const dimensions = dimensionsFor(id, config);
-    const goalPassageByBoundary = new Map<
-      Boundary["name"],
-      GoalPassageState
-    >();
+    const goalPassageByBoundary = new Map<Boundary["name"], GoalPassageState>();
     if (id === "button") {
       for (const boundary of boundaries) {
         if (boundary.name === "homeEnd" || boundary.name === "awayEnd") {
@@ -1138,7 +1144,8 @@ export function deriveSimulationFacts(
       if (earliest === undefined || earliest.type !== "crossing") {
         continue;
       }
-      const tieTolerance = Number.EPSILON * Math.max(1, Math.abs(earliest.timeMs)) * 16;
+      const tieTolerance =
+        Number.EPSILON * Math.max(1, Math.abs(earliest.timeMs)) * 16;
       for (const candidate of candidates) {
         if (
           candidate.type === "crossing" &&

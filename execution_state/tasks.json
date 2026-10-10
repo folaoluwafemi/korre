@@ -1162,6 +1162,15 @@
               "source_sha": "fc27a1dbfdba5dab9a03d20d14a77f818b85b5ac",
               "report": "execution_state/reports/C01-run-38084915701.md",
               "detail": "Worker smoke 1/1, root formatting gate, Playwright installation, migration twice and protocol 11/11 passed. All 8 workspace packages and root test-project typecheck passed. pnpm lint failed only at unaccepted facts.ts:221 unsafe any. Unit tests/build, integration and browser checks were skipped."
+            },
+            {
+              "command": "GitHub Actions run 38087201307: full C01 hosted verification attempt",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions",
+              "run_id": 38087201307,
+              "source_sha": "21ab540352c88f11ba15c8a2f4bb883c2ad71c61",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-run-38087201307.md",
+              "detail": "C01 workflow infrastructure passed through protocol and migrations; full pnpm verify stopped on Prettier for two F01 files. C01 remains open; downstream builds/integration/browser checks were skipped."
             }
           ],
           "next_action": "Exact-head run 38084915701 confirms C01 formatting, Worker runtime smoke, protocol tests, migration recheck and typecheck. Full verify stops at ESLint on unaccepted F01 facts.ts:221; tests/build/integration/browser did not run. Wait for the separately reviewed F01 math escalation, then materialize a new bounded implementation packet that also resolves the lint finding; rerun C01 full checks on GitHub. Diagnostic-browser evidence remains outstanding.",
@@ -1489,7 +1498,7 @@
         {
           "id": "T02-F01-ROTATION-1",
           "parent": "T02-F01",
-          "status": "IMPLEMENTED",
+          "status": "CHANGES_REQUIRED",
           "packet": "execution_state/packets/T02-F01-ROTATION-1.md",
           "owner": "Implementation complete; independent source review PASS; coordinator owns exact-SHA hosted verification",
           "author_identity": "/root/toolchain_audit",
@@ -1549,12 +1558,120 @@
               "environment": "local-document",
               "exit_code": 0,
               "detail": "Coordinator checked the source and metadata worktree before publication; no whitespace errors."
+            },
+            {
+              "command": "GitHub Actions run 38087201307: exact-SHA pnpm verify and hosted checks",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions",
+              "run_id": 38087201307,
+              "source_sha": "21ab540352c88f11ba15c8a2f4bb883c2ad71c61",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-run-38087201307.md",
+              "detail": "Dedicated Workerd smoke 1/1; protocol 11/11; migrations verified twice; all workspace/root typechecks and ESLint passed. Prettier failed only on the two assigned F01 files. Unit tests/build/integration/Chromium did not run. Exact check command and artifact hashes are in the report."
             }
           ],
-          "next_action": "Independent source review PASS is recorded. Coordinator must publish the reviewed source unchanged and run the exact hosted command; no source, F01, or T02 acceptance until hosted evidence passes."
+          "next_action": "Hosted run 38087201307 failed at Prettier after typecheck and ESLint; downstream tests/build/integration/browser were skipped. The packet stop condition forbids another source retry until the report-only escalation T02-F01-ROTATION-1-FORMAT-ESCALATION-1 is independently accepted."
+        },
+        {
+          "id": "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+          "parent": "T02",
+          "status": "ACCEPTED",
+          "owner": "coordinator report; /root/toolchain_audit authored; /root/foundation_review independently reviewed",
+          "packet": "execution_state/packets/T02-F01-ROTATION-1-FORMAT-ESCALATION-1.md",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review",
+          "depends_on": [
+            "parent:T01",
+            "T02-F01-math-escalation-1",
+            "T02-C0",
+            "T02-C2",
+            "C00-A",
+            "C00"
+          ],
+          "write_paths": [],
+          "implementation_report": "execution_state/reports/T02-F01-ROTATION-1-format-escalation-1.md",
+          "review_report": "execution_state/reports/T02-F01-ROTATION-1-format-escalation-1-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact report-only record extracted; documentation validation only."
+            },
+            {
+              "command": "git apply --stat and --check on pinned run-38087201307 patch",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "detail": "Exactly facts.ts and facts.test.ts; clean applicability; current SHA-256 7e9ff75e71a6fdee218317d253e07ffb339446d372e4ef44c9a5044c6db460aa."
+            },
+            {
+              "command": "Independent escalation review against exact run, patch and original stop condition",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-format-escalation-1-review.md",
+              "detail": "PASS authorizes only a separate exact-patch repair; no source edit or F01/T02 acceptance."
+            }
+          ],
+          "next_action": "Accepted as a report-only authorization gate. Apply only the pinned patch through T02-F01-ROTATION-1-FORMAT-REPAIR-1, then obtain independent source review and fresh exact-SHA GitHub verification.",
+          "evidence": "Report accurately classifies run 38087201307 and the pinned two-file Prettier patch. Current rechecks confirm the patch SHA-256 7e9ff75e71a6fdee218317d253e07ffb339446d372e4ef44c9a5044c6db460aa, exactly two authorized paths, and clean git apply --check. Independent review PASS authorizes only one separate exact-patch repair card; F01/T02 remain unaccepted."
+        },
+        {
+          "id": "T02-F01-ROTATION-1-FORMAT-REPAIR-1",
+          "parent": "T02",
+          "status": "IMPLEMENTED",
+          "packet": "execution_state/packets/T02-F01-ROTATION-1-FORMAT-REPAIR-1.md",
+          "owner": "/root/toolchain_audit — exact patch source repair; /root/foundation_review — independent review; coordinator — hosted verification",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review",
+          "depends_on": [
+            "parent:T01",
+            "T02-F01-math-escalation-1",
+            "T02-C0",
+            "T02-C2",
+            "C00-A",
+            "C00",
+            "T02-F01-ROTATION-1-FORMAT-ESCALATION-1"
+          ],
+          "supersedes": "T02-F01-ROTATION-1",
+          "write_paths": [
+            "games/counterball/src/simulation/facts.ts",
+            "games/counterball/src/simulation/facts.test.ts"
+          ],
+          "implementation_report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-1-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-REPAIR-1",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "detail": "Exact record extracted from all completion catalogues; all accepted dependencies resolve; ready=true."
+            },
+            {
+              "command": "Pinned patch SHA verification, git apply --check before apply, exact source diff inspection and git diff --check",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "detail": "Author report confirms exact pinned patch applied only to facts.ts and facts.test.ts; coordinator independently confirmed only those source paths changed and git diff --check passed. No application checks ran."
+            },
+            {
+              "command": "Independent exact-patch diff review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-1-review.md",
+              "detail": "Independent reviewer confirms exact digest, exact two-path patch scope, formatting-only changes, and no app checks."
+            },
+            {
+              "command": "Exact-reviewed-SHA GitHub Actions workflow: pnpm verify, pnpm test:integration, pnpm test:e2e --workers=1",
+              "result": "NOT RUN",
+              "environment": "github",
+              "detail": "Coordinator publication follows this review. Must capture exact SHA/run, complete logs, no-skip counts and real artifacts."
+            }
+          ],
+          "next_action": "Independent source review PASS. Coordinator now records the reviewed source and publishes one exact SHA for hosted verify, integration, browser E2E and artifact inspection."
         }
       ],
-      "next_action": "T02-F01-ROTATION-1 has independent source PASS and awaits exact-SHA GitHub verification; parent T02 remains open and no playable runner or deployed Havok evidence is claimed."
+      "next_action": "The exact formatting patch is independently reviewed PASS. Coordinator publication to GitHub is next; keep F01/T02 open until full hosted checks pass and then proceed to the real browser direct-shot packet."
     },
     {
       "id": "T03",

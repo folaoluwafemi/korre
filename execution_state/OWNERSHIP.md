@@ -95,3 +95,11 @@ No worker may spawn agents, build, run tests, or start services locally. Report 
 - `T02-F01-ROTATION-1` implementation ownership is released. `/root/swarm_review` may write only `execution_state/reports/T02-F01-ROTATION-1-review.md`; exact source, math, contract and test evidence is under review. Coordinator alone records verdict and then dispatches exact-head GitHub checks. No app command has run locally.
 
 - T02-F01-ROTATION-1 author ownership is released after implementation report and independent source-review PASS at `execution_state/reports/T02-F01-ROTATION-1-review.md`. Reviewer ownership is also released. Coordinator alone owns publication, exact-SHA hosted checks, and runtime status/ledger updates. No local application test/build/browser/physics or Wrangler command ran.
+
+- T02-F01-ROTATION-1 escalation ownership: `/root/toolchain_audit` is assigned only `execution_state/reports/T02-F01-ROTATION-1-format-escalation-1.md`; `/root/foundation_review` will independently review only `execution_state/reports/T02-F01-ROTATION-1-format-escalation-1-review.md`. The exact run, full masked log and extracted artifacts are preserved. No source patch may be applied before escalation PASS and a separate repair card.
+
+- T02-F01-ROTATION-1 formatting escalation report is saved and author ownership is released. `/root/foundation_review` now owns only `execution_state/reports/T02-F01-ROTATION-1-format-escalation-1-review.md`; the CI-generated patch remains unapplied until that independent PASS is recorded.
+
+- T02-F01 exact formatting repair: `/root/toolchain_audit` is assigned only the pinned run-38087201307 formatting patch on `games/counterball/src/simulation/facts.ts` and `facts.test.ts`, plus its unique implementation report. `/root/foundation_review` independently reviews only the resulting source diff and its unique review report. Coordinator owns catalogues/status, commit/push and exact-SHA GitHub checks. No local app command is authorized. Source ownership releases after review or a stop result.
+
+- T02-F01 exact formatting repair author and reviewer have both released their paths after independent PASS. Coordinator now owns the complete current source/config/status diff, commit/push, GitHub verification and artifact review.

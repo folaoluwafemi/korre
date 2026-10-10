@@ -2130,5 +2130,180 @@
     "stop_conditions": [
       "If bundling/runtime loader cannot run in Chromium, stop and report the exact blocker; do not use a mock."
     ]
+  },
+  {
+    "id": "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+    "parent": "T02",
+    "title": "Classify the hosted formatting failure before any source retry",
+    "role": "coordinator",
+    "depends_on": [
+      "parent:T01",
+      "T02-F01-math-escalation-1",
+      "T02-C0",
+      "T02-C2",
+      "C00-A",
+      "C00"
+    ],
+    "read_paths": [
+      "execution_state/packets/T02-F01-ROTATION-1.md",
+      "execution_state/packets/T02-F01-ROTATION-1-FORMAT-ESCALATION-1.md",
+      "execution_state/reports/T02-F01-ROTATION-1-implementation.md",
+      "execution_state/reports/T02-F01-ROTATION-1-review.md",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38087201307.md",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38087201307-github.log",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/counterball-hosted-checks-21ab540352c88f11ba15c8a2f4bb883c2ad71c61-run-38087201307-attempt-1/verify.log",
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/SWARM.md"
+    ],
+    "write_paths": [],
+    "outputs": [
+      "An independently reviewed report that accurately classifies the exact hosted failure and either authorizes one exact-patch formatting successor or stops all source edits."
+    ],
+    "steps": [
+      "Read the exact run report, complete masked workflow log, extracted verification log and uploaded patch.",
+      "Verify that typechecks and ESLint passed, Prettier alone stopped pnpm verify, and that unit tests/build/integration/browser checks did not run.",
+      "Confirm the workflow-produced patch contains only formatting changes in the two F01 source-owned files; do not apply it.",
+      "Recommend only a separate exact-patch repair card with independent source review and a new exact-SHA GitHub verification run, or stop if scope/behavior is uncertain.",
+      "Explicitly state that the focused Counterball test was not separately executed and that no gameplay or deployed-Havok result follows."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+        "environment": "local-document",
+        "expected": "The exact report-only escalation record is ready with its accepted dependencies."
+      },
+      {
+        "command": "git apply --stat execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch",
+        "environment": "local-document",
+        "expected": "Exactly facts.ts and facts.test.ts are listed."
+      },
+      {
+        "command": "git apply --check execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch",
+        "environment": "local-document",
+        "expected": "Patch applicability passes without changing the worktree."
+      },
+      {
+        "command": "Independent escalation review against run 38087201307, exact patch and the original stop condition",
+        "environment": "source-review",
+        "expected": "Reviewer confirms accurate pass/fail/skip accounting, exact two-file formatting-only scope and no source retry before this PASS."
+      }
+    ],
+    "acceptance": [
+      "The report distinguishes the 1/1 Workerd smoke, 11/11 protocol tests, migrations verified twice, full typechecks, ESLint and top-level format gate that passed from the Prettier failure on the two assigned F01 files.",
+      "The report records that the Counterball unit suite, full unit tests, build, integration, Chromium tests, deployed Havok and playable flow were not verified in run 38087201307.",
+      "The uploaded patch is exactly two paths, formatting-only and does not weaken tests or change rules, physics defaults, or runtime semantics.",
+      "A new source repair is authorized only as a separate exact-patch card after independent escalation review PASS; F01/T02 remain unaccepted."
+    ],
+    "negative_cases": [
+      "Do not apply the patch as part of this report-only packet.",
+      "Do not call skipped tests a pass, the formatting patch a behavior fix, or preview screenshots a new gameplay result.",
+      "Do not authorize semantic edits, changed physics defaults, widened paths, or consumer/staging work."
+    ],
+    "review_questions": [
+      "Does the complete run evidence show only Prettier failed inside pnpm verify after typechecks and ESLint passed?",
+      "Does the exact uploaded patch modify only the two authorized F01 paths and contain formatting-only changes?",
+      "Are all unit/build/integration/browser/deployed checks that did not run called out as NOT RUN or skipped?",
+      "Is the proposed successor bounded to the exact patch and fresh independent/hosted verification?"
+    ],
+    "stop_conditions": [
+      "If any patch hunk changes semantics or the patch contains a third path, stop and do not authorize a formatting-only successor.",
+      "If a reviewer finds inaccurate evidence or a broader cause, keep this escalation CHANGES_REQUIRED and prepare a narrower coordinator review.",
+      "Even after PASS, only a new exact-patch repair card may run; no F01/T02 acceptance follows from this report."
+    ]
+  },
+  {
+    "id": "T02-F01-ROTATION-1-FORMAT-REPAIR-1",
+    "parent": "T02",
+    "title": "Apply only the independently approved F01 formatting artifact",
+    "role": "worker",
+    "depends_on": [
+      "parent:T01",
+      "T02-F01-math-escalation-1",
+      "T02-C0",
+      "T02-C2",
+      "C00-A",
+      "C00",
+      "T02-F01-ROTATION-1-FORMAT-ESCALATION-1"
+    ],
+    "supersedes": [
+      "T02-F01-ROTATION-1"
+    ],
+    "read_paths": [
+      "execution_state/packets/T02-F01-ROTATION-1-FORMAT-REPAIR-1.md",
+      "execution_state/packets/T02-F01-ROTATION-1-FORMAT-ESCALATION-1.md",
+      "execution_state/reports/T02-F01-ROTATION-1-format-escalation-1-review.md",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch",
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/SWARM.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts"
+    ],
+    "outputs": [
+      "Only the exact reviewed run-38087201307 Prettier patch is applied to its two existing source-owned paths and is independently reviewed; no application behavior or defaults change."
+    ],
+    "steps": [
+      "Verify the saved patch SHA-256 is 7e9ff75e71a6fdee218317d253e07ffb339446d372e4ef44c9a5044c6db460aa and git apply --check succeeds.",
+      "Apply only execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch; do not run a formatter or change any additional path.",
+      "Inspect the resulting source diff and confirm it is exactly the effect of the saved patch and touches only facts.ts and facts.test.ts.",
+      "Run git diff --check and write the unique implementation report with patch digest, paths and explicit no-application-check statement.",
+      "Stop for independent source review; coordinator alone owns commit, push, GitHub verification and runtime status."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-REPAIR-1",
+        "environment": "local-document",
+        "expected": "Exact packet record is ready only after all named dependencies are ACCEPTED."
+      },
+      {
+        "command": "Get-FileHash execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch -Algorithm SHA256; git apply --check execution_state/reports/T02-F01-ROTATION-1-run-38087201307-artifacts/formatting-repair/formatting-repair.patch",
+        "environment": "local-document",
+        "expected": "Digest matches 7e9ff75e71a6fdee218317d253e07ffb339446d372e4ef44c9a5044c6db460aa; applicability exits 0 before application."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "No whitespace errors in the exact two-file formatting patch."
+      },
+      {
+        "command": "Independent exact-patch diff review",
+        "environment": "source-review",
+        "expected": "Reviewer independently verifies the changed paths and formatting-only patch identity."
+      },
+      {
+        "command": "GitHub Actions on the exact reviewed SHA: pnpm verify; pnpm test:integration; pnpm test:e2e --workers=1",
+        "environment": "github",
+        "expected": "All required checks pass; record exact SHA/run, full logs, test and no-skip counts, artifact digests and actual browser output. A successful source review alone does not accept F01."
+      }
+    ],
+    "acceptance": [
+      "Only the pinned patch with the exact recorded SHA-256 is applied, and the resulting diff modifies exactly the two assigned source files.",
+      "No application test, build, typecheck, lint, format, browser, physics, dry-run or deployment command ran in the source repair card.",
+      "An independent reviewer passes the exact diff before publication.",
+      "A fresh exact-reviewed-SHA GitHub run passes full verify, integration, and one-worker Chromium E2E with required tests not skipped; all logs, exact counts, hashes and artifacts are preserved before F01 may be marked verified.",
+      "The patch itself changes no runtime behavior, rule, configuration, physics default or cultural assumption; F01/T02 remain unaccepted until all original gates pass."
+    ],
+    "negative_cases": [
+      "Do not reformat independently, alter the patch, fix other findings, or change a third path.",
+      "Do not claim the patch is behavioral, or treat source review/format pass as evidence of gameplay or deployed Havok.",
+      "Do not use Node/mock/dry-run results to satisfy the deployed physics gate."
+    ],
+    "review_questions": [
+      "Does the applied patch digest match the coordinator-pinned artifact and is its diff limited to facts.ts and facts.test.ts?",
+      "Are all hunks formatting-only, with no changed runtime token, expectation, default or contract?",
+      "Does the implementation report state accurately that no application checks ran locally?",
+      "Does fresh exact-head GitHub CI pass full verify, integration, and Chromium E2E with required tests unsuppressed and no skips?"
+    ],
+    "stop_conditions": [
+      "If digest, applicability, changed paths or resulting diff differs, stop and report CHANGES_REQUIRED without another source edit.",
+      "If independent review fails, preserve evidence and use the bounded escalation process; do not begin a retry without new independently accepted authorization.",
+      "If any required hosted step fails or is skipped, preserve full evidence, leave F01/T02 unaccepted, and do not proceed to consumers on an inferred pass."
+    ]
   }
 ]

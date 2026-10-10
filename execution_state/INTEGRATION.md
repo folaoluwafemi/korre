@@ -57,3 +57,14 @@ The implementation for `T02-F01-ROTATION-1` is now saved; independent source rev
 ## T02-F01 rotational-support continuation — 2026-10-10
 
 `T02-F01-ROTATION-1` implementation is complete and the independent source review now passes at `execution_state/reports/T02-F01-ROTATION-1-review.md`. The exact reviewed source has not yet run on GitHub. Coordinator publication and exact-SHA verification are next; the card, F01 and parent T02 remain unaccepted. No local application test/build/browser/physics command or Wrangler command ran. The prior `facts.ts:221` lint blocker is addressed in source, but only hosted verification can establish that. No playable browser flick, match, AI, online flow or deployed Havok result is claimed.
+
+## T02-F01-ROTATION-1 hosted result — run 38087201307
+
+Run [38087201307](https://github.com/folaoluwafemi/korre/actions/runs/38087201307) tested exact SHA `21ab540352c88f11ba15c8a2f4bb883c2ad71c61`. Workerd smoke passed 1/1, protocol passed 11/11, migrations were verified twice, and workspace/root typechecks plus ESLint passed. Prettier failed only on `facts.ts` and `facts.test.ts`; the unit-test phase/build did not run, and integration/Chromium checks were skipped. The full log and extracted hosted artifacts are saved under `execution_state/reports/T02-F01-ROTATION-1-run-38087201307*`; the run report lists hashes. A report-only independent escalation is now underway as required by the source packet's stop condition. No F01/T02 acceptance, playable flow, fresh real-Havok observation, or deployed result is claimed.
+
+
+## T02-F01 exact formatting repair — 2026-10-10
+
+`T02-F01-ROTATION-1-FORMAT-ESCALATION-1` is accepted only as authorization for one exact-patch repair. Independent review PASS and current patch SHA/applicability checks confirm the saved artifact remains the reviewed two-file formatting patch. New card `T02-F01-ROTATION-1-FORMAT-REPAIR-1` is RUNNING under T02 with the accepted T01/math/C0/C2/C00 prerequisites preserved. `/root/toolchain_audit` owns only `facts.ts` and `facts.test.ts`; `/root/foundation_review` independently reviews the resulting diff. Coordinator owns publication and exact-SHA GitHub verify, integration and Chromium checks. No local application checks ran. F01/T02 remain unaccepted; no gameplay or deployed Havok result is claimed.
+
+Independent review of `T02-F01-ROTATION-1-FORMAT-REPAIR-1` passed at `reports/T02-F01-ROTATION-1-format-repair-1-review.md`: exact pinned digest, exact two-file scope, formatting-only semantics, and no local app checks. Source author/reviewer ownership is released. Coordinator publication and fresh exact-SHA GitHub verification remain pending; F01/T02 are not accepted.

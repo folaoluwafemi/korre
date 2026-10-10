@@ -1,0 +1,593 @@
+diff --git a/games/counterball/src/simulation/facts.test.ts b/games/counterball/src/simulation/facts.test.ts
+index 6bb69f6..e71d347 100644
+--- a/games/counterball/src/simulation/facts.test.ts
++++ b/games/counterball/src/simulation/facts.test.ts
+@@ -40,7 +40,8 @@ function createBodies(overrides: PoseOverrides = {}): PlaybackTransform[] {
+     const override = overrides[id];
+     return {
+       id,
+-      position: override?.position === undefined ? position : { ...override.position },
++      position:
++        override?.position === undefined ? position : { ...override.position },
+       rotation:
+         override?.rotation === undefined
+           ? { x: 0, y: 0, z: 0, w: 1 }
+@@ -108,25 +109,13 @@ function rotationAboutAxis(axis: Vec3, radians: number): Quat {
+ function multiplyQuaternions(left: Quat, right: Quat): Quat {
+   return {
+     x:
+-      left.w * right.x +
+-      left.x * right.w +
+-      left.y * right.z -
+-      left.z * right.y,
++      left.w * right.x + left.x * right.w + left.y * right.z - left.z * right.y,
+     y:
+-      left.w * right.y -
+-      left.x * right.z +
+-      left.y * right.w +
+-      left.z * right.x,
++      left.w * right.y - left.x * right.z + left.y * right.w + left.z * right.x,
+     z:
+-      left.w * right.z +
+-      left.x * right.y -
+-      left.y * right.x +
+-      left.z * right.w,
++      left.w * right.z + left.x * right.y - left.y * right.x + left.z * right.w,
+     w:
+-      left.w * right.w -
+-      left.x * right.x -
+-      left.y * right.y -
+-      left.z * right.z,
++      left.w * right.w - left.x * right.x - left.y * right.y - left.z * right.z,
+   };
+ }
+ 
+@@ -158,12 +147,12 @@ function expectFiniteProtocolFacts(facts: readonly SimulationFact[]): void {
+     if (fact.type === "contact") {
+       expect(ENTITY_IDS.includes(fact.a)).toBe(true);
+       expect(ENTITY_IDS.includes(fact.b)).toBe(true);
+-      expect(ENTITY_IDS.indexOf(fact.a)).toBeLessThan(ENTITY_IDS.indexOf(fact.b));
++      expect(ENTITY_IDS.indexOf(fact.a)).toBeLessThan(
++        ENTITY_IDS.indexOf(fact.b),
++      );
+     } else {
+       expect(ENTITY_IDS.includes(fact.entity)).toBe(true);
+-      expect(["left", "right", "homeEnd", "awayEnd"]).toContain(
+-        fact.boundary,
+-      );
++      expect(["left", "right", "homeEnd", "awayEnd"]).toContain(fact.boundary);
+       expect(["goal", "out"]).toContain(fact.kind);
+     }
+   }
+@@ -290,7 +279,9 @@ describe("pure simulation fact derivation", () => {
+     for (const fact of contactFacts) {
+       expect(ENTITY_IDS.includes(fact.a)).toBe(true);
+       expect(ENTITY_IDS.includes(fact.b)).toBe(true);
+-      expect(ENTITY_IDS.indexOf(fact.a)).toBeLessThan(ENTITY_IDS.indexOf(fact.b));
++      expect(ENTITY_IDS.indexOf(fact.a)).toBeLessThan(
++        ENTITY_IDS.indexOf(fact.b),
++      );
+       expect(Object.getPrototypeOf(fact)).toBe(Object.prototype);
+       expect(Object.getPrototypeOf(fact.point)).toBe(Object.prototype);
+       expect(Object.keys(fact).sort()).toEqual([
+@@ -301,7 +292,15 @@ describe("pure simulation fact derivation", () => {
+         "timeMs",
+         "type",
+       ]);
+-      expect([fact.step, fact.timeMs, fact.point.x, fact.point.y, fact.point.z].every(Number.isFinite)).toBe(true);
++      expect(
++        [
++          fact.step,
++          fact.timeMs,
++          fact.point.x,
++          fact.point.y,
++          fact.point.z,
++        ].every(Number.isFinite),
++      ).toBe(true);
+     }
+ 
+     const json = JSON.stringify(facts);
+@@ -333,7 +332,9 @@ describe("pure simulation fact derivation", () => {
+     expectFiniteProtocolFacts(forward);
+     expectFiniteProtocolFacts(reverse);
+     expect(forward).toEqual(reverse);
+-    expect(forward.map((fact) => fact.type === "contact" && [fact.a, fact.b])).toEqual([
++    expect(
++      forward.map((fact) => fact.type === "contact" && [fact.a, fact.b]),
++    ).toEqual([
+       ["button", "away-0"],
+       ["button", "home-3"],
+       ["home-5", "away-2"],
+@@ -353,7 +354,10 @@ describe("pure simulation fact derivation", () => {
+         contacts,
+       ),
+     ];
+-    const before = JSON.stringify({ observations, config: COUNTERBALL_CONFIG_V1 });
++    const before = JSON.stringify({
++      observations,
++      config: COUNTERBALL_CONFIG_V1,
++    });
+     const facts = deriveSimulationFacts(observations, COUNTERBALL_CONFIG_V1);
+     expectFiniteProtocolFacts(facts);
+     const contact = facts.find((fact) => fact.type === "contact");
+@@ -362,20 +366,52 @@ describe("pure simulation fact derivation", () => {
+     }
+     contact.point.x = 99;
+ 
+-    expect(JSON.stringify({ observations, config: COUNTERBALL_CONFIG_V1 })).toBe(
+-      before,
+-    );
++    expect(
++      JSON.stringify({ observations, config: COUNTERBALL_CONFIG_V1 }),
++    ).toBe(before);
+   });
+ 
+   it.each([
+-    { entity: "button" as const, boundary: "left" as const, kind: "out" as const },
+-    { entity: "button" as const, boundary: "right" as const, kind: "out" as const },
+-    { entity: "button" as const, boundary: "homeEnd" as const, kind: "goal" as const },
+-    { entity: "button" as const, boundary: "awayEnd" as const, kind: "goal" as const },
+-    { entity: "home-0" as const, boundary: "left" as const, kind: "out" as const },
+-    { entity: "home-1" as const, boundary: "right" as const, kind: "out" as const },
+-    { entity: "away-0" as const, boundary: "homeEnd" as const, kind: "out" as const },
+-    { entity: "away-1" as const, boundary: "awayEnd" as const, kind: "out" as const },
++    {
++      entity: "button" as const,
++      boundary: "left" as const,
++      kind: "out" as const,
++    },
++    {
++      entity: "button" as const,
++      boundary: "right" as const,
++      kind: "out" as const,
++    },
++    {
++      entity: "button" as const,
++      boundary: "homeEnd" as const,
++      kind: "goal" as const,
++    },
++    {
++      entity: "button" as const,
++      boundary: "awayEnd" as const,
++      kind: "goal" as const,
++    },
++    {
++      entity: "home-0" as const,
++      boundary: "left" as const,
++      kind: "out" as const,
++    },
++    {
++      entity: "home-1" as const,
++      boundary: "right" as const,
++      kind: "out" as const,
++    },
++    {
++      entity: "away-0" as const,
++      boundary: "homeEnd" as const,
++      kind: "out" as const,
++    },
++    {
++      entity: "away-1" as const,
++      boundary: "awayEnd" as const,
++      kind: "out" as const,
++    },
+   ])("reports a whole-body $entity crossing at $boundary", (fixture) => {
+     const [before, after] = crossingPair(fixture.entity, fixture.boundary);
+     const crossing = firstCrossing(
+@@ -393,7 +429,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("sweeps a fast whole-button exit between the recorded endpoints", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const boundary = boundaryGeometry("right");
+     const startX = 4;
+     const endX = 8;
+@@ -422,7 +459,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("waits until the trailing support clears after partial entry", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const boundary = boundaryGeometry("right");
+     const buttonRadius = COUNTERBALL_CONFIG_V1.geometry.buttonRadius;
+     const partial = deriveSimulationFacts(
+@@ -462,7 +500,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("keeps a goal-mouth decision when the center crossed in an earlier substep", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -485,7 +524,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("rejects sideways drift out of the post opening during the full passage", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -508,7 +548,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("rejects upward drift over the crossbar during the full passage", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -531,7 +572,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("uses quaternion orientation when deriving whole-button support", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const uprightAcrossX: Quat = {
+       x: 0,
+       y: 0,
+@@ -572,7 +614,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("finds the rotational exit when both interval endpoint clearances are positive", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const { buttonRadius, buttonThickness, pitchWidth } =
+       COUNTERBALL_CONFIG_V1.geometry;
+     const clearanceAt = (degrees: number): number => {
+@@ -616,7 +659,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("finds one earliest right exit through an ordinary vertical-axis yaw", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -647,7 +691,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("latches the earliest descending root when a rotation interval has multiple roots", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const { buttonRadius, buttonThickness, pitchWidth } =
+       COUNTERBALL_CONFIG_V1.geometry;
+     const clearanceAt = (degrees: number): number => {
+@@ -689,7 +734,8 @@ describe("pure simulation fact derivation", () => {
+     );
+ 
+     const crossings = crossingFacts(facts).filter(
+-      (crossing) => crossing.entity === "button" && crossing.boundary === "right",
++      (crossing) =>
++        crossing.entity === "button" && crossing.boundary === "right",
+     );
+     expect(crossings).toHaveLength(1);
+     expect(crossings[0]?.kind).toBe("out");
+@@ -701,8 +747,7 @@ describe("pure simulation fact derivation", () => {
+     const theta = Math.PI / 4;
+     const beta = 0.01;
+     const axisPath = theta * Math.sin(beta);
+-    const endpointAngle =
+-      2 * Math.asin(Math.sin(beta) * Math.sin(theta / 2));
++    const endpointAngle = 2 * Math.asin(Math.sin(beta) * Math.sin(theta / 2));
+     const priorEndpointBound =
+       endpointAngle * ((4 * Math.tan(theta / 4)) / theta);
+ 
+@@ -721,12 +766,8 @@ describe("pure simulation fact derivation", () => {
+         buttonThickness: 0.02,
+       },
+     };
+-    const {
+-      buttonRadius,
+-      buttonThickness,
+-      pitchWidth,
+-      surfaceY,
+-    } = config.geometry;
++    const { buttonRadius, buttonThickness, pitchWidth, surfaceY } =
++      config.geometry;
+     const theta = Math.PI / 4;
+     const beta = 0.01;
+     const epsilon = 0.0005;
+@@ -748,8 +789,7 @@ describe("pure simulation fact derivation", () => {
+       const delta =
+         2 *
+         Math.asin(
+-          Math.sin(beta) *
+-            Math.sin((theta * Math.abs(amount - epsilon)) / 2),
++          Math.sin(beta) * Math.sin((theta * Math.abs(amount - epsilon)) / 2),
+         );
+       return (
+         buttonRadius * Math.sin(delta) +
+@@ -877,10 +917,7 @@ describe("pure simulation fact derivation", () => {
+         physicalOffset = theta * (amount - 0.5);
+       }
+       const delta =
+-        2 *
+-        Math.asin(
+-          Math.sin(beta) * Math.sin(Math.abs(physicalOffset) / 2),
+-        );
++        2 * Math.asin(Math.sin(beta) * Math.sin(Math.abs(physicalOffset) / 2));
+       return buttonRadius * Math.sin(delta) + halfHeight * Math.cos(delta);
+     };
+     const clearanceAt = (amount: number): number =>
+@@ -1139,7 +1176,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("emits exact corner ties in stable boundary order", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -1161,7 +1199,8 @@ describe("pure simulation fact derivation", () => {
+   });
+ 
+   it("orders same-step contacts before crossings for attribution", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     const facts = deriveSimulationFacts(
+       [
+         createObservation(0, 0, {
+@@ -1179,27 +1218,31 @@ describe("pure simulation fact derivation", () => {
+ 
+     expectFiniteProtocolFacts(facts);
+     expect(facts.map((fact) => fact.type)).toEqual(["contact", "crossing"]);
+-    expect(facts[0]?.timeMs).toBeGreaterThan(facts[1]?.timeMs ?? Number.POSITIVE_INFINITY);
++    expect(facts[0]?.timeMs).toBeGreaterThan(
++      facts[1]?.timeMs ?? Number.POSITIVE_INFINITY,
++    );
+   });
+ 
+   it("rejects invalid history and bounds output to the protocol fact limit", () => {
+-    const intervalMs = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
++    const intervalMs =
++      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+     expect(() => deriveSimulationFacts([], COUNTERBALL_CONFIG_V1)).toThrow(
+       TypeError,
+     );
+     expect(() =>
+       deriveSimulationFacts(
+-        [
+-          createObservation(0, 0),
+-          createObservation(0, 0),
+-        ],
++        [createObservation(0, 0), createObservation(0, 0)],
+         COUNTERBALL_CONFIG_V1,
+       ),
+     ).toThrow(TypeError);
+ 
+     const tooManyContacts = Array.from(
+       { length: COUNTERBALL_PROTOCOL_LIMITS.maxSimulationFactsPerShot + 1 },
+-      () => ({ a: "button" as const, b: "home-0" as const, point: { x: 0, y: 0, z: 0 } }),
++      () => ({
++        a: "button" as const,
++        b: "home-0" as const,
++        point: { x: 0, y: 0, z: 0 },
++      }),
+     );
+     expect(() =>
+       deriveSimulationFacts(
+diff --git a/games/counterball/src/simulation/facts.ts b/games/counterball/src/simulation/facts.ts
+index 4e3d92f..98835b1 100644
+--- a/games/counterball/src/simulation/facts.ts
++++ b/games/counterball/src/simulation/facts.ts
+@@ -200,7 +200,9 @@ function validateGeometry(config: Readonly<CounterballConfig>): void {
+     throw new TypeError("Fact derivation requires valid finite geometry.");
+   }
+   if (!Number.isFinite(simulation.maxShotDurationSeconds * 1_000)) {
+-    throw new TypeError("Fact derivation requires a finite millisecond duration.");
++    throw new TypeError(
++      "Fact derivation requires a finite millisecond duration.",
++    );
+   }
+ }
+ 
+@@ -209,7 +211,9 @@ function normalizeObservations(
+   config: Readonly<CounterballConfig>,
+ ): Observation[] {
+   if (!Array.isArray(value) || value.length === 0) {
+-    throw new TypeError("At least the initial physics observation is required.");
++    throw new TypeError(
++      "At least the initial physics observation is required.",
++    );
+   }
+ 
+   const maximumTimeMs = config.simulation.maxShotDurationSeconds * 1_000;
+@@ -227,7 +231,9 @@ function normalizeObservations(
+     const step = candidate["step"];
+     const timeMs = candidate["timeMs"];
+     if (!Number.isSafeInteger(step) || (step as number) < 0) {
+-      throw new TypeError("Observation step must be a non-negative safe integer.");
++      throw new TypeError(
++        "Observation step must be a non-negative safe integer.",
++      );
+     }
+     if (
+       typeof timeMs !== "number" ||
+@@ -235,20 +241,28 @@ function normalizeObservations(
+       timeMs < 0 ||
+       timeMs > maximumTimeMs
+     ) {
+-      throw new TypeError("Observation time must be within the finite shot duration.");
++      throw new TypeError(
++        "Observation time must be within the finite shot duration.",
++      );
+     }
+     if (index === 0) {
+       if (step !== 0 || timeMs !== 0) {
+-        throw new TypeError("The initial observation must be step 0 at time 0.");
++        throw new TypeError(
++          "The initial observation must be step 0 at time 0.",
++        );
+       }
+     } else if ((step as number) < previousStep || timeMs <= previousTimeMs) {
+-      throw new TypeError("Observation steps must not decrease and times must increase.");
++      throw new TypeError(
++        "Observation steps must not decrease and times must increase.",
++      );
+     }
+ 
+     const bodies = normalizeBodies(candidate["bodies"]);
+     const contactStarts = normalizeContacts(candidate["contactStarts"]);
+     if (index === 0 && contactStarts.length !== 0) {
+-      throw new TypeError("The initial observation cannot contain contact starts.");
++      throw new TypeError(
++        "The initial observation cannot contain contact starts.",
++      );
+     }
+ 
+     observations.push({
+@@ -342,9 +356,7 @@ function supportExtent(
+   const radialProjection = Math.sqrt(
+     Math.max(0, 1 - axialProjection * axialProjection),
+   );
+-  return (
+-    radius * radialProjection + (height / 2) * Math.abs(axialProjection)
+-  );
++  return radius * radialProjection + (height / 2) * Math.abs(axialProjection);
+ }
+ 
+ function supportPoint(
+@@ -395,7 +407,12 @@ function leadingClearance(
+ ): number {
+   return (
+     signedCenterDistance(pose, boundary) -
+-    supportExtent(pose, inwardNormal(boundary), dimensions.radius, dimensions.height)
++    supportExtent(
++      pose,
++      inwardNormal(boundary),
++      dimensions.radius,
++      dimensions.height,
++    )
+   );
+ }
+ 
+@@ -406,7 +423,12 @@ function trailingClearance(
+ ): number {
+   return (
+     signedCenterDistance(pose, boundary) +
+-    supportExtent(pose, inwardNormal(boundary), dimensions.radius, dimensions.height)
++    supportExtent(
++      pose,
++      inwardNormal(boundary),
++      dimensions.radius,
++      dimensions.height,
++    )
+   );
+ }
+ 
+@@ -492,12 +514,7 @@ function interpolatePose(a: Pose, b: Pose, amount: number): Pose {
+ 
+ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
+   const { cosine, end } = shortestArcEndpoints(a, b);
+-  if (
+-    a.x === end.x &&
+-    a.y === end.y &&
+-    a.z === end.z &&
+-    a.w === end.w
+-  ) {
++  if (a.x === end.x && a.y === end.y && a.z === end.z && a.w === end.w) {
+     return 0;
+   }
+   const selectedCosine = Math.max(0, Math.min(1, cosine));
+@@ -522,11 +539,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
+ 
+   const angleFromDot = 2 * Math.acos(selectedCosine);
+   const angleFromRelative =
+-    2 *
+-    Math.atan2(
+-      relativeVectorLength,
+-      Math.abs(relative.w) / relativeNorm,
+-    );
++    2 * Math.atan2(relativeVectorLength, Math.abs(relative.w) / relativeNorm);
+   const theta = Math.max(angleFromDot, angleFromRelative);
+   if (!Number.isFinite(theta) || theta < 0 || theta > Math.PI + 1e-12) {
+     throw new TypeError("Cylinder rotation angle bound is not finite.");
+@@ -538,9 +551,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
+   const rotationMargin = 64 * Number.EPSILON * Math.max(1, theta);
+   const thetaUpper = Math.min(Math.PI, theta + rotationMargin);
+   const nlerp = cosine > 0.9995;
+-  const angularSpeed = nlerp
+-    ? 4 * Math.tan(thetaUpper / 4)
+-    : thetaUpper;
++  const angularSpeed = nlerp ? 4 * Math.tan(thetaUpper / 4) : thetaUpper;
+   if (!Number.isFinite(angularSpeed) || angularSpeed < 0) {
+     throw new TypeError("Cylinder angular speed bound is not finite.");
+   }
+@@ -575,8 +586,7 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
+   // small rotations. Inflate |u x v0| by a conservative operation-count
+   // allowance; near-degenerate axes took the full-angle fallback above.
+   const axisSineMargin =
+-    (128 * Number.EPSILON) / relativeVectorLength +
+-    64 * Number.EPSILON;
++    (128 * Number.EPSILON) / relativeVectorLength + 64 * Number.EPSILON;
+   const axisSineUpper = Math.min(1, axisSine + axisSineMargin);
+   const travel = angularSpeed * axisSineUpper;
+   if (!Number.isFinite(travel) || travel < 0) {
+@@ -615,9 +625,7 @@ function supportClearanceLipschitz(
+   dimensions: { radius: number; height: number },
+ ): number {
+   return clearanceLipschitzBound(
+-    Math.abs(
+-      after.position[boundary.axis] - before.position[boundary.axis],
+-    ),
++    Math.abs(after.position[boundary.axis] - before.position[boundary.axis]),
+     dimensions,
+     cylinderAxisAngularTravelBound(before.rotation, after.rotation),
+   );
+@@ -684,8 +692,7 @@ function findDescendingRoot(
+     // Signed centre distance is linear. A cylinder support point can move no
+     // faster than its circumradius times the shortest physical rotation angle.
+     // This Lipschitz lower bound proves intervals cannot contain a hidden exit.
+-    const lowerBound =
+-      middleValue - (lipschitzBound * (high - low)) / 2;
++    const lowerBound = middleValue - (lipschitzBound * (high - low)) / 2;
+     if (lowerBound >= 0) {
+       return undefined;
+     }
+@@ -956,7 +963,9 @@ export function deriveSimulationFacts(
+       !Number.isFinite(point.y) ||
+       !Number.isFinite(point.z)
+     ) {
+-      throw new TypeError("Derived fact must contain only finite protocol values.");
++      throw new TypeError(
++        "Derived fact must contain only finite protocol values.",
++      );
+     }
+     if (facts.length >= maximumFactCount) {
+       throw new RangeError(
+@@ -986,10 +995,7 @@ export function deriveSimulationFacts(
+ 
+   for (const id of ENTITY_IDS) {
+     const dimensions = dimensionsFor(id, config);
+-    const goalPassageByBoundary = new Map<
+-      Boundary["name"],
+-      GoalPassageState
+-    >();
++    const goalPassageByBoundary = new Map<Boundary["name"], GoalPassageState>();
+     if (id === "button") {
+       for (const boundary of boundaries) {
+         if (boundary.name === "homeEnd" || boundary.name === "awayEnd") {
+@@ -1138,7 +1144,8 @@ export function deriveSimulationFacts(
+       if (earliest === undefined || earliest.type !== "crossing") {
+         continue;
+       }
+-      const tieTolerance = Number.EPSILON * Math.max(1, Math.abs(earliest.timeMs)) * 16;
++      const tieTolerance =
++        Number.EPSILON * Math.max(1, Math.abs(earliest.timeMs)) * 16;
+       for (const candidate of candidates) {
+         if (
+           candidate.type === "crossing" &&
