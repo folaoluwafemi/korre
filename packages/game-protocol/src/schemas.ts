@@ -550,7 +550,13 @@ const GameShotAbortedEventSchema = z.strictObject({
   ...serverEventBaseShape,
   type: z.literal("game.shot.aborted"),
   actionId: uuid,
-  reason: z.enum(["initialization", "timeout", "invalidBody", "resourceLimit"]),
+  reason: z.enum([
+    "initialization",
+    "timeout",
+    "cancelled",
+    "invalidBody",
+    "resourceLimit",
+  ]),
   state: MatchStateSchema,
 });
 

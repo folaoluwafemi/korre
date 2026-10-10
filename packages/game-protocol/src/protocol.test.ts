@@ -26,10 +26,18 @@ import {
 import type {
   GameCommand,
   MatchState,
+  SimulationRunOptions,
   SimulationFact,
   VersionStamp,
 } from "./types.js";
 import { ProtocolParseError } from "./schemas.js";
+
+type NativeAbortSignalFits = AbortSignal extends NonNullable<
+  SimulationRunOptions["signal"]
+>
+  ? true
+  : false;
+const nativeAbortSignalFits: NativeAbortSignalFits = true;
 
 type FixtureCase = {
   versions: VersionStamp;
@@ -79,6 +87,45 @@ describe("Counterball v1 protocol", () => {
       "out",
       "penalty",
     ]);
+  });
+
+  it("keeps cancellation local and distinguishes it in aborted-shot events", () => {
+    expect(nativeAbortSignalFits).toBe(true);
+
+    const options: SimulationRunOptions = { signal: { aborted: true } };
+    expect(options.signal?.aborted).toBe(true);
+
+    const initial = fixture.states.initial;
+    const event = {
+      type: "game.shot.aborted" as const,
+      protocolVersion: 1 as const,
+      matchId: initial.matchId,
+      eventSeq: 1,
+      serverTimeMs: 1,
+      actionId: "00000000-0000-4000-8000-000000000070",
+      reason: "cancelled" as const,
+      state: initial,
+    };
+    expect(parseServerEvent(event)).toEqual(event);
+
+    for (const reason of [
+      "initialization",
+      "timeout",
+      "invalidBody",
+      "resourceLimit",
+    ] as const) {
+      expect(parseServerEvent({ ...event, reason })).toMatchObject({
+        type: "game.shot.aborted",
+        reason,
+      });
+    }
+
+    expect(() => parseServerEvent({ ...event, reason: "settled" })).toThrow(
+      ProtocolParseError,
+    );
+    expect(() =>
+      parseServerEvent({ ...event, transientSignal: options.signal }),
+    ).toThrow(ProtocolParseError);
   });
 
   it("requires exactly one button and fourteen unique legal caps", () => {

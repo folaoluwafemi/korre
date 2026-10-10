@@ -33,4 +33,8 @@ D38 now supplies canonical provisional `restart.clearanceEpsilon=0.005`; it need
 
 The browser now supports pointer/touch/keyboard camera inspection, capped idle/background rendering, and real native context-loss recovery. Hosted checks exercise unsupported preflight and partial engine construction followed by genuine retry without leaked listeners/registry entries. These are static scene checks, not playable matches. Real phones remain unverified.
 
+## C00-A — protocol cancellation contract
+
+2026-10-10: coordinator implemented C00-A under its exact five-path ownership and released source paths after independent source review PASS (`reports/C00-A-review.md`). The optional structural signal is process-local; simulation payloads remain unchanged. The protocol error/event enum adds `cancelled` with strict positive/negative tests and prelaunch version-compatibility documentation. `node scripts/check-completion-plan.mjs --packet C00-A` and `git diff --check` passed. Protocol tests and `pnpm verify` have not run and must run on GitHub against the exact pushed head. There is no deployed gameplay consumer recorded in this integration history; recheck any staged/versioned consumer before launch. Parent T02 remains RUNNING and no simulation cancellation implementation or gameplay acceptance is claimed.
+
 All application builds/tests ran on GitHub. User inspection can use the downloaded passing artifact through the lightweight loopback-only static server, with no local compilation or dependency installation. No Cloudflare/Railway deployment or paid/production change occurred in this review. Runtime authority is `tasks.json` and `reports/current-review-validation.md`; historical entries do not override them.

@@ -113,13 +113,18 @@ type ShotSimulation = {
   termination: 'settled';
 };
 interface SimulationRunner {
-  simulate(input: {
-    state: MatchState; command: GameCommand; config: CounterballConfig;
-  }): Promise<ShotSimulation>;
+  simulate(
+    input: {
+      state: MatchState; command: GameCommand; config: CounterballConfig;
+    },
+    options?: SimulationRunOptions,
+  ): Promise<ShotSimulation>;
 }
 ```
 
-`CounterballConfig` is defined once in game-protocol, using DECISIONS numeric table and explicit adapter coefficients chosen in T02. Do not import Babylon to define it. A simulator failure throws typed `SimulationError` (`initialization`, `timeout`, `invalidBody`, `resourceLimit`). An unfinished or timed-out shot is not a settled successful result.
+`SimulationRunOptions` is process-local: `{ signal?: { readonly aborted: boolean } }`. A native `AbortSignal` structurally fits this shape. The runner checks it between bounded simulation batches and after yielding. Do not add it to `SimulationInput`, command envelopes, persisted state, or any schema; those stay serializable and unchanged. Cancellation throws the typed `SimulationError` with code `cancelled`. It does not return partial `ShotSimulation`, masquerade as `timeout`/`resourceLimit`, or change timeout semantics. The coordinator must confirm no deployed protocol-v1 consumer rejects the new `game.shot.aborted.reason` value before launch. If such a consumer exists, version the protocol and update compatibility checks before release. Cancellation restores the pre-shot checkpoint and preserves newer pause/terminal state under the existing abort lifecycle.
+
+`CounterballConfig` is defined once in game-protocol, using DECISIONS numeric table and explicit adapter coefficients chosen in T02. Do not import Babylon to define it. A simulator failure throws typed `SimulationError` (`initialization`, `timeout`, `cancelled`, `invalidBody`, `resourceLimit`). An unfinished, timed-out, or cancelled shot is not a settled successful result.
 
 `restart.clearanceEpsilon` is the provisional positive finite vertical diagnostic margin (D38, initially 0.005 game units). It participates in `configHash`; it is not a foul, placement permission, or source of artificial lift. Diagnostic peak clearance must never be labelled proof of a collision-free obstacle traversal.
 

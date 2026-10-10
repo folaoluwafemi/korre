@@ -767,9 +767,62 @@
           "implementation_report": "execution_state/reports/T02-B2-run18-status-audit-repair-3.md",
           "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-3-review.md",
           "evidence": "Independent re-review PASS at execution_state/reports/T02-B2-run18-status-audit-repair-3-review.md. The stale hosted-verification wording is gone; the ledger accurately records run #18 success and keeps all open gates; task statuses remain T02 RUNNING and T02-B2 CHANGES_REQUIRED."
+        },
+        {
+          "id": "C00-A",
+          "status": "REVIEWING",
+          "depends_on": [
+            "parent:T01"
+          ],
+          "write_paths": [
+            "packages/game-protocol/src/types.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "packages/game-protocol/src/protocol.test.ts",
+            "knowledge_base/execution/CONTRACTS.md",
+            "execution_state/DECISIONS.md"
+          ],
+          "owner": "coordinator — source writes released",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/toolchain_audit (source review complete)",
+          "attempt_count": 0,
+          "implementation_report": "execution_state/reports/C00-A-implementation.md",
+          "review_report": "execution_state/reports/C00-A-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C00-A",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "T01 parent accepted; packet remains the only initially ready plan card."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-source",
+              "detail": "No whitespace errors."
+            },
+            {
+              "command": "Independent C00-A source review",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-A-review.md",
+              "detail": "Types/schema/docs and current consumers inspected; runtime remains unverified."
+            },
+            {
+              "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
+              "result": "NOT RUN",
+              "environment": "GitHub required",
+              "detail": "Do not execute application tests on laptop; exact commit must be tested on GitHub."
+            },
+            {
+              "command": "pnpm verify",
+              "result": "NOT RUN",
+              "environment": "GitHub required",
+              "detail": "Includes type/lint/format/unit/build; exact commit must be verified on GitHub."
+            }
+          ],
+          "next_action": "Source review PASS; commit/push, then run the focused protocol test and full verification on the exact GitHub head."
         }
       ],
-      "next_action": "Continue bounded facts/runner/calibration packets using accepted world, restart-pose helper and sampler. Prove actual loft, typed timeout/cancellation and crossings before accepting T02; then T04 deployed Havok and T05 real browser flick. D38 needs no human numeric choice."
+      "next_action": "C00-A is source-reviewed and awaiting exact-head GitHub verification. T02 remains RUNNING until its full simulation gates pass."
     },
     {
       "id": "T03",

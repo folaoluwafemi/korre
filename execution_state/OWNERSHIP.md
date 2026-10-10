@@ -80,3 +80,4 @@ No worker may spawn agents, build, run tests, or start services locally. Report 
 - Final coordinator record review: /root/toolchain_audit may write only execution_state/reports/current-review-final-review.md. Read-only review of coordinator status/ledger/integration/validation/README evidence consistency; no review of its own physics implementation and no status/source edits, local checks or agents.
 
 - Final coordinator record review PASS is saved at execution_state/reports/current-review-final-review.md. Reviewer stopped and all child write assignments are released. Only coordinator and the prebuilt loopback server remain active.
+- C00-A source is implemented and released by coordinator. Independent source review PASS is recorded at `execution_state/reports/C00-A-review.md`; reviewer assignment is released. Coordinator owns the exact-head GitHub verification and shared status updates. No application checks ran locally.

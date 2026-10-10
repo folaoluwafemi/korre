@@ -140,12 +140,23 @@ export type SimulationInput = {
   config: CounterballConfig;
 };
 
+export type SimulationRunOptions = {
+  signal?: { readonly aborted: boolean };
+};
+
 export interface SimulationRunner {
-  simulate(input: SimulationInput): Promise<ShotSimulation>;
+  simulate(
+    input: SimulationInput,
+    options?: SimulationRunOptions,
+  ): Promise<ShotSimulation>;
 }
 
 export type SimulationErrorCode =
-  "initialization" | "timeout" | "invalidBody" | "resourceLimit";
+  | "initialization"
+  | "timeout"
+  | "cancelled"
+  | "invalidBody"
+  | "resourceLimit";
 
 export type SimulationError = Error & {
   readonly code: SimulationErrorCode;
