@@ -1142,15 +1142,25 @@
               "source_sha": "c8ae1eee9990ba792d491bceee18361d6ff1be35",
               "report": "execution_state/reports/C01-runtime-run-38082875529.md",
               "detail": "Miniflare rejected compatibility date 2026-10-10 before collection: 0 test files, 0 tests, 1 runtime error. Downstream app checks were skipped."
+            },
+            {
+              "command": "GitHub Actions run #2: C01 hosted gate and Workerd smoke",
+              "result": "CHANGES_REQUIRED",
+              "exit_code": 1,
+              "environment": "GitHub Actions",
+              "run_id": 38084305781,
+              "source_sha": "f1e81ebf1b1303cfa7fb1ecfef60769497d77ad7",
+              "report": "execution_state/reports/C01-run-38084305781.md",
+              "detail": "Named Workerd smoke passed 1/1 with zero skips; the required Prettier gate then failed only on vitest.config.ts. PostgreSQL, protocol tests, full verify/build, integration, and browser checks were skipped."
             }
           ],
-          "next_action": "Run all required exact-head hosted checks using the source-reviewed C01-pool-repair-1 dependency update. Keep C01 CHANGES_REQUIRED until the named Worker smoke and artifact checks pass and diagnostic-browser producer evidence exists.",
-          "blocker": "The first hosted run failed before test collection because Miniflare did not support the unchanged 2026-10-10 Worker compatibility date. Diagnostic-browser evidence is also still unproduced."
+          "next_action": "Pool repair and named Worker smoke pass; the one-file formatting repair has independent review PASS. Commit its exact diff and rerun all C01 checks on GitHub. Parent C01 remains open for full no-skip verification and diagnostic-browser producer evidence.",
+          "blocker": "GitHub run 38084305781 passed only the named Workerd smoke (1/1) and failed Prettier on vitest.config.ts. The complete C01 checks and diagnostic-browser producer evidence remain outstanding."
         },
         {
           "id": "C01-pool-repair-1",
           "parent": "C01",
-          "status": "IMPLEMENTED",
+          "status": "ACCEPTED",
           "packet": "execution_state/packets/C01-pool-repair-1.md",
           "owner": "coordinator implementing; /root/foundation_review independent review",
           "author_identity": "coordinator",
@@ -1217,9 +1227,18 @@
               "environment": "source-review",
               "report": "execution_state/reports/C01-pool-repair-1-review.md",
               "detail": "Exact plugin/lock diff reviewed; active dependencies match; unchanged Worker date; hosted runtime still unverified."
+            },
+            {
+              "command": "pnpm test:workers (named Workerd runtime smoke)",
+              "result": "PASS",
+              "environment": "GitHub Actions",
+              "run_id": 38084305781,
+              "source_sha": "f1e81ebf1b1303cfa7fb1ecfef60769497d77ad7",
+              "detail": "1 test file and 1 test passed, 0 skipped; test executed under Miniflare/Workerd. This is pool smoke evidence only."
             }
           ],
-          "next_action": "Commit only the reviewed C01 pool-repair files and status evidence, then run the named Worker smoke and all C01 checks on GitHub at that exact SHA. Keep C01 open for diagnostic-browser evidence."
+          "next_action": "Commit only the reviewed C01 pool-repair files and status evidence, then run the named Worker smoke and all C01 checks on GitHub at that exact SHA. Keep C01 open for diagnostic-browser evidence.",
+          "evidence": "Independent source/dependency review PASS at execution_state/reports/C01-pool-repair-1-review.md. GitHub run 38084305781 on exact SHA f1e81ebf1b1303cfa7fb1ecfef60769497d77ad7 collected and passed the named Workerd smoke: 1 file, 1 test, 0 skipped. This verifies the pinned test runtime smoke only; full parent C01 checks remain open."
         },
         {
           "id": "T02-F01",
@@ -1274,9 +1293,16 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-F01-repair-1-review.md",
               "detail": "Found a finite ordinary y-axis yaw exit that throws before its descending root bracket. F01 and parent T02 remain unaccepted."
+            },
+            {
+              "command": "Independent T02-F01 repair-2 source review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-repair-2-review.md",
+              "detail": "Final repair attempt remains nonconservative for arbitrary 3D quaternion SLERP; exact theta=pi/4 path/chord counterexample and bound comparison in report. No hosted app checks ran."
             }
           ],
-          "next_action": "Complete final allowed focused repair 2 in execution_state/packets/T02-F01-repair-2.md. If repair 2 still fails, stop code changes and escalate with exact evidence."
+          "next_action": "Repair 2 failed independent review because the symmetry-axis path bound is not conservative for arbitrary SLERP. The two focused repair attempts are exhausted. Keep F01 CHANGES_REQUIRED and stop source edits pending a separately bounded coordinator escalation."
         },
         {
           "id": "T02-F01-repair-1",
@@ -1308,7 +1334,7 @@
         {
           "id": "T02-F01-repair-2",
           "parent": "T02-F01",
-          "status": "RUNNING",
+          "status": "CHANGES_REQUIRED",
           "packet": "execution_state/packets/T02-F01-repair-2.md",
           "owner": "/root/toolchain_audit implementing; /root/foundation_review independent review",
           "author_identity": "/root/toolchain_audit",
@@ -1321,11 +1347,63 @@
           ],
           "implementation_report": "execution_state/reports/T02-F01-repair-2-implementation.md",
           "review_report": "execution_state/reports/T02-F01-repair-2-review.md",
-          "checks": [],
-          "next_action": "Repair the exact vertical-yaw ordinary crossing without weakening fail-safe isolation. Add the named regression, preserve every existing case, save the implementation report and stop for independent review. All app checks run on GitHub. This is the final allowed focused repair."
+          "checks": [
+            {
+              "command": "Independent T02-F01 repair-2 source review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-repair-2-review.md",
+              "detail": "The endpoint angle between vertical symmetry axes is not an upper bound on the axis path under arbitrary shortest-arc SLERP. Reviewer gives theta=pi/4: required path/chord factor about 1.02617 versus the applied normalized-lerp multiplier about 1.01305. Clearance certificates can therefore be unsafe. No app checks ran."
+            }
+          ],
+          "next_action": "Final focused repair attempt failed independent review. Stop source changes in this packet. Coordinator must record the math issue and define any further work as a separately bounded escalation; no hosted check is claimed."
+        },
+        {
+          "id": "C01-format-repair-1",
+          "parent": "C01",
+          "status": "REVIEWING",
+          "packet": "execution_state/packets/C01-format-repair-1.md",
+          "owner": "coordinator",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/swarm_review (independent source review)",
+          "attempt_count": 1,
+          "depends_on": [
+            "C01-pool-repair-1 (ACCEPTED)"
+          ],
+          "write_paths": [
+            "vitest.config.ts",
+            "execution_state/packets/C01-format-repair-1.md",
+            "execution_state/reports/C01-format-repair-1-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/C01-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/C01-format-repair-1-review.md",
+          "checks": [
+            {
+              "command": "pnpm.cmd exec prettier --write vitest.config.ts",
+              "result": "PASS",
+              "environment": "local-format-only",
+              "exit_code": 0,
+              "detail": "Prettier 3.9.9 formatted only the hosted-reported root test config."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "detail": "No whitespace errors."
+            },
+            {
+              "command": "Independent C01-format-repair-1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-format-repair-1-review.md",
+              "detail": "One hunk in vitest.config.ts is formatting-only; include/exclude and test discovery are unchanged."
+            }
+          ],
+          "next_action": "Source review PASS. Commit the exact diff and rerun the complete C01 hosted checks on GitHub; this repair and its isolated format command do not accept parent C01."
         }
       ],
-      "next_action": "C01 pool-repair-1 source review PASS; exact-hosted run is next. T02-F01 repair 1 review found a second root-isolation defect; final allowed repair 2 is active. Parent T02 remains RUNNING."
+      "next_action": "Continue C01: commit reviewed vitest.config.ts formatting repair and rerun hosted checks. F01 repair 2 failed independent review; its two-attempt cycle is stopped and needs a separately bounded coordinator math escalation. T02 remains RUNNING."
     },
     {
       "id": "T03",
