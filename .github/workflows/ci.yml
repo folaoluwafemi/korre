@@ -26,6 +26,7 @@ jobs:
       - name: Verify
         env:
           COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
+          COUNTERBALL_INTENDED_SHOT_OUTPUT: .artifacts/counterball-intended-shot-observations.json
         run: pnpm verify
       - name: Upload calibration probe observations
         if: always()
@@ -33,6 +34,13 @@ jobs:
         with:
           name: counterball-calibration-observations
           path: .artifacts/counterball-calibration-observations.json
+          if-no-files-found: ignore
+      - name: Upload intended-shot probe observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterball-intended-shot-observations
+          path: .artifacts/counterball-intended-shot-observations.json
           if-no-files-found: ignore
       - run: pnpm test:integration
       - run: pnpm test:e2e --workers=1

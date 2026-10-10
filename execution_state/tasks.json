@@ -217,7 +217,7 @@
       "dependencies": [
         "T01"
       ],
-      "owner": "coordinator integration; /root/toolchain_audit — completed T02-B0 and C2 packets; /root/swarm_review — T02-A repair 2 and B0/B1 measurement review; /root/foundation_review — independent C0 source and repair reviews",
+      "owner": "coordinator integration; /root/toolchain_audit — T02-B2 intended-shot probe; /root/swarm_review — independent C2 repair reviews; /root/foundation_review — independent C0 and C2 source reviews",
       "implementation_report": null,
       "review_report": null,
       "checks": [
@@ -316,6 +316,24 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 1,
           "detail": "On commit e8c22a7b9baca76343be05fd97a40343db4e3111, workspace/root typecheck, ESLint, and Prettier passed. The sampler suite reported 11 passing and one failing test in its canonical-order/pose-only case; 8 PostgreSQL tests were skipped. Build/calibration, integration, and E2E did not run. The hosted log did not preserve assertion-level failure detail; bounded test repair 1 is in progress."
+        },
+        {
+          "command": "GitHub Actions run #13: pnpm verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "On commit 4603156ac700f095e345d3c60f4a60b336d51d5b, full hosted typecheck, ESLint, Prettier, unit tests, and build passed. The sampler suite reported 12 passing tests; 8 PostgreSQL tests remained skipped. The real-WASM calibration artifact was uploaded as ID 11665851189 (104,314 bytes); metadata digest sha256:7fb5dda038d1d5bffcba0a95f7e6886ebfee615e071e8a60bb77a3912c1757b6. The new artifact was not downloaded or data-reviewed; accepted B0 artifact review remains from run #8."
+        },
+        {
+          "command": "GitHub Actions run #13: pnpm test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 integration test passed."
+        },
+        {
+          "command": "GitHub Actions run #13: pnpm test:e2e --workers=1",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "All 3 one-worker Chromium tests passed."
         },
         {
           "command": "git diff --check after T02-C2 test repair 1",
@@ -486,12 +504,12 @@
         },
         {
           "id": "T02-C0",
-          "status": "CHANGES_REQUIRED",
+          "status": "ACCEPTED",
           "owner": "coordinator",
           "packet": "execution_state/packets/T02-C0-shared-restart-pose.md",
           "implementation_report": "execution_state/reports/T02-C0-shared-restart-pose-implementation.md",
           "review_report": "execution_state/reports/T02-C0-shared-restart-pose-review.md",
-          "evidence": "Coordinator implemented a pure tangent pose helper and focused unit tests. Independent source review PASS at execution_state/reports/T02-C0-shared-restart-pose-review.md; formatting repair 1 also passed independent diff review. Run #10 passed typecheck, ESLint, and Prettier, then found one over-strict exact floating-point assertion (69 passed, 8 PostgreSQL skipped). Test repair 1 replaces exact equality with 12-place component comparisons; independent review PASS at execution_state/reports/T02-C0-test-repair-1-review.md. The formula is unchanged. New hosted verify, integration, and E2E checks remain pending; T02 remains RUNNING."
+          "evidence": "Coordinator implemented a pure tangent pose helper and focused unit tests. Independent source review PASS at execution_state/reports/T02-C0-shared-restart-pose-review.md. The hosted formatter repair and 12-place numeric test repair received independent PASS reviews. GitHub Actions run #13 passed full verify (typecheck, ESLint, Prettier, unit tests, and build), integration, and all 3 one-worker Chromium tests on commit 4603156ac700f095e345d3c60f4a60b336d51d5b. C0 is accepted; parent T02 remains RUNNING."
         },
         {
           "id": "T02-C0-format-repair-1",
@@ -504,21 +522,21 @@
         },
         {
           "id": "T02-C0-test-repair-1",
-          "status": "IMPLEMENTED",
+          "status": "VERIFIED",
           "owner": "coordinator",
           "packet": "execution_state/packets/T02-C0-test-repair-1.md",
           "implementation_report": "execution_state/reports/T02-C0-test-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-C0-test-repair-1-review.md",
-          "evidence": "Coordinator replaced only the flat-pose test's exact position/quaternion object equality with per-component 12-place comparisons; expected formulas and helper are unchanged. Independent diff review PASS at execution_state/reports/T02-C0-test-repair-1-review.md. No local build/test/check ran; new hosted verify, integration, and E2E checks are pending."
+          "evidence": "Coordinator replaced only the flat-pose test's exact position/quaternion object equality with per-component 12-place comparisons; expected formulas and helper are unchanged. Independent diff review PASS. Run #13 full verify, integration, and one-worker Chromium E2E passed on commit 4603156ac700f095e345d3c60f4a60b336d51d5b. No local test/build ran."
         },
         {
           "id": "T02-C2",
-          "status": "IMPLEMENTED",
+          "status": "ACCEPTED",
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-C2-playback-sampling.md",
           "implementation_report": "execution_state/reports/T02-C2-sampling-implementation.md",
           "review_report": "execution_state/reports/T02-C2-sampling-review.md",
-          "evidence": "Pure, Babylon-free sampler implementation and synthetic-body tests are complete under the exact packet paths; implementation report marks every check NOT RUN. T01 and T02-A are accepted prerequisites. Independent review by /root/foundation_review passed at execution_state/reports/T02-C2-sampling-review.md; hosted CI is required before acceptance."
+          "evidence": "Pure, Babylon-free sampler implementation and synthetic-body tests are complete. Independent source review PASS at execution_state/reports/T02-C2-sampling-review.md. The hosted formatting repair and test repair received independent PASS reviews. Run #13 passed full verify (including all 12 sampler tests and build), integration, and all 3 one-worker Chromium tests on commit 4603156ac700f095e345d3c60f4a60b336d51d5b. C2 is accepted; parent T02 remains RUNNING."
         },
         {
           "id": "T02-C2-format-repair-1",
@@ -531,15 +549,24 @@
         },
         {
           "id": "T02-C2-test-repair-1",
-          "status": "IMPLEMENTED",
+          "status": "VERIFIED",
           "owner": "coordinator",
           "packet": "execution_state/packets/T02-C2-test-repair-1.md",
           "implementation_report": "execution_state/reports/T02-C2-test-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-C2-test-repair-1-review.md",
-          "evidence": "Coordinator changed only numeric assertions in the failing canonical-order/pose-only test to component-wise 12-place comparisons; sampler source and other tests are unchanged. Independent review PASS at execution_state/reports/T02-C2-test-repair-1-review.md confirms the cadence/count, exact t=0, canonical IDs, pose-only shape, and all pose values remain checked. Hosted run #12 assertion-level detail was unavailable. No local tests/builds ran; fresh hosted acceptance gates are pending."
+          "evidence": "Coordinator changed only numeric assertions in the failing canonical-order/pose-only test to component-wise 12-place comparisons; sampler source and other tests are unchanged. Independent review PASS confirms the cadence/count, exact t=0, canonical IDs, pose-only shape, and all pose values remain checked. Run #13 full verify, integration, and one-worker Chromium E2E passed on commit 4603156ac700f095e345d3c60f4a60b336d51d5b. No local tests/builds ran."
+        },
+        {
+          "id": "T02-B2",
+          "status": "RUNNING",
+          "owner": "/root/toolchain_audit — implementation; coordinator — CI artifact wiring; /root/foundation_review — independent review",
+          "packet": "execution_state/packets/T02-B2-intended-shot-probe.md",
+          "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
+          "review_report": "execution_state/reports/T02-B2-intended-shot-probe-review.md",
+          "evidence": "Prerequisite T02-C0 is ACCEPTED. Worker is assigned the packet's exact test/report paths; coordinator owns the separate CI output/upload change. Probe must use real pinned Havok WASM, preserve all fifteen-body observations, and must not select production coefficients. Hosted execution and artifact review remain pending."
         }
       ],
-      "next_action": "Push independently reviewed C2 test repair 1 for hosted verify, integration, and one-worker browser tests. C0 test repair and C2 source have independent PASS reviews; neither is accepted until all hosted gates pass. After C0 is accepted, run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. Then define bounded versioned config/cancellation decisions, implement canonical facts and the runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "Implement the real-Havok T02-B2 intended cap-into-button diagnostic and coordinator-owned artifact upload wiring. After independent source review, push for hosted verify, integration, and browser tests; retrieve and independently review all 40 observation tuples. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",
