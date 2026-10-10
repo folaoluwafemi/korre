@@ -214,11 +214,12 @@ function normalizeObservations(
 
   const maximumTimeMs = config.simulation.maxShotDurationSeconds * 1_000;
   const observations: Observation[] = [];
+  const candidates = value as readonly unknown[];
   let previousStep = -1;
   let previousTimeMs = -1;
 
-  for (let index = 0; index < value.length; index += 1) {
-    const candidate = value[index];
+  for (let index = 0; index < candidates.length; index += 1) {
+    const candidate = candidates[index];
     if (!isRecord(candidate)) {
       throw new TypeError("Physics observation must be an object.");
     }
@@ -419,7 +420,9 @@ function isWhollyInsidePitch(
   );
 }
 
-function interpolateQuaternion(a: Quat, b: Quat, amount: number): Quat {
+type ShortestArcEndpoints = { cosine: number; end: Quat };
+
+function shortestArcEndpoints(a: Quat, b: Quat): ShortestArcEndpoints {
   let bx = b.x;
   let by = b.y;
   let bz = b.z;
@@ -432,6 +435,21 @@ function interpolateQuaternion(a: Quat, b: Quat, amount: number): Quat {
     bz = -bz;
     bw = -bw;
   }
+
+  return { cosine, end: { x: bx, y: by, z: bz, w: bw } };
+}
+
+function multiplyQuaternions(a: Quat, b: Quat): Quat {
+  return {
+    x: a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+    y: a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+    z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w,
+    w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+  };
+}
+
+function interpolateQuaternion(a: Quat, b: Quat, amount: number): Quat {
+  const { cosine, end } = shortestArcEndpoints(a, b);
 
   let leftWeight: number;
   let rightWeight: number;
@@ -446,10 +464,10 @@ function interpolateQuaternion(a: Quat, b: Quat, amount: number): Quat {
   }
 
   const result = {
-    x: leftWeight * a.x + rightWeight * bx,
-    y: leftWeight * a.y + rightWeight * by,
-    z: leftWeight * a.z + rightWeight * bz,
-    w: leftWeight * a.w + rightWeight * bw,
+    x: leftWeight * a.x + rightWeight * end.x,
+    y: leftWeight * a.y + rightWeight * end.y,
+    z: leftWeight * a.z + rightWeight * end.z,
+    w: leftWeight * a.w + rightWeight * end.w,
   };
   const norm = Math.hypot(result.x, result.y, result.z, result.w);
   return {
@@ -472,37 +490,122 @@ function interpolatePose(a: Pose, b: Pose, amount: number): Pose {
   };
 }
 
-function quaternionArcRadians(a: Quat, b: Quat): number {
-  const cosine = Math.abs(
-    a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w,
-  );
-  return 2 * Math.acos(Math.max(-1, Math.min(1, cosine)));
-}
-
 function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
-  const axisA = verticalAxis(a);
-  const axisB = verticalAxis(b);
-  const cosine = Math.max(-1, Math.min(1, dot(axisA, axisB)));
-  const axisArc = Math.acos(cosine);
-  const quaternionArc = quaternionArcRadians(a, b);
-  if (quaternionArc === 0) {
-    return axisArc;
+  const { cosine, end } = shortestArcEndpoints(a, b);
+  if (
+    a.x === end.x &&
+    a.y === end.y &&
+    a.z === end.z &&
+    a.w === end.w
+  ) {
+    return 0;
+  }
+  const selectedCosine = Math.max(0, Math.min(1, cosine));
+  const relative = multiplyQuaternions(end, {
+    x: -a.x,
+    y: -a.y,
+    z: -a.z,
+    w: a.w,
+  });
+  const relativeNorm = Math.hypot(
+    relative.x,
+    relative.y,
+    relative.z,
+    relative.w,
+  );
+  if (relativeNorm === 0 || !Number.isFinite(relativeNorm)) {
+    throw new TypeError("Cylinder rotation axis bound is not finite.");
   }
 
-  // Cylinder support is invariant to twist around its own axis. Under the
-  // shortest-arc rotation, that axis follows a spherical arc whose length is
-  // this endpoint angle. Normalized lerp follows the same arc with at most
-  // this physical-speed ratio versus slerp, so pure vertical-axis yaw costs
-  // zero support travel while tilted-axis motion remains conservatively bound.
-  const normalizedLerpRateRatio = Math.max(
-    1,
-    (4 * Math.tan(quaternionArc / 4)) / quaternionArc,
+  const relativeVectorLength =
+    Math.hypot(relative.x, relative.y, relative.z) / relativeNorm;
+
+  const angleFromDot = 2 * Math.acos(selectedCosine);
+  const angleFromRelative =
+    2 *
+    Math.atan2(
+      relativeVectorLength,
+      Math.abs(relative.w) / relativeNorm,
+    );
+  const theta = Math.max(angleFromDot, angleFromRelative);
+  if (!Number.isFinite(theta) || theta < 0 || theta > Math.PI + 1e-12) {
+    throw new TypeError("Cylinder rotation angle bound is not finite.");
+  }
+
+  // Add an outward allowance for dot/product/trigonometric roundoff before
+  // applying the monotone angular-speed factor. Exact equivalent endpoints
+  // returned zero above; a numerically tiny, non-identical arc stays bounded.
+  const rotationMargin = 64 * Number.EPSILON * Math.max(1, theta);
+  const thetaUpper = Math.min(Math.PI, theta + rotationMargin);
+  const nlerp = cosine > 0.9995;
+  const angularSpeed = nlerp
+    ? 4 * Math.tan(thetaUpper / 4)
+    : thetaUpper;
+  if (!Number.isFinite(angularSpeed) || angularSpeed < 0) {
+    throw new TypeError("Cylinder angular speed bound is not finite.");
+  }
+
+  // The world relative quaternion is end * inverse(start), so its vector
+  // part supplies the selected world-axis direction. If that direction is
+  // numerically uncertain, use the full physical angular speed (s <= 1).
+  if (relativeVectorLength <= 1e-8) {
+    return angularSpeed + 64 * Number.EPSILON * Math.max(1, angularSpeed);
+  }
+
+  const relativeVectorNorm = Math.hypot(relative.x, relative.y, relative.z);
+  const rotationAxis = {
+    x: relative.x / relativeVectorNorm,
+    y: relative.y / relativeVectorNorm,
+    z: relative.z / relativeVectorNorm,
+  };
+  const initialAxis = normalized(verticalAxis(a));
+  if (initialAxis === undefined) {
+    throw new TypeError("Initial cylinder axis could not be bounded finitely.");
+  }
+  const axisSine = Math.hypot(
+    rotationAxis.y * initialAxis.z - rotationAxis.z * initialAxis.y,
+    rotationAxis.z * initialAxis.x - rotationAxis.x * initialAxis.z,
+    rotationAxis.x * initialAxis.y - rotationAxis.y * initialAxis.x,
   );
-  return axisArc * normalizedLerpRateRatio;
+  if (!Number.isFinite(axisSine)) {
+    throw new TypeError("Cylinder symmetry-axis travel is non-finite.");
+  }
+
+  // Division by the relative vector length amplifies floating-point error on
+  // small rotations. Inflate |u x v0| by a conservative operation-count
+  // allowance; near-degenerate axes took the full-angle fallback above.
+  const axisSineMargin =
+    (128 * Number.EPSILON) / relativeVectorLength +
+    64 * Number.EPSILON;
+  const axisSineUpper = Math.min(1, axisSine + axisSineMargin);
+  const travel = angularSpeed * axisSineUpper;
+  if (!Number.isFinite(travel) || travel < 0) {
+    throw new TypeError("Cylinder symmetry-axis travel could not be bounded.");
+  }
+  return travel + 64 * Number.EPSILON * Math.max(1, angularSpeed);
 }
 
 function circumradius(dimensions: { radius: number; height: number }): number {
   return Math.hypot(dimensions.radius, dimensions.height / 2);
+}
+
+function clearanceLipschitzBound(
+  centerTravel: number,
+  dimensions: { radius: number; height: number },
+  angularTravel: number,
+): number {
+  const bound = centerTravel + circumradius(dimensions) * angularTravel;
+  if (!Number.isFinite(bound) || bound < 0) {
+    throw new TypeError("Whole-body clearance could not be bounded finitely.");
+  }
+  if (bound === 0) {
+    return 0;
+  }
+  const outwardBound = bound + 64 * Number.EPSILON * Math.max(1, bound);
+  if (!Number.isFinite(outwardBound)) {
+    throw new TypeError("Whole-body clearance could not be bounded finitely.");
+  }
+  return outwardBound;
 }
 
 function supportClearanceLipschitz(
@@ -511,12 +614,12 @@ function supportClearanceLipschitz(
   boundary: Boundary,
   dimensions: { radius: number; height: number },
 ): number {
-  return (
+  return clearanceLipschitzBound(
     Math.abs(
       after.position[boundary.axis] - before.position[boundary.axis],
-    ) +
-    circumradius(dimensions) *
-      cylinderAxisAngularTravelBound(before.rotation, after.rotation)
+    ),
+    dimensions,
+    cylinderAxisAngularTravelBound(before.rotation, after.rotation),
   );
 }
 
@@ -660,17 +763,21 @@ function provesGoalPassageClear(
   }
 
   const { radius, height } = dimensionsFor("button", config);
-  const shapeRadius = circumradius({ radius, height });
   const angularTravel = cylinderAxisAngularTravelBound(
     before.rotation,
     after.rotation,
   );
-  const horizontalLipschitz =
-    Math.abs(after.position.x - before.position.x) +
-    shapeRadius * angularTravel;
-  const verticalLipschitz =
-    Math.abs(after.position.y - before.position.y) +
-    shapeRadius * angularTravel;
+  const dimensions = { radius, height };
+  const horizontalLipschitz = clearanceLipschitzBound(
+    Math.abs(after.position.x - before.position.x),
+    dimensions,
+    angularTravel,
+  );
+  const verticalLipschitz = clearanceLipschitzBound(
+    Math.abs(after.position.y - before.position.y),
+    dimensions,
+    angularTravel,
+  );
   const maximumDepth = 12;
 
   // The passage starts when the leading support reaches the goal plane and
@@ -824,9 +931,11 @@ function compareFacts(a: SimulationFact, b: SimulationFact): number {
 
 /**
  * Derive finite, canonical facts from every actual physical observation.
- * Positions are linear-interpolated and rotations use shortest-arc slerp
- * between adjacent substep endpoints. This is swept pose interpolation, not
- * a claim that endpoint observations prove collision-free physics traversal.
+ * Positions are linear-interpolated and rotations use the existing
+ * shortest-arc quaternion interpolation between adjacent substep endpoints,
+ * including its normalized-linear near-equal branch. This is swept pose
+ * interpolation, not a claim that endpoint observations prove collision-free
+ * physics traversal.
  */
 export function deriveSimulationFacts(
   observations: readonly PhysicsStepObservation[],

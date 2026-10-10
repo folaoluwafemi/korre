@@ -73,6 +73,16 @@ function rotationAboutZ(degrees: number): Quat {
   };
 }
 
+function rotationAboutX(degrees: number): Quat {
+  const halfAngle = (degrees * Math.PI) / 360;
+  return {
+    x: Math.sin(halfAngle),
+    y: 0,
+    z: 0,
+    w: Math.cos(halfAngle),
+  };
+}
+
 function rotationAboutY(degrees: number): Quat {
   const halfAngle = (degrees * Math.PI) / 360;
   return {
@@ -80,6 +90,52 @@ function rotationAboutY(degrees: number): Quat {
     y: Math.sin(halfAngle),
     z: 0,
     w: Math.cos(halfAngle),
+  };
+}
+
+function rotationAboutAxis(axis: Vec3, radians: number): Quat {
+  const length = Math.hypot(axis.x, axis.y, axis.z);
+  const halfAngle = radians / 2;
+  const sine = Math.sin(halfAngle) / length;
+  return {
+    x: axis.x * sine,
+    y: axis.y * sine,
+    z: axis.z * sine,
+    w: Math.cos(halfAngle),
+  };
+}
+
+function multiplyQuaternions(left: Quat, right: Quat): Quat {
+  return {
+    x:
+      left.w * right.x +
+      left.x * right.w +
+      left.y * right.z -
+      left.z * right.y,
+    y:
+      left.w * right.y -
+      left.x * right.z +
+      left.y * right.w +
+      left.z * right.x,
+    z:
+      left.w * right.z +
+      left.x * right.y -
+      left.y * right.x +
+      left.z * right.w,
+    w:
+      left.w * right.w -
+      left.x * right.x -
+      left.y * right.y -
+      left.z * right.z,
+  };
+}
+
+function negateQuaternion(rotation: Quat): Quat {
+  return {
+    x: -rotation.x,
+    y: -rotation.y,
+    z: -rotation.z,
+    w: -rotation.w,
   };
 }
 
@@ -639,6 +695,414 @@ describe("pure simulation fact derivation", () => {
     expect(crossings[0]?.kind).toBe("out");
     expect(crossings[0]?.step).toBe(2);
     expect(crossings[0]?.timeMs).toBeLessThan(intervalMs * 1.5);
+  });
+
+  it("distinguishes pi/4 path length from endpoint-axis angle", () => {
+    const theta = Math.PI / 4;
+    const beta = 0.01;
+    const axisPath = theta * Math.sin(beta);
+    const endpointAngle =
+      2 * Math.asin(Math.sin(beta) * Math.sin(theta / 2));
+    const priorEndpointBound =
+      endpointAngle * ((4 * Math.tan(theta / 4)) / theta);
+
+    expect(axisPath).toBeCloseTo(0.007853850735, 11);
+    expect(endpointAngle).toBeCloseTo(0.007653559767, 11);
+    expect(priorEndpointBound).toBeLessThan(axisPath);
+  });
+
+  it("finds the earliest pi/4 small-circle hidden exit", () => {
+    const intervalMs =
+      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+    const config: Readonly<CounterballConfig> = {
+      ...COUNTERBALL_CONFIG_V1,
+      geometry: {
+        ...COUNTERBALL_CONFIG_V1.geometry,
+        buttonThickness: 0.02,
+      },
+    };
+    const {
+      buttonRadius,
+      buttonThickness,
+      pitchWidth,
+      surfaceY,
+    } = config.geometry;
+    const theta = Math.PI / 4;
+    const beta = 0.01;
+    const epsilon = 0.0005;
+    const eta = 1e-7;
+    const halfHeight = buttonThickness / 2;
+    const centerX = pitchWidth / 2 + halfHeight + eta;
+    const y = surfaceY + Math.hypot(buttonRadius, halfHeight) + 0.01;
+    const relativeAxis = { x: Math.cos(beta), y: 0, z: Math.sin(beta) };
+    const tilt = rotationAboutZ(-90);
+    const startRotation = multiplyQuaternions(
+      rotationAboutAxis(relativeAxis, -theta * epsilon),
+      tilt,
+    );
+    const endRotation = multiplyQuaternions(
+      rotationAboutAxis(relativeAxis, theta * (1 - epsilon)),
+      tilt,
+    );
+    const clearanceAt = (amount: number): number => {
+      const delta =
+        2 *
+        Math.asin(
+          Math.sin(beta) *
+            Math.sin((theta * Math.abs(amount - epsilon)) / 2),
+        );
+      return (
+        buttonRadius * Math.sin(delta) +
+        halfHeight * Math.cos(delta) -
+        halfHeight -
+        eta
+      );
+    };
+
+    expect(clearanceAt(0)).toBeGreaterThan(0);
+    expect(clearanceAt(0.5)).toBeGreaterThan(0);
+    expect(clearanceAt(1)).toBeGreaterThan(0);
+    expect(clearanceAt(epsilon)).toBeLessThan(0);
+
+    let low = 0;
+    let high = epsilon;
+    for (let iteration = 0; iteration < 60; iteration += 1) {
+      const middle = (low + high) / 2;
+      if (clearanceAt(middle) >= 0) {
+        low = middle;
+      } else {
+        high = middle;
+      }
+    }
+    const expectedFirstRoot = (low + high) / 2;
+
+    const observations: PhysicsStepObservation[] = [
+      createObservation(0, 0, {
+        button: {
+          position: { x: 5.8, y, z: 0 },
+          rotation: startRotation,
+        },
+      }),
+    ];
+    const translationSegments = Math.ceil(
+      (centerX - 5.8) / (buttonThickness / 4),
+    );
+    for (let index = 1; index <= translationSegments; index += 1) {
+      const fraction = index / translationSegments;
+      observations.push(
+        createObservation(1, intervalMs * fraction, {
+          button: {
+            position: { x: 5.8 + (centerX - 5.8) * fraction, y, z: 0 },
+            rotation: startRotation,
+          },
+        }),
+      );
+    }
+    observations.push(
+      createObservation(2, intervalMs * 2, {
+        button: {
+          position: { x: centerX, y, z: 0 },
+          rotation: endRotation,
+        },
+      }),
+    );
+
+    const rightOuts = crossingFacts(
+      deriveSimulationFacts(observations, config),
+    ).filter(
+      (crossing) =>
+        crossing.entity === "button" &&
+        crossing.boundary === "right" &&
+        crossing.kind === "out",
+    );
+    expect(rightOuts).toHaveLength(1);
+    expect(rightOuts[0]?.step).toBe(2);
+    const observedFraction =
+      ((rightOuts[0]?.timeMs ?? 0) - intervalMs) / intervalMs;
+    expect(observedFraction).toBeGreaterThan(0);
+    expect(observedFraction).toBeLessThan(epsilon);
+    expect(observedFraction).toBeCloseTo(expectedFirstRoot, 8);
+    expect(observedFraction).toBeCloseTo(epsilon, 3);
+  });
+
+  it.each([
+    {
+      label: "NLERP branch above the threshold",
+      cosine: 0.9995001,
+      nlerp: true,
+    },
+    {
+      label: "SLERP branch below the threshold",
+      cosine: 0.9994999,
+      nlerp: false,
+    },
+  ])("uses the selected $label and bounds dense support samples", (fixture) => {
+    const intervalMs =
+      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+    const { buttonRadius, buttonThickness, pitchWidth, surfaceY } =
+      COUNTERBALL_CONFIG_V1.geometry;
+    const theta = 2 * Math.acos(fixture.cosine);
+    const beta = 0.01;
+    const halfHeight = buttonThickness / 2;
+    const eta = 1e-7;
+    const centerX = pitchWidth / 2 + halfHeight + eta;
+    const y = surfaceY + buttonRadius + 0.01;
+    const relativeAxis = { x: Math.cos(beta), y: 0, z: Math.sin(beta) };
+    const tilt = rotationAboutZ(-90);
+    const startRotation = multiplyQuaternions(
+      rotationAboutAxis(relativeAxis, -theta / 2),
+      tilt,
+    );
+    const endRotation = multiplyQuaternions(
+      rotationAboutAxis(relativeAxis, theta / 2),
+      tilt,
+    );
+    const actualCosine =
+      startRotation.x * endRotation.x +
+      startRotation.y * endRotation.y +
+      startRotation.z * endRotation.z +
+      startRotation.w * endRotation.w;
+    expect(actualCosine > 0.9995).toBe(fixture.nlerp);
+
+    const supportAt = (amount: number): number => {
+      let physicalOffset: number;
+      if (fixture.nlerp) {
+        const alpha = theta / 2;
+        const phi = Math.atan2(
+          amount * Math.sin(alpha),
+          1 - amount + amount * Math.cos(alpha),
+        );
+        physicalOffset = 2 * phi - theta / 2;
+      } else {
+        physicalOffset = theta * (amount - 0.5);
+      }
+      const delta =
+        2 *
+        Math.asin(
+          Math.sin(beta) * Math.sin(Math.abs(physicalOffset) / 2),
+        );
+      return buttonRadius * Math.sin(delta) + halfHeight * Math.cos(delta);
+    };
+    const clearanceAt = (amount: number): number =>
+      supportAt(amount) - halfHeight - eta;
+    expect(clearanceAt(0)).toBeGreaterThan(0);
+    expect(clearanceAt(0.5)).toBeLessThan(0);
+    expect(clearanceAt(1)).toBeGreaterThan(0);
+
+    const sampleCount = 2_048;
+    const rho = Math.hypot(buttonRadius, halfHeight);
+    const axisSpeed = fixture.nlerp
+      ? 4 * Math.tan(theta / 4) * Math.sin(beta)
+      : theta * Math.sin(beta);
+    const supportStepBound = (rho * axisSpeed) / sampleCount;
+    let previousSupport = supportAt(0);
+    for (let index = 1; index <= sampleCount; index += 1) {
+      const support = supportAt(index / sampleCount);
+      expect(Math.abs(support - previousSupport)).toBeLessThanOrEqual(
+        supportStepBound + 1e-12,
+      );
+      previousSupport = support;
+    }
+
+    const facts = deriveSimulationFacts(
+      [
+        createObservation(0, 0, {
+          button: {
+            position: { x: 5.8, y, z: 0 },
+            rotation: startRotation,
+          },
+        }),
+        createObservation(1, intervalMs, {
+          button: {
+            position: { x: centerX, y, z: 0 },
+            rotation: startRotation,
+          },
+        }),
+        createObservation(2, intervalMs * 2, {
+          button: {
+            position: { x: centerX, y, z: 0 },
+            rotation: endRotation,
+          },
+        }),
+      ],
+      COUNTERBALL_CONFIG_V1,
+    );
+    const rightOuts = crossingFacts(facts).filter(
+      (crossing) =>
+        crossing.entity === "button" &&
+        crossing.boundary === "right" &&
+        crossing.kind === "out",
+    );
+    expect(rightOuts).toHaveLength(1);
+    expect(rightOuts[0]?.step).toBe(2);
+    expect(rightOuts[0]?.timeMs).toBeLessThan(intervalMs * 1.5);
+  });
+
+  it("treats q and -q as the same and bounds near-zero rotation", () => {
+    const sameOrientation = rotationAboutZ(45);
+    const y =
+      COUNTERBALL_CONFIG_V1.geometry.surfaceY +
+      Math.hypot(
+        COUNTERBALL_CONFIG_V1.geometry.buttonRadius,
+        COUNTERBALL_CONFIG_V1.geometry.buttonThickness / 2,
+      ) +
+      0.01;
+    const signedEquivalentFacts = deriveSimulationFacts(
+      [
+        createObservation(0, 0, {
+          button: {
+            position: { x: 5.8, y, z: 0 },
+            rotation: sameOrientation,
+          },
+        }),
+        createObservation(1, 1, {
+          button: {
+            position: { x: 5.8, y, z: 0 },
+            rotation: negateQuaternion(sameOrientation),
+          },
+        }),
+      ],
+      COUNTERBALL_CONFIG_V1,
+    );
+    expect(crossingFacts(signedEquivalentFacts)).toEqual([]);
+
+    const tinyRotation = rotationAboutZ(1e-7);
+    const nearZeroFacts = deriveSimulationFacts(
+      [
+        createObservation(0, 0, {
+          button: { position: { x: 5.8, y, z: 0 } },
+        }),
+        createObservation(1, 1, {
+          button: {
+            position: { x: 5.8, y, z: 0 },
+            rotation: tinyRotation,
+          },
+        }),
+      ],
+      COUNTERBALL_CONFIG_V1,
+    );
+    expect(crossingFacts(nearZeroFacts)).toEqual([]);
+  });
+
+  it("keeps the exact pi tie finite and finds its first exit", () => {
+    const intervalMs =
+      COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds * 1_000;
+    const { buttonThickness, buttonRadius, pitchWidth, surfaceY } =
+      COUNTERBALL_CONFIG_V1.geometry;
+    const halfHeight = buttonThickness / 2;
+    const eta = 1e-7;
+    const centerX = pitchWidth / 2 + halfHeight + eta;
+    const y = surfaceY + buttonRadius + 0.01;
+    const halfTurn: Quat = { x: 0, y: 0, z: 1, w: 0 };
+    const facts = deriveSimulationFacts(
+      [
+        createObservation(0, 0, {
+          button: { position: { x: 5.8, y, z: 0 } },
+        }),
+        createObservation(1, intervalMs, {
+          button: { position: { x: centerX, y, z: 0 } },
+        }),
+        createObservation(2, intervalMs * 2, {
+          button: {
+            position: { x: centerX, y, z: 0 },
+            rotation: halfTurn,
+          },
+        }),
+      ],
+      COUNTERBALL_CONFIG_V1,
+    );
+    const rightOuts = crossingFacts(facts).filter(
+      (crossing) =>
+        crossing.entity === "button" &&
+        crossing.boundary === "right" &&
+        crossing.kind === "out",
+    );
+    expect(rightOuts).toHaveLength(1);
+    expect(rightOuts[0]?.step).toBe(2);
+    expect(rightOuts[0]?.timeMs).toBeLessThan(intervalMs * 1.5);
+  });
+
+  it.each([
+    {
+      label: "right-normal perpendicular axis",
+      boundary: "right" as const,
+      rotation: rotationAboutZ(0),
+      projection: 0,
+      equalSupport: false,
+    },
+    {
+      label: "right-normal parallel axis",
+      boundary: "right" as const,
+      rotation: rotationAboutZ(90),
+      projection: -1,
+      equalSupport: false,
+    },
+    {
+      label: "end-line-normal perpendicular axis",
+      boundary: "awayEnd" as const,
+      rotation: rotationAboutX(0),
+      projection: 0,
+      equalSupport: false,
+    },
+    {
+      label: "end-line-normal parallel axis",
+      boundary: "awayEnd" as const,
+      rotation: rotationAboutX(90),
+      projection: 1,
+      equalSupport: false,
+    },
+    {
+      label: "equal radial and axial support",
+      boundary: "right" as const,
+      rotation: rotationAboutZ(-45),
+      projection: Math.SQRT1_2,
+      equalSupport: true,
+    },
+  ])("keeps $label support cases finite", (fixture) => {
+    const config: Readonly<CounterballConfig> = fixture.equalSupport
+      ? {
+          ...COUNTERBALL_CONFIG_V1,
+          geometry: {
+            ...COUNTERBALL_CONFIG_V1.geometry,
+            buttonThickness: COUNTERBALL_CONFIG_V1.geometry.buttonRadius * 2,
+          },
+        }
+      : COUNTERBALL_CONFIG_V1;
+    const intervalMs = config.simulation.fixedStepSeconds * 1_000;
+    const { buttonRadius, buttonThickness, surfaceY } = config.geometry;
+    const halfHeight = buttonThickness / 2;
+    const boundary = boundaryGeometry(fixture.boundary, config);
+    const support =
+      buttonRadius * Math.sqrt(1 - fixture.projection * fixture.projection) +
+      halfHeight * Math.abs(fixture.projection);
+    const y = surfaceY + Math.hypot(buttonRadius, halfHeight) + 0.01;
+    const startPosition = { x: 0, y, z: 0 };
+    const endPosition = { ...startPosition };
+    startPosition[boundary.axis] =
+      boundary.plane + boundary.inwardSign * (support + 0.01);
+    endPosition[boundary.axis] =
+      boundary.plane - boundary.inwardSign * (support + 0.01);
+    const facts = deriveSimulationFacts(
+      [
+        createObservation(0, 0, {
+          button: {
+            position: startPosition,
+            rotation: fixture.rotation,
+          },
+        }),
+        createObservation(1, intervalMs, {
+          button: {
+            position: endPosition,
+            rotation: fixture.rotation,
+          },
+        }),
+      ],
+      config,
+    );
+    const crossing = firstCrossing(facts);
+    expect(crossing.entity).toBe("button");
+    expect(crossing.boundary).toBe(fixture.boundary);
+    expect(crossing.kind).toBe("out");
   });
 
   it.each([

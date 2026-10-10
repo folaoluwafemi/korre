@@ -121,6 +121,86 @@
     ]
   },
   {
+    "id": "T02-F01-ROTATION-1",
+    "parent": "T02",
+    "title": "Replace endpoint-axis travel with a conservative rotational support bound",
+    "role": "worker",
+    "depends_on": [
+      "T02-F01-math-escalation-1",
+      "T02-C0",
+      "T02-C2",
+      "C00-A",
+      "C00"
+    ],
+    "supersedes": [
+      "T02-F01"
+    ],
+    "read_paths": [
+      "execution_state/packets/T02-F01-facts.md",
+      "execution_state/packets/T02-F01-repair-2.md",
+      "execution_state/packets/T02-F01-math-escalation-1.md",
+      "execution_state/reports/T02-F01-repair-2-review.md",
+      "execution_state/reports/T02-F01-math-escalation-1.md",
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts"
+    ],
+    "outputs": [
+      "A conservative, fail-closed whole-button support-clearance bound for the actual shortest-arc SLERP/NLERP interpolation, with hosted lint cleanup and adversarial regression coverage."
+    ],
+    "steps": [
+      "Compute the selected relative world quaternion, physical angle, and vertical-axis orbit factor from the actual sign-selected interpolation; use theta*s for SLERP and 4*tan(theta/4)*s for the existing normalized-linear branch.",
+      "Use a conservative finite-cylinder support coefficient and explicit outward numeric margin or a safe full-angle fallback near degeneracy; reject any uncertain or nonfinite bound rather than certifying clearance.",
+      "Apply the bound to all existing button-boundary and goal-aperture clearance searches while preserving centre travel, left-first earliest-root search, work/depth limits, same-step event ordering, and input immutability.",
+      "Add the theta=pi/4 small-circle hidden-crossing regression using test-only button thickness 0.02; retain every prior F01 regression and add yaw, NLERP-threshold, degeneracy/pi-tie, and support-alignment coverage.",
+      "Fix the hosted ESLint no-unsafe-assignment at facts.ts:221 without weakening lint or changing production physics defaults."
+    ],
+    "checks": [
+      {
+        "environment": "local-document",
+        "expected": "The exact packet is extracted, reports ready=true, and shows the accepted original T02/F01 prerequisites plus accepted math escalation; supersession orders source ownership but does not bypass any acceptance dependency.",
+        "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1"
+      },
+      {
+        "environment": "github",
+        "expected": "The exact pushed commit passes focused Counterball tests, Counterball typecheck, and full pnpm verify; record complete suite counts, zero skipped tests, exact SHA, full logs, and artifact hashes. No app build/test runs locally.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "Independent reviewer reproduces the small-circle bound and hidden-crossing regression, verifies fail-closed numeric handling and all prior F01 behavior, and finds no lint/test weakening or default changes.",
+        "command": "Independent exact-diff review against the accepted math report and F01 contracts"
+      }
+    ],
+    "acceptance": [
+      "The clearance bound covers the parameterized symmetry-axis path for every branch selected by the production interpolation helper; endpoint angular separation is never used as path length.",
+      "The hidden-crossing fixture finds the earliest right/out root; pure yaw remains zero support travel; near-zero, sign-flipped, pi-tie, NLERP-threshold and nonsmooth support cases are finite, conservative or fail closed.",
+      "Every earlier F01 regression, stable ordering, immutability and bounded-work assertion remains intact; hosted typecheck, lint, tests and builds pass on the exact reviewed SHA with no skipped required checks."
+    ],
+    "negative_cases": [
+      "Do not certify an interval from endpoint symmetry-axis separation, a sample-only scan, or unproved quaternion interpolation.",
+      "Do not skip an unresolved interval, raise search work limits, weaken tests/lint, or alter cultural/gameplay/production physics defaults.",
+      "Do not claim continuous Havok motion proof or F01/T02 acceptance from a Node-only result, mock or source review."
+    ],
+    "review_questions": [
+      "Does the relative quaternion frame and sign selection match interpolateQuaternion exactly, including its dot threshold and pi tie?",
+      "Does each support Lipschitz coefficient cover finite-cylinder support at parallel, perpendicular and tie cases with a conservative floating-point margin?",
+      "Does the adversarial fixture fail under the old bound and pass by finding the earliest crossing under the corrected bound?",
+      "Do all previous source-review regressions and full hosted checks remain present and green without changing defaults?"
+    ],
+    "stop_conditions": [
+      "If the accepted derivation does not cover a runtime branch, if any unresolved interval can be skipped, or if the adversarial regression cannot be reproduced, stop and report CHANGES_REQUIRED without another source retry.",
+      "If exact-head hosted checks fail, preserve all raw logs and use the bounded escalation procedure; do not claim F01/T02 acceptance or proceed to consumers."
+    ]
+  },
+  {
     "id": "T02-L01",
     "parent": "T02",
     "title": "Run bounded coarse restart-loft diagnostic",

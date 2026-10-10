@@ -40,6 +40,7 @@ for (const packet of packets) {
     if (!strings(packet[field])) fail(id, `invalid ${field} string array.`);
     if (!["depends_on", "write_paths"].includes(field) && packet[field]?.length === 0) fail(id, `empty ${field}.`);
   }
+  if (packet.supersedes !== undefined && !strings(packet.supersedes)) fail(id, "invalid supersedes string array.");
   if ((packet.write_paths?.length ?? 0) > 5) fail(id, "more than five exact write paths.");
   if (packet.role === "worker" && packet.write_paths?.length === 0) fail(id, "worker must have concrete outputs; use coordinator role for an evidence gate.");
   for (const path of [...(packet.write_paths ?? []), ...(packet.read_paths ?? [])]) {
@@ -55,7 +56,7 @@ for (const packet of packets) {
   }
   if (!Array.isArray(packet.checks) || packet.checks.length === 0) fail(id, "missing concrete checks.");
   for (const check of packet.checks ?? []) {
-    if (!check.command || !check.expected || !["github", "source-review", "deployed", "human-device"].includes(check.environment)) fail(id, "check needs command, environment and expected result.");
+    if (!check.command || !check.expected || !["local-document", "github", "source-review", "deployed", "human-device"].includes(check.environment)) fail(id, "check needs command, environment and expected result.");
   }
 }
 
@@ -80,6 +81,16 @@ for (const packet of packets) {
     else if (byId.has(dependency)) { edges.add(dependency); packetGates.add(dependency); }
     else if (recordedPackets.get(dependency)?.status === "ACCEPTED") { edges.add(dependency); packetGates.add(dependency); }
     else fail(packet.id, `unknown packet dependency ${dependency}.`);
+  }
+  // Supersession orders write ownership and closes an older failed card. It is
+  // deliberately not added to requiredPackets: only accepted dependencies
+  // unblock execution.
+  for (const supersededId of packet.supersedes ?? []) {
+    const superseded = byId.get(supersededId);
+    if (!superseded) fail(packet.id, `unknown superseded packet ${supersededId}.`);
+    else if (superseded.parent !== packet.parent) fail(packet.id, `cannot supersede packet ${supersededId} under a different parent.`);
+    else if (recordedPackets.get(supersededId)?.status === "ACCEPTED") fail(packet.id, `cannot supersede accepted packet ${supersededId}.`);
+    edges.add(supersededId);
   }
   // Original parent gates remain mandatory, even if omitted from the card.
   for (const dependency of parents.get(packet.parent)?.dependencies ?? []) addParent(dependency);
@@ -119,7 +130,9 @@ if (errors.length) {
   process.exitCode = 1;
 } else {
   const acceptedPackets = new Set(state.tasks.flatMap((task) => task.packet_progress ?? []).filter((packet) => packet.status === "ACCEPTED").map((packet) => packet.id));
+  const supersededPackets = new Set(state.tasks.flatMap((task) => task.packet_progress ?? []).filter((packet) => packet.status === "SUPERSEDED").map((packet) => packet.id));
   const isReady = (packet) => !acceptedPackets.has(packet.id)
+    && !supersededPackets.has(packet.id)
     && requiredParents.get(packet.id).every((id) => parents.get(id).status === "ACCEPTED")
     && requiredPackets.get(packet.id).every((id) => acceptedPackets.has(id));
   const ready = packets.filter(isReady).map((packet) => packet.id);
@@ -128,7 +141,7 @@ if (errors.length) {
     const counts = new Map();
     for (const packet of packets) counts.set(packet.parent, (counts.get(packet.parent) ?? 0) + 1);
     const rows = packets.map((packet) => `| ${packet.id} | ${packet.parent} | ${packet.title.replaceAll("|", "/")} | ${packet.role} | ${packet.depends_on.join(", ") || "None"} | ${packet.write_paths.length} |`);
-    const index = `# Packet index\n\nGenerated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically by the validator. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.\n\n${packets.length} bounded cards cover ${remaining.length} remaining parents. Initially ready: ${ready.join(", ") || "none"}.\n\n| ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |\n|---|---|---|---|---|---|\n${rows.join("\n")}\n\nTo read one exact card: \`node scripts/check-completion-plan.mjs --packet <ID>\`. To revalidate or regenerate this index: \`node scripts/check-completion-plan.mjs --write-index\`. Both commands perform documentation work only. Runtime state remains execution_state/tasks.json.\n`;
+    const index = `# Packet index\n\nGenerated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.\n\n${packets.length} bounded cards cover ${remaining.length} remaining parents. Initially ready: ${ready.join(", ") || "none"}.\n\n| ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |\n|---|---|---|---|---|---|\n${rows.join("\n")}\n\nTo read one exact card: \`node scripts/check-completion-plan.mjs --packet <ID>\`. To revalidate or regenerate this index: \`node scripts/check-completion-plan.mjs --write-index\`. Both commands perform documentation work only. Runtime state remains execution_state/tasks.json.\n`;
     writeFileSync(resolve(root, planDirectory, "PACKETS.md"), index);
   }
   const argument = process.argv.indexOf("--packet");

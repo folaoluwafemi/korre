@@ -1,8 +1,8 @@
 # Packet index
 
-Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically by the validator. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
+Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-71 bounded cards cover 21 remaining parents. Initially ready: C00-A.
+72 bounded cards cover 21 remaining parents. Initially ready: C01, T02-F01-ROTATION-1.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -17,6 +17,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | C03 | T02 | Accept canonical calibration handoff for real runner | coordinator | C02 | 0 |
 | T02-D01 | T02 | Measure direct-shot impulse response on the canonical fixture | worker | C00-B, C01, T02-B0, T02-A, C00 | 1 |
 | T02-F01 | T02 | Implement pure simulation facts from physics-step observations | worker | T02-C0, T02-C2, C00-A, C00 | 2 |
+| T02-F01-ROTATION-1 | T02 | Replace endpoint-axis travel with a conservative rotational support bound | worker | T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 2 |
 | T02-L01 | T02 | Run bounded coarse restart-loft diagnostic | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00 | 1 |
 | T02-L02 | T02 | Run one bounded local refinement or record no eligible restart | worker | T02-L01 | 1 |
 | T02-P01 | T02 | Provide stable scene pose update and entity picking API | worker | parent:T03, C00, C01-H | 4 |
