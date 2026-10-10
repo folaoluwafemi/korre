@@ -882,7 +882,7 @@
         },
         {
           "id": "C00-B",
-          "status": "IMPLEMENTED",
+          "status": "RUNNING",
           "depends_on": [
             "parent:T01",
             "C00-A"
@@ -899,7 +899,7 @@
           ],
           "owner": "coordinator",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/swarm_review (independent source review PASS)",
+          "reviewer_identity": "/root/swarm_review (source and formatting-repair PASS); /root/toolchain_audit (run 38080345526 CHANGES_REQUIRED)",
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/C00-B-implementation.md",
           "review_report": "execution_state/reports/C00-B-review.md",
@@ -936,6 +936,44 @@
             },
             {
               "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080345526",
+              "exit_code": 0,
+              "detail": "Exact SHA ba59e5a40a6b2877b8be452936db73f9a64a3168; one file, 11 tests passed, no skips reported."
+            },
+            {
+              "command": "pnpm verify",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions run 38080345526",
+              "exit_code": 1,
+              "detail": "Workspace typechecks passed; Prettier failed only on protocol.test.ts and schemas.ts. Unit tests/build did not run; integration and browser E2E were skipped. Full log: execution_state/reports/C00-B-run-38080345526/counterball-verification-log/verify.log."
+            },
+            {
+              "command": "Independent C00-B hosted runtime review",
+              "result": "CHANGES_REQUIRED",
+              "report": "execution_state/reports/C00-B-runtime-review-run-38080345526.md",
+              "detail": "Confirmed exact SHA, focused 11/11 result and formatting-only blocker; no T02 or runtime acceptance."
+            },
+            {
+              "command": "GitHub-generated formatter patch: git apply --check",
+              "result": "PASS",
+              "environment": "local-source",
+              "detail": "Patch SHA-256 73b3431c6465fde2e19d88a277c8e7baaf4509f631d646907e19933df5f13ae0; exactly the two failing C00-B-owned files."
+            },
+            {
+              "command": "git diff --check after formatter repair 1",
+              "result": "PASS",
+              "environment": "local-source",
+              "detail": "No whitespace errors after applying the hosted patch."
+            },
+            {
+              "command": "Independent C00-B formatting repair 1 review",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-B-format-repair-1-review.md",
+              "detail": "Reviewer confirmed all four patch hunks are whitespace-only and limited to the two assigned files."
+            },
+            {
+              "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
               "result": "NOT RUN",
               "environment": "GitHub required",
               "detail": "Packet-owned focused protocol suite; application tests stay remote-only."
@@ -947,10 +985,25 @@
               "detail": "Exact reviewed commit must pass hosted typecheck, lint/format, unit tests, and build."
             }
           ],
-          "next_action": "Source reviewed. Push the bounded diff, run the focused protocol suite and pnpm verify on GitHub, and request exact-head independent run review before acceptance."
+          "next_action": "Formatting repair 1 passed independent source review. Commit the reviewed two-file diff plus run evidence; rerun the focused suite and pnpm verify on GitHub, then obtain exact-head independent review."
+        },
+        {
+          "id": "C00-B-format-repair-1",
+          "status": "VERIFIED",
+          "owner": "coordinator",
+          "write_paths": [
+            "packages/game-protocol/src/protocol.test.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "execution_state/reports/C00-B-format-repair-1-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/C00-B-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/C00-B-format-repair-1-review.md",
+          "reviewer_identity": "/root/swarm_review (independent source review PASS)",
+          "attempt_count": 1,
+          "evidence": "Applied the exact formatting-only GitHub artifact patch after failed run 38080345526; git apply --check and git diff --check passed; independent source review PASS. Fresh hosted checks remain required."
         }
       ],
-      "next_action": "C00-A ACCEPTED. C00-B is materialized and READY with original parent T01 preserved. Parent T02 remains RUNNING until its full simulation gates pass."
+      "next_action": "C00-B first hosted run 38080345526 passed its focused 11-test suite and typechecks, then failed Prettier on two owned files. Formatting repair 1 is applied and under independent review; rerun hosted checks before accepting C00-B or preparing C00. Parent T02 remains RUNNING."
     },
     {
       "id": "T03",

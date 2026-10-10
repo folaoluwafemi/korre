@@ -1,0 +1,49 @@
+diff --git a/packages/game-protocol/src/protocol.test.ts b/packages/game-protocol/src/protocol.test.ts
+index 7580283..e8f1a8f 100644
+--- a/packages/game-protocol/src/protocol.test.ts
++++ b/packages/game-protocol/src/protocol.test.ts
+@@ -416,8 +416,7 @@ describe("Counterball v1 protocol", () => {
+         ...calibration,
+         impulse: {
+           ...calibration.impulse,
+-          applicationHeightOffset:
+-            COUNTERBALL_CONFIG_V1.geometry.capHeight,
++          applicationHeightOffset: COUNTERBALL_CONFIG_V1.geometry.capHeight,
+         },
+       },
+       { ...calibration, restartLift: { mode: "assisted" } },
+diff --git a/packages/game-protocol/src/schemas.ts b/packages/game-protocol/src/schemas.ts
+index 3e9d72e..6de17f0 100644
+--- a/packages/game-protocol/src/schemas.ts
++++ b/packages/game-protocol/src/schemas.ts
+@@ -699,8 +699,8 @@ export const RoomCommandResponseSchema = z.union([
+   roomCommandFailureSchema,
+ ]);
+ 
+-export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
+-  z.strictObject({
++export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
++  .strictObject({
+     schemaVersion: z.literal(1),
+     configVersion: z.literal("counterball-config-1"),
+     geometry: z.strictObject({
+@@ -752,7 +752,8 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
+       maximumPrivateTargetGoals: z.literal(10),
+     }),
+     physicsCalibration: physicsCalibrationSchema.nullable(),
+-  }).superRefine((config, context) => {
++  })
++  .superRefine((config, context) => {
+     const calibration = config.physicsCalibration;
+     if (calibration === null) {
+       return;
+@@ -765,7 +766,8 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
+       context.addIssue({
+         code: "custom",
+         path: ["physicsCalibration", "impulse", "applicationHeightOffset"],
+-        message: "Application height offset must stay within half the cap height.",
++        message:
++          "Application height offset must stay within half the cap height.",
+       });
+     }
+ 

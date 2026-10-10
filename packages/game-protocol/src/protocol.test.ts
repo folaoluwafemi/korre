@@ -416,8 +416,7 @@ describe("Counterball v1 protocol", () => {
         ...calibration,
         impulse: {
           ...calibration.impulse,
-          applicationHeightOffset:
-            COUNTERBALL_CONFIG_V1.geometry.capHeight,
+          applicationHeightOffset: COUNTERBALL_CONFIG_V1.geometry.capHeight,
         },
       },
       { ...calibration, restartLift: { mode: "assisted" } },

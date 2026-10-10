@@ -699,8 +699,8 @@ export const RoomCommandResponseSchema = z.union([
   roomCommandFailureSchema,
 ]);
 
-export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
-  z.strictObject({
+export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
+  .strictObject({
     schemaVersion: z.literal(1),
     configVersion: z.literal("counterball-config-1"),
     geometry: z.strictObject({
@@ -752,7 +752,8 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
       maximumPrivateTargetGoals: z.literal(10),
     }),
     physicsCalibration: physicsCalibrationSchema.nullable(),
-  }).superRefine((config, context) => {
+  })
+  .superRefine((config, context) => {
     const calibration = config.physicsCalibration;
     if (calibration === null) {
       return;
@@ -765,7 +766,8 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
       context.addIssue({
         code: "custom",
         path: ["physicsCalibration", "impulse", "applicationHeightOffset"],
-        message: "Application height offset must stay within half the cap height.",
+        message:
+          "Application height offset must stay within half the cap height.",
       });
     }
 

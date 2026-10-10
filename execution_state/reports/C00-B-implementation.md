@@ -1,6 +1,6 @@
 # C00-B implementation report
 
-Status: source implemented and independent source review passed; hosted checks are pending.
+Status: source implemented and independent source review passed; the first hosted attempt failed only on formatting, and repair 1 is awaiting independent review plus a fresh hosted run.
 
 ## Changes
 
@@ -33,3 +33,5 @@ The frozen guard uses a conservative energy bound and per-body `vBound`, `omegaB
 The simulation runner is not implemented yet. Therefore this packet has no runtime evidence that a calibrated runner rejects null, executes bounded substeps, or settles entities on the apron. Those are requirements for the runner and T02 parent gates; C00-B does not accept T02 or claim a playable game. All tuning remains provisional, and `physicsCalibration` remains null in the shipping fixture until measured values and a new config hash are accepted.
 
 The reviewer also confirmed that the pinned Babylon API issues one Havok world step per call. Hosted tests must still verify the changed protocol source and all workspace consumers on the exact pushed commit. No parent or runtime gate is accepted by this source review.
+
+The first hosted attempt was run 38080345526 on `ba59e5a40a6b2877b8be452936db73f9a64a3168`. The focused protocol suite passed 11/11 with no skips; typechecks passed; Prettier failed on `protocol.test.ts` and `schemas.ts`, so unit tests/build and later integration/browser steps did not run. Independent run review is CHANGES_REQUIRED. The formatter's exact two-file patch was applied under repair 1; see `C00-B-format-repair-1-implementation.md`. Fresh hosted checks are pending.
