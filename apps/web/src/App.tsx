@@ -1,6 +1,10 @@
 import { lazy, Suspense, useEffect, useState, type MouseEvent } from "react";
 
 const CounterballPreview = lazy(() => import("./CounterballPreview.js"));
+const CounterballRendererDiagnostic =
+  import.meta.env.VITE_COUNTERBALL_DEV_HARNESS === "1"
+    ? lazy(() => import("./CounterballRendererDiagnostic.js"))
+    : null;
 
 export default function App() {
   const [pathname, setPathname] = useState(() =>
@@ -34,15 +38,22 @@ export default function App() {
 
   if (pathname === "/preview") {
     return (
-      <Suspense
-        fallback={
-          <main id="main" tabIndex={-1}>
-            Loading scene preview…
-          </main>
-        }
-      >
-        <CounterballPreview onNavigateHome={() => navigate("/")} />
-      </Suspense>
+      <>
+        <Suspense
+          fallback={
+            <main id="main" tabIndex={-1}>
+              Loading scene preview…
+            </main>
+          }
+        >
+          <CounterballPreview onNavigateHome={() => navigate("/")} />
+        </Suspense>
+        {CounterballRendererDiagnostic === null ? null : (
+          <Suspense fallback={null}>
+            <CounterballRendererDiagnostic />
+          </Suspense>
+        )}
+      </>
     );
   }
 

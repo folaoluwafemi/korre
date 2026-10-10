@@ -144,3 +144,11 @@ Report-only escalation `T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2` is ACCEPTED aft
 - **Still open:** C01 has no separate diagnostic browser build/harness artifact. Its test wiring passed several named setup checks and the latest full workflow passed, but C01 is not accepted until the diagnostic artifact, explicit build-mode metadata and production exclusion proof exist. T02 is RUNNING. There is no real browser flick, full local match, AI match, online match, deployed Havok result or staging deployment.
 - **Constraints carried forward:** seven caps per side, visible holes in an ordinary plastic button, open green concrete, one placed restart, any owned cap may relocate, every other cap stays fixed, no automatic two-shot reward, unique username before public AI/online. Cultural and physics defaults remain provisional where marked.
 - **Next:** materialize and execute `C01-DIAG-PANEL`, followed by `C01-DIAG-BUILD`; then resume C01 acceptance and the accepted dependency graph toward D01/L01/P01/BR01/BR02. Never treat this renderer-only diagnostic as playable physics.
+
+## Current checkpoint — 2026-10-11
+
+`C01-DIAG-PANEL` is ACCEPTED after source review and exact-head GitHub run 38093822035. The run passed 26 test files/140 tests with zero skips, integration 1/1 and production Chromium 4/4 with zero skips/flaky/unexpected cases. The independent audit rehashed all 926 extracted artifact files and confirmed the production bundle did not include the panel at that unintegrated source SHA. It proved no panel browser interaction, flick, match, deployment or Havok behavior.
+
+`C01-DIAG-BUILD` source review is PASS at `execution_state/reports/C01-DIAG-BUILD-review.md`. It wires the panel behind `VITE_COUNTERBALL_DEV_HARNESS=1`, checks the ordinary production build with the flag unset, and adds a separately inventoried GitHub diagnostic artifact. No app build, tests or browser automation ran locally. C01 and T02 remain open.
+
+**Next:** publish the source-reviewed commit, run GitHub CI, and audit both downloaded browser artifacts. After C01 is accepted, continue C01-P/C01-H and the dependency-gated first real browser flick. The panel/build artifact is not playable proof.

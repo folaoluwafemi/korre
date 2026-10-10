@@ -94,6 +94,8 @@ jobs:
           mkdir -p .artifacts
           set -o pipefail
           pnpm verify 2>&1 | tee .artifacts/verify.log
+      - name: Check production build excludes the diagnostic renderer
+        run: node tests/production/counterball-dev-match-absent.mjs
       - name: Package the exact dry-run Worker build
         run: |
           mkdir -p .artifacts/realtime-prebuilt/dist
@@ -249,6 +251,77 @@ jobs:
         with:
           name: counterball-browser-preview
           path: apps/web/dist/
+          if-no-files-found: error
+      - name: Build the separate diagnostic renderer browser bundle
+        env:
+          VITE_COUNTERBALL_DEV_HARNESS: "1"
+        run: pnpm --filter @korre/web exec vite build --outDir dist-dev
+      - name: Package the exact diagnostic browser build and inventory
+        run: |
+          mkdir -p .artifacts/web-diagnostic
+          cp -R apps/web/dist-dev/. .artifacts/web-diagnostic/
+          node --input-type=module <<'NODE'
+          import { createHash } from "node:crypto";
+          import { readdir, readFile, writeFile } from "node:fs/promises";
+          import path from "node:path";
+          import { execFileSync } from "node:child_process";
+
+          const root = ".artifacts/web-diagnostic";
+          const marker = "Development-only renderer diagnostic";
+          const files = [];
+          async function walk(directory) {
+            for (const item of await readdir(directory, { withFileTypes: true })) {
+              const absolute = path.join(directory, item.name);
+              if (item.isDirectory()) await walk(absolute);
+              else if (item.isFile()) files.push(absolute);
+            }
+          }
+          await walk(root);
+          if (files.length === 0 || !files.some((file) => path.basename(file) === "index.html")) {
+            throw new Error("Diagnostic browser build is missing emitted files or index.html.");
+          }
+          const markerMatches = await Promise.all(files.map(async (file) => ({
+            file,
+            containsMarker: (await readFile(file)).includes(Buffer.from(marker)),
+          })));
+          if (!markerMatches.some((item) => item.containsMarker)) {
+            throw new Error("Diagnostic browser build does not contain its renderer marker.");
+          }
+          const webPackage = JSON.parse(await readFile("apps/web/package.json", "utf8"));
+          const emittedFiles = await Promise.all(files.map(async (file) => {
+            const bytes = await readFile(file);
+            return {
+              path: path.relative(root, file).split(path.sep).join("/"),
+              size: bytes.length,
+              sha256: createHash("sha256").update(bytes).digest("hex"),
+            };
+          }));
+          const inventory = {
+            sourceSha: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            buildMode: "renderer-diagnostic",
+            devHarnessFlag: "set",
+            diagnosticMarker: marker,
+            pinnedVersions: {
+              node: process.version,
+              pnpm: execFileSync("pnpm", ["--version"], { encoding: "utf8" }).trim(),
+              vite: webPackage.devDependencies.vite,
+            },
+            emittedFiles,
+          };
+          if (!inventory.sourceSha || !inventory.runId || !inventory.runAttempt) {
+            throw new Error("Diagnostic artifact provenance is incomplete.");
+          }
+          await writeFile(path.join(root, "build-inventory.json"), `${JSON.stringify(inventory, null, 2)}\n`);
+          NODE
+      - name: Upload the separate diagnostic browser build and inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterball-web-diagnostic-${{ github.sha }}
+          path: .artifacts/web-diagnostic/
+          include-hidden-files: true
+          retention-days: 14
           if-no-files-found: error
       - name: Upload browser review evidence
         if: always()

@@ -392,7 +392,8 @@
     "parent": "T02",
     "title": "Wire hosted future tests and preserve evidence remotely",
     "depends_on": [
-      "C00"
+      "C00",
+      "C01-DIAG-BUILD"
     ],
     "write_paths": [
       ".github/workflows/ci.yml",
@@ -417,7 +418,101 @@
       "Existing98 baseline tests still execute; no weakened assertions or lost DB/browser evidence.",
       "Every future check has a verified command/test-discovery owner and is run on GitHub.",
       "No app build executes on laptop; no dependency upgrade solely to hide failure.",
-      "Realtime artifact is self-contained, retained and names the actual emitted entry/modules/config; O03 requires its run/name/id and hash inventory, never an untracked laptop rebuild."
+      "Realtime artifact is self-contained, retained and names the actual emitted entry/modules/config; O03 requires its run/name/id and hash inventory, never an untracked laptop rebuild.",
+      "C01-DIAG-BUILD passes before C01 is accepted: the separate diagnostic browser artifact carries exact SHA/run/attempt/build-mode provenance and hashes, while the production artifact records the flag unset and excludes the renderer diagnostic marker. Browser diagnostic routing remains owned by C01-H."
+    ]
+  },
+  {
+    "role": "coordinator",
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md",
+      "execution_state/tasks.json",
+      "apps/web/src/App.tsx",
+      "apps/web/src/CounterballRendererDiagnostic.tsx",
+      "apps/web/src/CounterballRendererDiagnostic.css",
+      "apps/web/vite.config.ts",
+      ".github/workflows/ci.yml",
+      "scripts/serve-preview.mjs"
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet C01-DIAG-BUILD",
+        "environment": "local-document",
+        "expected": "The exact card is ready only after C00, T03 and C01-DIAG-PANEL are ACCEPTED; this check proves plan consistency only."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "No whitespace errors in the exact App, CI workflow and production absence-check script paths."
+      },
+      {
+        "command": "Independent C01-DIAG-BUILD source/config review",
+        "environment": "source-review",
+        "expected": "PASS; reviewer confirms the panel is imported only under the compile-time diagnostic flag, production remains flag-unset, and CI preserves existing jobs and uses distinct artifact provenance."
+      },
+      {
+        "command": "GitHub ci exact-head: pnpm verify, existing production Chromium suite, node tests/production/counterball-dev-match-absent.mjs, VITE_COUNTERBALL_DEV_HARNESS=1 pnpm --filter @korre/web exec vite build --outDir dist-dev, and diagnostic artifact inventory/package",
+        "environment": "github",
+        "expected": "All existing checks pass with their real zero-skip counts; the production script confirms no panel marker with the flag unset; the diagnostic build contains the marker and uploads a separately named inventory containing exact source SHA, run/attempt, mode, flag and SHA-256/size for every emitted file."
+      },
+      {
+        "command": "Independent exact-run diagnostic and production artifact audit",
+        "environment": "source-review",
+        "expected": "PASS after download; all diagnostic inventory hashes and file sets recompute, provenance matches the exact successful run, the marker is present in diagnostic output and absent from the production artifact. No browser interaction, flick, physics or playability claim is made by this card."
+      }
+    ],
+    "negative_cases": [
+      "No renderer panel import in the flag-unset production graph.",
+      "No diagnostic artifact labelled production or sharing the production artifact name.",
+      "No browser, flick, physics, match, identity or gameplay claim from a successful build or marker scan.",
+      "No local app build, test, browser automation, install or Wrangler command."
+    ],
+    "review_questions": [
+      "Does the production bundle omit the unique visible diagnostic marker after the flag is unset?",
+      "Does the separate diagnostic inventory list and hash every emitted file and retain exact run provenance?",
+      "Does the workflow preserve the existing production preview artifact and full no-skip checks?"
+    ],
+    "stop_conditions": [
+      "If a shared Playwright routing edit is needed, stop and leave it for C01-H; do not expand this card.",
+      "If any emitted diagnostic or production inventory hash differs, preserve the run and repair only the inventory/build packaging defect.",
+      "If production includes the diagnostic marker, do not weaken the assertion or accept the card; use bounded repair/escalation."
+    ],
+    "id": "C01-DIAG-BUILD",
+    "parent": "T02",
+    "title": "Build and hash a separate diagnostic renderer artifact",
+    "depends_on": [
+      "C01-DIAG-PANEL",
+      "C00",
+      "parent:T03"
+    ],
+    "write_paths": [
+      "apps/web/src/App.tsx",
+      ".github/workflows/ci.yml",
+      "tests/production/counterball-dev-match-absent.mjs"
+    ],
+    "outputs": [
+      "A compile-time flagged renderer-only panel import, a production-bundle exclusion check, and a separately named GitHub diagnostic browser artifact with exact provenance and complete emitted-file hashes. Browser routing remains for C01-H."
+    ],
+    "steps": [
+      "Use the accepted C01-DIAG-PANEL and T03 preview without changing scene geometry, input, gameplay or shared contracts.",
+      "On /preview, conditionally lazy-import and render the diagnostic panel only when import.meta.env.VITE_COUNTERBALL_DEV_HARNESS equals the literal string 1; keep the normal production graph flag-unset.",
+      "Add tests/production/counterball-dev-match-absent.mjs to fail if the flag is set or the normal apps/web/dist emitted files contain the unique renderer diagnostic marker; run exactly node tests/production/counterball-dev-match-absent.mjs after the normal production build.",
+      "Extend the existing GitHub workflow only after normal production build packaging and production Chromium checks: build a separate apps/web/dist-dev with VITE_COUNTERBALL_DEV_HARNESS=1 pnpm --filter @korre/web exec vite build --outDir dist-dev.",
+      "Package the separate output as counterball-web-diagnostic-${github.sha}; inventory every emitted path, byte size and SHA-256 plus source SHA, run ID, attempt, buildMode=renderer-diagnostic and devHarnessFlag=set. Fail if index.html, emitted files or the diagnostic marker are missing.",
+      "Upload with 14-day retention; preserve production inventory/build and browser preview as separate artifacts. Do not edit Playwright routing; C01-H owns browser mode selection and interactive diagnostic coverage."
+    ],
+    "acceptance": [
+      "Only the three exact source/config/script paths are changed, aside from implicit reports and coordinator task/ledger/catalogue bookkeeping.",
+      "The dynamic panel import and its marker are removed from the normal production artifact with VITE_COUNTERBALL_DEV_HARNESS unset; the exact absence script passes.",
+      "The diagnostic artifact is independently distinguishable, contains the diagnostic marker, and its inventory records and hashes every emitted file with exact GitHub provenance.",
+      "Existing production build artifact, hosted tests, integration checks, and Chromium regression suite remain present and report real pass/skip/retry counts.",
+      "Source review, exact-head GitHub verification, downloaded-artifact hash audit and independent review all pass before acceptance.",
+      "This card proves build separation and renderer marker presence only; no browser interaction, Havok, flick, match or playability is claimed."
     ]
   },
   {

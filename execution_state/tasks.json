@@ -1105,7 +1105,8 @@
           "reviewer_identity": "/root/foundation_review (independent source/config review PASS)",
           "depends_on": [
             "parent:T01",
-            "C00"
+            "C00",
+            "C01-DIAG-BUILD"
           ],
           "write_paths": [
             ".github/workflows/ci.yml",
@@ -1227,8 +1228,8 @@
               "detail": "All eight API archives and all 926 extracted member hashes agree. Reviewer confirms production and preview artifacts exist, but counterball-web-diagnostic does not."
             }
           ],
-          "next_action": "Run 38091279565 passes the required hosted checks and the independent audit verifies every downloaded artifact. Keep C01 CHANGES_REQUIRED: the accepted-source diagnostic browser build/harness artifact and its explicit build-mode proof are still absent. Materialize the bounded diagnostic-build producer as a separate follow-up under T02 using accepted T03 renderer inputs; do not mislabel production preview or claim a flick.",
-          "blocker": "The exact hosted workflow, Worker smoke, migrations, protocol, full verify/build, integration and production-preview browser checks now pass on run 38091279565, with all artifacts independently hash-checked. C01 acceptance remains open because no counterball-web-diagnostic artifact or diagnostic build-mode proof exists; C01.md explicitly forbids substituting the production preview or fabricating the artifact."
+          "next_action": "The existing Workerd, production, database, integration and browser checks pass on prior exact heads. C01-DIAG-BUILD owns the remaining separate diagnostic artifact and flag-unset production exclusion proof; C01 stays CHANGES_REQUIRED until that follow-up and fresh exact-head CI/artifact review pass.",
+          "blocker": "C01-DIAG-BUILD has not yet produced the separately named diagnostic browser artifact or exact build-mode provenance; existing production preview evidence cannot substitute for it."
         },
         {
           "id": "C01-pool-repair-1",
@@ -2059,11 +2060,11 @@
         },
         {
           "id": "C01-DIAG-PANEL",
-          "status": "REVIEWING",
+          "status": "ACCEPTED",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#C01-DIAG-PANEL",
-          "owner": "Coordinator integration; /root/toolchain_audit implementation released; /root/foundation_review source review PASS released",
+          "owner": "Coordinator integration; all implementation and review ownership released",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/foundation_review",
+          "reviewer_identity": "/root/foundation_review (source PASS); /root/run_evidence_review (hosted artifact PASS)",
           "depends_on": [
             "parent:T03",
             "C00"
@@ -2101,15 +2102,94 @@
             },
             {
               "command": "GitHub exact-head pnpm verify and production preview browser regression",
-              "result": "NOT RUN",
+              "result": "PASS",
               "environment": "GitHub Actions",
-              "detail": "Run after independent source review before diagnostic wiring; existing C01 workflow must prove this test is discovered and production preview E2E has no skips."
+              "run_id": 38093822035,
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38093822035",
+              "source_sha": "6ca75219e68fefc9a7ed73aaeffb25954598b27b",
+              "attempt": 1,
+              "detail": "Exact-head pnpm verify passed 26 files/140 tests with zero skips; integration 1/1 and production Chromium 4/4 with zero skips, flaky or unexpected cases. The component test was collected 1/1."
+            },
+            {
+              "command": "GitHub Actions CI on exact source SHA 6ca75219e68fefc9a7ed73aaeffb25954598b27b",
+              "result": "PASS",
+              "environment": "GitHub Actions",
+              "run_id": 38093822035,
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38093822035",
+              "source_sha": "6ca75219e68fefc9a7ed73aaeffb25954598b27b",
+              "attempt": 1,
+              "detail": "Run 38093822035 passed 30 workflow steps; 2 conditional suggestion steps skipped; pnpm verify 26 files/140 tests with zero test skips, integration 1/1, Chromium 4/4 with zero skip/flaky/unexpected. Eight artifacts downloaded; inventories rehashed and production file set scanned.",
+              "exit_code": 0,
+              "report": "execution_state/reports/C01-DIAG-PANEL-run-38093822035.md"
+            },
+            {
+              "command": "Independent exact-head runtime/artifact review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-PANEL-runtime-review-38093822035.md",
+              "detail": "Independent reviewer verified exact run/SHA, all eight artifact records and 926 extracted file hashes, production inventory and exclusion scan. Verdict is limited to the isolated diagnostic panel test and production artifact; no panel browser interaction or playability is claimed."
             }
           ],
-          "next_action": "Source review PASS. Coordinator owns reviewed-tree publication and GitHub exact-head verification; accept this card only after the panel test and production preview regression pass."
+          "next_action": "Accepted for the isolated accessible panel and its test under unchanged production checks. This does not wire a browser diagnostic build or prove playability; continue with C01-DIAG-BUILD."
+        },
+        {
+          "id": "C01-DIAG-BUILD",
+          "status": "REVIEWING",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-DIAG-BUILD",
+          "owner": "coordinator source implementation complete; source writes released for independent review",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review",
+          "depends_on": [
+            "C01-DIAG-PANEL",
+            "C00",
+            "parent:T03"
+          ],
+          "write_paths": [
+            "apps/web/src/App.tsx",
+            ".github/workflows/ci.yml",
+            "tests/production/counterball-dev-match-absent.mjs"
+          ],
+          "implementation_report": "execution_state/reports/C01-DIAG-BUILD-implementation.md",
+          "review_report": "execution_state/reports/C01-DIAG-BUILD-review.md",
+          "attempt_count": 1,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C01-DIAG-BUILD",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact bounded coordinator card extracted after C01-DIAG-PANEL, C00, T03 and original T01 dependencies were accepted; plan check is not implementation proof."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exit 0 for tracked source/config/docs diff; separate PowerShell scan found no trailing whitespace in the new untracked production script. No app command ran."
+            },
+            {
+              "command": "Independent C01-DIAG-BUILD source/config review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-review.md",
+              "detail": "Independent source reviewer confirmed the compile-time flag boundary, production marker assertion, CI ordering and separate artifact provenance. Runtime remains NOT RUN."
+            },
+            {
+              "command": "GitHub ci exact-head production and diagnostic build gates",
+              "result": "NOT RUN",
+              "environment": "github",
+              "detail": "Run only after source review; retain full logs, no-skip test counts, exact run provenance and distinct production/diagnostic artifacts."
+            },
+            {
+              "command": "Independent exact-run diagnostic and production artifact audit",
+              "result": "NOT RUN",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-runtime-review.md"
+            }
+          ],
+          "next_action": "Independent source review PASS; exact source is ready to publish. Run GitHub ci on that exact head, then download and independently audit the distinct production and diagnostic artifacts. C01-H still owns browser routing."
         }
       ],
-      "next_action": "Materialize C01-DIAG-PANEL from the accepted T03 static scene, then C01-DIAG-BUILD. Keep C01 open until the hosted diagnostic artifact, build-mode provenance and production exclusion are actually verified; only then proceed to C01-P/C01-H and direct-shot evidence."
+      "blocker": "The renderer panel has no separate diagnostic build artifact yet. C01-DIAG-BUILD is READY; C01 remains CHANGES_REQUIRED until its artifact provenance and production exclusion gate pass. Browser routing and interactive diagnostic coverage remain assigned to C01-H.",
+      "next_action": "Execute coordinator-owned C01-DIAG-BUILD, then finish C01 acceptance from exact-head hosted checks and independent artifact review. Proceed to C01-P/C01-H and the first real browser flick only after accepted prerequisites."
     },
     {
       "id": "T03",
