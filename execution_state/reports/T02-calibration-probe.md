@@ -1,6 +1,6 @@
 # T02-B0 real Havok calibration probe — implementation evidence
 
-Status: **IMPLEMENTED, NOT EXECUTED.** This report records source and local declaration inspection only. It contains no measured physics results and does not accept T02 or T04.
+Status: **IMPLEMENTED, NOT LOCALLY CHECKED.** This report records source and local declaration inspection plus one remote typecheck failure and its source repair. It contains no measured physics results and does not accept T02 or T04.
 
 ## Assigned files
 
@@ -23,14 +23,20 @@ The restart button pose uses configured cap/button radii and thickness with cyli
 
 ## Static API inspection
 
-The installed Babylon 9.30.0 declarations expose the APIs used by the probe: `PhysicsShape.material` read/write with friction, static friction, restitution and combine modes; `PhysicsBody.applyImpulse`, velocity getters, and collision observables/callback enabling; and `HavokPlugin.executeStep(delta, physicsBodies)`. The `PhysicsEngine` declarations expose the fixed-step getter and body list. The existing runtime tests resolve the pinned package WASM through the same package path. This is declaration/source inspection only; it does not show that the probe compiles or that the runtime accepts these materials or reports the expected contacts.
+The installed Babylon 9.30.0 declarations expose the APIs used by the probe: `PhysicsShape.material` read/write with friction, static friction, restitution and combine modes; `PhysicsBody.applyImpulse`, velocity getters, and collision observables/callback enabling; and `HavokPlugin.executeStep(delta, physicsBodies)`. The v2 barrel exports its concrete engine class as `PhysicsEngineV2`, with the fixed-step getter and body list. The existing runtime tests resolve the pinned package WASM through the same package path. This is declaration/source inspection only; it does not show that the probe compiles or that the runtime accepts these materials or reports the expected contacts.
+
+## Repair 1 from remote typecheck
+
+GitHub run `38036894586` failed `pnpm verify` during typecheck at `calibrationProbe.test.ts:353`: `getBodies` is not present on the generic `IPhysicsEngine` type returned by the scene accessor. Repair 1 added an `instanceof` narrowing but imported `PhysicsEngine as PhysicsEngineV2`. Independent review 1 found that the pinned v2 barrel exports the class as `PhysicsEngineV2`, not as `PhysicsEngine`; therefore that import was not valid. Repair 2 now imports the actual `PhysicsEngineV2` barrel export and uses it in the `instanceof` guard before calling `getBodies()`. This corrects the reviewed export-name finding while retaining the real engine body list. The repair is **unverified**: no local check or hosted rerun has confirmed it compiles.
 
 ## Required commands and evidence
 
-The coordinator’s resumed packet explicitly prohibited running checks or starting a process. Therefore all checks and measurements below are **NOT RUN**:
+The coordinator’s resumed packet explicitly prohibited running local checks or starting a process. Local checks and all physical measurements below remain **NOT RUN**:
 
 1. `pnpm.cmd --filter @korre/counterball typecheck` — **NOT RUN**.
 2. `pnpm.cmd --filter @korre/counterball test` — **NOT RUN**. This is the command that must execute the probe and produce real Havok observations.
 3. `pnpm.cmd lint` — **NOT RUN**.
+
+The remote `pnpm verify` typecheck failure and source repair above are recorded separately; they do not establish that the repair passes.
 
 No trial values, contact outcomes, WASM initialization result, elapsed times, or coefficient recommendations are claimed. After the authorized hosted test command runs, capture its complete `COUNTERBALL_CALIBRATION_PROBE` record and append the actual observations and any failures before independent review. Until then, no calibration value is selected and neither T02 nor T04 is accepted by this report.

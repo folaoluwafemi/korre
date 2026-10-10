@@ -220,7 +220,14 @@
       "owner": "coordinator integration; /root/toolchain_audit — independent T02-A repair 2 review",
       "implementation_report": null,
       "review_report": null,
-      "checks": [],
+      "checks": [
+        {
+          "command": "GitHub Actions run #1: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 2,
+          "detail": "Hosted typecheck found calibrationProbe.test.ts(353,66): getBodies does not exist on generic IPhysicsEngine. Integration and E2E steps were skipped. Repair 1 is in progress; no probe measurements were produced."
+        }
+      ],
       "blocker": null,
       "packet": "execution_state/packets/T02-A.md",
       "packet_progress": [
@@ -254,7 +261,23 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source and implementation report are saved. Independent source review PASS confirms pinned actual Havok/WASM path, full 480-trial matrix, real contacts/impulses, and no config mutation. Runtime measurements plus typecheck/test/lint are NOT RUN under the laptop restriction; hosted CI must produce the 480 observations before this packet is VERIFIED."
+          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Remote typecheck/test/lint and all probe measurements still await hosted run #2."
+        },
+        {
+          "id": "T02-B0-repair-1",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B0-calibration-probe.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-review.md",
+          "evidence": "Repair 1 narrowed through PhysicsEngine but imported a non-exported name. Independent source review CHANGES_REQUIRED; superseded by repair 2. No local checks or measurements ran."
+        },
+        {
+          "id": "T02-B0-repair-2",
+          "status": "IMPLEMENTED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B0-calibration-probe.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-review.md",
+          "evidence": "Imports the pinned PhysicsEngineV2 barrel export and narrows the actual scene engine before getBodies. Independent source review PASS. No local or hosted runtime checks have run after this repair; awaiting GitHub CI."
         }
       ],
       "next_action": "Run the bounded real-Havok coefficient/tilt probe in the GitHub runner without freezing shared config; capture its observations, then complete runtime review and coordinator coefficient decision before the canonical runner packet."
@@ -270,6 +293,11 @@
       "implementation_report": "execution_state/reports/T03-implementation.md",
       "review_report": "execution_state/reports/T03-review-repair-1.md",
       "checks": [
+        {
+          "command": "GitHub Actions run #1: pnpm test:e2e --workers=1",
+          "result": "SKIPPED",
+          "detail": "The workflow stopped at pnpm verify after the T02 calibration probe type error; the remote browser job did not execute."
+        },
         {
           "command": "pnpm.cmd test:e2e",
           "result": "CHANGES_REQUIRED",

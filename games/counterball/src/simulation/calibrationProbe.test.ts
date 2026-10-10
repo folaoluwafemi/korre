@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine.js";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import {
+  PhysicsEngineV2,
   PhysicsMaterialCombineMode,
   type IPhysicsCollisionEvent,
   type PhysicsMaterial,
@@ -258,8 +259,8 @@ async function runTrial(
       ),
     });
     const physicsEngine = world.scene.getPhysicsEngine();
-    if (physicsEngine === null) {
-      throw new Error("Probe world has no Physics V2 engine.");
+    if (!(physicsEngine instanceof PhysicsEngineV2)) {
+      throw new Error("Probe world has no concrete Physics V2 engine.");
     }
     if (physicsEngine.getTimeStep() !== fixedStepSeconds) {
       throw new Error("Probe world did not use the canonical fixed step.");
