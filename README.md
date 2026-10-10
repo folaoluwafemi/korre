@@ -20,7 +20,7 @@ Open <http://127.0.0.1:4173/preview>. This lightweight local server serves the e
 - Node.js 24.21.0 (see `.node-version`)
 - pnpm 10.33.0
 - For browser tests, the Playwright Chromium browser
-- PostgreSQL will be needed by the identity task; no database is needed for the current health checks
+- PostgreSQL is required to run the identity API; CI supplies a disposable database for its tests. The static browser preview needs no database.
 
 On Windows, run the `.cmd` command shims if PowerShell blocks the scripts.
 

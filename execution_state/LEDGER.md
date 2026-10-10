@@ -2,9 +2,9 @@
 
 This file records evidence-backed task transitions. The immutable seed remains at `knowledge_base/execution/status.json`; its initial READY state is not implementation evidence.
 
-## Current review progress
+## Current review accepted
 
-The user requested a pass over implemented code before testing. Current packets improve the static preview, real database/migration evidence and physics diagnostics. D38 removes the need for a human numerical epsilon choice while retaining a provisional engineering label. Builds/tests run on GitHub, with no local application build or test under this review. Runs 38047177729 and 38047344796 exposed focused typing/lint defects, which were repaired. Run 38047543611 passed migrations twice, verification and integration; two of four browser cases failed and are being repaired. No full review or T11 acceptance is claimed yet. The independent 40-row physics artifact review passed at reports/current-physics-runtime-review.md; parent T02 remains unfinished.
+The requested review improved the static preview, real database/migration evidence and physics diagnostics. Final GitHub run 38057543954 on 22a7375e1b57a01d1bd91e23f18749ed7096d4a8 passed all checks/builds, 98 tests with zero skips, migrations twice, one integration test and four clean browser cases. Independent source/runtime reviews passed. This review, T11 API/database scope and T02-B2 diagnostic are ACCEPTED; parent T02 remains RUNNING and actual gameplay remains unfinished. Earlier failed runs and repairs are preserved below as history. D38 is a provisional engineering margin, needs no human numeric choice and proves no loft. No local application build/test ran; the user preview serves the downloaded GitHub build through a small loopback server. See reports/current-review-validation.md.
 
 ## Baseline
 
@@ -26,8 +26,8 @@ Derived from execution_state/tasks.json; unassigned paths below are plan ceiling
 |---|---|---|---|---|---|---|---|
 | T00 | workspace and reproducible checks | ACCEPTED | Coordinator; exact packets in OWNERSHIP.md | None | See OWNERSHIP.md | execution_state/reports/T00-implementation.md; execution_state/reports/T00-review-repair-2.md | Accepted; T01 is unblocked. |
 | T01 | canonical protocol, config, SDK, and fixtures | ACCEPTED | Coordinator; exact packets in OWNERSHIP.md | T00 | See OWNERSHIP.md | execution_state/reports/T01-implementation.md; execution_state/reports/T01-review.md | Accepted; T02, T03, and T11 are unblocked. |
-| T02 | isolated headless Havok shot runner | RUNNING | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | None | D38 resolves the diagnostic epsilon as a provisional engineering default. Review/fix probe classification and run hosted checks. T02 still requires canonical runner, facts, typed failures, cancellation and actual restart loft; no human numeric input is needed. |
-| T03 | procedural pitch, caps, and button | ACCEPTED | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | execution_state/reports/T03-implementation.md; execution_state/reports/T03-hosted-review-1.md | Accepted. T05 remains blocked until T02 is ACCEPTED; continue the hosted calibration artifact and deployed Havok gates. |
+| T02 | isolated headless Havok shot runner | RUNNING | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | None | Continue bounded facts/runner/calibration packets using accepted world, restart-pose helper and sampler. Prove actual loft, typed timeout/cancellation and crossings before accepting T02; then T04 deployed Havok and T05 real browser flick. D38 needs no human numeric choice. |
+| T03 | procedural pitch, caps, and button | ACCEPTED | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | execution_state/reports/T03-implementation.md; execution_state/reports/T03-hosted-review-1.md | Improved static scene ready for inspection; all four built-browser checks passed. T05 still waits for ACCEPTED T02. |
 | T04 | Cloudflare actual WASM smoke | PLANNED | Unassigned | T02 | See OWNERSHIP.md | None | Await accepted T02; then use the user-authorized Wrangler session for the plan-designated staging Havok smoke only. Do not publish production or change plans. |
 | T05 | first local flick, touch, and camera | PLANNED | Unassigned | T02, T03 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
 | T06 | pure referee and turn/scoring rules | PLANNED | Unassigned | T01, T02 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
@@ -35,7 +35,7 @@ Derived from execution_state/tasks.json; unassigned paths below are plan ceiling
 | T08 | placed-shot interface and local match HUD | PLANNED | Unassigned | T05, T07 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
 | T09 | full local rule integration | PLANNED | Unassigned | T06, T08 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
 | T10 | one basic AI | PLANNED | Unassigned | T09 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
-| T11 | PostgreSQL migrations and identity service | RUNNING | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | None | Run real PostgreSQL repository, HTTP composition and migration checks on the disposable GitHub CI service, then independent parent review. Railway is not needed for CI acceptance. |
+| T11 | PostgreSQL migrations and identity service | ACCEPTED | Coordinator; exact packets in OWNERSHIP.md | T01 | See OWNERSHIP.md | execution_state/reports/T11-hosted-implementation.md; execution_state/reports/current-identity-runtime-review.md | Accepted T11. T12 still waits for T05; T13 still waits for T04/T12. Identity UI, actual proxy and Railway deployment remain future tasks. |
 | T12 | same-origin identity UI and mandatory gate | PLANNED | Unassigned | T11, T05 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
 | T13 | edge proxy, authenticated rooms, and slots | PLANNED | Unassigned | T04, T11, T12 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
 | T14 | durable authoritative shot transaction | PLANNED | Unassigned | T13, T06, T07 | See OWNERSHIP.md | None | Wait for ACCEPTED dependencies; see TASKS.md |
@@ -63,3 +63,9 @@ Derived from execution_state/tasks.json; unassigned paths below are plan ceiling
 - T11's disposable PostgreSQL checks are prepared on GitHub; they have not run yet for these changes. The user need not provision Railway to run these tests. No unrelated Railway project is touched.
 - Browser usability/performance fixes are in progress. T03 remains an accepted static preview; improvements require fresh independent review and hosted evidence before acceptance.
 - The catalogue table above is regenerated from tasks.json for readability. Earlier run reports below remain historical evidence, not current blockers.
+
+## Review accepted after hosted verification
+
+GitHub run 38057543954 on 22a7375e1b57a01d1bd91e23f18749ed7096d4a8: all 24 files/98 tests passed with zero skips, workspace checks/builds, migrations twice, integration and all four built-browser cases passed. No local build/test. Independent current review reports passed; no deployed physics or gameplay claim.
+
+T11 and the bounded T02-B2 diagnostic are ACCEPTED. T02 remains RUNNING, T04/T05 and full gameplay remain unfinished. Current authority is tasks.json plus reports/current-review-validation.md; preceding review-progress entries are historical. No credentials or numeric epsilon input are needed for the next independent source packets.

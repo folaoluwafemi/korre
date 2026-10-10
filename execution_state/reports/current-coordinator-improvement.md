@@ -31,3 +31,7 @@ The coordinator also adds a CI-only Playwright JSON reporter alongside GitHub ou
 ## Constructor repair formatting
 
 Run 38056833055 on 76582ec passed migrations, all typechecks and ESLint, then Prettier required two union-type line wraps in the constructor component and browser spec. Unit/build/integration/E2E checks did not run. The coordinator inspected and applied the hosted formatting patch for exactly those two paths. It changes formatting only; no local formatter/build/test ran. The independent browser reviewer must check the applied diff before the next run.
+
+## Final integrated result
+
+Hosted run 38057543954 on 22a7375e1b57a01d1bd91e23f18749ed7096d4a8 passed frozen installation, all checks/builds, 98 tests with zero skips, two migration applications, one integration test and four clean built-browser tests. Independent source and runtime reviews passed. Earlier pending/failure statements are historical. Final authority is current-review-validation.md and tasks.json. The loopback preview server subsequently started using only the downloaded prebuilt artifact; no local application build/test ran.

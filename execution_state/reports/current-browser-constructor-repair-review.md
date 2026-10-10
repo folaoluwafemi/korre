@@ -1,6 +1,6 @@
 # Partial browser-engine constructor repair — independent review
 
-**Source verdict: PASS after the explicit receiver annotation. Runtime verdict: PENDING a new hosted run/artifacts.** This review does not accept parent T03/T02 or claim repaired E2E passes.
+**Source verdict: PASS after the explicit receiver annotation. Runtime verdict: PASS for the bounded constructor failure/retry repair, evidenced below.** This review does not accept parent T03/T02 or claim physical-phone proof.
 
 Reviewed the current exact component/spec/browser-barrel diffs, `current-browser-constructor-repair.md`, actual pinned Babylon 9.30.0 constructor and engine-store source, and the run-23 startup-failure error context. This reviewer did not implement these changes. Run 23's expected-zero/received-one cleanup failure is retained as failure evidence.
 
@@ -27,3 +27,15 @@ Next hosted run must pass Verify, integration and all four production-built E2E 
 Independently compared the current two-file diff against `.artifacts/run24-format/formatting-repair.patch`. The actual diff matches its two hunks only: `CounterballPreview.tsx:92` formats the existing cast union on one line and omits its optional leading union separator; `counterball-preview.spec.ts:12` wraps the existing optional three-literal mode type. The resulting TypeScript types are identical. No runtime expressions, constructor/journal/preflight logic, test branches, assertions, or values change.
 
 **PASS for this formatting-only repair.** Coordinator reports run `38056833055` / `76582ec` passed migrations, typechecks and ESLint before Prettier stopped verification; no runtime test/build success is inferred. I ran no formatter or local application check and performed no source edit. Full hosted runtime verification remains pending the next run.
+
+## Final hosted constructor runtime addendum
+
+**Runtime verdict: PASS.** Independently checked [GitHub run 38057543954](https://github.com/folaoluwafemi/korre/actions/runs/38057543954), commit `22a7375e1b57a01d1bd91e23f18749ed7096d4a8`: the workflow completed successfully; the supplied status records successful Verify, integration and production-built E2E steps. There is no source diff against that commit in the reviewed component, browser export or test/config paths.
+
+The actual `.artifacts/final-browser/.artifacts/browser-test-results.json` has four expected passes, zero skipped/unexpected/flaky results and no errors. Each test passed on retry=0 with no second attempt. `WebGL failure and context loss are recoverable` passed in 2,691 ms and records the supported `WEBGL_lose_context` annotation.
+
+The corresponding inspected test body first blocks all four WebGL acquisition names and requires clean unsupported startup, then retries to real WebGL2 with one engine. Its supported native extension branch exercises lost-state/disabled retry, actual restore through the retained extension handle, restored UI and a real-WebGL2 manual rebuild. It subsequently unmounts to zero engine instances/listener baseline, permits actual native preflight but rejects the constructor's later requests, and requires the startup error plus frame/listener baseline and zero registry entries. It then permits retry and requires actual WebGL2 with exactly one engine. These latter assertions are unconditional after the capability block. Their passing execution supplies the previously missing runtime evidence for the actual partial-constructor listener/registry leak and recovery, rather than just the unsupported preflight path.
+
+The JSON confirms the built-directory server command with server reuse disabled. I also inspected the three actual desktop/inspection/mobile screenshots: normal open green pitch and distinct teams, visibly perforated four-hole button at inspection scale, and responsive wrapped controls/static copy. The mobile camera test passed its strict backing-buffer/overflow checks on its first attempt; ordinary idle/unmount/remount also passed. The fuller screenshot/results observations are recorded in `current-browser-sync-repair-review.md`.
+
+Acceptance remains bounded to this observed constructor acquisition failure and preview lifecycle. Existing unrelated-engine preservation is source-reviewed but not independently exercised with simultaneous engines; arbitrary later driver/resource failure cleanup is not proven. Chromium mobile emulation does not supply physical-phone evidence. No local build, test, formatter or server was run, and no implementation/shared record was edited by this reviewer.

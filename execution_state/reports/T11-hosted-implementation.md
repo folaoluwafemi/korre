@@ -24,3 +24,7 @@ Independent source reviews are `T11-B-review-repair-1.md`, `T11-parent-review-re
 ## Limits
 
 No Railway deployment, external database migration or Cloudflare proxy was exercised. T12 identity UI/browser cookies and T13 actual edge trust-boundary behavior are separate tasks. `/health` is liveness, not ongoing database readiness. Transactional invalid-SQL rollback was executed; compatibility with earlier code is supported by additive-schema inspection, without a prior-binary boot rehearsal. No local database, application build or test was run for this review.
+
+## Final integrated verification
+
+Run 38057543954 on 22a7375e1b57a01d1bd91e23f18749ed7096d4a8 passed all checks/builds, 98 tests with zero skips, migrations twice, integration and four clean browser cases. Identity source is unchanged since the independently reviewed run-23 evidence. Final independent confirmation is in current-identity-runtime-review.md; coordinator accepts T11 API/database scope only. No Railway/deployed identity UI claim.
