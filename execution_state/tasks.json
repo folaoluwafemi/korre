@@ -246,10 +246,28 @@
           "detail": "Workspace/root typecheck and ESLint passed. Hosted Prettier reported exactly App.tsx, pieces.test.ts, and calibrationProbe.test.ts. Unit tests, actual-WASM probe, build, integration, and E2E did not run."
         },
         {
+          "command": "GitHub Actions run #5: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Typecheck, ESLint, and Prettier passed. Vitest reported 57 passed and 8 PostgreSQL tests skipped; the probe's preflight failed because 60 was compared with a converted maximum of 59.99999999999999. It failed before Havok initialization/trials. Build, integration, and E2E did not run."
+        },
+        {
           "command": "Independent source review: CI format repair 1",
           "result": "PASS",
           "report": "execution_state/reports/CI-format-repair-1-review.md",
           "detail": "Independent review confirmed the three-file diff is formatting-only and preserves routes, scene assertions, probe order, all 480 trials, physics inputs, observations, teardown, and timeout."
+        },
+        {
+          "command": "Independent source review: T02-B0 repair 4",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T02-calibration-probe-repair-4-review.md",
+          "detail": "Reviewer accepted the narrow 1e-9° floating-point tolerance and unchanged 480-trial matrix, but found misindentation that would fail hosted Prettier. Formatting-only repair 5 is in progress."
+        },
+        {
+          "command": "Independent source review: T02-B0 repair 5",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-calibration-probe-repair-5-review.md",
+          "detail": "Reviewer confirmed the repaired indentation, retained approved maximumTiltDegrees + 1e-9° bound and unchanged candidate/config, and found the diff limited to formatting. Hosted verification is pending."
         }
       ],
       "blocker": null,
@@ -285,7 +303,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports/narrows PhysicsEngineV2 and passes independent source review. Run #2 passed game package typecheck but failed root typecheck in preview E2E. Run #3 passed typechecks then lint found require-await on synchronous runTrial; repair 3 is independently reviewed PASS. Run #4 passed typechecks and ESLint, then Prettier reported three files including this probe before tests/build. No probe measurements exist. Formatting repair 1 is pending independent review and run #5."
+          "evidence": "Probe source is saved. Run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports/narrows PhysicsEngineV2 and passes independent source review. Run #2 passed game package typecheck but failed root typecheck in preview E2E. Run #3 passed typechecks then lint found require-await; repair 3 is independently reviewed PASS. Run #4 passed typechecks/ESLint and exposed three Prettier differences; formatting repair 1 is independently reviewed PASS. Run #5 passed typecheck, ESLint, Prettier and 57 tests (8 PostgreSQL skips); the probe failed its 60° float-conversion preflight before Havok initialization. Repair 4 added a 1e-9° boundary tolerance and was source-reviewed CHANGES_REQUIRED only for indentation. Formatting-only repair 5 is implemented and awaiting independent review. No probe measurements exist; hosted run #6 is required."
         },
         {
           "id": "T02-B0-repair-1",
@@ -320,9 +338,27 @@
           "implementation_report": "execution_state/reports/CI-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/CI-format-repair-1-review.md",
           "evidence": "Prettier was run locally only on the three files named by hosted run #4. Independent source review PASS confirms formatting-only changes. No local build/test/typecheck/lint ran. Hosted run #5 is required before measurements."
+        },
+        {
+          "id": "T02-B0-repair-4",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B0-repair-4.md",
+          "implementation_report": "execution_state/reports/T02-calibration-probe-repair-4-implementation.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-repair-4-review.md",
+          "evidence": "Adds a 1e-9 degree tolerance to the configured 60° maximum check only, with no candidate/config/physics changes. Independent source review accepted that logic and matrix preservation but required correction of two indentation errors. Repair 5 addresses formatting only."
+        },
+        {
+          "id": "T02-B0-repair-5",
+          "status": "IMPLEMENTED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T02-B0-repair-5.md",
+          "implementation_report": "execution_state/reports/T02-calibration-probe-repair-5-implementation.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-repair-5-review.md",
+          "evidence": "Ran Prettier only on calibrationProbe.test.ts to fix the indentation found by repair 4 review. Independent source review PASS. No build/test/typecheck/lint ran. Hosted run #6 remains pending; no probe measurements exist."
         }
       ],
-      "next_action": "Push the independently reviewed formatting-only repair and run hosted verification. If it reaches the real-WASM probe, capture observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
+      "next_action": "Complete independent review of the formatting-only repair 5, then push and run hosted verification. If it reaches the real-WASM probe, capture observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
     },
     {
       "id": "T03",
@@ -346,6 +382,12 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 1,
           "detail": "Typecheck and ESLint passed. Prettier reported App.tsx, pieces.test.ts, and calibrationProbe.test.ts; unit tests/build did not run. Integration and E2E were skipped."
+        },
+        {
+          "command": "GitHub Actions run #5: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Typecheck, lint/format, and 57 tests passed; 8 PostgreSQL tests were skipped. Calibration preflight failed at 60° due to floating-point boundary conversion before Havok trials. Build, integration, and browser E2E did not run."
         },
         {
           "command": "Independent source review: T03 repair 2",

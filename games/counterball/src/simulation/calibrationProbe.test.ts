@@ -453,8 +453,10 @@ function runTrial(
 describe("real Havok calibration probe", () => {
   it("records the full provisional coefficient, impulse, and restart-tilt matrix", async () => {
     expect(COUNTERBALL_CONFIG_V1.bodies.capMass).toBe(1);
+    const maximumTiltDegrees =
+      (COUNTERBALL_CONFIG_V1.restart.maxButtonTiltRadians * 180) / Math.PI;
     expect(candidateTiltDegrees[4]).toBeLessThanOrEqual(
-      (COUNTERBALL_CONFIG_V1.restart.maxButtonTiltRadians * 180) / Math.PI,
+      maximumTiltDegrees + 1e-9,
     );
 
     const havok = await initializeHavokRuntime({
