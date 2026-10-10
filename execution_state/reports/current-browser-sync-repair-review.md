@@ -1,0 +1,25 @@
+# Browser resize/context synchronization repair — independent review
+
+**Source verdict: PASS. Runtime verdict: PENDING fresh hosted verification.** No parent-task acceptance or physical-phone proof is claimed.
+
+Reviewed the exact one-file diff in `tests/e2e/counterball-preview.spec.ts`, `current-browser-sync-repair.md`, run-25 JSON results and its two actual error contexts, the existing render-wait helper, and relevant primary API documentation. No production component, CSS, fixture or physics code changes are included.
+
+## Historical evidence
+
+Run `38057030306` / `3ef3e784151ac68fee293f1001346f0d71496725` recorded a mobile backing-width assertion of expected ≤524 versus observed 1821 on its initial attempt; that test passed on retry and its JSON status is **flaky**, not an unconditional clean pass. The context-loss test's JSON annotation says the extension was supported; both attempts failed waiting 15 seconds for restored status. Its error context still shows the lost-context message. The ordinary scene/remount and home tests passed. This evidence is a diagnosis input, not a pass for the current repair.
+
+## Independent source findings
+
+- **Resize synchronization measures real backing dimensions.** After each viewport change, the test waits for a new animation-frame request and an empty pending-frame set using the unchanged helper, then polls actual canvas `width`/`height` against current CSS bounds and `min(devicePixelRatio, 1.5)`. CSS and backing dimensions must all be positive. This prevents a zero-size canvas from satisfying the cap. Original exact viewport sizes, document/body no-horizontal-overflow checks, and both original backing-dimension cap assertions still run afterward. The test does not replace them with an attribute, remove the 1.5 limit, alter the existing +2-pixel rounding allowance, skip a viewport or change product sizing.
+- **The wait is bounded without an increased deadline.** Added `expect.poll` calls retain the default bounded assertion timeout; neither the existing 60-second test timeout nor the render helper's assertions are changed. Polling acknowledges the asynchronous resize/render lifecycle while continuing to fail if real buffers never settle within the same cap. The reported immediate stale backing width is consistent with this missing synchronization; actual recovery remains to be executed.
+- **The retained handle matches WebGL semantics.** `canvas.evaluateHandle` obtains the extension before losing the context. Its Boolean capability check handles null; when supported, both `loseContext()` and `restoreContext()` execute against that same browser object via `JSHandle.evaluate`, without another post-loss extension lookup. The extension remains connected across loss, and restoration is asynchronous with a real restored event; the test correctly waits for lost UI before requesting restore and for restored UI afterward. These semantics are specified by [Khronos WEBGL_lose_context](https://registry.khronos.org/webgl/extensions/WEBGL_lose_context/). Playwright's [JSHandle API](https://playwright.dev/docs/api/class-jshandle#js-handle-evaluate) documents passing the referenced in-page object to the callback and explicit disposal.
+- **This exercises native recovery rather than synthesizing events.** The patch invokes actual extension methods. Lost alert, disabled retry, restored alert, enabled retry, actual manual restart and real WebGL2 afterward remain strict requirements. The handle is released in `finally` across success/failure. Unsupported-extension coverage retains its annotation and does not claim the recovery branch executed. The cast describes the native object's two methods; it does not supply fake methods.
+- **Other meaningful assertions are preserved.** Real camera screenshot differences, HTML/keyboard controls, synthetic pinch, strict seven-plus-seven count/scene checks, initial unsupported preflight failure, later partial-constructor failure, listener/frame baselines, zero leaked registry entries and successful retry with one actual engine remain unchanged. Scroll normalization and final home/inspect reachability checks are retained. No assertion is weakened or conditionally skipped beyond the already-existing capability branch.
+
+No concrete source defect was identified in this bounded synchronization repair. The author's report accurately marks the new runtime checks pending and does not turn the historical retry into proof of the repair.
+
+## Verification boundary
+
+Read-only diff/source/artifact inspection and bounded JSON result analysis only. No local test, build, formatter, lint, typecheck, install, server or application process was run. No agent was spawned; only this report was written.
+
+Fresh hosted evidence must show Verify/integration success and all four production-built E2E tests' actual statuses/attempts, plus whether context-loss recovery executed. Inspect the JSON report and actual screenshots before runtime PASS. Browser emulation/synthetic input remain distinct from physical-phone acceptance. A runtime addendum can be written here after the coordinator provides the new run/artifacts.

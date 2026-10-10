@@ -13,6 +13,11 @@ type WindowWithPreviewLifecycle = Window & {
     "unsupported" | "constructor-failure" | "allow";
 };
 
+type WebGlLoseContextExtension = {
+  loseContext: () => void;
+  restoreContext: () => void;
+};
+
 async function installLifecycleProbe(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const pendingFrames = new Set<number>();
@@ -351,11 +356,37 @@ test.describe("mobile preview camera", () => {
         Math.ceil(viewport.cssCanvasHeight * cappedPixelRatio) + 2,
       );
     };
+    const waitForCanvasPixelCap = async (): Promise<void> => {
+      await expect
+        .poll(async () => {
+          const viewport = await readViewport();
+          const cappedPixelRatio = Math.min(viewport.devicePixelRatio, 1.5);
+          return (
+            viewport.cssCanvasWidth > 0 &&
+            viewport.cssCanvasHeight > 0 &&
+            viewport.canvasWidth > 0 &&
+            viewport.canvasHeight > 0 &&
+            viewport.canvasWidth <=
+              Math.ceil(viewport.cssCanvasWidth * cappedPixelRatio) + 2 &&
+            viewport.canvasHeight <=
+              Math.ceil(viewport.cssCanvasHeight * cappedPixelRatio) + 2
+          );
+        })
+        .toBe(true);
+    };
 
     await checkNoHorizontalOverflowAndPixelCap(390, 844);
+    const beforeDesktopResize = (await readLifecycle(page))
+      .animationFrameRequests;
     await page.setViewportSize({ width: 1280, height: 900 });
+    await waitForRenderAfter(page, beforeDesktopResize);
+    await waitForCanvasPixelCap();
     await checkNoHorizontalOverflowAndPixelCap(1280, 900);
+    const beforeMobileResize = (await readLifecycle(page))
+      .animationFrameRequests;
     await page.setViewportSize({ width: 390, height: 844 });
+    await waitForRenderAfter(page, beforeMobileResize);
+    await waitForCanvasPixelCap();
     await checkNoHorizontalOverflowAndPixelCap(390, 844);
     // The interaction sequence above can leave the document scrolled. Return to
     // the page start before checking which controls mobile users can reach there.
@@ -443,37 +474,42 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
     .poll(async () => (await readLifecycle(page)).engineInstances)
     .toBe(1);
 
-  const contextLossSupported = await canvas.evaluate((element) => {
+  const loseContextExtension = await canvas.evaluateHandle((element) => {
     const context = (element as HTMLCanvasElement).getContext("webgl2");
-    return Boolean(context?.getExtension("WEBGL_lose_context"));
+    return context?.getExtension("WEBGL_lose_context") ?? null;
   });
+  const contextLossSupported = await loseContextExtension.evaluate(
+    (extension) => extension !== null,
+  );
   test.info().annotations.push({
     type: "webgl-context-loss",
     description: contextLossSupported
       ? "WEBGL_lose_context supported; exercising loss and recovery."
       : "WEBGL_lose_context unavailable; startup failure and retry were tested.",
   });
-  if (contextLossSupported) {
-    await canvas.evaluate((element) => {
-      const context = (element as HTMLCanvasElement).getContext("webgl2");
-      context?.getExtension("WEBGL_lose_context")?.loseContext();
-    });
-    await expect(alert).toContainText("context was lost");
-    await expect(retry).toBeDisabled();
-    await canvas.evaluate((element) => {
-      const context = (element as HTMLCanvasElement).getContext("webgl2");
-      context?.getExtension("WEBGL_lose_context")?.restoreContext();
-    });
-    await expect(alert).toContainText("context was restored", {
-      timeout: 15_000,
-    });
-    await expect(retry).toBeEnabled();
-    await retry.click();
-    await expect(alert).toHaveCount(0);
-    await expect(
-      page.getByRole("button", { name: "Inspect four-hole button" }),
-    ).toBeEnabled({ timeout: 30_000 });
-    expect(await webGlVersion(page)).toContain("WebGL 2");
+  try {
+    if (contextLossSupported) {
+      await loseContextExtension.evaluate((extension) => {
+        (extension as unknown as WebGlLoseContextExtension).loseContext();
+      });
+      await expect(alert).toContainText("context was lost");
+      await expect(retry).toBeDisabled();
+      await loseContextExtension.evaluate((extension) => {
+        (extension as unknown as WebGlLoseContextExtension).restoreContext();
+      });
+      await expect(alert).toContainText("context was restored", {
+        timeout: 15_000,
+      });
+      await expect(retry).toBeEnabled();
+      await retry.click();
+      await expect(alert).toHaveCount(0);
+      await expect(
+        page.getByRole("button", { name: "Inspect four-hole button" }),
+      ).toBeEnabled({ timeout: 30_000 });
+      expect(await webGlVersion(page)).toContain("WebGL 2");
+    }
+  } finally {
+    await loseContextExtension.dispose();
   }
 
   await page.getByRole("link", { name: "Back to Counterball home" }).click();
