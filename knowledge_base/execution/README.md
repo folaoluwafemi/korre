@@ -4,11 +4,13 @@ Prepared 10 October 2026. This plan defines implementation gates, not proof that
 
 ## Start here
 
+For continuation from the current reviewed source, use [the completion plan](completion/README.md) and [its resume prompt](completion/START_HERE.md). The original task catalogue remains authoritative; the completion packets refine remaining work without resetting accepted tasks.
+
 1. Read root `AGENTS.md`.
 2. Read [decisions](DECISIONS.md), [contracts](CONTRACTS.md), and [task catalogue](TASKS.md).
 3. Read [swarm runbook](SWARM.md). Use its coordinator prompt for the implementing model.
 4. Read [gameplay specification](GAMEPLAY.md) and [platform specification](PLATFORM.md) only for the assigned task.
-5. T00 copies [status.json](status.json), the immutable initial seed, to `execution_state/tasks.json`. Claim the first ready task there. Complete its checks and independent review before its dependents start.
+5. Inspect `execution_state/tasks.json` and the live source. T00 created that state from [status.json](status.json) during initial setup; never recopy the seed on resume. Claim the next ready remaining packet and complete its checks and independent review before dependents start.
 
 The current human asked for a detailed plan that a less capable model can execute with subagents. Do not silently switch models, create user-owned chats, or launch the entire implementation while preparing this handoff. During implementation, use the configured model and its subagents. The user can choose a less capable model before starting the handoff prompt.
 

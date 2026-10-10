@@ -1,5 +1,7 @@
 # Start Counterball implementation
 
+Implementation has started. Use [the continuation prompt](completion/START_HERE.md) for the current reviewed source. The original prompt below is retained for history; do not restart accepted T00/T01 or copy the seed again.
+
 Choose the model you want to implement the plan with, then send the prompt below in this chat. The coordinator uses that model and its available subagents. Do not assume the planning model is the executing model.
 
 ```text

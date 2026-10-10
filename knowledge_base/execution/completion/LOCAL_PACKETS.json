@@ -1,0 +1,2054 @@
+[
+  {
+    "id": "T02-D01",
+    "parent": "T02",
+    "title": "Measure direct-shot impulse response on the canonical fixture",
+    "role": "worker",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-A",
+      "C00"
+    ],
+    "read_paths": [
+      "execution_state/reports/T02-calibration-observations-review-1.md",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/calibrationProbe.test.ts",
+      "packages/game-protocol/src/config.ts",
+      "knowledge_base/execution/CONTRACT_WORK.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/directImpulseProbe.test.ts"
+    ],
+    "outputs": [
+      "Six bounded direct-shot observations at impulses 2/4/8 and two fixed open-lane aims using actual pinned Havok WASM"
+    ],
+    "steps": [
+      "Use one canonical fixture/checkpoint and actual selected caps; record fixture IDs and exact initial transform.",
+      "Run the Cartesian matrix of impulses [2,4,8] × aims [straight at button, open longitudinal lane], with the same direct contact/apply-point API the runner will use.",
+      "Measure actual per-tick movement, button/cap contacts, path, speed, all-body finite settling and final transforms.",
+      "Report impulse as input units, not normalized player power; do not choose coefficients or alter config.",
+      "Write the full env-gated JSON only after six unique trials and assertions pass."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Six real-WASM tuples, full assertions and provenance pass; output is retrievable from the CI artifact."
+      },
+      {
+        "command": "Independent review against pinned world factory and tuple matrix",
+        "environment": "source-review",
+        "expected": "No mocked physics and no conflation of input impulse with final player-facing power."
+      }
+    ],
+    "acceptance": [
+      "Diagnostic is accepted only as measured evidence, not as a production direct-shot mapping.",
+      "All-body settling and exact setup provenance accompany each row."
+    ],
+    "negative_cases": [
+      "Probe constants leak to runtime; fixture is repositioned between trials; one selected cap or contact is omitted.",
+      "Input impulse is reported as a final normalized-power calibration without an evidence-based mapping."
+    ],
+    "review_questions": [
+      "Do six rows match the exact matrix and same starting state?",
+      "Does the actual cap move and does physics settle all 15 bodies?",
+      "Are observations sufficient for coordinator to choose or reject a bounded horizontal mapping?"
+    ],
+    "stop_conditions": [
+      "If direct inputs fail to produce reliable finite settling, preserve failing observations and leave C02 blocked.",
+      "Do not widen the impulse range or tune friction in this packet."
+    ]
+  },
+  {
+    "id": "T02-F01",
+    "parent": "T02",
+    "title": "Implement pure simulation facts from physics-step observations",
+    "role": "worker",
+    "depends_on": [
+      "T02-C0",
+      "T02-C2",
+      "C00-A",
+      "C00"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/simulation/sampling.ts",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "packages/game-protocol/src/types.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/facts.test.ts"
+    ],
+    "outputs": [
+      "Pure deterministic contact and oriented whole-button crossing facts from complete fixed-step observations"
+    ],
+    "steps": [
+      "Implement stable contact/crossing ordering from every canonical physics tick; never use downsampled PlaybackFrame as a rule source.",
+      "Derive goal mouth, height, side and end-line decisions from the frozen config and whole-button orientation.",
+      "Use canonical EntityId and step indices; keep tie-breaks deterministic and serializable.",
+      "Prove input immutability, contact-before-same-step-crossing attribution order, and bounded output shape."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Pure fact and geometry tests pass with no browser/Node globals or engine handles in output.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "Facts use complete fixed-step physical data, stable IDs and whole-button geometry.",
+        "command": "Independent review of facts against CONTRACTS and GAMEPLAY"
+      }
+    ],
+    "acceptance": [
+      "Pure function output is deterministic and matches canonical fact types.",
+      "Tests cover orientation, exact ties, goal-mouth/height and side/end exit geometry."
+    ],
+    "negative_cases": [
+      "Fact inferred from video/playback frames, mesh names, frame interpolation or mutable scene state.",
+      "Incomplete ordering or engine handles in serialized facts."
+    ],
+    "review_questions": [
+      "Are every step facts and tie-breaks reproducible?",
+      "Does the entire button body determine crossing?",
+      "Are role rules excluded from this pure geometry module?"
+    ],
+    "stop_conditions": [
+      "If the C00 fact schema is not accepted, stop and request coordinator clarification before choosing a private type."
+    ]
+  },
+  {
+    "id": "T02-L01",
+    "parent": "T02",
+    "title": "Run bounded coarse restart-loft diagnostic",
+    "role": "worker",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00"
+    ],
+    "read_paths": [
+      "execution_state/packets/T02-runner-design-audit-1.md",
+      "execution_state/reports/T02-runner-design-audit-1.md",
+      "execution_state/reports/T02-calibration-observations-review-1.md",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/features/restarts/domain/placementPose.ts",
+      "games/counterball/src/simulation/sampling.ts",
+      "games/counterball/src/simulation/intendedShotProbe.test.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+    ],
+    "outputs": [
+      "Real pinned-Havok WASM output for a fixed 24-case diagnostic matrix",
+      "Env-gated JSON with exact tuple, config/engine/schema hashes, per-tick contacts, whole-button swept clearance, initial/final extent crossing, cap travel, finite/settled state and honest eligibility",
+      "Explicit statement of discrete-step limits and whether the configured guard excludes tunnelling."
+    ],
+    "steps": [
+      "Use the accepted world factory, placement helper and sampler; no mock, NullEngine substitution, new impulse path or production config mutation.",
+      "Run fixed matrix: tilt 45°/60° × restart impulse 6/8 × azimuth −15°/0°/+15° × obstacle gap 0.75/1.0; deterministic nested order is gap, tilt, impulse, azimuth.",
+      "Record every fixed 1/120 s state, actual contacts and conservative swept bounds between states. The initial whole-button extent must be fully before the obstacle and the final extent fully beyond it; require positive frozen-margin swept clearance throughout the full horizontal-overlap interval.",
+      "Check the C00-frozen config-hashed linear/angular guard at every Havok substep; if any segment can tunnel, fail that candidate. Preserve actual contact facts and report the limits of finite-step evidence.",
+      "Mark eligible only when before/after whole-button crossing, full-overlap swept clearance, actual no-button/obstacle contacts, all-15-body finite settling and every substep guard all pass.",
+      "Write the artifact only after every matrix and integrity assertion passes; zero eligible candidates are valid diagnostic output."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "All 24 pinned-WASM trials and assertions pass; artifact contains 24 unique expected tuples even when no candidate is eligible."
+      },
+      {
+        "command": "Independent review of matrix and raw artifact",
+        "environment": "source-review",
+        "expected": "No mutation of canonical coefficients and no claim stronger than observed per-tick evidence."
+      }
+    ],
+    "acceptance": [
+      "This probe may be accepted with zero eligible candidates if all 24 trials are complete, provenance is valid, and output says no traversal was proven.",
+      "Every value is within C00-B and the existing tested envelope; no hidden lift is added.",
+      "Do not claim continuous traversal from 120-Hz endpoints alone; require conservative swept clearance, whole-body before/after crossing, no-contact evidence and the substep guard."
+    ],
+    "negative_cases": [
+      "Console-only or synthetic observations; downsampled playback facts; a single apex as proof; obstacle contact counted as clear.",
+      "Calling the diagnostic a calibration/gameplay pass without full extent crossing, continuous-overlap swept evidence and settlement.",
+      "Any trial can tunnel between substeps or lacks the frozen config-hashed guard."
+    ],
+    "review_questions": [
+      "Are all 24 tuples complete and unique in fixed order?",
+      "Does whole-button extent start before and end beyond the obstacle?",
+      "Is swept clearance positive for full overlap, are actual contacts clear, and does every substep satisfy the guard?",
+      "Are finite-step limits stated honestly?"
+    ],
+    "stop_conditions": [
+      "If a pinned runtime trial fails, retain failure and use SWARM bounded repair; do not drop tuples or change the matrix.",
+      "If no candidate qualifies, stop after report and record no refinement; do not invent a loft formula.",
+      "If C00 has not frozen a support/substep guard or the solver cannot instrument it, stop before trial execution and request contract repair."
+    ]
+  },
+  {
+    "id": "T02-L02",
+    "parent": "T02",
+    "title": "Run one bounded local refinement or record no eligible restart",
+    "role": "worker",
+    "depends_on": [
+      "T02-L01"
+    ],
+    "read_paths": [
+      "execution_state/reports/T02-L01-implementation.md",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "packages/game-protocol/src/config.ts",
+      "games/counterball/src/features/restarts/domain/placementPose.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/loftRefinedProbe.test.ts"
+    ],
+    "outputs": [
+      "At most nine refined real-Havok trials around one deterministic eligible coarse candidate, or an explicit no-refinement record",
+      "Explicitly states the discrete physics evidence and whether the configured guard rules out tunnelling."
+    ],
+    "steps": [
+      "If no coarse candidate passes every eligibility assertion, run zero physics trials and emit the reason; this is a complete negative diagnostic.",
+      "Otherwise select the highest-clearance eligible coarse candidate; stable ties use lower impulse, lower tilt, lower absolute azimuth, then original tuple order.",
+      "Hold its azimuth and obstacle gap; run the unique 3×3 grid with no duplicate clamp values: tilt is center−5°/center/center+5° unless center is within 5° of 60°, then use center−10°/center−5°/center; impulse is center−0.5/center/center+0.5 unless center is within 0.5 of 8, then use center−1/center−0.5/center. Keep tilt within [30°,60°] and impulse within [5.5,8], sorted ascending.",
+      "Reuse L01 whole-button before/after extent crossing, positive conservative swept clearance for the entire overlap interval, actual no-obstacle-contact facts and all-15-body settlement; fixed 120-Hz endpoints alone are insufficient. Check every Havok substep against the frozen guard and state the finite-step limits.",
+      "Do not alter the canonical config or try further refinement."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Zero trials with an explicit reason when L01 has no candidate, otherwise exactly nine unique asserted trials; artifact truthfully records outcome."
+      },
+      {
+        "command": "Independent review of deterministic candidate selection and output",
+        "environment": "source-review",
+        "expected": "No larger matrix, iterative search or untested assisted-force formula."
+      }
+    ],
+    "acceptance": [
+      "A no-candidate result is accepted diagnostic evidence and leaves calibration open.",
+      "A candidate is only a measurement; it is not yet production calibration or T02 acceptance.",
+      "Do not claim continuous traversal from 120-Hz endpoint samples alone; require conservative swept clearance, whole-body before/after crossing and actual no-contact evidence."
+    ],
+    "negative_cases": [
+      "Continuing search after the fixed grid, picking a candidate based on unrecorded output, or calling a peak/apex a pass.",
+      "Any config/fixture hash changes in this packet.",
+      "Any candidate can tunnel between fixed steps or lacks a C00-frozen substep guard; no geometric extrapolation may convert that into a pass.",
+      "Do not mark continuous passage from sampled snapshots if a body could tunnel between them."
+    ],
+    "review_questions": [
+      "Can the winner be recomputed from L01 rows with the specified tie-break?",
+      "Are all 120-Hz oriented overlap samples and actual contacts present?",
+      "Does the report preserve a negative result without implying gameplay readiness?"
+    ],
+    "stop_conditions": [
+      "If output is incomplete or eligibility calculation differs from L01, stop and repair the probe before C02.",
+      "If no candidate qualifies, mark calibration application blocked; do not loosen margin or exceed frozen bounds.",
+      "If C00 has not frozen a support/substep guard, stop and request the coordinator to amend the shared contract before running the candidate matrix.",
+      "If the pinned physics step/substep limit cannot exclude obstacle tunnelling, stop without classifying any row as a pass."
+    ]
+  },
+  {
+    "id": "T02-P01",
+    "parent": "T02",
+    "title": "Provide stable scene pose update and entity picking API",
+    "role": "worker",
+    "depends_on": [
+      "parent:T03",
+      "C00",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/scene/createScene.ts",
+      "games/counterball/src/scene/pieces.ts",
+      "games/counterball/src/browser.ts",
+      "packages/game-protocol/src/types.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/scene/presentation.ts",
+      "games/counterball/src/scene/presentation.test.ts",
+      "games/counterball/src/scene/pieces.ts",
+      "games/counterball/src/browser.ts"
+    ],
+    "outputs": [
+      "Stable EntityId-to-PieceAssembly map with coordinator-frozen pose-update and picking signatures."
+    ],
+    "steps": [
+      "Use createPieces and its PieceAssembly.id/root/bodyMesh outputs; preserve stable IDs and button holes.",
+      "Make only the intended body meshes pickable; resolve Babylon pick results through parent metadata/entity ID into canonical EntityId.",
+      "Update root positions and quaternions from accepted BodyState or PlaybackFrame without adjudication, transform invention or authority mutation.",
+      "Use only the exact create/update/pick exports frozen by C00 and export them from games/counterball/src/browser.ts.",
+      "Test all 15 IDs, missing/duplicate IDs, orientation updates, cap/button picking and scene disposal."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Scene update/picking unit tests pass and browser entry exports the concrete API.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "Presentation consumes canonical snapshots only and maps every pick back to one stable entity ID.",
+        "command": "Independent review against Babylon scene/piece types"
+      }
+    ],
+    "acceptance": [
+      "A scene consumer can update each piece from an authoritative snapshot and pick its canonical stable ID.",
+      "Picking and camera movement do not mutate protocol state or rules."
+    ],
+    "negative_cases": [
+      "Mesh index or transient name becomes authority; picking hole/details returns wrong entity; body mesh remains non-pickable.",
+      "A second private presentation API or Babylon handle enters a network message."
+    ],
+    "review_questions": [
+      "Can tests prove every piece has one stable ID and updates exactly?",
+      "Are visual child meshes resolved to their root entity?",
+      "Do browser exports match C00 signatures?"
+    ],
+    "stop_conditions": [
+      "If existing Babylon APIs do not support the frozen signatures, stop and ask coordinator to amend C00; do not edit App.tsx."
+    ]
+  },
+  {
+    "id": "T02-BR01",
+    "parent": "T02",
+    "title": "Expose a bounded browser-WASM direct-shot diagnostic",
+    "role": "worker",
+    "depends_on": [
+      "T02-D01",
+      "T02-P01",
+      "C01",
+      "C01-H"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/directImpulseProbe.test.ts",
+      "games/counterball/src/scene/presentation.ts",
+      "packages/game-protocol/src/config.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/simulation/browserDirectProbe.test.ts",
+      "games/counterball/src/browser.ts"
+    ],
+    "outputs": [
+      "A browser-only diagnostic entry that creates the existing canonical fixture through worldFactory and pinned Havok/WASM, applies exactly one accepted D01 measured direct-impulse candidate, advances a bounded real simulation, and returns serializable transforms, contacts and typed termination.",
+      "No production default power mapping or playable route; this diagnostic can only be invoked by the explicit diagnostic build."
+    ],
+    "steps": [
+      "Read D01 raw accepted observations and use one documented existing input tuple without extrapolating a player-facing power conversion or changing canonical config.",
+      "Use the pinned browser Havok loader and existing worldFactory/fixture; do not import the Node adapter, mock physics, create a second world/config, or write to App/UI.",
+      "Apply one actual impulse to the measured intended entity, run only the C00-frozen bounded fixed-step/yield/resource-limit policy, collect every required serializable body/contact/termination fact, and dispose in all outcomes.",
+      "Export the minimal diagnostic API from the existing browser.ts entry; preserve presentation module boundaries and do not create competing wire/protocol types.",
+      "Keep the experiment result diagnostic and explicitly unaccepted as production calibration, runner parity, restart traversal or T02/T05 completion."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify",
+        "environment": "github",
+        "expected": "The bounded probe API tests, package typecheck and workspace gates pass without a Node substitute or mock."
+      },
+      {
+        "command": "Independent review of D01 tuple provenance, browser-only WASM path, bounds and cleanup",
+        "environment": "source-review",
+        "expected": "Only the explicit measured diagnostic impulse is used; no production mapping/default or alternate authority is introduced."
+      }
+    ],
+    "acceptance": [
+      "The browser entry exposes a bounded, typed, disposable diagnostic using the real pinned browser Havok/WASM loader and existing fixture/world factory.",
+      "Returned observations include actual transforms, contacts and typed termination; any missing fact, timeout, wall limit or C00 guard violation fails the diagnostic.",
+      "The card does not claim a browser movement pass or accept T02/T05; BR02 performs actual Chromium interaction/render proof."
+    ],
+    "negative_cases": [
+      "Node-only adapter, mocked physics, separate unversioned configuration, hidden kick, silently clipped output, or applying an unmeasured impulse.",
+      "Unbounded stepping, no host yield/cancellation/resource guard, stale engine handles, or incomplete disposal.",
+      "Treating diagnostic impulse as a final player-facing power mapping or claiming calibration acceptance."
+    ],
+    "review_questions": [
+      "Does the code use the pinned browser WASM loader and canonical factory/fixture?",
+      "Is the exact D01 input tuple identified and copied without mutation or reinterpretation?",
+      "Are all step, yield, cancellation, output and cleanup limits explicit and fail-closed?"
+    ],
+    "stop_conditions": [
+      "If D01 has no accepted finite candidate, no impulse may be invented; report BR01 blocked on the missing measured input.",
+      "Any needed signature/config change returns to coordinator before implementation; do not add a competing type or alter shared contracts."
+    ]
+  },
+  {
+    "id": "T02-BR02",
+    "parent": "T02",
+    "title": "Show the first real direct shot in the diagnostic browser",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-BR01",
+      "T02-D01",
+      "T02-P01",
+      "parent:T03",
+      "C01",
+      "C01-H"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/scene/presentation.ts",
+      "apps/web/src/CounterballPreview.tsx",
+      "playwright.config.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/OPERATIONS.md"
+    ],
+    "write_paths": [
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "apps/web/src/App.tsx",
+      "tests/e2e/counterball-direct-probe.spec.ts"
+    ],
+    "outputs": [
+      "A dev-harness-only direct diagnostic surface that invokes BR01 after a deliberate pointer flick gesture, renders actual returned transforms through T02-P01 presentation and labels itself diagnostic/not playable.",
+      "A focused real Chromium/WebGL proof of physical state and canvas-pixel movement using browser Havok/WASM, with a preserved trace and teardown evidence."
+    ],
+    "steps": [
+      "Add a test-only route behind the compiled VITE_COUNTERBALL_DEV_HARNESS gate; ordinary production output must not include this route or component.",
+      "Accept one deliberate bounded pointer flick only as a trigger for the fixed D01 measured diagnostic tuple; do not add gameplay aim/power mapping, scoring, identity bypass, hotseat or public match behavior.",
+      "Call the BR01 browser diagnostic directly, display its serializable results using the accepted scene presentation API, and update actual scene transforms; do not treat labels or synthetic snapshots as movement.",
+      "Capture real WebGL pixels before and after and assert the button/cap moved, visible button holes and piece count remain, pitch is open green concrete, and route remains clearly non-playable.",
+      "Verify WebGL/WASM failure is visible, retry/disposal returns engine/listener baselines, and no mode is silently skipped."
+    ],
+    "checks": [
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "C01-H explicitly collects this spec against dist-dev; real Chromium/WebGL Havok movement changes serializable transforms and rendered pixels, and teardown returns to baseline."
+      },
+      {
+        "command": "Production build and diagnostic-route source review",
+        "environment": "source-review",
+        "expected": "The explicit diagnostic harness is compiled out of ordinary production and exposes no playable/public identity route."
+      }
+    ],
+    "acceptance": [
+      "A real pointer gesture invokes BR01 in Chromium with pinned browser Havok/WASM and produces measured changed transforms plus rendered pixels.",
+      "The surface is labelled diagnostic/not playable; no rules, gameplay power mapping or identity gate is bypassed.",
+      "A failure to start/restore WebGL or Havok is observable, and disposal/remount leaves no engine/listener leaks.",
+      "This is early child evidence only and does not accept T02/T05 or unblock gameplay cards."
+    ],
+    "negative_cases": [
+      "Fake canvas pixels, text-only success, Node-only result, mock world, production-reachable dev route, or swallowed WebGL/WASM failure.",
+      "Interpreting drag length as production power, opening guest/public play, scoring, or claiming calibrated restart support."
+    ],
+    "review_questions": [
+      "Does the pointer gesture call BR01 and produce real scene transforms and canvas pixels?",
+      "Is every dev import absent from ordinary production build?",
+      "Are failure/retry and teardown assertions observable without bypassing WebGL/WASM?"
+    ],
+    "stop_conditions": [
+      "If C01-H does not collect the exact spec or dist-dev is unavailable, keep BR02 blocked pending coordinator wiring; do not substitute a broad E2E run.",
+      "If browser WebGL/WASM is unavailable, report the exact capability/error and leave this proof blocked."
+    ]
+  },
+  {
+    "id": "T02-R01",
+    "parent": "T02",
+    "title": "Implement isolated asynchronous runner and host entrypoints",
+    "role": "worker",
+    "depends_on": [
+      "T02-F01",
+      "T02-W01",
+      "T02-C0",
+      "T02-C2",
+      "C00-A",
+      "C00-B",
+      "C03",
+      "C00"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/havokRuntime.ts",
+      "games/counterball/src/simulation/dispose.ts",
+      "packages/game-protocol/src/types.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/simulation/runner.test.ts",
+      "games/counterball/src/headless.ts"
+    ],
+    "outputs": [
+      "One isolated serializable SimulationRunner implementation with a host-injected private scheduler/clock and a headless runner export."
+    ],
+    "steps": [
+      "Validate input/config/hash and signal before allocating; create one world per run and return only canonical ShotSimulation or typed error.",
+      "Use a private injected monotonic clock and host scheduler; yield exactly after every 4 fixed 1/120-second physics ticks (about 33 ms), with browser/Node hosts supplying their own event-loop yield and no physics changes.",
+      "Check signal before allocation, before every 4-tick batch, immediately after each awaited yield, before finalization, before cleanup, and after cleanup before any result returns; always dispose in finally.",
+      "Define simulated-time exhaustion at configured max simulated duration without settlement as timeout; define monotonic wall-clock deadline, fact/frame/workload cap exhaustion, or displacement-guard exhaustion as resourceLimit; never conflate these outcomes.",
+      "Keep 120-Hz physics facts and bounded playback sampling; no partial success on error. Export only the headless factory here; the browser entry factory is the separate T02-E01 packet.",
+      "Test the exact 4-tick yield cadence, wall-clock and simulated-time error mapping using injected monotonic clock/scheduler, and abort checks before/after each batch and cleanup; never mock body motion.",
+      "Enforce the C00-frozen swept-displacement/angular-change guard; use verified Havok substeps or fail typed resourceLimit before a candidate can be called physically supported."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Runner validation, yield cadence, error mapping and headless exports pass; no browser globals enter the headless entry.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "One shared physics/rules path, signal checks at all boundaries, and reliable disposal.",
+        "command": "Independent review of runner lifecycle and host exports"
+      }
+    ],
+    "acceptance": [
+      "The headless entry invokes the shared simulation implementation; host-specific runtime/yield setup stays outside physics/rules.",
+      "Simulated timeout, wall-clock/resource limit and cancellation are distinct.",
+      "No step may exceed the config-hashed tunnelling guard; never report a candidate pass when the solver could skip the obstacle.",
+      "Runner yields after every 4 physics ticks and checks cancellation on both sides of every batch and cleanup.",
+      "Monotonic wall-clock/resource limits and simulated-time settling timeout remain separate typed errors."
+    ],
+    "negative_cases": [
+      "Synchronous 15-second loop blocks UI; cancellation checked only once or missed after final batch.",
+      "Wall-clock deadline reported as simulated timeout; partial result on any limit.",
+      "Headless entry imports React, DOM or browser UI; browser path runs a Node-only adapter."
+    ],
+    "review_questions": [
+      "Does each await boundary get a pre/post signal check?",
+      "Is cleanup guaranteed on success, timeout, resourceLimit and cancellation?",
+      "Are host yielding and physics stepping separate?"
+    ],
+    "stop_conditions": [
+      "If pinned Havok cannot be scheduled without blocking or the configured batch can exceed the host budget, stop and request a reviewed contract/limit adjustment.",
+      "If exact scheduler or timeout semantics differ from accepted C00 contracts, coordinator must update the contract before code proceeds."
+    ]
+  },
+  {
+    "id": "T02-R02",
+    "parent": "T02",
+    "title": "Prove direct shot movement in pinned Havok WASM",
+    "role": "worker",
+    "depends_on": [
+      "T02-R01",
+      "T02-D01",
+      "C03"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/directImpulseProbe.test.ts",
+      "execution_state/reports/T02-D01-implementation.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/runner.directHavok.test.ts"
+    ],
+    "outputs": [
+      "Real direct-shot runner evidence with measured cap/button movement, contacts, all-body settling and bounded frames/facts"
+    ],
+    "steps": [
+      "Run canonical normal commands through exported SimulationRunner with real pinned Havok WASM.",
+      "Cover quiet/no-contact, cap-to-button, cap-to-cap/button chain, and fixed direct impulse endpoints approved in C02.",
+      "Compare serialized result start/end with actual world transforms and captured same-run facts.",
+      "Assert all 15 bodies remain finite and enter the configured quiet window; assert playback and fact bounds.",
+      "Emit artifact only after every assertion and cleanup pass."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Direct real-WASM runner tests pass in hosted CI; no Node-only shortcut or mocks."
+      },
+      {
+        "command": "Independent review of output provenance and runner-path test",
+        "environment": "source-review",
+        "expected": "Test exercises exported production runner and checks actual WASM-derived movement, all bodies, facts and disposal."
+      }
+    ],
+    "acceptance": [
+      "Every direct trial that returns success contains plausible movement and all-15 settling; failures are typed and complete.",
+      "T02 direct gate is met only with this actual WASM evidence."
+    ],
+    "negative_cases": [
+      "Mock runner, fake body motion, pre-authored facts, or trusting the diagnostic's input impulse as observed movement.",
+      "A timer ending is mistaken for physical settling."
+    ],
+    "review_questions": [
+      "Does the test instantiate the pinned Havok runtime through the same factory?",
+      "Is the shot movement read from actual final transforms?",
+      "Are contacts and outputs attributable to exact config hash?"
+    ],
+    "stop_conditions": [
+      "Any missing WASM artifact, skipped test, partial output or non-settled body leaves the direct gate open."
+    ]
+  },
+  {
+    "id": "T02-R03",
+    "parent": "T02",
+    "title": "Prove placed restart pose and physical traversal",
+    "role": "worker",
+    "depends_on": [
+      "T02-R02",
+      "T02-L02",
+      "C02",
+      "C03"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/features/restarts/domain/placementPose.ts",
+      "games/counterball/src/simulation/loftRefinedProbe.test.ts",
+      "execution_state/reports/T02-L02-implementation.md",
+      "knowledge_base/execution/CONTRACTS.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/runner.restartHavok.test.ts"
+    ],
+    "outputs": [
+      "Runner-level restart integration evidence tied to the accepted calibration and exact placed button transform"
+    ],
+    "steps": [
+      "Use the existing pure deriveRestartButtonPose helper and any accepted C02 mode; do not copy its formula or add forces.",
+      "Verify arbitrary owned cap relocation is represented by the command/setup input while all other 13 caps retain exact transforms.",
+      "Prove whole-button extent starts before and ends fully beyond the obstacle; compute conservative swept clearance over every interval in the full horizontal-overlap span, check actual no-button-obstacle contacts, and enforce the accepted linear/angular substep guard. Fixed 120-Hz endpoints alone are not continuous traversal proof.",
+      "Assert only explicitly selected cap/button setup transforms change before simulation; preserve all unrelated bodies.",
+      "Write no success artifact unless the actual runner proves every physical criterion.",
+      "Record the solver displacement/angular guard and actual contact stream; document that fixed 120-Hz endpoint samples alone do not prove continuous traversal."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Restart physical gate passes on pinned WASM with continuous clearance and no obstacle contact; otherwise test fails and T02 stays open."
+      },
+      {
+        "command": "Independent physical-path review",
+        "environment": "source-review",
+        "expected": "No mocked launch, automatic extra shot, hidden push, or deviation from canonical helper."
+      }
+    ],
+    "acceptance": [
+      "At least one validated placed restart traverses an obstacle without contact through the whole button body and all 15 bodies settle.",
+      "Any cap owned by the actor may be selected; every other cap remains fixed.",
+      "No continuous-traversal claim from fixed 120-Hz samples alone; a tunnel-capable step or missing frozen substep guard leaves the gate open.",
+      "Any potential tunnelling, missing swept interval or unreported contact leaves the physical restart gate open."
+    ],
+    "negative_cases": [
+      "Single apex only; sampled camera frames; candidate from a different fixture/config; opponent cap relocation; automatic two-shot reward.",
+      "Claiming physical success when L02 had no accepted candidate."
+    ],
+    "review_questions": [
+      "Does the runner reproduce the exact tested starting geometry/config?",
+      "Is clearance continuous at fixed physics steps and oriented to actual button shape?",
+      "Can a reviewer verify untouched cap transforms byte-for-byte?"
+    ],
+    "stop_conditions": [
+      "If no proven L02 candidate exists, keep this packet blocked; do not implement or claim assisted lift."
+    ]
+  },
+  {
+    "id": "T02-R04",
+    "parent": "T02",
+    "title": "Prove timeout, cancellation, limits and isolated cleanup",
+    "role": "worker",
+    "depends_on": [
+      "T02-R01",
+      "C00-A",
+      "C00"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/simulation/dispose.ts",
+      "packages/game-protocol/src/types.ts",
+      "packages/game-protocol/src/schemas.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/runner.lifecycleHavok.test.ts"
+    ],
+    "outputs": [
+      "Real-runner lifecycle tests for every canonical failure class and room isolation"
+    ],
+    "steps": [
+      "Use actual world construction to test invalid body, forced bounded timeout, resource limits and pre-aborted/mid-run cancellation.",
+      "Assert each error code/reason is exact; cancelled is never timeout and none emits a partial successful ShotSimulation.",
+      "Run two distinct rooms sequentially and concurrently if the runner contract permits; verify no transform/fact leakage.",
+      "Verify cancellation/error restores or preserves pre-shot application checkpoint and always disposes engine/world resources.",
+      "Use fixed iteration limits and bounded timeouts to keep CI deterministic."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Lifecycle suite passes on actual runner; every injected failure has typed outcome and cleanup."
+      },
+      {
+        "command": "Independent review of cancellation and cleanup assertions",
+        "environment": "source-review",
+        "expected": "No global abort, swallowed error, hanging promise, or engine registry/resource leak."
+      }
+    ],
+    "acceptance": [
+      "timeout, cancelled, invalidBody and resourceLimit are distinct; action authority is not partially committed.",
+      "Repeated create/fail/dispose returns allocations and listeners to baseline."
+    ],
+    "negative_cases": [
+      "No hanging cancellation path; no partial success; no blanket global teardown that destroys another room.",
+      "No test-only behavior used by production to declare completion."
+    ],
+    "review_questions": [
+      "Is each failure injected at a real allocation/simulation boundary?",
+      "Does each runner complete or fail within bounded time?",
+      "Is cleanup asserted with existing engine/resource counters?"
+    ],
+    "stop_conditions": [
+      "If cleanup leaves a resource or the test requires global state deletion, stop and repair ownership rather than weakening the assertion."
+    ]
+  },
+  {
+    "id": "T02-R05",
+    "parent": "T02",
+    "title": "Prove a direct shot in the browser with real Havok WASM",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-R02",
+      "T02-P01",
+      "T02-E01",
+      "parent:T03",
+      "C01",
+      "C01-H",
+      "T02-BR02"
+    ],
+    "read_paths": [
+      "games/counterball/src/browser.ts",
+      "games/counterball/src/simulation/runner.ts",
+      "apps/web/src/CounterballPreview.tsx",
+      "playwright.config.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/scene/presentation.ts"
+    ],
+    "write_paths": [
+      "apps/web/src/CounterballPhysicsProbe.tsx",
+      "apps/web/src/App.tsx",
+      "tests/e2e/counterball-physics.spec.ts"
+    ],
+    "outputs": [
+      "A test-mode-only browser probe that invokes the canonical browser SimulationRunner and shows actual rendered direct-shot movement.",
+      "Uses the canonical browser runner export and stable presentation update/picking API from T02-P01; this is child evidence only and does not accept T02 or unblock T05."
+    ],
+    "steps": [
+      "Mount the same protocol/config/world adapter with pinned Havok WASM in Chromium; do not use the Node adapter result as browser proof.",
+      "Use one fixed deterministic direct-shot command and return serializable final transforms/facts through a test-only route.",
+      "Capture real rendered canvas frames before and after; assert the actual button or cap transform and pixels change, count remains correct, holes remain visible, and the route stays unavailable in ordinary production.",
+      "Prove the browser uses the exported production runner and stable scene update/picking API; keep restart traversal in the later T02-R07 card.",
+      "Bound test execution and preserve logs/artifact provenance."
+    ],
+    "checks": [
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-physics.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The explicitly selected Chromium/WebGL direct-shot probe invokes the real Havok WASM runner and observes moved transforms plus rendered output; no text-label-only pass."
+      },
+      {
+        "command": "Independent browser-path and production-route review",
+        "environment": "source-review",
+        "expected": "The diagnostic route exists only in the explicit test artifact, and the browser does not call a Node-only runtime or claim parent-gate acceptance."
+      }
+    ],
+    "acceptance": [
+      "At least one direct browser shot shows real changed physics transforms and rendered pixels using pinned Havok WASM.",
+      "A real context/WASM failure is surfaced; direct-shot browser evidence alone does not accept T02 or unblock T05."
+    ],
+    "negative_cases": [
+      "Mock/Node-only runner, fake pixel screenshot, synthetic DOM success state, or calling the probe from the production page.",
+      "Silent skip when WebGL/WASM is absent."
+    ],
+    "review_questions": [
+      "Is Havok/WASM imported in the browser bundle and used by the interaction?",
+      "Do canvas pixels and serializable physics state both change?",
+      "Does teardown/remount restore engine/listener baselines?"
+    ],
+    "stop_conditions": [
+      "If Chromium cannot supply required WebGL/WASM, mark browser gate blocked and preserve the exact capability/error; do not claim pass."
+    ]
+  },
+  {
+    "id": "T02-R07",
+    "parent": "T02",
+    "title": "Prove placed-restart traversal in Chromium after physics proof",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-R03",
+      "T02-R05",
+      "T02-P01",
+      "T02-E01",
+      "parent:T03",
+      "C01",
+      "C01-H"
+    ],
+    "read_paths": [
+      "apps/web/src/CounterballPhysicsProbe.tsx",
+      "tests/e2e/counterball-physics.spec.ts",
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/simulation/facts.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md"
+    ],
+    "write_paths": [
+      "apps/web/src/CounterballPhysicsProbe.tsx",
+      "tests/e2e/counterball-physics.spec.ts"
+    ],
+    "outputs": [
+      "A test-mode-only restart scenario added sequentially to the accepted counterball-physics browser probe, exercising one placed restart with the same canonical runner and real browser Havok WASM.",
+      "A focused real Chromium/WebGL proof records whole-button start/end extents, continuous conservative swept clearance over the full horizontal-overlap interval, actual no-button/obstacle contacts and finite settling of all 15 bodies."
+    ],
+    "steps": [
+      "Extend the existing test-only probe with one deterministic placed-restart scenario, using the canonical restart-pose helper and accepted config; do not modify App routing or create another physics implementation.",
+      "Run only the explicitly named restart-browser spec against the diagnostic prebuilt artifact and pinned browser WASM.",
+      "Record config/engine/adapter provenance, every substep guard result, whole-button oriented extents, conservative swept clearance, actual obstacle contact facts, all-body finite settlement, visible pixels and teardown counters.",
+      "Reject any run that relies only on endpoint samples, text labels, assumed clearance, mocked contacts or incomplete settling; report a typed resourceLimit or failed traversal honestly.",
+      "Bound the test and preserve the browser trace and structured observations for independent review."
+    ],
+    "checks": [
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-physics.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The named Chromium/WebGL restart test runs pinned Havok and proves whole-button traversal using the frozen C00 substep/swept-clearance guard, no obstacle contact and finite all-body settling; otherwise it fails and T02 stays open."
+      },
+      {
+        "command": "Independent review of browser provenance, swept evidence and cleanup",
+        "environment": "source-review",
+        "expected": "The browser proof uses the accepted restart helper and same runner, with no mock, Node shortcut, hidden push or inference from discrete endpoint samples."
+      }
+    ],
+    "acceptance": [
+      "The placed restart passes in the real browser only when actual start/end extents fully straddle the obstacle, conservative clearance stays above the frozen margin throughout horizontal overlap, no button-obstacle contact occurs and all 15 bodies finitely settle.",
+      "The early direct-shot T02-R05 evidence remains a child diagnostic and cannot relax T02 or T05 gates."
+    ],
+    "negative_cases": [
+      "A browser-only geometry result substituted for actual Physics V2 movement.",
+      "Endpoint-only samples, reduced collision radii, inferred no-contact, omitted bodies, auto-restart, or unbounded retry/search.",
+      "Any exceeded/uninstrumented C00 guard reported as successful traversal."
+    ],
+    "review_questions": [
+      "Does the same pinned browser runner and canonical restart helper execute the shot?",
+      "Are conservative whole-button clearance and actual contacts independently recorded for every relevant solver substep?",
+      "Are all 15 bodies finite and settled, and are engine/listener counters back at baseline?"
+    ],
+    "stop_conditions": [
+      "Any missing substep/clearance/contact/settlement evidence keeps T02 open; preserve the run and return the exact blocker rather than weaken the gate.",
+      "If browser WebGL/WASM is unavailable, mark the browser proof blocked with the exact capability/error; do not claim pass."
+    ]
+  },
+  {
+    "id": "T02-R06",
+    "parent": "T02",
+    "title": "Prove crossing bounds, tunneling resistance and repeated-world cleanup",
+    "role": "worker",
+    "depends_on": [
+      "T02-R02",
+      "T02-R03",
+      "T02-R04",
+      "T02-W01",
+      "T02-P01"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/facts.ts",
+      "games/counterball/src/simulation/runner.ts",
+      "packages/game-protocol/src/config.ts",
+      "knowledge_base/execution/CONTRACT_WORK.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/runner.boundaryStressHavok.test.ts"
+    ],
+    "outputs": [
+      "Fixed stress cases for goal/out/side exit and repeated actual-world lifecycle",
+      "Instrumented substep evidence demonstrates that tested trajectories cannot silently tunnel through the smallest relevant collider."
+    ],
+    "steps": [
+      "At configured maximum horizontal impulse and maximum accepted restart tilt, run fixed high-speed trajectories across goal mouth, post/crossbar frame, side boundary and far end boundary.",
+      "Instrument every Havok substep and assert the C00-frozen linear/angular displacement guard against the smallest relevant collider feature; if the guard is exceeded, require verified internal substeps or fail typed resourceLimit before accepting the shot.",
+      "Check whole-button oriented crossing facts using conservative swept geometry for each substep; same-step contact precedes crossing for attribution only and cannot hide a tunnelling interval.",
+      "For every exited body, verify it lands within the config-hashed open apron and the whole world settles; out-of-coverage fails safely rather than freezes or disappears.",
+      "Create, simulate, and dispose 50 independent real-Havok worlds sequentially, asserting baseline after each cycle.",
+      "Use only fixed max-envelope inputs and bounded CI loops; include the discrete integration and swept-bound limits in the report."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "All fixed boundary and 50-cycle real-WASM cases pass without leaks or dropped facts."
+      },
+      {
+        "command": "Independent review of envelope and contact/crossing evidence",
+        "environment": "source-review",
+        "expected": "All tests stay within frozen C00-B support bounds and do not hide exit-body behavior."
+      }
+    ],
+    "acceptance": [
+      "T02 stress evidence demonstrates exact whole-button crossing facts and settles bodies on open pavement within the accepted envelope.",
+      "Resource/coverage overflow returns the typed failure and never a successful partial result."
+    ],
+    "negative_cases": [
+      "Walls, culling, kill/teleport/respawn, silent body omission, downsampled rule facts, or stress beyond the accepted config envelope.",
+      "A single successful trajectory presented as exhaustive stress proof.",
+      "A trajectory that crosses an obstacle between solver steps without sufficient guard or substep proof cannot count as a successful crossing."
+    ],
+    "review_questions": [
+      "Are the tested trajectories at the declared maximum envelope?",
+      "Are all 15 IDs and all crossing/contact facts present?",
+      "Does each construction cycle return cleanup counters to baseline?"
+    ],
+    "stop_conditions": [
+      "Any out-of-envelope body or incomplete fact sequence keeps T02 open; return to coordinator for a new reviewed support policy."
+    ]
+  },
+  {
+    "id": "T02-W01",
+    "parent": "T02",
+    "title": "Apply measured material, damping and apron config to Physics V2",
+    "role": "worker",
+    "depends_on": [
+      "C03",
+      "T02-A"
+    ],
+    "read_paths": [
+      "packages/game-protocol/src/config.ts",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/worldFactory.test.ts",
+      "node_modules/@babylonjs/core/Physics/v2"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/simulation/worldFactory.test.ts"
+    ],
+    "outputs": [
+      "One config-driven real Physics V2 world factory used by headless and browser adapters"
+    ],
+    "steps": [
+      "Apply exactly the accepted material/damping/shape and support-apron fields using verified pinned API types.",
+      "Preserve the painted pitch, open boundary and canonical crossing planes; apron is horizontal pavement with no enclosing walls.",
+      "Reject null calibration and unsupported envelope explicitly before a playable run.",
+      "Keep creation isolated by room/run and disposal ownership explicit.",
+      "Add tests for shape/material readback, config identity, apron bounds and failure-safe cleanup."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify",
+        "environment": "github",
+        "expected": "Real pinned-Havok factory tests and all workspace gates pass."
+      },
+      {
+        "command": "Review installed Physics V2 declarations and official Babylon docs",
+        "environment": "source-review",
+        "expected": "Every property is supported and applied consistently; no mock substitutes for WASM."
+      }
+    ],
+    "acceptance": [
+      "Browser and Node production adapters can consume the same factory/config.",
+      "Configured support bounds and setup readback are testable; no unmeasured constants remain."
+    ],
+    "negative_cases": [
+      "Runner runs with null calibration, hidden extra impulse, shifted rule plane, walls, or non-configurable apron.",
+      "WorldFactory mutates canonical input or shares bodies across runs."
+    ],
+    "review_questions": [
+      "Do actual adapter properties read back as requested?",
+      "Does world teardown free all bodies even if construction fails?",
+      "Does the apron settle out-of-bounds shots without changing referee facts?"
+    ],
+    "stop_conditions": [
+      "If pinned WASM cannot instantiate the accepted config, stop and return a precise API/runtime blocker; never fall back to mock."
+    ]
+  },
+  {
+    "id": "T05-F01",
+    "parent": "T05",
+    "title": "Build deterministic flick and camera input state machines",
+    "role": "worker",
+    "depends_on": [
+      "T02-P01",
+      "parent:T02",
+      "parent:T03",
+      "C00-A",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/scene/createScene.ts",
+      "games/counterball/src/browser.ts",
+      "games/counterball/src/scene/presentation.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/flick/presentation/aimInput.ts",
+      "games/counterball/src/features/flick/presentation/aimInput.test.ts",
+      "games/counterball/src/features/camera/presentation/cameraInput.ts",
+      "games/counterball/src/features/camera/presentation/cameraInput.test.ts"
+    ],
+    "outputs": [
+      "Pure input reducers separating one-cap aim from camera orbit/zoom"
+    ],
+    "steps": [
+      "Freeze one-pointer aim lifecycle with pointer capture, screen-to-pitch projection, canonical yaw/power conversion and cancel/pointercancel/resize behavior.",
+      "Keep empty-pitch drag orbit and pinch/wheel zoom separate from cap aim; a second pointer can never submit a shot.",
+      "Add keyboard angle/power/fire controls and accessible fallback state without direct physics side effects.",
+      "Ensure camera/view changes never mutate MatchState or simulation inputs.",
+      "Test deterministically with fixed pointer coordinates, viewport and selected owned-cap IDs."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify",
+        "environment": "github",
+        "expected": "Input state-machine tests and all workspace checks pass."
+      },
+      {
+        "command": "Independent review of pointer state and canonical yaw/power conversion",
+        "environment": "source-review",
+        "expected": "No camera gesture can fire or alter game physics; cancellation releases all captured pointers."
+      }
+    ],
+    "acceptance": [
+      "Aim and view gestures are mutually exclusive and return identical command values at 30/60 Hz for the same input.",
+      "A keyboard user can choose angle/power, fire one shot and cancel."
+    ],
+    "negative_cases": [
+      "Double fire, second-finger shot, stale drag after resize, aim orbiting the camera or camera mutating authority.",
+      "Extra modes, autoaim, hidden sensitivity defaults or additional game rules."
+    ],
+    "review_questions": [
+      "Are aim and orbit disjoint for all pointer counts?",
+      "Are units and coordinate axes exactly those frozen in protocol?",
+      "Is pointer cancellation deterministic and leak-free?"
+    ],
+    "stop_conditions": [
+      "If camera ray/projection APIs or canonical command axes are unclear, stop and ask coordinator rather than inventing a conversion."
+    ]
+  },
+  {
+    "id": "T05-F02",
+    "parent": "T05",
+    "title": "Deliver first real local flick in a compiled-out dev harness",
+    "role": "coordinator",
+    "depends_on": [
+      "T05-F01",
+      "T02-P01",
+      "parent:T02",
+      "parent:T03",
+      "C01",
+      "C01-H"
+    ],
+    "read_paths": [
+      "apps/web/src/App.tsx",
+      "apps/web/src/CounterballPreview.tsx",
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/features/flick/presentation/aimInput.ts",
+      "apps/web/vite.config.ts",
+      "playwright.config.ts",
+      "games/counterball/src/scene/presentation.ts",
+      "games/counterball/src/browser.ts"
+    ],
+    "write_paths": [
+      "apps/web/src/App.tsx",
+      "apps/web/src/CounterballDevMatch.tsx",
+      "tests/e2e/local-flick.spec.ts",
+      "tests/production/counterball-dev-match-absent.mjs"
+    ],
+    "outputs": [
+      "Explicit test-build-only local dev match route with one real browser flick and production absence proof"
+    ],
+    "steps": [
+      "Mount the accepted scene and the same browser SimulationRunner; command remains canonical and results come only from resolution.",
+      "Pick any owned cap, drag to aim, release once; show real playback/final transforms and re-enable input only when ready.",
+      "Provide accessible HTML aim/fire fallback and visible error/cancel/terminal states.",
+      "Expose the local test identity only in the explicit C01 counterball-test build; never make a guest or public route.",
+      "Add production artifact assertion that dev route marker/chunk is absent from ordinary build."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify && pnpm test:integration",
+        "environment": "github",
+        "expected": "Production and dedicated test build checks pass before the targeted browser run."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/local-flick.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The explicitly selected diagnostic browser test performs a real flick and asserts actual cap/button movement and the final snapshot."
+      },
+      {
+        "command": "pnpm build",
+        "environment": "github",
+        "expected": "Builds the ordinary production artifact with VITE_COUNTERBALL_DEV_HARNESS unset."
+      },
+      {
+        "command": "node tests/production/counterball-dev-match-absent.mjs",
+        "environment": "github",
+        "expected": "The ordinary production artifact contains no diagnostic match route/chunk or local identity bypass."
+      }
+    ],
+    "acceptance": [
+      "The user can complete a real flick in the browser without manual scene editing; this is still a development harness, not MVP completion.",
+      "Dev identity and route are absent from production bundle and remain inaccessible on ordinary preview."
+    ],
+    "negative_cases": [
+      "Fake shot animation, manually changed mesh without runner, guest launch route, or production inclusion of test identity.",
+      "Continuous input while state is paused/terminal or an extra shot after one release."
+    ],
+    "review_questions": [
+      "Does a pointer release invoke the canonical runner exactly once?",
+      "Does ordinary `pnpm build` exclude the route while explicit test mode includes it?",
+      "Are failures/cancellation visible and do they preserve checkpoint state?"
+    ],
+    "stop_conditions": [
+      "If route cannot be compiled into a separate artifact, stop before exposing it in App; do not ship a hidden guest match."
+    ]
+  },
+  {
+    "id": "T06-R01",
+    "parent": "T06",
+    "title": "Implement pure referee resolution and match transition",
+    "role": "worker",
+    "depends_on": [
+      "parent:T01",
+      "parent:T02",
+      "C00-A"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/GAMEPLAY.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "packages/game-protocol/src/types.ts",
+      "games/counterball/src/simulation/facts.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/referee/domain/resolveShot.ts",
+      "games/counterball/src/features/referee/domain/resolveShot.test.ts",
+      "games/counterball/src/features/match/domain/transition.ts",
+      "games/counterball/src/features/match/domain/transition.test.ts"
+    ],
+    "outputs": [
+      "Pure immutable Resolution and deterministic next-state transition over canonical ShotSimulation"
+    ],
+    "steps": [
+      "Implement the C00-frozen resolveShot(before, command, simulation, config) signature; no renderer/database/clock/engine imports.",
+      "Cover foul scope and precedence, selected cap button-touch exemption, penalty location, goal/own-goal, whole-button exits and last touch, same-step tie ordering, ordinary alternation and target completion.",
+      "Represent only one placed-shot award; no banked two-shot rewards.",
+      "Apply explicit validated cap return/reset operations after simulation facts and preserve unrelated bodies.",
+      "Validate final MatchState and test every listed GAMEPLAY fixture plus input immutability."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify",
+        "environment": "github",
+        "expected": "All table-driven rule fixtures and workspace gates pass."
+      },
+      {
+        "command": "Independent gameplay/decision review",
+        "environment": "source-review",
+        "expected": "Every provisional rule is labelled, no historical uncertainty silently becomes fact, and precedence matches human corrections."
+      }
+    ],
+    "acceptance": [
+      "Resolution is deterministic and side-effect free; all existing GAMEPLAY scenarios are explicit tests.",
+      "No extra-shot bank, no scene or network dependency, and malformed facts do not produce a valid new authority state."
+    ],
+    "negative_cases": [
+      "Foul based on nonselected cap without explicit decision, reward stacking, goal from center crossing alone, last touch after exit, or changed unrelated cap.",
+      "Rules computed from frames instead of physics facts."
+    ],
+    "review_questions": [
+      "Does each decision table map to at least one test?",
+      "Are event order, state result and scoring consistent?",
+      "Are all assumptions still marked provisional where required?"
+    ],
+    "stop_conditions": [
+      "If a human correction conflicts with a default, human correction wins; stop and ask coordinator to update canonical decisions before implementation."
+    ]
+  },
+  {
+    "id": "T07-F01",
+    "parent": "T07",
+    "title": "Define deterministic seven-cap formation presets",
+    "role": "worker",
+    "depends_on": [
+      "parent:T01",
+      "parent:T06"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/GAMEPLAY.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "packages/game-protocol/src/types.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/formations/domain/formations.ts",
+      "games/counterball/src/features/formations/domain/formations.test.ts"
+    ],
+    "outputs": [
+      "At least two labelled provisional, mirrored seven-cap formations with no initial overlaps"
+    ],
+    "steps": [
+      "Define two seven-cap arrays using current provisional concepts only; preserve exactly seven caps per team.",
+      "Mirror for the other team, use canonical IDs/units and prove no overlap or boundary violation.",
+      "Keep names and styling plainly provisional; add no cultural ceremony or extra formation feature.",
+      "Test symmetry, IDs, count, overlap, bounds and deterministic reset snapshots."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Pure formation fixtures pass and workspace gates pass.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "Seven caps exactly; no undocumented cultural rule.",
+        "command": "Independent review against human clarifications and provisional decisions"
+      }
+    ],
+    "acceptance": [
+      "Both teams receive seven unique non-overlapping cap transforms and deterministic mirror behavior.",
+      "Any assumptions not settled by the human remain labelled provisional."
+    ],
+    "negative_cases": [
+      "Eight caps, missing cap, asymmetric accidental overlap, hidden formation advantage or invented cultural naming."
+    ],
+    "review_questions": [
+      "Are all IDs/teams consistent with MatchState?",
+      "Can reset create a fresh fair formation without moving the button?"
+    ],
+    "stop_conditions": [
+      "If formation rules conflict with a human clarification, stop and request canonical decision update before changing the arrays."
+    ]
+  },
+  {
+    "id": "T07-R02",
+    "parent": "T07",
+    "title": "Implement bounded legal restart placement solver",
+    "role": "worker",
+    "depends_on": [
+      "T07-F01",
+      "parent:T01",
+      "parent:T06",
+      "parent:T02",
+      "C00"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/GAMEPLAY.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/features/restarts/domain/placementPose.ts",
+      "games/counterball/src/features/formations/domain/formations.ts",
+      "games/counterball/src/features/match/domain/transition.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/restarts/domain/placementSolver.ts",
+      "games/counterball/src/features/restarts/domain/placementSolver.test.ts"
+    ],
+    "outputs": [
+      "Deterministic valid-placement and placementBlocked results for any owned cap at canonical anchors"
+    ],
+    "steps": [
+      "Resolve throw/foul anchor at the recorded exit/contact point and penalty at the canonical penalty-box edge.",
+      "Allow any owned cap; exclude only that cap's old pose from the search; reuse deriveRestartButtonPose for button support/orientation.",
+      "Validate anchor tolerance, bounds and overlap; search all owned caps in a fixed deterministic bounded region.",
+      "Return explicit no-legal-placement without moving another friendly cap, any opponent cap or an unrelated object.",
+      "Test far cap selection, anchor edges, penalty, fully blocked search, retry determinism and byte-identical untouched transforms."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Placement cases pass with bounded runtime and no mutation on invalid result.",
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "Any owned cap may relocate and every other cap remains exactly fixed.",
+        "command": "Independent review of geometry, pure helper use and untouched transforms"
+      }
+    ],
+    "acceptance": [
+      "Solver either returns one canonical legal restart or explicit placementBlocked.",
+      "No arbitrary-distance button placement or unauthorized cap movement."
+    ],
+    "negative_cases": [
+      "Unbounded/random search, moving opponent or nonselected friendly bodies, teleporting button away from anchor, or mutating rejected state."
+    ],
+    "review_questions": [
+      "Is search deterministic and bounded?",
+      "Are selected old pose and anchor treated correctly?",
+      "Do all other IDs remain byte-identical?"
+    ],
+    "stop_conditions": [
+      "If no valid placement can support the proven physics mode, preserve placementBlocked and report the game-rule limitation; do not relax physics clearance."
+    ]
+  },
+  {
+    "id": "T08-R01",
+    "parent": "T08",
+    "title": "Build accessible placed-restart controls and local HUD",
+    "role": "worker",
+    "depends_on": [
+      "parent:T05",
+      "parent:T07",
+      "T07-F01",
+      "T07-R02",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/features/restarts/domain/placementSolver.ts",
+      "games/counterball/src/features/match/domain/transition.ts",
+      "apps/web/src/CounterballDevMatch.tsx"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/restarts/presentation/RestartControls.tsx",
+      "games/counterball/src/features/match/presentation/MatchHud.tsx",
+      "apps/web/src/styles.css",
+      "tests/e2e/local-restart.spec.ts"
+    ],
+    "outputs": [
+      "Player-facing score/turn/status plus accessible cap, radial placement and tilt controls"
+    ],
+    "steps": [
+      "Expose cap selection, anchor position, radial angle, tilt in degrees, valid/invalid reason, cancel and one atomic confirm/fire action.",
+      "Show score, whose turn, throw-in/foul/penalty and restart status in semantic HTML outside the canvas.",
+      "Make all actions keyboard operable, focus visible, announced by live region and touch targets usable at 390×844.",
+      "Do not use 'extra turn'; preserve one-shot award rule.",
+      "Add E2E for valid, invalid, cancelled, keyboard and completely blocked placement."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/web test && pnpm verify",
+        "environment": "github",
+        "expected": "Accessible restart component and workspace checks pass before the targeted browser run."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/local-restart.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The explicitly selected diagnostic restart flow works on the built test route without invalid fire."
+      },
+      {
+        "command": "Keyboard and 390×844 browser review",
+        "environment": "source-review",
+        "expected": "Controls remain reachable without horizontal overflow; status and errors stay visible beside the canvas."
+      }
+    ],
+    "acceptance": [
+      "A player can make a valid placed shot with pointer or keyboard and can cancel without state changes.",
+      "Invalid/blocked placement cannot fire and gives an actionable status."
+    ],
+    "negative_cases": [
+      "Canvas-only control, silent invalid click, hidden error, arbitrary placement, or camera angle changing authoritative tilt/azimuth.",
+      "No new rule or reset loophole."
+    ],
+    "review_questions": [
+      "Can screen-reader/keyboard users complete/cancel placement?",
+      "Are errors announced and focus retained?",
+      "Does camera movement remain presentation-only?"
+    ],
+    "stop_conditions": [
+      "If current frozen presentation API cannot update stable mesh IDs, ask coordinator to complete the C00 presentation contract first."
+    ]
+  },
+  {
+    "id": "T09-R01",
+    "parent": "T09",
+    "title": "Integrate local checkpoint, simulation, resolution and playback controller",
+    "role": "worker",
+    "depends_on": [
+      "parent:T06",
+      "parent:T08",
+      "parent:T02",
+      "parent:T05",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/features/referee/domain/resolveShot.ts",
+      "games/counterball/src/features/match/domain/transition.ts",
+      "games/counterball/src/features/restarts/presentation/RestartControls.tsx",
+      "games/counterball/src/scene/presentation.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/match/application/localMatchController.ts",
+      "games/counterball/src/features/match/application/localMatchController.test.ts",
+      "tests/integration/local-match.test.ts",
+      "apps/web/src/CounterballDevMatch.tsx"
+    ],
+    "outputs": [
+      "One local authority pipeline from validated action through real runner, pure resolution and deterministic playback"
+    ],
+    "steps": [
+      "Use the frozen controller and SDK signatures; checkpoint before simulation; serialize one in-flight action; route accepted output into resolution and playback.",
+      "On typed failure/cancel preserve pre-shot state; on success unlock only after playback/placement phase completes.",
+      "Connect dev harness UI to controller and expose diagnostics only in test mode.",
+      "Implement rematch as a new zero-score state with nonoverlapping accepted formations, not an extra-turn shortcut.",
+      "Test replay at 30/60 Hz gives same authoritative final snapshot and cleanup on remount."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm test:integration && pnpm verify",
+        "environment": "github",
+        "expected": "Controller and integration tests pass with real runner adapter; no duplicated action or stale phase."
+      },
+      {
+        "command": "Independent review of checkpoint/abort and ownership pipeline",
+        "environment": "source-review",
+        "expected": "One authority result, monotone local action state and exact pre-shot restore on failure."
+      }
+    ],
+    "acceptance": [
+      "Commands→simulate→resolve→playback→next phase works without manual scene editing.",
+      "No simultaneous simulation or stale result can overwrite newer/rematch state."
+    ],
+    "negative_cases": [
+      "UI mutates MatchState before runner result, animation treated as authority, swallowed failure, or duplicate release sends two shots.",
+      "Rematch retains score or stale callbacks update a new match."
+    ],
+    "review_questions": [
+      "Is there exactly one simulation lifecycle path?",
+      "Does cancellation preserve checkpoint and prevent late commit?",
+      "Do all subscribers dispose at rematch/unmount?"
+    ],
+    "stop_conditions": [
+      "If accepted SDK or controller signatures differ from actual C00 output, stop and request coordinator signature update."
+    ]
+  },
+  {
+    "id": "T09-R02",
+    "parent": "T09",
+    "title": "Prove complete first-to-three local match and rematch in the browser",
+    "role": "worker",
+    "depends_on": [
+      "T09-R01",
+      "T08-R01",
+      "parent:T02",
+      "parent:T03",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/GAMEPLAY.md",
+      "tests/e2e/local-flick.spec.ts",
+      "tests/e2e/local-restart.spec.ts",
+      "apps/web/src/CounterballDevMatch.tsx"
+    ],
+    "write_paths": [
+      "tests/e2e/local-match.spec.ts"
+    ],
+    "outputs": [
+      "Scripted real-browser match through foul, out, penalty, goal, completion and rematch"
+    ],
+    "steps": [
+      "Drive only user-visible canonical controls; use test-only deterministic opponent/setup fixture if needed, never fake resolution.",
+      "Complete a first-to-three match including placed restart, then rematch and repeat a fresh action.",
+      "Assert 15 stable IDs after each resolution/reset, no blocked input, no duplicated shot and no invalid snapshot.",
+      "Capture one final screenshot and inspect copy/status/error affordances."
+    ],
+    "checks": [
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/local-match.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The explicitly selected Chromium flow completes first-to-three and rematch through the actual runner; all state transitions and IDs pass."
+      },
+      {
+        "command": "Review screenshot and test trace",
+        "environment": "source-review",
+        "expected": "Visible score, turn and restart states correspond to serializable authority state."
+      }
+    ],
+    "acceptance": [
+      "A full local first-to-three match and rematch complete without manual scene editing.",
+      "A blocked placement is reported as a limitation, not hidden by an automatic reset."
+    ],
+    "negative_cases": [
+      "Mock final score, bypass shot flow, empty fixture state, hidden developer control or unexplained blocked restart.",
+      "Claiming parent T09 accepted before T02/T06/T08 gates are accepted."
+    ],
+    "review_questions": [
+      "Does the flow exercise all stated local match phases?",
+      "Can user reach an honest blocked/retry state?",
+      "Are rematch IDs/state fully fresh?"
+    ],
+    "stop_conditions": [
+      "If user-facing flow cannot reach a rule fixture without mutating scene by hand, stop and report the missing controller/UI contract."
+    ]
+  },
+  {
+    "id": "T10-A01",
+    "parent": "T10",
+    "title": "Adapt local AI and match controller to the existing GameTransport",
+    "role": "worker",
+    "depends_on": [
+      "T10-R01",
+      "T10-R02",
+      "parent:T09",
+      "C00",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "packages/game-sdk/src/transport.ts",
+      "games/counterball/src/features/match/application/localMatchController.ts",
+      "games/counterball/src/features/ai/application/chooseAction.ts",
+      "games/counterball/src/features/ai/application/workerMessages.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/ai/application/localAiTransport.ts",
+      "games/counterball/src/features/ai/application/localAiTransport.test.ts"
+    ],
+    "outputs": [
+      "GameTransport-conforming local AI adapter that uses the same controller, worker and canonical server-event types"
+    ],
+    "steps": [
+      "Implement the existing GameTransport interface; do not add SDK wire types or claim authenticated identity for local test identity.",
+      "Connect human sendAction to localMatchController; after committed turn, request one AI action only when the canonical phase assigns AI.",
+      "Use serializable Worker messages and accepted cancellation/generation semantics; dispose worker/subscriptions on rematch and unmount.",
+      "Publish snapshots/events through existing SDK types; do not create an alternate AI-only result or rules path.",
+      "Test connect/snapshot/subscribe/unsubscribe, one AI action per turn, cancellation and dispose."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "expected": "Local GameTransport adapter and worker integration pass using the canonical controller and event contracts.",
+        "command": "pnpm --filter @korre/counterball test && pnpm test:integration && pnpm verify"
+      },
+      {
+        "environment": "source-review",
+        "expected": "No competing transport interface, local identity is not serialized as authority, and AI cannot act out of turn.",
+        "command": "Independent SDK boundary review"
+      }
+    ],
+    "acceptance": [
+      "Local AI match uses the existing GameTransport contract and same controller/resolution path as a human.",
+      "Each accepted phase produces at most one AI action; dispose and rematch cancel pending work."
+    ],
+    "negative_cases": [
+      "Alternative transport protocol, client-claimed username/team authority, AI acting during human phase, stale worker result committed after rematch."
+    ],
+    "review_questions": [
+      "Are every SDK event/action schema canonical?",
+      "Are stale generations discarded safely?",
+      "Does unsubscribe/dispose release both transport and worker?"
+    ],
+    "stop_conditions": [
+      "If GameTransport is missing a required accepted capability, stop and request coordinator update rather than extending the SDK privately."
+    ]
+  },
+  {
+    "id": "T10-R01",
+    "parent": "T10",
+    "title": "Implement bounded legal AI candidates and deterministic scoring",
+    "role": "worker",
+    "depends_on": [
+      "parent:T09",
+      "parent:T02",
+      "parent:T07"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/GAMEPLAY.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/features/match/domain/transition.ts",
+      "games/counterball/src/features/restarts/domain/placementSolver.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/ai/domain/candidates.ts",
+      "games/counterball/src/features/ai/domain/candidates.test.ts",
+      "games/counterball/src/features/ai/domain/scoreCandidate.ts",
+      "games/counterball/src/features/ai/domain/scoreCandidate.test.ts"
+    ],
+    "outputs": [
+      "Pure normal/restart candidate generation and stable heuristic ranking"
+    ],
+    "steps": [
+      "Generate no more than eight legal shots from nearest cap/button geometry, goal aim and bounded defensive alternatives.",
+      "Use canonical command validation and restart placement solver; no AI-specific action or success rule.",
+      "Score outcome potential, collisions and placement legality from serializable state only; use deterministic seeded tie-breaking in tests.",
+      "Return explicit no-legal-action when blocked and refuse actions outside AI's turn.",
+      "Keep one basic setting only."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm verify",
+        "environment": "github",
+        "expected": "Pure candidate/ranking tests and full workspace gates pass."
+      },
+      {
+        "command": "Independent domain review",
+        "environment": "source-review",
+        "expected": "AI emits only legal canonical commands and cannot call presentation/physics directly."
+      }
+    ],
+    "acceptance": [
+      "Every emitted candidate passes shared validation and count is at most eight.",
+      "No legal placement yields a visible no-action result rather than cap teleport or rule exception."
+    ],
+    "negative_cases": [
+      "Candidate overflow, invalid ownership, action in human phase, random nondeterministic production tie-break, or a second AI difficulty.",
+      "Hidden special shot or unbounded search."
+    ],
+    "review_questions": [
+      "Does every candidate use the same command/rule contract as a human?",
+      "Is blocked placement surfaced exactly?",
+      "Can the test seed reproduce rank order?"
+    ],
+    "stop_conditions": [
+      "If referee/placement signatures are not accepted, wait rather than duplicating them."
+    ]
+  },
+  {
+    "id": "T10-R02",
+    "parent": "T10",
+    "title": "Evaluate at most eight AI shots off the input-critical path",
+    "role": "worker",
+    "depends_on": [
+      "T10-R01",
+      "parent:T02",
+      "C00-A",
+      "C01-H"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/features/ai/domain/candidates.ts",
+      "knowledge_base/execution/CONTRACT_WORK.md",
+      "apps/web/vite.config.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/ai/application/chooseAction.ts",
+      "games/counterball/src/features/ai/application/chooseAction.test.ts",
+      "games/counterball/src/features/ai/application/aiWorker.ts",
+      "games/counterball/src/features/ai/application/workerMessages.ts",
+      "tests/integration/ai-worker.test.ts"
+    ],
+    "outputs": [
+      "Bounded asynchronous candidate evaluation with generation/cancellation and serializable worker messages"
+    ],
+    "steps": [
+      "Confirm with the pinned Vite/WASM setup that a dedicated worker can instantiate the same browser runner before choosing the worker route.",
+      "Evaluate no more than eight candidates using isolated same-config simulations, fixed wall-clock budget and cancellation on rematch/dispose.",
+      "Keep Babylon/engine handles inside the execution host; cross worker boundary only canonical serialized input and result.",
+      "Use generation IDs to drop stale results without allowing a late choice to alter authority.",
+      "If worker WASM is unsupported, stop and return evidence to coordinator for an explicit reviewed alternative; do not silently run long work on the main thread."
+    ],
+    "checks": [
+      {
+        "command": "pnpm test:integration && pnpm verify",
+        "environment": "github",
+        "expected": "Worker integration uses the real same-version browser WASM, returns a serializable legal action, cancels on stale generation and meets its bounded budget."
+      },
+      {
+        "command": "pnpm test:integration tests/integration/ai-worker.test.ts",
+        "environment": "github",
+        "expected": "The named AI worker integration case exercises repeated aim input while bounded candidate search runs and verifies input handling remains responsive."
+      }
+    ],
+    "acceptance": [
+      "One basic AI chooses or returns no-legal-action within the packet budget; all simulations use the same runner/config.",
+      "Cancelled/rematch computation cannot fire late."
+    ],
+    "negative_cases": [
+      "More than eight candidates, mock/Node-only evaluation claimed as browser-worker success, engine object posted across worker, or uncancellable search.",
+      "Main-thread fallback exceeds responsiveness budget."
+    ],
+    "review_questions": [
+      "Does Worker initialize actual pinned WASM?",
+      "Is cancellation race-safe?",
+      "Are execution time and candidate count measured rather than assumed?"
+    ],
+    "stop_conditions": [
+      "Worker/WASM packaging failure or >500 ms input-blocking work stops the packet for coordinator review; no unapproved engine alternative."
+    ]
+  },
+  {
+    "id": "T10-R03",
+    "parent": "T10",
+    "title": "Expose AI only behind the mandatory username identity gate",
+    "role": "coordinator",
+    "depends_on": [
+      "T10-R02",
+      "T10-A01",
+      "parent:T12"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "apps/web/src/App.tsx",
+      "packages/identity-client/src",
+      "apps/api/src",
+      "games/counterball/src/features/ai/application/localAiTransport.ts",
+      "packages/game-sdk/src/transport.ts"
+    ],
+    "write_paths": [
+      "apps/web/src/AiMatchRoute.tsx",
+      "apps/web/src/App.tsx",
+      "tests/e2e/identity-ai-gate.spec.ts"
+    ],
+    "outputs": [
+      "Authenticated AI route with no guest or unregistered bypass"
+    ],
+    "steps": [
+      "Use accepted same-origin identity session and unique-username-complete state; never trust a username field from browser action payload.",
+      "Before unique username completion, disable/hide public AI start and explain the required step.",
+      "After completion, start AI through same canonical controller and AI host.",
+      "Ensure logged-out, pending, rejected and session-expired states cannot act; preserve local test-only route isolation.",
+      "Test no username, duplicate username, successful unique username, logout and session expiry."
+    ],
+    "checks": [
+      {
+        "command": "pnpm test:integration && pnpm verify",
+        "environment": "github",
+        "expected": "Identity and AI integration checks pass against the accepted API contract before service-aware browser checks."
+      },
+      {
+        "command": "pnpm test:e2e tests/e2e/identity-ai-gate.spec.ts --config playwright.identity.config.ts --workers=1",
+        "environment": "github",
+        "expected": "The named browser suite uses the actual API, trusted development bridge and disposable PostgreSQL; AI stays unavailable until accepted unique-username identity state."
+      },
+      {
+        "command": "Production bundle and route review",
+        "environment": "source-review",
+        "expected": "No guest match path or test identity exists in production."
+      }
+    ],
+    "acceptance": [
+      "Public AI requires completed unique username; secret/session authenticates the player and username remains display data.",
+      "No guest matches or AI action before gate."
+    ],
+    "negative_cases": [
+      "Client-supplied username grants identity, test dev identity reused in production, or stale session permits action.",
+      "Duplicate username accepted."
+    ],
+    "review_questions": [
+      "Does API/session, not form input, determine actor?",
+      "Is AI entry truly inaccessible before the gate?",
+      "Does logout prevent pending result commit?"
+    ],
+    "stop_conditions": [
+      "If T12 is not ACCEPTED, keep public route packet blocked; do not bypass the dependency."
+    ]
+  },
+  {
+    "id": "T21-D01",
+    "parent": "T21",
+    "title": "Measure real-phone support on Android Chrome and iOS Safari",
+    "role": "coordinator",
+    "depends_on": [
+      "T21-P01",
+      "T21-P02",
+      "parent:T09",
+      "parent:T10",
+      "parent:T15"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/TASKS.md",
+      "execution_state/reports/T21-P01-implementation.md",
+      "execution_state/reports/T21-P02-implementation.md",
+      "execution_state/reports/T21-O01-implementation.md"
+    ],
+    "write_paths": [],
+    "outputs": [
+      "Human-device evidence table written in execution_state/reports/T21-D01-implementation.md with exact device, OS/browser, build hash, measured frame time/FPS and outcomes, or explicit BLOCKED reason."
+    ],
+    "steps": [
+      "Install only the reviewable staging/dev build on one documented modest Android Chrome device and one real iOS Safari device.",
+      "Measure sustained play at 30 fps lower-end target and 60 fps capable target with scene size, quality level, thermal/battery observation and dropped-frame method recorded.",
+      "Exercise portrait/landscape, pinch/orbit, aim cancel, restart keyboard/accessibility alternative where available, reduced motion, audio mute, loading retry and visible WebGL/context failure recovery in the available local match build.",
+      "Record actual screenshots/video locally if permitted, but do not publish or upload personal account data.",
+      "If physical access is unavailable, record BLOCKED and the exact human action needed in execution_state/reports/T21-D01-implementation.md; do not report an emulator or repeat this check in another packet."
+    ],
+    "checks": [
+      {
+        "command": "Manual Counterball smoke and frame-time capture on physical Android Chrome",
+        "environment": "human-device",
+        "expected": "Record device/OS/browser/build hash and measured frame times; target 30 fps lower-end play."
+      },
+      {
+        "command": "Manual Counterball smoke and frame-time capture on physical iOS Safari",
+        "environment": "human-device",
+        "expected": "Record device/OS/browser/build hash and measured frame times; target 30 fps lower-end play."
+      }
+    ],
+    "acceptance": [
+      "Both devices have real-browser evidence before mobile support is called ready.",
+      "Missing device access is BLOCKED, not ACCEPTED or simulated."
+    ],
+    "negative_cases": [
+      "Emulator, desktop viewport or Chromium screenshot presented as a phone pass; no measured frame times; secrets/PII in evidence."
+    ],
+    "review_questions": [
+      "Are device and OS versions exact?",
+      "Are measurements repeatable and tied to one build hash?",
+      "Are failures and device limitations recorded plainly?",
+      "Does the T21 parent consume this one report rather than duplicating the same manual phone test in another packet?"
+    ],
+    "stop_conditions": [
+      "If either device is unavailable, mark only this gate BLOCKED and list needed access; do not delay unrelated local work or state T21 complete."
+    ]
+  },
+  {
+    "id": "T21-O01",
+    "parent": "T21",
+    "title": "Bind online camera presentation to authoritative shared playback",
+    "role": "worker",
+    "depends_on": [
+      "T21-P02",
+      "parent:T15",
+      "C01-H",
+      "O19"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "packages/game-protocol/src/types.ts",
+      "packages/game-sdk/src",
+      "apps/web/src/CounterballMatch.tsx"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/camera/application/onlinePlaybackCamera.ts",
+      "games/counterball/src/features/camera/application/onlinePlaybackCamera.test.ts",
+      "apps/web/src/CounterballMatch.tsx",
+      "tests/e2e/online-cinematic.spec.ts"
+    ],
+    "outputs": [
+      "Optional online cinematic driven only from canonical server playback, same for player and spectator.",
+      "Does not repeat manual phone checks; the coordinator consumes the single T21-D01 device report at parent acceptance."
+    ],
+    "steps": [
+      "Consume accepted playback frames/timing from the canonical SDK transport; do not run local physics or infer outcomes.",
+      "Allow camera disable/skip while preserving event sequence, authoritative result, membership and next-shot lock.",
+      "Use one server timeline for player and spectator, including late join offset and playback completion.",
+      "Dispose subscriptions/timers on route leave, role change and WebGL recovery.",
+      "Test two-client playback consistency and that skip does not send a gameplay action."
+    ],
+    "checks": [
+      {
+        "command": "pnpm test:integration && pnpm verify",
+        "environment": "github",
+        "expected": "Shared playback integration checks pass before the staged online browser run."
+      },
+      {
+        "command": "pnpm test:e2e tests/e2e/online-cinematic.spec.ts --config playwright.online.config.ts --workers=1",
+        "environment": "github",
+        "expected": "The named online/cinematic case runs through O19 staging services; player and spectator observe identical committed state and skip affects camera only."
+      },
+      {
+        "command": "Independent review against SDK/protocol playback envelopes",
+        "environment": "source-review",
+        "expected": "No client-authored result, timing authority or extra transport message."
+      }
+    ],
+    "acceptance": [
+      "The same committed playback state drives both roles; camera choice cannot alter authority.",
+      "No next action unlocks before server phase transition."
+    ],
+    "negative_cases": [
+      "Client simulates online shot, camera skip acknowledges result, spectator receives different final state, or wall-clock local timer becomes authority.",
+      "Unbounded timers/subscriptions after leave."
+    ],
+    "review_questions": [
+      "Is timing derived from canonical server offset/playback fields?",
+      "Do players and spectators render the same final state?",
+      "Does skip leave protocol traffic unchanged?"
+    ],
+    "stop_conditions": [
+      "If T15 is not ACCEPTED or canonical playback shape differs, keep packet blocked and do not invent another wire event."
+    ]
+  },
+  {
+    "id": "T21-P01",
+    "parent": "T21",
+    "title": "Add persisted audio and accessibility preferences",
+    "role": "worker",
+    "depends_on": [
+      "parent:T09",
+      "parent:T10",
+      "parent:T15",
+      "C01-H"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/TASKS.md",
+      "apps/web/src/styles.css",
+      "games/counterball/src/browser.ts",
+      "apps/web/src/CounterballDevMatch.tsx"
+    ],
+    "write_paths": [
+      "games/counterball/src/features/preferences/preferences.ts",
+      "games/counterball/src/audio/cues.ts",
+      "apps/web/src/PreferenceControls.tsx",
+      "apps/web/src/PreferenceControls.test.tsx",
+      "apps/web/src/CounterballDevMatch.tsx"
+    ],
+    "outputs": [
+      "Persistent mute/reduced-motion/quality controls mounted in local play and gesture-gated procedural cues."
+    ],
+    "steps": [
+      "Add strict versioned preference parsing with safe defaults, local persistence and failure tolerance.",
+      "Respect prefers-reduced-motion and explicit controls; unavailable audio never blocks a shot.",
+      "Create short original procedural cues only after a user gesture; wire cues to committed local events, never predicted outcomes.",
+      "Mount labelled, focusable preference controls in the existing test-only local match surface; no public guest route.",
+      "Test storage corruption, unavailable AudioContext, autoplay block, mute, reduced motion and local event timing in the component/browser test."
+    ],
+    "checks": [
+      {
+        "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/web test && pnpm verify",
+        "environment": "github",
+        "expected": "Preference component and cue checks pass; controls are mounted and sound never plays before a gesture or when muted."
+      },
+      {
+        "command": "Accessibility review of control labels and reduced-motion behavior",
+        "environment": "source-review",
+        "expected": "Keyboard/focus labels work and motion/audio are independently optional."
+      }
+    ],
+    "acceptance": [
+      "Mute and reduced motion persist; sound starts only after gesture and only after committed local event.",
+      "Controls are reachable in the local test surface; unsupported audio APIs degrade without blocking play."
+    ],
+    "negative_cases": [
+      "Autoplay on page load, loud/continuous sounds, storage parse crash, or motion that changes game timing/state.",
+      "New visual/cultural assets without approval or controls implemented but not mounted."
+    ],
+    "review_questions": [
+      "Does first AudioContext use follow a gesture?",
+      "Does mute prevent every cue?",
+      "Is control visible/keyboard accessible?",
+      "Does cue timing follow committed events?"
+    ],
+    "stop_conditions": [
+      "If audio capability is unavailable, keep controls safe and report it; do not add external assets/services."
+    ]
+  },
+  {
+    "id": "T21-P02",
+    "parent": "T21",
+    "title": "Polish local scene materials and skippable camera presentation",
+    "role": "worker",
+    "depends_on": [
+      "T21-P01",
+      "parent:T09",
+      "parent:T10",
+      "parent:T03",
+      "parent:T15",
+      "C01-H"
+    ],
+    "read_paths": [
+      "games/counterball/src/scene/materials.ts",
+      "games/counterball/src/scene/createScene.ts",
+      "apps/web/src/CounterballDevMatch.tsx",
+      "apps/web/src/styles.css"
+    ],
+    "write_paths": [
+      "games/counterball/src/scene/materials.ts",
+      "games/counterball/src/features/camera/presentation/cinematicCamera.ts",
+      "apps/web/src/CounterballDevMatch.tsx",
+      "apps/web/src/styles.css",
+      "tests/e2e/counterball-cinematic.spec.ts"
+    ],
+    "outputs": [
+      "Original readable materials and optional skippable follow/return camera mounted in local play, with reduced-motion and low-quality paths."
+    ],
+    "steps": [
+      "Improve existing pitch/cap/button materials without changing visible holes, open green concrete, piece count or canonical transforms.",
+      "Implement short local follow/return camera over accepted playback frames; mount it in CounterballDevMatch; skip/disable changes camera only and restores saved user view.",
+      "Provide low-quality path that disables expensive effects and lazy-load presentation-only chunks.",
+      "Respect reduced motion and keyboard/focus; keep errors/retry visible using the existing stylesheet.",
+      "Test camera skip, view restore, quality switch, resize, WebGL failure recovery and state snapshot equality in Chromium."
+    ],
+    "checks": [
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Production and diagnostic artifacts build with their distinct flags before the targeted browser run."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-cinematic.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "The explicitly selected local cinematic case proves skip leaves before/after MatchState identical and the control is mounted."
+      },
+      {
+        "command": "Independent visual/accessibility review at desktop and 390×844",
+        "environment": "source-review",
+        "expected": "Button holes remain visible, pitch stays open and green, no horizontal overflow occurs, and animation is optional."
+      }
+    ],
+    "acceptance": [
+      "Presentation is optional and skippable; camera/material changes never alter command, facts or final state.",
+      "Reduced-motion and low-quality settings are observable, reachable and functional."
+    ],
+    "negative_cases": [
+      "New walls, erased button holes, animations that delay authority, hidden loading failure, or collision changes made only for visuals.",
+      "Performance claim inferred from screenshot or camera module never mounted."
+    ],
+    "review_questions": [
+      "Does skip restore the previous camera?",
+      "Are materials only presentation and does button geometry remain canonical?",
+      "Are retries/disposal safe on WebGL loss?",
+      "Can keyboard/focus users reach the skip/quality controls?"
+    ],
+    "stop_conditions": [
+      "If material changes affect physics or visual failure masks a failed runner, revert to last accepted scene behavior."
+    ]
+  },
+  {
+    "id": "T02-E01",
+    "parent": "T02",
+    "title": "Export the real WASM browser runner factory",
+    "role": "worker",
+    "depends_on": [
+      "T02-R01",
+      "C00",
+      "C03",
+      "C01-H",
+      "T02-P01",
+      "T02-BR01"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "games/counterball/src/browser.ts",
+      "games/counterball/src/simulation/runner.ts",
+      "games/counterball/src/simulation/havokRuntime.ts",
+      "games/counterball/src/headless.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/browser.ts"
+    ],
+    "outputs": [
+      "Public browser entry factory that initializes the pinned Havok WASM package and injects browser host scheduling into the canonical runner."
+    ],
+    "steps": [
+      "Export the exact browser factory signature frozen by C00; call the same runner implementation and config used by the headless host.",
+      "Use the pinned @babylonjs/havok browser loader and a browser event-loop yield; keep Node imports out of the browser entry.",
+      "Make runtime-init failure explicit and typed; do not silently fall back to a mock or NullEngine.",
+      "Preserve existing scene, mesh and type exports; do not expose scheduling internals on the wire.",
+      "The later T02-R05 Chromium test must prove this factory actually initializes WASM and moves bodies."
+    ],
+    "checks": [
+      {
+        "environment": "github",
+        "command": "pnpm --filter @korre/counterball typecheck && pnpm verify",
+        "expected": "Browser entry compiles with real WASM loader and no Node-only imports."
+      },
+      {
+        "environment": "source-review",
+        "command": "Independent source review of pinned browser loader and export surface",
+        "expected": "Export matches C00 contract and same runner; no mock or duplicate implementation."
+      }
+    ],
+    "acceptance": [
+      "Browser consumer can import the canonical runner factory from @korre/counterball/browser.",
+      "Actual runtime proof is reserved for T02-R05; this export packet does not claim physics execution by itself."
+    ],
+    "negative_cases": [
+      "NullEngine/Node fallback, duplicate browser-only physics code, DOM types in protocol or loader failure treated as success."
+    ],
+    "review_questions": [
+      "Is the pinned WASM package imported through supported browser entry?",
+      "Does the factory invoke the exact canonical runner?",
+      "Are existing browser exports preserved?"
+    ],
+    "stop_conditions": [
+      "If bundling/runtime loader cannot run in Chromium, stop and report the exact blocker; do not use a mock."
+    ]
+  }
+]
