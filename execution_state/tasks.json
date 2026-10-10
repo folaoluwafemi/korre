@@ -1189,10 +1189,21 @@
               "source_sha": "efd6f567a35b29313ceda1c82dcc7b3b73b1298d",
               "report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-1-run-38088587482.md",
               "detail": "Worker/protocol/migrations, typecheck/lint/format pass; 7 F01 facts tests fail before build/artifact packaging/integration/browser. Diagnostic-browser artifact remains absent."
+            },
+            {
+              "command": "GitHub Actions run 38090063627: C01 setup and hosted gate",
+              "result": "CHANGES_REQUIRED",
+              "exit_code": 1,
+              "environment": "GitHub Actions",
+              "run_id": 38090063627,
+              "attempt": 1,
+              "source_sha": "e9d7aee4a3202b2e0a14bfb6a6f62bf967a62669",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-run-38090063627.md",
+              "detail": "Worker smoke 1/1, root formatting config, Playwright installation, migrations and protocol 11/11 passed. All workspace typechecks and ESLint passed; hosted Prettier stopped Verify only on facts.ts. Full tests/build and integration/browser runs were skipped; Worker/browser package steps and diagnostic-browser artifact did not run."
             }
           ],
-          "next_action": "Run 38088587482 confirms hosted setup and gates but stops in facts.test.ts (131 pass, 7 fail, 0 skipped). C01 remains CHANGES_REQUIRED; diagnostic build/harness evidence is still absent.",
-          "blocker": "Fresh hosted run 38088587482 fails seven T02-F01 fact tests before build, integration or browser checks. C01 diagnostic-browser producer/artifact is also still absent; after the F01 source stop rule is resolved, resume C01 hosted verification and diagnostic artifact work."
+          "next_action": "After the independently reviewed facts.ts formatting repair and a fresh full hosted run, resume C01 artifact inventory/hash acceptance. This run proved the named Worker smoke and protocol/migration setup but did not reach builds or browser checks.",
+          "blocker": "GitHub run 38090063627 failed Verify at Prettier on facts.ts, so C01 required build/integration/browser/artifact checks did not run. C01 diagnostic browser build/harness producer and evidence remain absent."
         },
         {
           "id": "C01-pool-repair-1",
@@ -1752,9 +1763,9 @@
         {
           "id": "T02-F01-ROTATION-1-SEMANTIC-REPAIR-2",
           "parent": "T02",
-          "status": "IMPLEMENTED",
+          "status": "CHANGES_REQUIRED",
           "packet": "execution_state/packets/T02-F01-ROTATION-1-SEMANTIC-REPAIR-2.md",
-          "owner": "/root/toolchain_audit — source author; /root/foundation_review — independent reviewer; coordinator — publication and GitHub checks",
+          "owner": "/root/toolchain_audit — source author released; /root/foundation_review — independent reviewer released; coordinator — hosted verification",
           "author_identity": "/root/toolchain_audit",
           "reviewer_identity": "/root/foundation_review",
           "depends_on": [
@@ -1801,15 +1812,128 @@
             },
             {
               "command": "GitHub Actions ci workflow on the exact reviewed SHA",
-              "result": "NOT_RUN",
-              "environment": "github"
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38090063627,
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38090063627",
+              "source_sha": "e9d7aee4a3202b2e0a14bfb6a6f62bf967a62669",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-run-38090063627.md",
+              "log": "execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-run-38090063627-github.log",
+              "exit_code": 1,
+              "detail": "Run 38090063627 failed only at Prettier for facts.ts after typecheck and ESLint passed. Full tests/build/integration/browser steps did not run; full log and all downloaded artifacts are preserved."
             }
           ],
-          "next_action": "Source implementation and independent review passed. Coordinator owns exact reviewed-tree commit/push and full GitHub ci workflow. Keep F01/T02 unaccepted until hosted run and artifact audit pass.",
-          "blocker": null
+          "next_action": "Source author and reviewer are released. A new report-only escalation classifies the hosted Prettier failure before any source retry; F01/T02 remain unaccepted.",
+          "blocker": "GitHub run 38090063627 failed Verify because Prettier flagged line wrapping in facts.ts. A separate independently reviewed formatting card is required before source edits resume."
+        },
+        {
+          "id": "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2",
+          "parent": "T02",
+          "status": "ACCEPTED",
+          "packet": "execution_state/packets/T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2.md",
+          "owner": "/root/toolchain_audit — report author released; /root/swarm_review — independent report reviewer released; coordinator — status and follow-up",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/swarm_review",
+          "depends_on": [
+            "parent:T01",
+            "T02-F01-math-escalation-1",
+            "T02-C0",
+            "T02-C2",
+            "C00-A",
+            "C00",
+            "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+            "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1"
+          ],
+          "write_paths": [],
+          "implementation_report": "execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-2.md",
+          "review_report": "execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-2-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "detail": "Exact report-only record extracted from the completion catalogues; packet and full plan checks pass. Documentation validation only."
+            },
+            {
+              "command": "Read-only audit of exact GitHub run and artifacts 38090063627",
+              "result": "PASS",
+              "environment": "local-evidence",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-run-38090063627.md",
+              "detail": "Coordinator and report author independently matched exact run metadata, all 32 step conclusions, verify.log, hosted patch SHA/base, clean applicability, and downloaded artifacts. GitHub artifact API confirmed all four archive IDs, sizes and SHA-256 digests."
+            },
+            {
+              "command": "Independent failure-escalation review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-2-review.md",
+              "detail": "Independent review verifies exact run metadata, artifact IDs/digests, patch base/hash/scope/applicability, and all proof limits. PASS authorizes only a separate pinned formatting card."
+            }
+          ],
+          "next_action": "Accepted strictly as a report-only failure classification. It authorizes only T02-F01-ROTATION-1-FORMAT-REPAIR-2; F01/T02 remain unaccepted.",
+          "evidence": "Author report and independent PASS agree that run 38090063627 on e9d7aee4a3202b2e0a14bfb6a6f62bf967a62669 failed only at Prettier on facts.ts; the one-file patch is pinned and applies cleanly without behavior changes. Full tests/build/integration/browser did not run."
+        },
+        {
+          "id": "T02-F01-ROTATION-1-FORMAT-REPAIR-2",
+          "parent": "T02",
+          "status": "IMPLEMENTED",
+          "packet": "execution_state/packets/T02-F01-ROTATION-1-FORMAT-REPAIR-2.md",
+          "owner": "/root/toolchain_audit — source author released; /root/foundation_review — independent reviewer released; coordinator — publication and hosted verification",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review",
+          "depends_on": [
+            "parent:T01",
+            "T02-F01-math-escalation-1",
+            "T02-C0",
+            "T02-C2",
+            "C00-A",
+            "C00",
+            "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
+            "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1",
+            "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2"
+          ],
+          "supersedes": [
+            "T02-F01-ROTATION-1-SEMANTIC-REPAIR-2"
+          ],
+          "write_paths": [
+            "games/counterball/src/simulation/facts.ts"
+          ],
+          "implementation_report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-2-implementation.md",
+          "review_report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-2-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-REPAIR-2",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "detail": "Exact packet extracted after escalation-2 ACCEPTED; plan check reports all listed prerequisites accepted."
+            },
+            {
+              "command": "Pinned patch hash/base verification, exact apply and git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-2-implementation.md",
+              "detail": "Pinned patch SHA/base verified; git apply --stat/check and apply passed; coordinator confirmed git diff --binary -- facts.ts is byte-for-byte identical to the 1,101-byte hosted patch and scoped git diff --check passes. No app command ran."
+            },
+            {
+              "command": "Independent exact-diff source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-2-review.md",
+              "detail": "Independent review confirms patch SHA/base and byte-for-byte equality between the current one-file/two-hunk diff and pinned hosted patch. No app checks ran."
+            },
+            {
+              "command": "GitHub Actions ci on exact reviewed SHA",
+              "result": "PENDING",
+              "environment": "GitHub Actions",
+              "report": "execution_state/reports/T02-F01-ROTATION-1-format-repair-2-run-<id>.md"
+            }
+          ],
+          "next_action": "Source implementation and independent review are complete. Coordinator will commit/push the exact reviewed diff and run the existing GitHub ci workflow; no local app checks."
         }
       ],
-      "next_action": "Semantic repair 2 is implemented and independently source-reviewed PASS. Coordinator exact-SHA GitHub verification and artifact audit are next; no app checks ran yet. F01/T02 remain unaccepted."
+      "next_action": "The pinned F01 formatting repair is implemented and independently reviewed PASS. Coordinator owns commit/push and fresh exact-SHA hosted ci verification."
     },
     {
       "id": "T03",

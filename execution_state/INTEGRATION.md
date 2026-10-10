@@ -78,10 +78,22 @@ Run 38088587482 on exact reviewed SHA `efd6f567a35b29313ceda1c82dcc7b3b73b1298d`
 
 The run-38088587482 failure report and independent review are saved at `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-1.md` and `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-1-review.md`. They classify the exact 131/7/0 tests and 23/1/8 workflow steps. Report-only escalation is ACCEPTED; F01/T02 are not.
 
-`T02-F01-ROTATION-1-SEMANTIC-REPAIR-2` is materialized under T02 and its exact packet and full document checks pass. Author: `/root/toolchain_audit`, writing only `games/counterball/src/simulation/facts.ts`, `games/counterball/src/simulation/facts.test.ts`, and its named implementation report. Independent reviewer: `/root/foundation_review`, writing only its named review report. Coordinator owns commit/push, hosted checks, artifacts and shared status. No source edit or app check is complete yet; do not infer a build or game proof.
+`T02-F01-ROTATION-1-SEMANTIC-REPAIR-2` is materialized under T02 and its exact packet and full document checks pass. Author: `/root/toolchain_audit`, writing only `games/counterball/src/simulation/facts.ts`, `games/counterball/src/simulation/facts.test.ts`, and its named implementation report. Independent reviewer: `/root/foundation_review`, writing only its named review report. The implementation and source review are complete; coordinator owns publication, hosted checks, artifacts and shared status.
 
 ## T02-F01 semantic repair 2 source review — 2026-10-10
 
 Implementation and independent review are saved at `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-implementation.md` and `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-review.md`. Source review PASS covers exactly the two assigned source/test files and does not establish test/runtime success.
 
 Coordinator now owns committing/pushing the exact reviewed tree and running the GitHub `ci` workflow with full logs/artifact provenance and no skipped required checks. No local application command ran. F01/T02 stay open.
+
+Exact reviewed SHA `e9d7aee4a3202b2e0a14bfb6a6f62bf967a62669` was pushed to `codex/remote-ci-bootstrap`; GitHub `ci` run 38090063627 failed at Verify. The summary and complete evidence are saved in `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-run-38090063627.md` and companion logs/artifacts. Typecheck and ESLint passed; Prettier flagged only `facts.ts`. Unit tests/build/integration/browser checks did not run. A read-only applicability check confirms the hosted formatting patch is one-file/two-hunk and has not been applied. New independent report-only escalation `T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2` is READY; F01/T02 stay unaccepted.
+
+The same hosted run confirms C01 setup: Workerd smoke 1/1, root config formatting, migrations and protocol 11/11 passed. C01 remains CHANGES_REQUIRED because its full hosted verification and required Worker/browser package/build checks did not complete; no diagnostic browser artifact was produced.
+
+## T02-F01 formatting escalation and repair 2 — 2026-10-10
+
+Report-only escalation `T02-F01-ROTATION-1-CI-FAIL-ESCALATION-2` is ACCEPTED strictly as a failure-classification gate. Its author report and independent PASS are at `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-2.md` and `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-2-review.md`. They confirm the exact Prettier-only failure and authorize only the exact two-hunk patch with digest `c1a80ffd8ad4bcf4eb8f566df92dd02ac7b765e791d8612608aace1e65007bfe`.
+
+`T02-F01-ROTATION-1-FORMAT-REPAIR-2` is READY under T02. `/root/toolchain_audit` owns only `games/counterball/src/simulation/facts.ts` and its named implementation report; `/root/foundation_review` is the independent reviewer. No patch has been applied. The author must use the saved artifact only, then stop for source review before coordinator publication and full hosted CI. F01/T02 remain unaccepted.
+
+The exact patch is now applied and independently reviewed PASS. Author and reviewer ownership are released; byte-for-byte diff and whitespace checks pass. Coordinator owns committing/pushing the reviewed diff and running full hosted CI. No local application checks ran; F01/T02 remain unaccepted.

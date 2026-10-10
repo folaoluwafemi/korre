@@ -620,8 +620,7 @@ function clearanceLipschitzBound(
   dimensions: { radius: number; height: number },
   angularTravel: number,
 ): number {
-  const bound =
-    centerTravel + supportAngularRadius(dimensions) * angularTravel;
+  const bound = centerTravel + supportAngularRadius(dimensions) * angularTravel;
   if (!Number.isFinite(bound) || bound < 0) {
     throw new TypeError("Whole-body clearance could not be bounded finitely.");
   }
@@ -814,11 +813,7 @@ function provesGoalPassageClear(
     after.rotation,
   );
   const dimensions = { radius, height };
-  const roundoffAllowance = goalMouthRoundoffAllowance(
-    before,
-    after,
-    config,
-  );
+  const roundoffAllowance = goalMouthRoundoffAllowance(before, after, config);
   const horizontalLipschitz = clearanceLipschitzBound(
     Math.abs(after.position.x - before.position.x),
     dimensions,
