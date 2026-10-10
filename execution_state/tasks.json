@@ -2134,11 +2134,11 @@
         },
         {
           "id": "C01-DIAG-BUILD",
-          "status": "RUNNING",
+          "status": "CHANGES_REQUIRED",
           "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-DIAG-BUILD",
-          "owner": "coordinator owns exact-head hosted validation after reviewed formatting repair 2",
+          "owner": "coordinator owns exact-head hosted validation after independent static-env repair review PASS",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/foundation_review (repair 2 source PASS); /root/toolchain_audit (repair 1 source PASS); /root/run_evidence_review (run reports 38094866745 and 38095374146 PASS)",
+          "reviewer_identity": "/root/foundation_review (format repair 2 and static-env repair 1 source PASS); /root/toolchain_audit (TS4111 repair 1 source PASS); /root/run_evidence_review (runs 38094866745, 38095374146 and 38095656864 evidence audits and coordinator metadata review PASS)",
           "depends_on": [
             "C01-DIAG-PANEL",
             "C00",
@@ -2146,6 +2146,7 @@
           ],
           "write_paths": [
             "apps/web/src/App.tsx",
+            "apps/web/src/vite-env.d.ts",
             ".github/workflows/ci.yml",
             "tests/production/counterball-dev-match-absent.mjs"
           ],
@@ -2204,6 +2205,18 @@
               "detail": "Exact-head run passed workspace typecheck including apps/web, ESLint, Worker smoke 1/1, protocol 11/11, root config formatting, Chromium setup, and migrations twice. pnpm verify then failed only at Prettier for tests/production/counterball-dev-match-absent.mjs. Unit tests/build and 11 downstream production/integration/browser/diagnostic gates did not run; workflow steps were 23 success, 1 failure, 12 skipped."
             },
             {
+              "command": "GitHub ci exact-head production-exclusion validation",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38095656864,
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38095656864",
+              "source_sha": "ba5e3c32064e3b58a95f7c063594f956f25bcca8",
+              "attempt": 1,
+              "exit_code": 1,
+              "report": "execution_state/reports/C01-DIAG-BUILD-run-38095656864.md",
+              "detail": "Frozen install, Workers smoke 1/1, workflow formatting, Chromium setup, disposable migrations twice, protocol 11/11, and pnpm verify all passed; verify reported 26 files/140 tests/0 skips and completed the production build. The next production-marker check failed because renderer-diagnostic__label remained in CounterballRendererDiagnostic-DHfjSTAh.css. Workflow totals: 24 success, 1 failure, 11 skipped (10 task gates plus one post-action); no production artifact packaging, diagnostic build, integration, or Chromium result."
+            },
+            {
               "command": "Independent exact-run evidence audit 38095374146",
               "result": "PASS",
               "environment": "source-review",
@@ -2237,14 +2250,59 @@
               "result": "NOT RUN",
               "environment": "source-review",
               "report": "execution_state/reports/C01-DIAG-BUILD-runtime-review.md"
+            },
+            {
+              "command": "Independent run-evidence audit 38095656864",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-run-38095656864-review.md",
+              "detail": "Independent audit confirmed exact run/SHA/attempt, full-log digest, 24/1/11 workflow totals and 10 skipped task gates plus cleanup, pnpm verify 26 files/140 tests with zero skips, CSS marker failure, all six API artifact records and no production/diagnostic artifact or playability claim."
+            },
+            {
+              "command": "C01-DIAG-BUILD static-env repair 1 implementation and bounded source checks",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-static-env-repair-1-implementation.md",
+              "detail": "Only App.tsx dot-form flag access and the new no-import vite-env.d.ts declaration were implemented; packet extraction and git diff --check passed. No app command ran."
+            },
+            {
+              "command": "Independent C01-DIAG-BUILD static-env repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-static-env-repair-1-review.md",
+              "detail": "Reviewer confirmed exact two-source-path scope, correct ambient Vite type merge, unchanged literal flag/conditional lazy import/null branch, and no assertion/workflow/config/contract edits. Hosted proof remains pending."
+            },
+            {
+              "command": "Independent C01-DIAG-BUILD coordinator metadata review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-coordinator-metadata-review.md",
+              "detail": "Reviewer confirmed the original parent/dependency order, four exact paths, catalogue/index/task agreement, historical failed-run status, and no acceptance or playability overclaim."
             }
           ],
-          "repair_attempts": 2,
-          "next_action": "Repair 2 source review and run-evidence audit both PASS. Publish this exact reviewed source and rerun full GitHub CI. This is the first formatting repair attempt; if the same formatter check fails again, follow SWARM escalation. C01-H still owns browser routing."
+          "repair_attempts": 3,
+          "repair_history": [
+            {
+              "failure_mechanism": "TypeScript Vite env index-signature access",
+              "attempts": 1,
+              "outcome": "Repaired and independently source-reviewed; exact-head run 38095374146 passed typecheck."
+            },
+            {
+              "failure_mechanism": "Prettier formatting in production absence check",
+              "attempts": 1,
+              "outcome": "Repaired and independently source-reviewed; exact-head run 38095656864 passed formatting."
+            },
+            {
+              "failure_mechanism": "Vite production graph retained diagnostic CSS marker",
+              "attempts": 1,
+              "outcome": "Observed on exact-head run 38095656864; first focused dot-form env replacement repair implemented and independently source-reviewed PASS; fresh hosted proof pending."
+            }
+          ],
+          "next_action": "Run 38095656864 evidence review and static-env repair source review both PASS. Publish the exact reviewed repair with coordinator reports/state, then run exact-head GitHub CI and audit the complete production and separately flagged diagnostic artifacts. If the marker exclusion failure repeats after this repair, follow SWARM escalation. C01-H still owns browser routing."
         }
       ],
-      "blocker": "Run 38095374146 passed TypeScript and ESLint but failed Prettier before unit tests/builds and downstream artifacts. Repair 2 source review and exact-run evidence audit pass; fresh hosted validation is pending. C01 remains CHANGES_REQUIRED. Browser routing and interactive diagnostic coverage remain assigned to C01-H.",
-      "next_action": "Publish the reviewed repair, rerun hosted checks, then independently verify the separate diagnostic and production artifacts before C01 acceptance and C01-P/C01-H browser-interaction work."
+      "blocker": "Run 38095656864 proved that the production bundle still contains the diagnostic CSS marker; a focused compile-time env replacement repair and fresh hosted proof are required. C01 remains CHANGES_REQUIRED. Browser routing and interactive diagnostic coverage remain assigned to C01-H.",
+      "next_action": "Audit run 38095656864; finish the bounded compile-time exclusion repair and exact-head hosted verification; then continue the dependency graph toward the first real browser flick."
     },
     {
       "id": "T03",

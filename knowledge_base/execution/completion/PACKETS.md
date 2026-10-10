@@ -13,7 +13,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | C04-QA | T21 | Prepare and run automated release checks before the physical-device gate | coordinator | parent:T17, parent:T18, parent:T19, parent:T20, C01-H | 4 |
 | C00 | T02 | Accept contract preparation before producer work | coordinator | C00-B | 0 |
 | C01 | T02 | Wire hosted future tests and preserve evidence remotely | coordinator | C00, C01-DIAG-BUILD | 5 |
-| C01-DIAG-BUILD | T02 | Build and hash a separate diagnostic renderer artifact | coordinator | C01-DIAG-PANEL, C00, parent:T03 | 3 |
+| C01-DIAG-BUILD | T02 | Build and hash a separate diagnostic renderer artifact | coordinator | C01-DIAG-PANEL, C00, parent:T03 | 4 |
 | C02 | T02 | Publish only evidence-supported calibration and support settings | coordinator | T02-L02, T02-D01, C01-H | 5 |
 | C03 | T02 | Accept canonical calibration handoff for real runner | coordinator | C02 | 0 |
 | COMPLETION-GRAPH-REPAIR-2 | T02 | Synchronize the accepted fact-repair graph and close its stale failed card | coordinator | T02-F01-ROTATION-1, T02-F01-ROTATION-1-FORMAT-REPAIR-2 | 3 |

@@ -433,6 +433,7 @@
       "knowledge_base/execution/completion/LOCAL_NOTES.md",
       "execution_state/tasks.json",
       "apps/web/src/App.tsx",
+      "apps/web/src/vite-env.d.ts",
       "apps/web/src/CounterballRendererDiagnostic.tsx",
       "apps/web/src/CounterballRendererDiagnostic.css",
       "apps/web/vite.config.ts",
@@ -448,7 +449,7 @@
       {
         "command": "git diff --check",
         "environment": "local-document",
-        "expected": "No whitespace errors in the exact App, CI workflow and production absence-check script paths."
+        "expected": "No whitespace errors in the exact App, Vite env declaration, CI workflow and production absence-check script paths."
       },
       {
         "command": "Independent C01-DIAG-BUILD source/config review",
@@ -492,6 +493,7 @@
     ],
     "write_paths": [
       "apps/web/src/App.tsx",
+      "apps/web/src/vite-env.d.ts",
       ".github/workflows/ci.yml",
       "tests/production/counterball-dev-match-absent.mjs"
     ],
@@ -500,14 +502,14 @@
     ],
     "steps": [
       "Use the accepted C01-DIAG-PANEL and T03 preview without changing scene geometry, input, gameplay or shared contracts.",
-      "On /preview, conditionally lazy-import and render the diagnostic panel only when import.meta.env.VITE_COUNTERBALL_DEV_HARNESS equals the literal string 1; keep the normal production graph flag-unset.",
+      "Add apps/web/src/vite-env.d.ts with a no-import ImportMetaEnv augmentation declaring readonly VITE_COUNTERBALL_DEV_HARNESS?: string. Use dot-form import.meta.env.VITE_COUNTERBALL_DEV_HARNESS in App.tsx so Vite can statically replace the flag. On /preview, conditionally lazy-import and render the diagnostic panel only when it equals the literal string 1; keep the normal production graph flag-unset.",
       "Add tests/production/counterball-dev-match-absent.mjs to fail if the flag is set or the normal apps/web/dist emitted files contain the unique renderer diagnostic marker; run exactly node tests/production/counterball-dev-match-absent.mjs after the normal production build.",
       "Extend the existing GitHub workflow only after normal production build packaging and production Chromium checks: build a separate apps/web/dist-dev with VITE_COUNTERBALL_DEV_HARNESS=1 pnpm --filter @korre/web exec vite build --outDir dist-dev.",
       "Package the separate output as counterball-web-diagnostic-${github.sha}; inventory every emitted path, byte size and SHA-256 plus source SHA, run ID, attempt, buildMode=renderer-diagnostic and devHarnessFlag=set. Fail if index.html, emitted files or the diagnostic marker are missing.",
       "Upload with 14-day retention; preserve production inventory/build and browser preview as separate artifacts. Do not edit Playwright routing; C01-H owns browser mode selection and interactive diagnostic coverage."
     ],
     "acceptance": [
-      "Only the three exact source/config/script paths are changed, aside from implicit reports and coordinator task/ledger/catalogue bookkeeping.",
+      "Only the four exact source/config/script paths are changed, aside from implicit reports and coordinator task/ledger/catalogue bookkeeping.",
       "The dynamic panel import and its marker are removed from the normal production artifact with VITE_COUNTERBALL_DEV_HARNESS unset; the exact absence script passes.",
       "The diagnostic artifact is independently distinguishable, contains the diagnostic marker, and its inventory records and hashes every emitted file with exact GitHub provenance.",
       "Existing production build artifact, hosted tests, integration checks, and Chromium regression suite remain present and report real pass/skip/retry counts.",
