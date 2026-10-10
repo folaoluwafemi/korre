@@ -252,6 +252,24 @@
           "detail": "Typecheck, ESLint, and Prettier passed. Vitest reported 57 passed and 8 PostgreSQL tests skipped; the probe's preflight failed because 60 was compared with a converted maximum of 59.99999999999999. It failed before Havok initialization/trials. Build, integration, and E2E did not run."
         },
         {
+          "command": "GitHub Actions run #6: pnpm verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "Full typecheck, lint/format, tests, and build passed. The calibration test passed with all 480 actual Havok-WASM trials and assertions. Vitest suppressed the passing test's console output, so the measured records were not retrievable from logs; no numerical observations or coefficient choice are claimed yet."
+        },
+        {
+          "command": "GitHub Actions run #6: pnpm test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 integration test passed."
+        },
+        {
+          "command": "GitHub Actions run #6: pnpm test:e2e --workers=1",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "All 3 Chromium browser tests passed, including both Counterball preview flows."
+        },
+        {
           "command": "Independent source review: CI format repair 1",
           "result": "PASS",
           "report": "execution_state/reports/CI-format-repair-1-review.md",
@@ -268,6 +286,12 @@
           "result": "PASS",
           "report": "execution_state/reports/T02-calibration-probe-repair-5-review.md",
           "detail": "Reviewer confirmed the repaired indentation, retained approved maximumTiltDegrees + 1e-9° bound and unchanged candidate/config, and found the diff limited to formatting. Hosted verification is pending."
+        },
+        {
+          "command": "Independent source review: T02-B1 artifact output",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-B1-calibration-artifact-review.md",
+          "detail": "Reviewer confirmed env-gated output after assertions, matching workflow upload path, ignored artifact directory, read-only workflow permissions, and no secret dependency. Hosted artifact publication remains pending."
         }
       ],
       "blocker": null,
@@ -303,7 +327,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports/narrows PhysicsEngineV2 and passes independent source review. Run #2 passed game package typecheck but failed root typecheck in preview E2E. Run #3 passed typechecks then lint found require-await; repair 3 is independently reviewed PASS. Run #4 passed typechecks/ESLint and exposed three Prettier differences; formatting repair 1 is independently reviewed PASS. Run #5 passed typecheck, ESLint, Prettier and 57 tests (8 PostgreSQL skips); the probe failed its 60° float-conversion preflight before Havok initialization. Repair 4 added a 1e-9° boundary tolerance and was source-reviewed CHANGES_REQUIRED only for indentation. Formatting-only repair 5 is implemented and awaiting independent review. No probe measurements exist; hosted run #6 is required."
+          "evidence": "Probe source is saved. Runs #1–#4 repaired type/export, preview typing, async lint, and formatting issues. Run #5 passed typecheck/lint/format and 57 tests (8 PostgreSQL skips), then the probe failed its 60° float-conversion preflight before Havok initialization. Repair 4 adds a 1e-9° tolerance and repair 5 fixes its formatting; both have independent source reports. Run #6 passed verify, integration, and 3 browser tests; the calibration test asserts all 480 actual Havok-WASM trials passed. Vitest suppressed the successful test's console record, so no numerical data or coordinator coefficient decision has been recorded. A CI artifact output is being added before T02 acceptance."
         },
         {
           "id": "T02-B0-repair-1",
@@ -356,21 +380,36 @@
           "implementation_report": "execution_state/reports/T02-calibration-probe-repair-5-implementation.md",
           "review_report": "execution_state/reports/T02-calibration-probe-repair-5-review.md",
           "evidence": "Ran Prettier only on calibrationProbe.test.ts to fix the indentation found by repair 4 review. Independent source review PASS. No build/test/typecheck/lint ran. Hosted run #6 remains pending; no probe measurements exist."
+        },
+        {
+          "id": "T02-B1",
+          "status": "IMPLEMENTED",
+          "owner": "/root/toolchain_audit — probe output; coordinator — CI upload; /root/foundation_review — independent review",
+          "packet": "execution_state/packets/T02-B1-calibration-artifact.md",
+          "implementation_report": "execution_state/reports/T02-B1-calibration-artifact-implementation.md",
+          "review_report": "execution_state/reports/T02-B1-calibration-artifact-review.md",
+          "evidence": "Adds an env-gated full JSON record after probe assertions and uploads it as a read-only GitHub Actions artifact. Independent source/config review PASS. New hosted execution and 480-record artifact validation are pending."
         }
       ],
-      "next_action": "Complete independent review of the formatting-only repair 5, then push and run hosted verification. If it reaches the real-WASM probe, capture observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
+      "next_action": "Persist the successful probe's full observation matrix as a hosted artifact, independently review its data, and make the coordinator coefficient decision. Then complete the separate deployed Cloudflare Havok gate before accepting T02."
     },
     {
       "id": "T03",
       "title": "procedural pitch, caps, and button",
-      "status": "CHANGES_REQUIRED",
+      "status": "ACCEPTED",
       "dependencies": [
         "T01"
       ],
       "owner": "/root/foundation_review — repairs 1 and 2; /root/toolchain_audit — independent repair 2 source review",
       "implementation_report": "execution_state/reports/T03-implementation.md",
-      "review_report": "execution_state/reports/T03-review-repair-1.md",
+      "review_report": "execution_state/reports/T03-hosted-review-1.md",
       "checks": [
+        {
+          "command": "Independent integrated T03 review: GitHub Actions run #6",
+          "result": "PASS",
+          "report": "execution_state/reports/T03-hosted-review-1.md",
+          "detail": "Reviewer directly verified the successful run and 3 one-worker Chromium tests, including preview flows. Source, prior findings, and hosted evidence meet T03 acceptance; T02, PostgreSQL, and deployment are explicitly outside scope."
+        },
         {
           "command": "GitHub Actions run #3: pnpm verify",
           "result": "CHANGES_REQUIRED",
@@ -388,6 +427,24 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 1,
           "detail": "Typecheck, lint/format, and 57 tests passed; 8 PostgreSQL tests were skipped. Calibration preflight failed at 60° due to floating-point boundary conversion before Havok trials. Build, integration, and browser E2E did not run."
+        },
+        {
+          "command": "GitHub Actions run #6: pnpm verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "Typecheck, lint/format, tests, and build passed, including the repaired real-WASM probe."
+        },
+        {
+          "command": "GitHub Actions run #6: pnpm test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 integration test passed."
+        },
+        {
+          "command": "GitHub Actions run #6: pnpm test:e2e --workers=1",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "All 3 Chromium browser tests passed, including the open-pitch and inspection/responsive preview flows."
         },
         {
           "command": "Independent source review: T03 repair 2",
@@ -473,9 +530,17 @@
           "implementation_report": "execution_state/reports/CI-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/CI-format-repair-1-review.md",
           "evidence": "Formatting-only changes cover App.tsx and the piece/probe tests flagged in hosted run #4. Independent review PASS. Run #4 still skipped tests, build, integration, and E2E; hosted run #5 is required."
+        },
+        {
+          "id": "T03-hosted-review-1",
+          "status": "ACCEPTED",
+          "owner": "/root/swarm_review",
+          "packet": "execution_state/packets/T03-hosted-review-1.md",
+          "review_report": "execution_state/reports/T03-hosted-review-1.md",
+          "evidence": "Independent integrated review PASS. GitHub run #6 completed verify, integration, and 3 one-worker Chromium tests successfully; the reviewer directly confirmed the preview tests and T03 behavior. T03 is accepted; other product gates remain separate."
         }
       ],
-      "next_action": "Push the independently reviewed formatting-only repair and run hosted pnpm verify, integration, and one-worker browser E2E. If a gate fails, repair the confirmed cause and obtain a new independent review. Keep T05 blocked until T03 is ACCEPTED."
+      "next_action": "Accepted. T05 remains blocked until T02 is ACCEPTED; continue the hosted calibration artifact and deployed Havok gates."
     },
     {
       "id": "T04",

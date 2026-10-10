@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
-import { readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine.js";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector.js";
 import {
@@ -551,27 +552,39 @@ describe("real Havok calibration probe", () => {
       ),
     ).toBe(true);
 
+    const result = {
+      babylonCore: "9.30.0",
+      havokPackage: "1.3.14",
+      wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
+      fixedStepSeconds,
+      maximumProbeSeconds,
+      settleWindowSeconds:
+        COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
+      linearSettleThreshold:
+        COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
+      angularSettleThreshold:
+        COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
+      candidateFrictions,
+      candidateRestitutions,
+      candidateImpulses,
+      candidateTiltDegrees,
+      restartAzimuthRadians,
+      observedTrials: observations.length,
+      observations,
+    };
     console.info(
-      `COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify({
-        babylonCore: "9.30.0",
-        havokPackage: "1.3.14",
-        wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
-        fixedStepSeconds,
-        maximumProbeSeconds,
-        settleWindowSeconds:
-          COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
-        linearSettleThreshold:
-          COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
-        angularSettleThreshold:
-          COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
-        candidateFrictions,
-        candidateRestitutions,
-        candidateImpulses,
-        candidateTiltDegrees,
-        restartAzimuthRadians,
-        observedTrials: observations.length,
-        observations,
-      })}`,
+      `COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify(result)}`,
     );
+
+    const artifactPath = process.env["COUNTERBALL_CALIBRATION_OUTPUT"];
+    if (artifactPath !== undefined && artifactPath.trim().length > 0) {
+      const absoluteArtifactPath = resolve(artifactPath);
+      await mkdir(dirname(absoluteArtifactPath), { recursive: true });
+      await writeFile(
+        absoluteArtifactPath,
+        `${JSON.stringify(result, null, 2)}\n`,
+        "utf8",
+      );
+    }
   }, 600_000);
 });
