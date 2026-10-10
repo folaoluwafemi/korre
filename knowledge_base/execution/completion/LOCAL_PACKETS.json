@@ -2226,9 +2226,7 @@
       "T02-C2",
       "C00-A",
       "C00",
-      "T02-F01-ROTATION-1-FORMAT-ESCALATION-1"
-    ],
-    "supersedes": [
+      "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
       "T02-F01-ROTATION-1"
     ],
     "read_paths": [
@@ -2406,10 +2404,10 @@
       "C00-A",
       "C00",
       "T02-F01-ROTATION-1-FORMAT-ESCALATION-1",
-      "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1"
+      "T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1",
+      "T02-F01-ROTATION-1"
     ],
     "supersedes": [
-      "T02-F01-ROTATION-1",
       "T02-F01-ROTATION-1-FORMAT-REPAIR-1"
     ],
     "read_paths": [
@@ -2677,6 +2675,90 @@
     "ready": true,
     "required_parent_acceptance": [
       "T01"
+    ]
+  },
+  {
+    "id": "C01-DIAG-PANEL",
+    "parent": "T02",
+    "title": "Add an explicit non-playable renderer diagnostic panel",
+    "role": "worker",
+    "depends_on": [
+      "parent:T03",
+      "C00"
+    ],
+    "read_paths": [
+      "execution_state/packets/C01.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md",
+      "apps/web/src/App.tsx",
+      "apps/web/src/CounterballPreview.tsx",
+      "apps/web/src/styles.css",
+      "apps/web/src/App.test.tsx",
+      "apps/web/package.json",
+      "vitest.config.ts"
+    ],
+    "write_paths": [
+      "apps/web/src/CounterballRendererDiagnostic.tsx",
+      "apps/web/src/CounterballRendererDiagnostic.css",
+      "apps/web/src/CounterballRendererDiagnostic.test.tsx"
+    ],
+    "outputs": [
+      "A reusable, accessible development-only renderer diagnostic panel that clearly says the current scene is static and does not run Havok, flick pieces or provide a match. The existing static preview and production behavior are unchanged until a later coordinator wiring card imports it."
+    ],
+    "steps": [
+      "Use the current T03 preview as a read-only reference; do not change its scene, camera, physics, fixture, or existing text.",
+      "Create one focused semantic panel component with a visible renderer-only development label and a plain statement that no physics, flick or match is available. Keep it noninteractive and avoid identity/gameplay controls.",
+      "Style the panel with readable contrast, responsive wrapping and no motion dependency; import its stylesheet from the component so the coordinator can conditionally import both with the development module.",
+      "Add a renderToStaticMarkup unit test following the existing App test pattern; prove the warning marker, non-playable text and child content render.",
+      "Run only the lightweight whitespace check locally, write the exact implementation report, and stop for independent review. Do not integrate App or CI; those shared paths belong to a separate coordinator card."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet C01-DIAG-PANEL",
+        "environment": "local-document",
+        "expected": "Exact worker packet is ready after accepted T03 and C00; no app command runs."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "No whitespace errors in the three exact assigned paths."
+      },
+      {
+        "command": "Independent review of the exact three-file diff and non-playable/accessibility claims",
+        "environment": "source-review",
+        "expected": "PASS; reviewer confirms this panel has no physics/gameplay behavior and does not alter the accepted preview."
+      },
+      {
+        "command": "GitHub ci on the exact reviewed source SHA: pnpm verify and COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e --workers=1",
+        "environment": "github",
+        "expected": "Run after independent panel source review, before diagnostic wiring. The panel unit test is discovered and passes; existing production preview regressions retain their exact counts with zero skips. This proves only the isolated panel source/test and unchanged production preview."
+      }
+    ],
+    "acceptance": [
+      "The three exact paths are the only source/test changes and match the card.",
+      "The new unit test verifies the explicit non-playable renderer warning and component content.",
+      "The component is ready for compile-time conditional dynamic import; no unconditional production import exists yet.",
+      "Independent source review and exact-head hosted CI pass before this card is accepted; diagnostic artifact/build-mode/production-exclusion evidence remains owned by a separate coordinator card and C01 remains open.",
+      "No local app build, test, browser run, physics simulation or deployment is claimed."
+    ],
+    "negative_cases": [
+      "Do not call the panel a game harness, flick, Havok result, or playable milestone.",
+      "Do not edit App.tsx, workflow/config, shared contracts, current preview code, tasks.json, or any file outside the three exact worker paths.",
+      "Do not use mocks or a local canvas as runtime/physics proof.",
+      "Do not add identity, AI, online, cultural or rule UI."
+    ],
+    "review_questions": [
+      "Is the label visible and readable without relying on color alone?",
+      "Does the text unambiguously say there is no physics, flick, or match?",
+      "Does the unit test exercise the exact warning component without booting Babylon/WebGL?",
+      "Are all existing static preview behavior and production imports untouched?"
+    ],
+    "stop_conditions": [
+      "Stop if integration requires editing an existing/shared path; request a new coordinator card instead.",
+      "Stop if project TypeScript/test configuration cannot discover the test without a shared config edit.",
+      "Stop if review finds the label could be mistaken for playable/gameplay evidence."
     ]
   }
 ]

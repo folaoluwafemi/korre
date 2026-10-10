@@ -531,5 +531,87 @@
       "Producer consumes canonical config; no probe/test constant copied as default.",
       "All new calibration/hash consumers compile and old diagnostics remain truthful."
     ]
+  },
+  {
+    "id": "COMPLETION-GRAPH-REPAIR-2",
+    "parent": "T02",
+    "title": "Synchronize the accepted fact-repair graph and close its stale failed card",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-F01-ROTATION-1",
+      "T02-F01-ROTATION-1-FORMAT-REPAIR-2"
+    ],
+    "read_paths": [
+      "execution_state/tasks.json",
+      "execution_state/reports/COMPLETION-GRAPH-REPAIR-1-review.md",
+      "execution_state/reports/T02-F01-ROTATION-1-run-38091279565-independent-review.md",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+      "scripts/check-completion-plan.mjs"
+    ],
+    "write_paths": [
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+      "execution_state/tasks.json",
+      "knowledge_base/execution/completion/PACKETS.md"
+    ],
+    "outputs": [
+      "The accepted T02-F01 packet is a prerequisite, never the superseded target, for its historical repair attempts; the failed format-repair-1 card is closed as SUPERSEDED; the completion validator no longer advertises that closed card as ready."
+    ],
+    "steps": [
+      "Read the first independent graph review and the exact accepted run/source evidence; preserve all historical run results.",
+      "Update only the two relevant LOCAL_PACKETS.json records so accepted F01 is in depends_on; retain the existing format-repair-1 to semantic-repair-2 supersession edge.",
+      "Synchronize the matching task-progress records: add accepted F01 to the two dependency arrays, remove it from supersedes, and mark format-repair-1 SUPERSEDED by the already reviewed successor chain.",
+      "Regenerate PACKETS.md using node scripts/check-completion-plan.mjs --write-index.",
+      "Run the complete document validator, exact extraction for this packet and both affected historical packets, then git diff --check. Record the stale-ready result and successor evidence.",
+      "Stop for independent review; only the coordinator updates this card to ACCEPTED after review passes."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet COMPLETION-GRAPH-REPAIR-2",
+        "environment": "local-document",
+        "expected": "The coordinator repair card extracts as dependency-ready after its accepted F01 inputs."
+      },
+      {
+        "command": "node scripts/check-completion-plan.mjs --write-index",
+        "environment": "local-document",
+        "expected": "All 79 packets and parent coverage validate; no accepted packet is superseded."
+      },
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-FORMAT-REPAIR-1; node scripts/check-completion-plan.mjs --packet T02-F01-ROTATION-1-SEMANTIC-REPAIR-2",
+        "environment": "local-document",
+        "expected": "The failed format card is not ready, and the superseded semantic card retains its accepted dependency and historical ordering."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "No whitespace errors in the coordinator metadata/index amendment."
+      },
+      {
+        "command": "Independent review of exact catalogue/state diff and all validator outputs",
+        "environment": "source-review",
+        "expected": "Reviewer confirms status/edge agreement, no graph cycle, and no application/runtime claims."
+      }
+    ],
+    "acceptance": [
+      "All affected edges and task-progress fields agree with accepted F01 and the recorded failed/superseded attempts.",
+      "Full plan check passes and the closed format-repair-1 card is absent from initialReady.",
+      "Independent review passes.",
+      "No application build/test/browser/physics/deployment check is claimed or required for this metadata-only repair."
+    ],
+    "negative_cases": [
+      "Do not modify accepted source or weaken its hosted evidence.",
+      "Do not delete historical failures, test counts, reports, hashes, or artifact provenance.",
+      "Do not claim this documentation repair advances T02 playability or deployed Havok."
+    ],
+    "review_questions": [
+      "Does the status ledger agree with the current catalogues for every affected repair card?",
+      "Does the validator pass without advertising format-repair-1 as ready or permitting supersession of accepted F01?",
+      "Are all historical run results and source reports preserved verbatim?",
+      "Is the change limited to coordinator metadata and generated packet index?"
+    ],
+    "stop_conditions": [
+      "If task records disagree with the accepted hosted run or reports, stop and preserve the conflicting evidence.",
+      "If the validator reports a cycle, conflicting writer, or stale ready status, do not accept this card.",
+      "If any runtime claim is introduced, remove it and document only checks actually performed."
+    ]
   }
 ]

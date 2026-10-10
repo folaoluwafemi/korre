@@ -1,0 +1,11 @@
+# Completion Graph Repair 1 Review
+
+**Verdict: CHANGES_REQUIRED — dependency ordering is valid, but the updated graph exposes a stale packet as ready.**
+
+The `LOCAL_PACKETS.json` diff moves `T02-F01-ROTATION-1` from `supersedes` to `depends_on` for both `T02-F01-ROTATION-1-FORMAT-REPAIR-1` and `T02-F01-ROTATION-1-SEMANTIC-REPAIR-2`. The semantic repair still supersedes `T02-F01-ROTATION-1-FORMAT-REPAIR-1`. No implementation or runtime source changed.
+
+The plan validator passes with 78 packets and no cycle/ownership-conflict errors. Its graph logic adds explicit dependencies and supersession relations as ordering edges; dependency edges also become acceptance gates. The `T02-F01-ROTATION-1` prerequisite is accepted. The source writers remain ordered: the F01 packet precedes both same-path repair cards, and semantic repair 2 remains ordered after format repair 1 through its supersession relation. The two packet extractions show the new dependency in both records. Plan validation is documentation-only, not an application check.
+
+However, the full validator's `initialReady` now includes `T02-F01-ROTATION-1-FORMAT-REPAIR-1`. The relevant `execution_state/tasks.json` packet progress says F01 is `ACCEPTED`, format repair 1 is still `CHANGES_REQUIRED`, semantic repair 2 is `SUPERSEDED`, and format repair 2 is `ACCEPTED`. The validator's `isReady` logic excludes packets whose recorded status is `ACCEPTED` or `SUPERSEDED`; it does not infer that an older card is closed because a later catalogue packet supersedes it. Adding the accepted F01 dependency therefore makes the stale format-repair-1 card appear actionable, even though the later semantic and formatting successors have already handled that work.
+
+The catalogue relationship changes are otherwise correct and no cycle or loss of source-path ownership ordering was found. Before relying on `initialReady`, the coordinator should separately close the old format-repair-1 packet in runtime status (or otherwise ensure the readiness calculation excludes it). No status or catalogue edits were made in this review. No application commands were run; only the plan validator/extractions and read-only diff/script/status review were performed.
