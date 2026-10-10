@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState, type MouseEvent } from "react";
 
 const CounterballPreview = lazy(() => import("./CounterballPreview.js"));
 const CounterballRendererDiagnostic =
-  import.meta.env.VITE_COUNTERBALL_DEV_HARNESS === "1"
+  import.meta.env["VITE_COUNTERBALL_DEV_HARNESS"] === "1"
     ? lazy(() => import("./CounterballRendererDiagnostic.js"))
     : null;
 

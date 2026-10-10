@@ -2134,11 +2134,11 @@
         },
         {
           "id": "C01-DIAG-BUILD",
-          "status": "REVIEWING",
+          "status": "RUNNING",
           "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-DIAG-BUILD",
-          "owner": "coordinator source implementation complete; source writes released for independent review",
+          "owner": "coordinator executing focused TypeScript repair 1; implementation writes remain limited to the listed C01-DIAG-BUILD paths",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/foundation_review",
+          "reviewer_identity": "/root/foundation_review (initial source review); /root/toolchain_audit (repair 1 source PASS); /root/run_evidence_review (failed-run evidence report PASS)",
           "depends_on": [
             "C01-DIAG-PANEL",
             "C00",
@@ -2173,10 +2173,30 @@
               "detail": "Independent source reviewer confirmed the compile-time flag boundary, production marker assertion, CI ordering and separate artifact provenance. Runtime remains NOT RUN."
             },
             {
+              "command": "Independent C01-DIAG-BUILD repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-repair-1-review.md",
+              "detail": "Reviewer confirmed the exact TS4111 bracket-access repair and unchanged production boundary, assertions, workflow, artifact names and provenance. Hosted validation remains pending."
+            },
+            {
               "command": "GitHub ci exact-head production and diagnostic build gates",
-              "result": "NOT RUN",
+              "result": "CHANGES_REQUIRED",
               "environment": "github",
-              "detail": "Run only after source review; retain full logs, no-skip test counts, exact run provenance and distinct production/diagnostic artifacts."
+              "run_id": 38094866745,
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38094866745",
+              "source_sha": "1453b12b525d553b07f4add02e21f61ee401282c",
+              "attempt": 1,
+              "exit_code": 1,
+              "report": "execution_state/reports/C01-DIAG-BUILD-run-38094866745.md",
+              "detail": "Frozen install, Workers smoke 1/1, config formatting, Chromium install, disposable migrations twice, and protocol tests 11/11 passed. pnpm verify failed apps/web typecheck with TS4111 at App.tsx:5; no aggregate unit/integration/browser no-skip result. Workflow steps: 23 success, 1 failure, 12 skipped. Production exclusion, production/Worker packaging, integration, Chromium and diagnostic build/package/upload were skipped."
+            },
+            {
+              "command": "Independent audit of failed-run evidence report 38094866745",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-DIAG-BUILD-run-38094866745-review.md",
+              "detail": "Reviewer checked exact run/SHA, log error, passing individual counts, 23/1/12 step totals, 11 skipped task gates plus one skipped post-action, and GitHub-reported artifact metadata. The run itself failed and proves no build/playability."
             },
             {
               "command": "Independent exact-run diagnostic and production artifact audit",
@@ -2185,11 +2205,12 @@
               "report": "execution_state/reports/C01-DIAG-BUILD-runtime-review.md"
             }
           ],
-          "next_action": "Independent source review PASS; exact source is ready to publish. Run GitHub ci on that exact head, then download and independently audit the distinct production and diagnostic artifacts. C01-H still owns browser routing."
+          "repair_attempts": 1,
+          "next_action": "Repair 1 source review and the failed-run evidence report audit both PASS. Publish this exact reviewed repair and run full GitHub CI; then independently hash/audit the emitted production and diagnostic artifacts. C01-H still owns browser routing."
         }
       ],
-      "blocker": "The renderer panel has no separate diagnostic build artifact yet. C01-DIAG-BUILD is READY; C01 remains CHANGES_REQUIRED until its artifact provenance and production exclusion gate pass. Browser routing and interactive diagnostic coverage remain assigned to C01-H.",
-      "next_action": "Execute coordinator-owned C01-DIAG-BUILD, then finish C01 acceptance from exact-head hosted checks and independent artifact review. Proceed to C01-P/C01-H and the first real browser flick only after accepted prerequisites."
+      "blocker": "Run 38094866745 failed the C01-DIAG-BUILD TypeScript check before emitting production or diagnostic build artifacts. C01-DIAG-BUILD is CHANGES_REQUIRED; C01 remains CHANGES_REQUIRED. Browser routing and interactive diagnostic coverage remain assigned to C01-H.",
+      "next_action": "Complete the reviewed bracket-access repair, rerun exact-head hosted checks and artifact audit, then resume C01 acceptance. Proceed to C01-P/C01-H and the first real browser flick only after accepted prerequisites."
     },
     {
       "id": "T03",
