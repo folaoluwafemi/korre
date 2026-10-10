@@ -558,8 +558,7 @@ describe("real Havok calibration probe", () => {
       wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
       fixedStepSeconds,
       maximumProbeSeconds,
-      settleWindowSeconds:
-        COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
+      settleWindowSeconds: COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
       linearSettleThreshold:
         COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
       angularSettleThreshold:
@@ -572,9 +571,7 @@ describe("real Havok calibration probe", () => {
       observedTrials: observations.length,
       observations,
     };
-    console.info(
-      `COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify(result)}`,
-    );
+    console.info(`COUNTERBALL_CALIBRATION_PROBE ${JSON.stringify(result)}`);
 
     const artifactPath = process.env["COUNTERBALL_CALIBRATION_OUTPUT"];
     if (artifactPath !== undefined && artifactPath.trim().length > 0) {
