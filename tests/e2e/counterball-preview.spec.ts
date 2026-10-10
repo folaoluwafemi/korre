@@ -4,11 +4,12 @@ type PreviewLifecycle = {
   pendingAnimationFrames: () => number;
   animationFrameRequests: () => number;
   resizeListeners: () => number;
+  engineInstances: () => number;
 };
 
 type WindowWithPreviewLifecycle = Window & {
   __counterballPreviewLifecycle?: PreviewLifecycle;
-  __counterballAllowWebGL?: boolean;
+  __counterballPreviewWebGLMode?: "unsupported" | "constructor-failure" | "allow";
 };
 
 async function installLifecycleProbe(page: Page): Promise<void> {
@@ -66,6 +67,7 @@ async function installLifecycleProbe(page: Page): Promise<void> {
         pendingAnimationFrames: () => pendingFrames.size,
         animationFrameRequests: () => animationFrameRequests,
         resizeListeners: () => resizeListeners.size,
+        engineInstances: () => -1,
       } satisfies PreviewLifecycle,
     });
   });
@@ -75,6 +77,7 @@ async function readLifecycle(page: Page): Promise<{
   pendingAnimationFrames: number;
   animationFrameRequests: number;
   resizeListeners: number;
+  engineInstances: number;
 }> {
   return page.evaluate(() => {
     const lifecycle = (window as WindowWithPreviewLifecycle)
@@ -83,6 +86,7 @@ async function readLifecycle(page: Page): Promise<{
       pendingAnimationFrames: lifecycle?.pendingAnimationFrames() ?? -1,
       animationFrameRequests: lifecycle?.animationFrameRequests() ?? -1,
       resizeListeners: lifecycle?.resizeListeners() ?? -1,
+      engineInstances: lifecycle?.engineInstances() ?? -1,
     };
   });
 }
@@ -371,8 +375,9 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
   await installLifecycleProbe(page);
   await page.addInitScript(`
     (() => {
-      window.__counterballAllowWebGL = false;
+      window.__counterballPreviewWebGLMode = "unsupported";
       const original = HTMLCanvasElement.prototype.getContext;
+      const canvasesWithPreflightContext = new WeakSet();
       const webGLContextNames = new Set([
         "webgl2",
         "experimental-webgl2",
@@ -380,12 +385,23 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
         "experimental-webgl",
       ]);
       HTMLCanvasElement.prototype.getContext = function(type, ...args) {
-        if (
-          this.getAttribute("data-testid") === "counterball-canvas" &&
-          !window.__counterballAllowWebGL &&
-          webGLContextNames.has(String(type).toLowerCase())
-        ) {
-          return null;
+        const isPreviewCanvas =
+          this.getAttribute("data-testid") === "counterball-canvas";
+        const contextName = String(type).toLowerCase();
+        if (isPreviewCanvas && webGLContextNames.has(contextName)) {
+          const mode = window.__counterballPreviewWebGLMode;
+          if (mode === "unsupported") return null;
+          if (
+            mode === "constructor-failure" &&
+            canvasesWithPreflightContext.has(this)
+          ) {
+            return null;
+          }
+          const context = original.call(this, type, ...args);
+          if (mode === "constructor-failure" && context) {
+            canvasesWithPreflightContext.add(this);
+          }
+          return context;
         }
         return original.call(this, type, ...args);
       };
@@ -410,9 +426,11 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
     baseline.pendingAnimationFrames,
   );
   expect(failedLifecycle.resizeListeners).toBe(baseline.resizeListeners);
+  expect(failedLifecycle.engineInstances).toBe(0);
 
   await page.evaluate(() => {
-    (window as WindowWithPreviewLifecycle).__counterballAllowWebGL = true;
+    (window as WindowWithPreviewLifecycle).__counterballPreviewWebGLMode =
+      "allow";
   });
   await retry.click();
   await expect(alert).toHaveCount(0);
@@ -420,6 +438,9 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
     page.getByRole("button", { name: "Inspect four-hole button" }),
   ).toBeEnabled({ timeout: 30_000 });
   expect(await webGlVersion(page)).toContain("WebGL 2");
+  await expect
+    .poll(async () => (await readLifecycle(page)).engineInstances)
+    .toBe(1);
 
   const contextLossSupported = await canvas.evaluate((element) => {
     const context = (element as HTMLCanvasElement).getContext("webgl2");
@@ -453,4 +474,43 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
     ).toBeEnabled({ timeout: 30_000 });
     expect(await webGlVersion(page)).toContain("WebGL 2");
   }
+
+  await page.getByRole("link", { name: "Back to Counterball home" }).click();
+  await expect(canvas).toHaveCount(0);
+  await expect
+    .poll(async () => (await readLifecycle(page)).resizeListeners)
+    .toBe(baseline.resizeListeners);
+  await expect
+    .poll(async () => (await readLifecycle(page)).engineInstances)
+    .toBe(0);
+
+  await page.evaluate(() => {
+    (window as WindowWithPreviewLifecycle).__counterballPreviewWebGLMode =
+      "constructor-failure";
+  });
+  await page
+    .getByRole("link", { name: "Open the Counterball scene preview" })
+    .click();
+  await expect(alert).toContainText("could not start", { timeout: 30_000 });
+  await expect(retry).toBeEnabled();
+  const constructorFailure = await readLifecycle(page);
+  expect(constructorFailure.pendingAnimationFrames).toBe(
+    baseline.pendingAnimationFrames,
+  );
+  expect(constructorFailure.resizeListeners).toBe(baseline.resizeListeners);
+  expect(constructorFailure.engineInstances).toBe(0);
+
+  await page.evaluate(() => {
+    (window as WindowWithPreviewLifecycle).__counterballPreviewWebGLMode =
+      "allow";
+  });
+  await retry.click();
+  await expect(alert).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Inspect four-hole button" }),
+  ).toBeEnabled({ timeout: 30_000 });
+  expect(await webGlVersion(page)).toContain("WebGL 2");
+  await expect
+    .poll(async () => (await readLifecycle(page)).engineInstances)
+    .toBe(1);
 });

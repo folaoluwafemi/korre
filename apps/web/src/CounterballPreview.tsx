@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   Engine,
+  EngineStore,
   createCounterballScene,
   type ArcRotateCamera,
   type BodyState,
@@ -34,6 +35,21 @@ type CameraView = Pick<
 
 type PointerPoint = { x: number; y: number };
 
+type TrackedConstructorListener = {
+  target: EventTarget;
+  type: string;
+  listener: EventListenerOrEventListenerObject;
+  capture: boolean;
+};
+
+type PreviewLifecycleProbe = {
+  engineInstances?: () => number;
+};
+
+type WindowWithPreviewLifecycle = Window & {
+  __counterballPreviewLifecycle?: PreviewLifecycleProbe;
+};
+
 const fixture = fixtureJson as CounterballFixture;
 const initialBodies = fixture.states.initial.bodies;
 const buttonBody = (() => {
@@ -58,6 +74,98 @@ const MAX_BETA = 1.5;
 const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const MAX_RENDER_RATE = 30;
 const MIN_RENDER_INTERVAL_MS = 1000 / MAX_RENDER_RATE;
+
+function ensurePreviewWebGLContext(canvas: HTMLCanvasElement): void {
+  const attributes: WebGLContextAttributes = {
+    alpha: true,
+    antialias: true,
+    depth: true,
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: true,
+    stencil: true,
+  };
+  const requestContext = (
+    name: string,
+  ): WebGLRenderingContext | WebGL2RenderingContext | null => {
+    try {
+      return canvas.getContext(name, attributes) as
+        | WebGLRenderingContext
+        | WebGL2RenderingContext
+        | null;
+    } catch {
+      return null;
+    }
+  };
+
+  const context =
+    requestContext("webgl2") ??
+    requestContext("experimental-webgl2") ??
+    requestContext("webgl") ??
+    requestContext("experimental-webgl");
+  if (!context) {
+    throw new Error("WebGL not supported");
+  }
+}
+
+function createPreviewEngine(canvas: HTMLCanvasElement): Engine {
+  const previousEngines = new Set(EngineStore.Instances);
+  const constructorListeners: TrackedConstructorListener[] = [];
+  const eventTargetPrototype = EventTarget.prototype;
+  // The originals are invoked with the intercepted target as their receiver.
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const addEventListener = eventTargetPrototype.addEventListener;
+  // eslint-disable-next-line @typescript-eslint/unbound-method
+  const removeEventListener = eventTargetPrototype.removeEventListener;
+  const trackAddEventListener: typeof addEventListener = function (
+    this: EventTarget,
+    type,
+    listener,
+    options,
+  ): void {
+    addEventListener.call(this, type, listener, options);
+    if (listener) {
+      constructorListeners.push({
+        target: this,
+        type,
+        listener,
+        capture:
+          typeof options === "boolean" ? options : (options?.capture ?? false),
+      });
+    }
+  };
+
+  eventTargetPrototype.addEventListener = trackAddEventListener;
+  try {
+    return new Engine(
+      canvas,
+      true,
+      {
+        preserveDrawingBuffer: true,
+        stencil: true,
+        // Recovery rebuilds the whole preview. Do not queue Babylon's separate
+        // asynchronous restore against an engine that retry may dispose.
+        doNotHandleContextLost: true,
+        limitDeviceRatio: MAX_DEVICE_PIXEL_RATIO,
+      },
+      true,
+    );
+  } catch (error) {
+    for (const { target, type, listener, capture } of constructorListeners) {
+      removeEventListener.call(target, type, listener, capture);
+    }
+    for (let index = EngineStore.Instances.length - 1; index >= 0; index -= 1) {
+      const instance = EngineStore.Instances[index];
+      if (instance && !previousEngines.has(instance)) {
+        EngineStore.Instances.splice(index, 1);
+      }
+    }
+    throw error;
+  } finally {
+    if (eventTargetPrototype.addEventListener === trackAddEventListener) {
+      eventTargetPrototype.addEventListener = addEventListener;
+    }
+  }
+}
 
 function isOrbitCamera(
   camera: BabylonCamera | null,
@@ -123,6 +231,12 @@ export default function CounterballPreview({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const lifecycleProbe = (window as WindowWithPreviewLifecycle)
+      .__counterballPreviewLifecycle;
+    if (lifecycleProbe) {
+      lifecycleProbe.engineInstances = () => EngineStore.Instances.length;
+    }
 
     setRenderError(null);
     setRetryAvailable(false);
@@ -326,21 +440,10 @@ export default function CounterballPreview({
     };
 
     try {
+      ensurePreviewWebGLContext(canvas);
       canvas.addEventListener("webglcontextlost", onContextLost);
       canvas.addEventListener("webglcontextrestored", onContextRestored);
-      engine = new Engine(
-        canvas,
-        true,
-        {
-          preserveDrawingBuffer: true,
-          stencil: true,
-          // Recovery rebuilds the whole preview. Do not queue Babylon's separate
-          // asynchronous restore against an engine that retry may dispose.
-          doNotHandleContextLost: true,
-          limitDeviceRatio: MAX_DEVICE_PIXEL_RATIO,
-        },
-        true,
-      );
+      engine = createPreviewEngine(canvas);
       scene = createCounterballScene(engine, initialBodies);
       const activeCamera = scene.activeCamera;
       if (!isOrbitCamera(activeCamera)) {

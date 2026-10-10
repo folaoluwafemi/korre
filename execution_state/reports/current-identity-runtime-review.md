@@ -1,6 +1,6 @@
 # Identity cleanup and hosted runtime review
 
-**Source verdict: PASS for the bounded test-helper and cleanup repair. Hosted evidence: INCOMPLETE for exact zero-skip and migration-suite counts. Parent T11 remains RUNNING.** This was a read-only review. I ran no local tests, builds, installs, formatter, server, or database commands.
+**Initial run-22 review:** Source verdict PASS for the bounded test-helper and cleanup repair; hosted evidence was incomplete. The follow-up below records the full run-23 artifact and supersedes that evidence status. This was a read-only review. I ran no local tests, builds, installs, formatter, server, or database commands.
 
 ## Source review at `248273daffa6a8246609f064dc4f397461a7437b`
 
@@ -22,8 +22,36 @@ The [GitHub run](https://github.com/folaoluwafemi/korre/actions/runs/38047543611
 
 The coordinator's pending `.github/workflows/ci.yml` diff pipes `pnpm verify` through `tee .artifacts/verify.log` with `set -o pipefail`, then uploads the file under an `if: always()` step. By inspection this preserves the command's failure status while retaining full output when checks fail. The new capture has not yet run on GitHub, so it supplies no additional verification evidence yet.
 
-## T11 acceptance status
+## Historical T11 status after run 22
 
 `execution_state/tasks.json` still marks T11 `RUNNING`, with no parent implementation or review report recorded. The current task plan requires real database checks for concurrent normalized-name claims, SQL-looking input, session expiry/revocation, name-only rejection, recovery use/rotation, and migration forward/rollback compatibility. This run shows useful disposable-PostgreSQL evidence for the migration's twice-run application and for the visible repository and HTTP suites. Its truncated verification output does not prove the exact full suite or zero skips, and the five migration-runner tests have no visible per-file result. T11 should remain unaccepted until the full captured log resolves those points and the coordinator records the parent implementation evidence and independent parent review.
 
 T12's identity UI, T13's deployed edge proxy, Railway deployment, and browser/mobile preview failures are separate scopes; this review does not claim them complete or use them as a substitute for T11 database evidence.
+
+## Follow-up: full run-23 verification artifact
+
+**Independent T11 review verdict: PASS for the T11 PostgreSQL identity, migration, and API scope.** The coordinator will record final T11 acceptance after the integrated browser check is green. This review does not accept T12 or T13 and does not change runtime status itself.
+
+Run [38056114718](https://github.com/folaoluwafemi/korre/actions/runs/38056114718) used commit `fadb7a3c5bf3fd624d37f80fd54dbcb60f8da446`. Its uploaded local evidence is `.artifacts/run23-verification/verify.log`. The full `pnpm verify` log records all workspace typechecks, ESLint, Prettier, unit/integration-style tests, and workspace builds succeeding. Vitest reports **24 test files passed and 98 tests passed**, with no skipped tests. The three identity/PostgreSQL suites report:
+
+- `identity.repository.test.ts`: 10 passed; two pure username-policy checks and eight opted-in real-PostgreSQL cases.
+- `identity.http-postgres.test.ts`: 2 passed against the real disposable PostgreSQL service through the actual Hono app, identity service, and repository.
+- `migrations.test.ts`: 5 passed against the real disposable PostgreSQL service and actual child-process migration runner.
+
+The CI job sets the explicit database opt-in and a loopback `korre_test` URL. The separate workflow step applied/rechecked the actual additive migration twice; both invocations logged `Verified 1 forward-only migration(s).` No local or Railway database was accessed.
+
+The T11 acceptance criteria are supported by the code and these executed cases: PostgreSQL's normalized-name unique constraint decides concurrent claims; parameterized repository queries avoid SQL interpretation; sessions store token hashes and enforce expiry/revocation; usernames alone do not restore sessions; recovery is scoped to the normalized expected username, consumed once, rotated with session revocation in a transaction; and HMAC rate-limit buckets persist/expire without storing raw IPs or usernames. The HTTP cases also cover production host-cookie attributes, cookie restore, CSRF/logout, and recovery replay/rotation. Source inspection confirms the API requires server-side service auth before accepting validated `CF-Connecting-IP`, fails startup when required environment/schema configuration is missing, and the migrator takes an advisory lock, verifies stable checksums, applies each migration/history row transactionally, and closes its pool/client on exit. The five runner tests cover reapplication, LF/CRLF history, changed/corrupt checksums, invalid-SQL rollback, and bounded lock contention/recovery.
+
+The GitHub run is still **red overall** because the separate preview E2E step had three passes and one failure: WebGL startup/context-loss cleanup expected zero `resizeListeners` but observed one (`tests/e2e/counterball-preview.spec.ts:369`, assertion at line 412). This is outside T11 and does not invalidate the successful API/PostgreSQL verification. Keep the preview failure tracked in its own task.
+
+The API source is unchanged between the previously reviewed repair commit `248273daffa6a8246609f064dc4f397461a7437b` and run-23 commit `fadb7a3c5bf3fd624d37f80fd54dbcb60f8da446`. At report time, `execution_state/tasks.json` still lists T11 as RUNNING and has no parent implementation report; coordinator-owned status/report bookkeeping is the remaining step to record this PASS.
+
+### Scope and rollback notes
+
+The migration only adds identity/result/inbox/rate-limit tables, indexes, and constraints; it does not alter or drop pre-existing application tables. That supports application-code rollback compatibility by source review. The five PostgreSQL migrator tests prove transaction rollback for invalid SQL, but they do not boot a prior application binary against the migrated schema, so this report does not claim a binary rollback rehearsal. The platform's later socket-ticket table is not in migration 001 and must be added by the appropriate later task before socket authentication uses it. Likewise, this T11 verdict does not prove a deployed edge strips forged `CF-Connecting-IP` headers; that remains T13 work.
+
+## Coordinator parent implementation report review
+
+**Review verdict: PASS for `execution_state/reports/T11-hosted-implementation.md`.** Its reported run ID and SHA match the GitHub metadata; its 24-file/98-test, zero-skip counts and the 10 repository, 2 HTTP, and 5 migration-suite counts match the full run-23 artifact. The twice-applied migration result, all-workspace `pnpm verify` result, one passing integration smoke, and 3-pass/1-fail E2E status are consistent with the run logs. The report keeps the WebGL failure outside the T11 API/database result and explicitly limits application rollback compatibility to additive-schema inspection rather than claiming an old-binary rehearsal. I found no unsupported T11 evidence claim or correction to request.
+
+The current task record remains `RUNNING` pending the coordinator's planned integrated browser-green status transition. That sequencing does not leave a T11-specific source or database acceptance finding open.
