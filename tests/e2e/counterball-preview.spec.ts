@@ -352,6 +352,12 @@ test.describe("mobile preview camera", () => {
     await checkNoHorizontalOverflowAndPixelCap(1280, 900);
     await page.setViewportSize({ width: 390, height: 844 });
     await checkNoHorizontalOverflowAndPixelCap(390, 844);
+    // The interaction sequence above can leave the document scrolled. Return to
+    // the page start before checking which controls mobile users can reach there.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(
+      page.getByRole("link", { name: "Back to Counterball home" }),
+    ).toBeInViewport();
     await expect(inspectButton).toBeInViewport();
     await page.screenshot({
       path: "execution_state/reports/T03-narrow-viewport.png",
@@ -367,8 +373,18 @@ test("WebGL failure and context loss are recoverable", async ({ page }) => {
     (() => {
       window.__counterballAllowWebGL = false;
       const original = HTMLCanvasElement.prototype.getContext;
+      const webGLContextNames = new Set([
+        "webgl2",
+        "experimental-webgl2",
+        "webgl",
+        "experimental-webgl",
+      ]);
       HTMLCanvasElement.prototype.getContext = function(type, ...args) {
-        if (!window.__counterballAllowWebGL && String(type).startsWith("webgl")) {
+        if (
+          this.getAttribute("data-testid") === "counterball-canvas" &&
+          !window.__counterballAllowWebGL &&
+          webGLContextNames.has(String(type).toLowerCase())
+        ) {
           return null;
         }
         return original.call(this, type, ...args);

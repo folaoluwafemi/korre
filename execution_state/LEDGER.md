@@ -2,6 +2,10 @@
 
 This file records evidence-backed task transitions. The immutable seed remains at `knowledge_base/execution/status.json`; its initial READY state is not implementation evidence.
 
+## Current review progress
+
+The user requested a pass over implemented code before testing. Current packets improve the static preview, real database/migration evidence and physics diagnostics. D38 removes the need for a human numerical epsilon choice while retaining a provisional engineering label. Builds/tests run on GitHub, with no local application build or test under this review. Runs 38047177729 and 38047344796 exposed focused typing/lint defects, which were repaired. Run 38047543611 passed migrations twice, verification and integration; two of four browser cases failed and are being repaired. No full review or T11 acceptance is claimed yet. The independent 40-row physics artifact review passed at reports/current-physics-runtime-review.md; parent T02 remains unfinished.
+
 ## Baseline
 
 - 2026-10-10: initial Git branch `master`, no commits, and no Git remote.

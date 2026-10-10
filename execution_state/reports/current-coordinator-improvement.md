@@ -21,3 +21,9 @@ Independent browser review identified a restore/dispose race in pinned Babylon: 
 
 ## Hosted repair 2
 Run38047344796 on af887af passed all workspace and root-test typechecks, then ESLint found two unsafe explicit throws inside test cleanup finally blocks. No unit/build/integration/E2E result is claimed. Coordinator replaced these cleanup blocks with sequential best-effort cleanup, retains verified schema/path guards, collects failures, and raises AggregateError after cleanup. Invalid targets are never dropped/deleted. Tests/checks remain required; no lint rule is disabled. This integrates the independent browser lifecycle repair described above and needs fresh hosted checks.
+
+## Hosted browser/evidence repair
+
+Run 38047543611 on 248273d passed the migration-twice, Verify and integration steps, then failed two of four browser cases. The browser worker is diagnosing the mobile post-resize viewport assertion and WebGL startup injection. This is not an accepted full run. The Verify step's Actions log is cut off among verbose Havok constructor messages, so later test counts/build summaries cannot be recovered from that display. CI now preserves the complete verification output as a separate artifact using tee with pipefail; the unchanged verification command still controls the exit status. Exact final counts require that artifact from the next run and independent review.
+
+The coordinator also adds a CI-only Playwright JSON reporter alongside GitHub output and includes that exact results file in the browser evidence upload. This preserves actual context-loss capability annotations, pass/retry/skip counts and timings rather than inferring which conditional browser branch ran. Official API checked: https://playwright.dev/docs/test-reporters#multiple-reporters. These configuration paths are coordinator-owned and need independent source review plus fresh hosted checks.

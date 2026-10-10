@@ -33,3 +33,9 @@ Coordinator alone owns canonical config/types/schema/hash fixtures, D38, `.gitat
 GitHub checks: `pnpm install --frozen-lockfile`; migration `pnpm --filter @korre/api db:migrate` twice on disposable PostgreSQL; `pnpm verify`; `pnpm test:integration`; `COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e --workers=1`. Upload real diagnostic JSON, built web files and browser evidence. Review source and actual passing run/SHA before accepting repairs or parent T11.
 
 Failure: two focused repairs per worker/failure then evidence to coordinator; never weaken required checks. User testing serves the remotely built artifact via `node scripts/serve-preview.mjs`, loopback only, after explicit progress notice; it performs no build. No production publication, paid-plan change or unrelated external service use.
+
+## Hosted browser repair
+
+Run 38047543611 on 248273d passed verification (including real PostgreSQL and real Havok diagnostics), migration application/reapplication and integration. Its browser result was two passed, two failed: mobile inspect control outside the viewport after resize, and startup-failure injection did not prevent WebGL initialization. Those are observed failures, not accepted exceptions.
+
+Worker `/root/foundation_review` owns only the three browser paths above and `execution_state/reports/current-browser-repair.md`. Inspect actual scroll/layout behavior and pinned engine context fallback before changing code. Correct test setup where it causes the failure, and product behavior if it is defective. Preserve control reachability, real pixels, no overflow, recovery and lifecycle assertions. Coordinator runs all checks remotely; independent `/root/swarm_review` must review before acceptance. No second browser repair may weaken the acceptance checks.
