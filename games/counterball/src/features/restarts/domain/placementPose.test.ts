@@ -1,7 +1,4 @@
-import {
-  COUNTERBALL_CONFIG_V1,
-  type Vec3,
-} from "@korre/game-protocol";
+import { COUNTERBALL_CONFIG_V1, type Vec3 } from "@korre/game-protocol";
 import { describe, expect, it } from "vitest";
 import { deriveRestartButtonPose } from "./placementPose.js";
 
@@ -10,11 +7,7 @@ const invalidInputs: Array<[Vec3, number, number]> = [
   [{ x: Number.NaN, y: 0, z: 0 }, 0, 0],
   [{ x: 0, y: 0, z: 0 }, Number.POSITIVE_INFINITY, 0],
   [{ x: 0, y: 0, z: 0 }, 0, -0.01],
-  [
-    { x: 0, y: 0, z: 0 },
-    0,
-    config.restart.maxButtonTiltRadians + 0.01,
-  ],
+  [{ x: 0, y: 0, z: 0 }, 0, config.restart.maxButtonTiltRadians + 0.01],
 ];
 
 describe("deriveRestartButtonPose", () => {
@@ -94,11 +87,14 @@ describe("deriveRestartButtonPose", () => {
     expect(pose0.position).not.toBe(posePeriod.position);
   });
 
-  it.each(invalidInputs)("rejects invalid pose inputs", (cap, azimuth, tilt) => {
-    expect(() => deriveRestartButtonPose(cap, azimuth, tilt, config)).toThrow(
-      new TypeError("Invalid restart button pose input."),
-    );
-  });
+  it.each(invalidInputs)(
+    "rejects invalid pose inputs",
+    (cap, azimuth, tilt) => {
+      expect(() => deriveRestartButtonPose(cap, azimuth, tilt, config)).toThrow(
+        new TypeError("Invalid restart button pose input."),
+      );
+    },
+  );
 
   it("rejects invalid collision geometry", () => {
     const invalidConfig = {

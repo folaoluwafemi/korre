@@ -1,8 +1,4 @@
-import type {
-  CounterballConfig,
-  Quat,
-  Vec3,
-} from "@korre/game-protocol";
+import type { CounterballConfig, Quat, Vec3 } from "@korre/game-protocol";
 
 export type RestartButtonPose = {
   position: Vec3;
