@@ -1066,6 +1066,7 @@ describe("pure simulation fact derivation", () => {
       rotation: rotationAboutZ(0),
       projection: 0,
       equalSupport: false,
+      expectedKind: "out",
     },
     {
       label: "right-normal parallel axis",
@@ -1073,6 +1074,7 @@ describe("pure simulation fact derivation", () => {
       rotation: rotationAboutZ(90),
       projection: -1,
       equalSupport: false,
+      expectedKind: "out",
     },
     {
       label: "end-line-normal perpendicular axis",
@@ -1080,6 +1082,7 @@ describe("pure simulation fact derivation", () => {
       rotation: rotationAboutX(0),
       projection: 0,
       equalSupport: false,
+      expectedKind: "goal",
     },
     {
       label: "end-line-normal parallel axis",
@@ -1087,6 +1090,7 @@ describe("pure simulation fact derivation", () => {
       rotation: rotationAboutX(90),
       projection: 1,
       equalSupport: false,
+      expectedKind: "goal",
     },
     {
       label: "equal radial and axial support",
@@ -1094,6 +1098,7 @@ describe("pure simulation fact derivation", () => {
       rotation: rotationAboutZ(-45),
       projection: Math.SQRT1_2,
       equalSupport: true,
+      expectedKind: "out",
     },
   ])("keeps $label support cases finite", (fixture) => {
     const config: Readonly<CounterballConfig> = fixture.equalSupport
@@ -1139,7 +1144,7 @@ describe("pure simulation fact derivation", () => {
     const crossing = firstCrossing(facts);
     expect(crossing.entity).toBe("button");
     expect(crossing.boundary).toBe(fixture.boundary);
-    expect(crossing.kind).toBe("out");
+    expect(crossing.kind).toBe(fixture.expectedKind);
   });
 
   it.each([
@@ -1153,6 +1158,16 @@ describe("pure simulation fact derivation", () => {
         COUNTERBALL_CONFIG_V1.geometry.buttonRadius,
       y: 0.0225,
       kind: "out",
+    },
+    {
+      label: "positive post clearance",
+      x:
+        COUNTERBALL_CONFIG_V1.geometry.goalWidth / 2 -
+        COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius -
+        COUNTERBALL_CONFIG_V1.geometry.buttonRadius -
+        1e-9,
+      y: 0.0225,
+      kind: "goal",
     },
     {
       label: "exact crossbar tangency",

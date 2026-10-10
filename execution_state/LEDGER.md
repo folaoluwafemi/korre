@@ -112,3 +112,20 @@ Run 38087201307 on exact SHA `21ab540352c88f11ba15c8a2f4bb883c2ad71c61` passed t
 
 
 The independent exact-patch review passed at `reports/T02-F01-ROTATION-1-format-repair-1-review.md`. It confirms the pinned formatting-only patch and two-path scope; no application checks ran. Source ownership is released. The repair is IMPLEMENTED, not VERIFIED or ACCEPTED. Coordinator exact-SHA GitHub verify, integration, Chromium E2E and artifact review remain pending; no playability or deployed Havok result is claimed.
+
+
+## T02-F01 exact-head verification failure — run 38088587482
+
+Run [38088587482](https://github.com/folaoluwafemi/korre/actions/runs/38088587482) on exact SHA `efd6f567a35b29313ceda1c82dcc7b3b73b1298d` passed typecheck, ESLint and Prettier, then failed Vitest: 25 files, 138 tests, 131 passed, 7 failed, 0 skipped. Seven failures are in `facts.test.ts`: protocol signed-zero JSON stability; canonical contact tie order; pi/4 root precision; selected-SLERP interval exhaustion; two end-line support classifications; and exact-post tangency. Build, integration and Chromium checks were skipped. Full log SHA, extracted logs, artifact names/IDs/digests and probe hashes are in `reports/T02-F01-ROTATION-1-format-repair-1-run-38088587482.md`; the passing 480 calibration and 40 intended-shot observations are diagnostic, not deployed proof. The exact-patch card is CHANGES_REQUIRED. Report-only escalation `T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1` is RUNNING; no further source edit or consumer work until independent review. F01/T02 remain open and no playable flow/deployed Havok result exists.
+
+## T02-F01 failure escalation and bounded successor — 2026-10-10
+
+Report-only card “T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1” is ACCEPTED after independent review at “execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-1-review.md”. The author and reviewer verified GitHub run 38088587482 on SHA efd6f567a35b29313ceda1c82dcc7b3b73b1298d: 23 successful steps, one failed Verify step, eight skipped steps; 131 passed, seven failed, zero skipped tests. The report keeps probes/screenshots diagnostic and makes no browser, build, deployed-Havok or playable-flow claim.
+
+The exact two-file successor “T02-F01-ROTATION-1-SEMANTIC-REPAIR-2” is READY under T02. It preserves the accepted support bound and current search caps, corrects only two clear-goal fixture expectations under provisional D20, and retains the root tolerance and exact-post-out rule. `/root/toolchain_audit` is source author; `/root/foundation_review` is independent reviewer; the coordinator owns GitHub verification. Source work and all app checks remain pending. F01 and T02 are unaccepted.
+
+## T02-F01 semantic repair 2 source review — 2026-10-10
+
+The source implementation is saved in the two assigned fact files and independently reviewed PASS at `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-review.md`. The reviewer confirms the accepted parameterized symmetry-axis bound, sharper finite-cylinder coefficient proof, original search limits/root/tolerance, corrected clear-goal fixtures, exact post tangency allowance, signed-zero output normalization and deterministic lexical contact-pair order. No application tests, build, lint, formatting, browser, or physics checks ran locally.
+
+Coordinator owns publication and the full GitHub `ci` workflow on the exact reviewed SHA. F01/T02 remain unaccepted until the hosted run and artifact audit pass. The report-only escalation remains accepted only as a failure-classification gate.

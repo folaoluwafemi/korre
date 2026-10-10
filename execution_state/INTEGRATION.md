@@ -68,3 +68,20 @@ Run [38087201307](https://github.com/folaoluwafemi/korre/actions/runs/3808720130
 `T02-F01-ROTATION-1-FORMAT-ESCALATION-1` is accepted only as authorization for one exact-patch repair. Independent review PASS and current patch SHA/applicability checks confirm the saved artifact remains the reviewed two-file formatting patch. New card `T02-F01-ROTATION-1-FORMAT-REPAIR-1` is RUNNING under T02 with the accepted T01/math/C0/C2/C00 prerequisites preserved. `/root/toolchain_audit` owns only `facts.ts` and `facts.test.ts`; `/root/foundation_review` independently reviews the resulting diff. Coordinator owns publication and exact-SHA GitHub verify, integration and Chromium checks. No local application checks ran. F01/T02 remain unaccepted; no gameplay or deployed Havok result is claimed.
 
 Independent review of `T02-F01-ROTATION-1-FORMAT-REPAIR-1` passed at `reports/T02-F01-ROTATION-1-format-repair-1-review.md`: exact pinned digest, exact two-file scope, formatting-only semantics, and no local app checks. Source author/reviewer ownership is released. Coordinator publication and fresh exact-SHA GitHub verification remain pending; F01/T02 are not accepted.
+
+
+## T02-F01 exact-head test failure — 2026-10-10
+
+Run 38088587482 on exact reviewed SHA `efd6f567a35b29313ceda1c82dcc7b3b73b1298d` passed setup, Worker smoke 1/1, protocol 11/11, migrations twice, all typechecks, ESLint and Prettier. Vitest ran 25 files / 138 tests: 24 files passed and 1 failed; 131 passed, 7 failed, 0 skipped. Build, integration and Chromium steps skipped. Full job log, verify log, artifact IDs, extracted data and hashes are in `reports/T02-F01-ROTATION-1-format-repair-1-run-38088587482.md` and the companion artifacts directory. A report-only exact-failure escalation is running; source retries are stopped until independent PASS. No playable/browser/deployed-Havok claim follows.
+
+## T02-F01 report acceptance and semantic repair 2 — 2026-10-10
+
+The run-38088587482 failure report and independent review are saved at `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-1.md` and `execution_state/reports/T02-F01-ROTATION-1-ci-fail-escalation-1-review.md`. They classify the exact 131/7/0 tests and 23/1/8 workflow steps. Report-only escalation is ACCEPTED; F01/T02 are not.
+
+`T02-F01-ROTATION-1-SEMANTIC-REPAIR-2` is materialized under T02 and its exact packet and full document checks pass. Author: `/root/toolchain_audit`, writing only `games/counterball/src/simulation/facts.ts`, `games/counterball/src/simulation/facts.test.ts`, and its named implementation report. Independent reviewer: `/root/foundation_review`, writing only its named review report. Coordinator owns commit/push, hosted checks, artifacts and shared status. No source edit or app check is complete yet; do not infer a build or game proof.
+
+## T02-F01 semantic repair 2 source review — 2026-10-10
+
+Implementation and independent review are saved at `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-implementation.md` and `execution_state/reports/T02-F01-ROTATION-1-semantic-repair-2-review.md`. Source review PASS covers exactly the two assigned source/test files and does not establish test/runtime success.
+
+Coordinator now owns committing/pushing the exact reviewed tree and running the GitHub `ci` workflow with full logs/artifact provenance and no skipped required checks. No local application command ran. F01/T02 stay open.

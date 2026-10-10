@@ -337,6 +337,14 @@ function dot(a: Vec3, b: Vec3): number {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
+function cross(a: Vec3, b: Vec3): Vec3 {
+  return {
+    x: a.y * b.z - a.z * b.y,
+    y: a.z * b.x - a.x * b.z,
+    z: a.x * b.y - a.y * b.x,
+  };
+}
+
 function normalized(value: Vec3): Vec3 | undefined {
   const length = Math.hypot(value.x, value.y, value.z);
   if (length === 0) {
@@ -351,11 +359,13 @@ function supportExtent(
   radius: number,
   height: number,
 ): number {
-  const axis = verticalAxis(pose.rotation);
+  const axis = normalized(verticalAxis(pose.rotation));
+  if (axis === undefined) {
+    throw new TypeError("Cylinder support axis could not be normalized.");
+  }
   const axialProjection = Math.max(-1, Math.min(1, dot(axis, direction)));
-  const radialProjection = Math.sqrt(
-    Math.max(0, 1 - axialProjection * axialProjection),
-  );
+  const radial = cross(axis, direction);
+  const radialProjection = Math.hypot(radial.x, radial.y, radial.z);
   return radius * radialProjection + (height / 2) * Math.abs(axialProjection);
 }
 
@@ -365,13 +375,14 @@ function supportPoint(
   radius: number,
   height: number,
 ): Vec3 {
-  const axis = verticalAxis(pose.rotation);
+  const axis = normalized(verticalAxis(pose.rotation));
+  if (axis === undefined) {
+    throw new TypeError("Cylinder support axis could not be normalized.");
+  }
   const axialProjection = Math.max(-1, Math.min(1, dot(axis, direction)));
-  const radial = normalized({
-    x: direction.x - axialProjection * axis.x,
-    y: direction.y - axialProjection * axis.y,
-    z: direction.z - axialProjection * axis.z,
-  });
+  // (axis × direction) × axis is the in-plane component of direction. It
+  // avoids subtracting nearly equal vectors when the cylinder is aligned.
+  const radial = normalized(cross(cross(axis, direction), axis));
   const axialSign = Math.sign(axialProjection);
   return {
     x:
@@ -595,8 +606,13 @@ function cylinderAxisAngularTravelBound(a: Quat, b: Quat): number {
   return travel + 64 * Number.EPSILON * Math.max(1, angularSpeed);
 }
 
-function circumradius(dimensions: { radius: number; height: number }): number {
-  return Math.hypot(dimensions.radius, dimensions.height / 2);
+function supportAngularRadius(dimensions: {
+  radius: number;
+  height: number;
+}): number {
+  // The accepted piecewise derivative bound for finite-cylinder support is
+  // max(radius, half-height), including its one-sided limits at support ties.
+  return Math.max(dimensions.radius, dimensions.height / 2);
 }
 
 function clearanceLipschitzBound(
@@ -604,7 +620,8 @@ function clearanceLipschitzBound(
   dimensions: { radius: number; height: number },
   angularTravel: number,
 ): number {
-  const bound = centerTravel + circumradius(dimensions) * angularTravel;
+  const bound =
+    centerTravel + supportAngularRadius(dimensions) * angularTravel;
   if (!Number.isFinite(bound) || bound < 0) {
     throw new TypeError("Whole-body clearance could not be bounded finitely.");
   }
@@ -689,9 +706,9 @@ function findDescendingRoot(
       throw new TypeError("Crossing clearance became non-finite.");
     }
 
-    // Signed centre distance is linear. A cylinder support point can move no
-    // faster than its circumradius times the shortest physical rotation angle.
-    // This Lipschitz lower bound proves intervals cannot contain a hidden exit.
+    // Signed centre distance is linear. The accepted finite-cylinder support
+    // bound multiplies symmetry-axis travel by max(radius, half-height).
+    // This lower bound proves intervals cannot contain a hidden exit.
     const lowerBound = middleValue - (lipschitzBound * (high - low)) / 2;
     if (lowerBound >= 0) {
       return undefined;
@@ -727,6 +744,28 @@ type GoalMouthClearances = {
 };
 
 type GoalPassageState = { active: boolean; clear: boolean };
+
+function goalMouthRoundoffAllowance(
+  before: Pose,
+  after: Pose,
+  config: Readonly<CounterballConfig>,
+): number {
+  const { geometry } = config;
+  const scale = Math.max(
+    1,
+    Math.abs(geometry.goalWidth / 2),
+    Math.abs(geometry.goalFrameRadius),
+    Math.abs(geometry.goalHeight),
+    Math.abs(geometry.surfaceY),
+    Math.abs(before.position.x),
+    Math.abs(after.position.x),
+    Math.abs(before.position.y),
+    Math.abs(after.position.y),
+    Math.abs(geometry.buttonRadius),
+    Math.abs(geometry.buttonThickness / 2),
+  );
+  return 64 * Number.EPSILON * scale;
+}
 
 function goalMouthClearance(
   pose: Pose,
@@ -775,6 +814,11 @@ function provesGoalPassageClear(
     after.rotation,
   );
   const dimensions = { radius, height };
+  const roundoffAllowance = goalMouthRoundoffAllowance(
+    before,
+    after,
+    config,
+  );
   const horizontalLipschitz = clearanceLipschitzBound(
     Math.abs(after.position.x - before.position.x),
     dimensions,
@@ -799,9 +843,9 @@ function provesGoalPassageClear(
     );
     if (
       !Object.values(clearance).every(Number.isFinite) ||
-      clearance.left <= 0 ||
-      clearance.right <= 0 ||
-      clearance.top <= 0 ||
+      clearance.left <= roundoffAllowance ||
+      clearance.right <= roundoffAllowance ||
+      clearance.top <= roundoffAllowance ||
       clearance.bottom < 0
     ) {
       return false;
@@ -809,9 +853,9 @@ function provesGoalPassageClear(
 
     const halfWidth = (high - low) / 2;
     if (
-      clearance.left - horizontalLipschitz * halfWidth > 0 &&
-      clearance.right - horizontalLipschitz * halfWidth > 0 &&
-      clearance.top - verticalLipschitz * halfWidth > 0 &&
+      clearance.left - horizontalLipschitz * halfWidth > roundoffAllowance &&
+      clearance.right - horizontalLipschitz * halfWidth > roundoffAllowance &&
+      clearance.top - verticalLipschitz * halfWidth > roundoffAllowance &&
       clearance.bottom - verticalLipschitz * halfWidth >= 0
     ) {
       return true;
@@ -895,6 +939,10 @@ function compareEntity(a: EntityId, b: EntityId): number {
   return compareNumber(entityOrder.get(a) ?? 0, entityOrder.get(b) ?? 0);
 }
 
+function compareEntityIdLexically(a: EntityId, b: EntityId): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 function compareFacts(a: SimulationFact, b: SimulationFact): number {
   const stepOrder = compareNumber(a.step, b.step);
   if (stepOrder !== 0) {
@@ -916,8 +964,8 @@ function compareFacts(a: SimulationFact, b: SimulationFact): number {
 
   if (a.type === "contact" && b.type === "contact") {
     return (
-      compareEntity(a.a, b.a) ||
-      compareEntity(a.b, b.b) ||
+      compareEntityIdLexically(a.a, b.a) ||
+      compareEntityIdLexically(a.b, b.b) ||
       compareNumber(a.point.x, b.point.x) ||
       compareNumber(a.point.y, b.point.y) ||
       compareNumber(a.point.z, b.point.z)
@@ -972,7 +1020,12 @@ export function deriveSimulationFacts(
         `Simulation facts exceed the ${maximumFactCount}-fact protocol limit.`,
       );
     }
-    facts.push(fact);
+    const canonicalPoint = {
+      x: point.x === 0 ? 0 : point.x,
+      y: point.y === 0 ? 0 : point.y,
+      z: point.z === 0 ? 0 : point.z,
+    };
+    facts.push({ ...fact, point: canonicalPoint });
   };
 
   for (let index = 1; index < normalized.length; index += 1) {

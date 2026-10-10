@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-74 bounded cards cover 21 remaining parents. Initially ready: C01, T02-F01-ROTATION-1, T02-F01-ROTATION-1-FORMAT-REPAIR-1.
+76 bounded cards cover 21 remaining parents. Initially ready: C01, T02-F01-ROTATION-1, T02-F01-ROTATION-1-FORMAT-REPAIR-1, T02-F01-ROTATION-1-SEMANTIC-REPAIR-2.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -50,6 +50,8 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-E01 | T02 | Export the real WASM browser runner factory | worker | T02-R01, C00, C03, C01-H, T02-P01, T02-BR01 | 1 |
 | T02-F01-ROTATION-1-FORMAT-ESCALATION-1 | T02 | Classify the hosted formatting failure before any source retry | coordinator | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 0 |
 | T02-F01-ROTATION-1-FORMAT-REPAIR-1 | T02 | Apply only the independently approved F01 formatting artifact | worker | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00, T02-F01-ROTATION-1-FORMAT-ESCALATION-1 | 2 |
+| T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1 | T02 | Classify seven exact-head fact failures before another source edit | coordinator | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00, T02-F01-ROTATION-1-FORMAT-ESCALATION-1 | 0 |
+| T02-F01-ROTATION-1-SEMANTIC-REPAIR-2 | T02 | Repair seven exact-head simulation fact failures without weakening the crossing proof | worker | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00, T02-F01-ROTATION-1-FORMAT-ESCALATION-1, T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1 | 2 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
 | O02 | T04 | Build restricted real-WASM smoke Durable Object | coordinator | C00, O01, parent:T02, C01 | 5 |
 | O03 | T04 | Prove deployed staging WASM before online authority | coordinator | O02, C01 | 4 |
