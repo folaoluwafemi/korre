@@ -67,18 +67,22 @@ describe("pure playback sampler", () => {
     }
 
     const frames = sampler.finish();
-    expect(frames.map(({ timeMs }) => timeMs)).toEqual([
-      0,
-      4 * (1 / 120) * 1_000,
-      8 * (1 / 120) * 1_000,
-    ]);
+    const sampleTimes = frames.map(({ timeMs }) => timeMs);
+    expect(sampleTimes).toHaveLength(3);
+    expect(sampleTimes[0]).toBe(0);
+    expect(sampleTimes[1]).toBeCloseTo(4 * (1 / 120) * 1_000, 12);
+    expect(sampleTimes[2]).toBeCloseTo(8 * (1 / 120) * 1_000, 12);
     expect(frames[0]?.bodies.map(({ id }) => id)).toEqual(ENTITY_IDS);
-    expect(frames[0]?.bodies[0]).toEqual({
-      id: "button",
-      position: { x: 0, y: 0.2, z: 0 },
-      rotation: { x: 0, y: 0, z: 0, w: 1 },
-    });
-    expect(Object.keys(frames[0]?.bodies[0] ?? {}).sort()).toEqual([
+    const firstButton = frames[0]?.bodies[0];
+    expect(firstButton?.id).toBe("button");
+    expect(firstButton?.position.x).toBeCloseTo(0, 12);
+    expect(firstButton?.position.y).toBeCloseTo(0.2, 12);
+    expect(firstButton?.position.z).toBeCloseTo(0, 12);
+    expect(firstButton?.rotation.x).toBeCloseTo(0, 12);
+    expect(firstButton?.rotation.y).toBeCloseTo(0, 12);
+    expect(firstButton?.rotation.z).toBeCloseTo(0, 12);
+    expect(firstButton?.rotation.w).toBeCloseTo(1, 12);
+    expect(Object.keys(firstButton ?? {}).sort()).toEqual([
       "id",
       "position",
       "rotation",

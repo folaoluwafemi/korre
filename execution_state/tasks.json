@@ -312,6 +312,19 @@
           "detail": "On commit d9881f3b2ff48e9bf016e7423348bfcee3595454, workspace/root typecheck and ESLint passed; hosted Prettier reported only games/counterball/src/simulation/sampling.ts and sampling.test.ts. Unit tests/build, calibration observations, integration, and E2E did not run. Formatting repair 1 is in progress."
         },
         {
+          "command": "GitHub Actions run #12: pnpm verify, integration, and one-worker Chromium E2E",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "On commit e8c22a7b9baca76343be05fd97a40343db4e3111, workspace/root typecheck, ESLint, and Prettier passed. The sampler suite reported 11 passing and one failing test in its canonical-order/pose-only case; 8 PostgreSQL tests were skipped. Build/calibration, integration, and E2E did not run. The hosted log did not preserve assertion-level failure detail; bounded test repair 1 is in progress."
+        },
+        {
+          "command": "git diff --check after T02-C2 test repair 1",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 1,
+          "detail": "No whitespace errors in the scoped canonical-order/pose-only test assertion diff."
+        },
+        {
           "command": "pnpm.cmd exec prettier --write games/counterball/src/simulation/sampling.ts games/counterball/src/simulation/sampling.test.ts",
           "result": "PASS",
           "exit_code": 0,
@@ -515,9 +528,18 @@
           "implementation_report": "execution_state/reports/T02-C2-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-C2-format-repair-1-review.md",
           "evidence": "Hosted run #11 typecheck and ESLint passed but Prettier named only the two C2 sampler files. The pinned formatter and scoped git diff --check passed; independent source review PASS at execution_state/reports/T02-C2-format-repair-1-review.md confirms five formatting-only hunks. No unit tests, build, integration, E2E, or calibration probe ran in run #11. Fresh hosted acceptance gates remain pending."
+        },
+        {
+          "id": "T02-C2-test-repair-1",
+          "status": "IMPLEMENTED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T02-C2-test-repair-1.md",
+          "implementation_report": "execution_state/reports/T02-C2-test-repair-1-implementation.md",
+          "review_report": "execution_state/reports/T02-C2-test-repair-1-review.md",
+          "evidence": "Coordinator changed only numeric assertions in the failing canonical-order/pose-only test to component-wise 12-place comparisons; sampler source and other tests are unchanged. Independent review PASS at execution_state/reports/T02-C2-test-repair-1-review.md confirms the cadence/count, exact t=0, canonical IDs, pose-only shape, and all pose values remain checked. Hosted run #12 assertion-level detail was unavailable. No local tests/builds ran; fresh hosted acceptance gates are pending."
         }
       ],
-      "next_action": "Push the independently reviewed C2 formatting repair and rerun hosted verify, integration, and one-worker browser tests. C0 test repair and C2 source have independent PASS reviews; neither is accepted until those hosted gates pass. After C0 is accepted, run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. Then define bounded versioned config/cancellation decisions, implement canonical facts and the runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "Push independently reviewed C2 test repair 1 for hosted verify, integration, and one-worker browser tests. C0 test repair and C2 source have independent PASS reviews; neither is accepted until all hosted gates pass. After C0 is accepted, run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. Then define bounded versioned config/cancellation decisions, implement canonical facts and the runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",
