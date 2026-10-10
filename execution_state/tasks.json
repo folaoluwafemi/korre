@@ -882,7 +882,7 @@
         },
         {
           "id": "C00-B",
-          "status": "RUNNING",
+          "status": "ACCEPTED",
           "depends_on": [
             "parent:T01",
             "C00-A"
@@ -899,7 +899,7 @@
           ],
           "owner": "coordinator",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/swarm_review (source and formatting-repair PASS); /root/toolchain_audit (run 38080345526 CHANGES_REQUIRED)",
+          "reviewer_identity": "/root/swarm_review (source and formatting-repair PASS); /root/toolchain_audit (run 38080651730 exact-head PASS)",
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/C00-B-implementation.md",
           "review_report": "execution_state/reports/C00-B-review.md",
@@ -974,18 +974,53 @@
             },
             {
               "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
-              "result": "NOT RUN",
-              "environment": "GitHub required",
-              "detail": "Packet-owned focused protocol suite; application tests stay remote-only."
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080651730",
+              "exit_code": 0,
+              "detail": "Exact SHA 63c8cdb379a508fa9333d2ec6f3c510739a8e0ac; one file, 11/11 tests passed, no skips reported."
             },
             {
               "command": "pnpm verify",
-              "result": "NOT RUN",
-              "environment": "GitHub required",
-              "detail": "Exact reviewed commit must pass hosted typecheck, lint/format, unit tests, and build."
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080651730",
+              "exit_code": 0,
+              "detail": "Exact SHA 63c8cdb379a508fa9333d2ec6f3c510739a8e0ac; typecheck, lint/format and build passed; 24 files/100 tests passed, no skipped-test line."
+            },
+            {
+              "command": "Disposable PostgreSQL migration recheck",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080651730",
+              "exit_code": 0,
+              "detail": "One forward-only migration verified twice on the disposable CI PostgreSQL service."
+            },
+            {
+              "command": "pnpm test:integration",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080651730",
+              "exit_code": 0,
+              "detail": "1 integration file and 1/1 test passed."
+            },
+            {
+              "command": "pnpm test:e2e --workers=1",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38080651730",
+              "exit_code": 0,
+              "detail": "4 Chromium tests passed; exact-run JSON: 0 skipped, 0 unexpected, 0 flaky."
+            },
+            {
+              "command": "Independent C00-B exact-head hosted runtime review",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-B-runtime-review-run-38080651730.md",
+              "detail": "Verified exact SHA, focused/full counts, artifacts and scope limits; C00-B contract/schema scope passes, but T02 remains open."
+            },
+            {
+              "command": "GitHub artifact retrieval and metadata",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-B-runtime-review-run-38080651730.md",
+              "detail": "Five artifacts recorded by exact ID, size and GitHub SHA-256; downloaded evidence retained under execution_state/reports/C00-B-run-38080651730/."
             }
           ],
-          "next_action": "Formatting repair 1 passed independent source review. Commit the reviewed two-file diff plus run evidence; rerun the focused suite and pnpm verify on GitHub, then obtain exact-head independent review."
+          "next_action": "C00-B accepted for protocol calibration shape/schema and frozen contracts only. Runner null rejection, actual substeps, candidate diagnostics, settling and physical traversal remain T02 runtime requirements. C00 contract-preparation acceptance is now the next coordinator card."
         },
         {
           "id": "C00-B-format-repair-1",
@@ -1001,9 +1036,176 @@
           "reviewer_identity": "/root/swarm_review (independent source review PASS)",
           "attempt_count": 1,
           "evidence": "Applied the exact formatting-only GitHub artifact patch after failed run 38080345526; git apply --check and git diff --check passed; independent source review PASS. Fresh hosted checks remain required."
+        },
+        {
+          "id": "C00",
+          "status": "ACCEPTED",
+          "owner": "coordinator",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review (independent handoff review PASS)",
+          "depends_on": [
+            "parent:T01",
+            "C00-B"
+          ],
+          "write_paths": [],
+          "implementation_report": "execution_state/reports/C00-contract-preparation-implementation.md",
+          "review_report": "execution_state/reports/C00-contract-preparation-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C00",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact coordinator handoff record extracted after C00-B and required parent T01 were accepted."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Plan consistency only; no implementation/runtime check ran."
+            },
+            {
+              "command": "Parse execution_state/tasks.json",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Task file loaded successfully after materializing C00 handoff review."
+            },
+            {
+              "command": "Independent C00 handoff review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C00-contract-preparation-review.md",
+              "detail": "Accepted C00-A/B exact-head source/runtime evidence and concrete canonical contracts for T02-F01. Acceptance is limited to contract/schema preparation; parent T02 remains RUNNING."
+            }
+          ],
+          "next_action": "C00 accepted for contract/schema preparation only after independent review. T02-F01 is the next producer card and is now assigned; parent T02 remains RUNNING."
+        },
+        {
+          "id": "C01",
+          "status": "IMPLEMENTING",
+          "packet": "execution_state/packets/C01.md",
+          "owner": "coordinator",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review (independent source/config review PASS)",
+          "depends_on": [
+            "parent:T01",
+            "C00"
+          ],
+          "write_paths": [
+            ".github/workflows/ci.yml",
+            "vitest.config.ts",
+            "vitest.workers.config.ts",
+            "package.json",
+            "pnpm-lock.yaml",
+            "execution_state/packets/C01.md",
+            "execution_state/reports/C01-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/C01-implementation.md",
+          "review_report": "execution_state/reports/C01-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C01",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact coordinator record reports ready after accepted dependencies."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Completion plan consistency only; no runtime check."
+            },
+            {
+              "command": "pnpm.cmd install --lockfile-only --ignore-scripts",
+              "result": "PASS",
+              "environment": "local-metadata",
+              "detail": "Pinned Worker Vitest plugin metadata resolved with zero package downloads/additions; no app install/build/test ran."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Re-run after the final C01 workflow, inventory provenance, and report edits; no whitespace errors. No application check."
+            },
+            {
+              "command": "Independent C01 source/config review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-review.md",
+              "detail": "Workerd test wiring, generated protected secrets, hosted logs, and artifact inventories pass source review. Exact-head hosted execution and inventory/hash inspection remain pending. Diagnostic-browser acceptance remains open."
+            }
+          ],
+          "next_action": "Run the source-reviewed commit on GitHub, inspect logs and actual artifacts/hash inventories, and keep C01 IMPLEMENTING until exact-hosted evidence plus a real diagnostic browser producer are complete."
+        },
+        {
+          "id": "T02-F01",
+          "status": "CHANGES_REQUIRED",
+          "packet": "execution_state/packets/T02-F01-facts.md",
+          "owner": "/root/toolchain_audit initial implementation; /root/swarm_review independent review CHANGES_REQUIRED",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/swarm_review (independent review CHANGES_REQUIRED)",
+          "depends_on": [
+            "parent:T01",
+            "T02-C0",
+            "T02-C2",
+            "C00-A",
+            "C00"
+          ],
+          "write_paths": [
+            "games/counterball/src/simulation/facts.ts",
+            "games/counterball/src/simulation/facts.test.ts",
+            "execution_state/reports/T02-F01-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/T02-F01-implementation.md",
+          "review_report": "execution_state/reports/T02-F01-review.md",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C00",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "C00 reported ready after T01/C00-B prerequisites were accepted; handoff review subsequently passed."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-F01",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact F01 record reports ready=true after ACCEPTED T02-C0, T02-C2, C00-A, C00 and parent T01."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Plan consistency only; no application implementation/runtime check."
+            },
+            {
+              "command": "Independent T02-F01 source review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-F01-review.md",
+              "detail": "Found stale goal-mouth classification at trailing support, and equal-sign endpoint clearances can hide a rotational exit/re-entry. Exact reproducers and required regressions are in the report; no local app checks ran."
+            }
+          ],
+          "next_action": "Complete the bounded repair in execution_state/packets/T02-F01-repair-1.md; preserve the original API, dependencies and tests. Keep T02-F01 unaccepted until fresh independent review and hosted checks pass."
+        },
+        {
+          "id": "T02-F01-repair-1",
+          "parent": "T02-F01",
+          "status": "RUNNING",
+          "packet": "execution_state/packets/T02-F01-repair-1.md",
+          "owner": "/root/toolchain_audit implementing; /root/foundation_review independent re-review",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review (independent re-review after implementation report)",
+          "attempt_count": 1,
+          "write_paths": [
+            "games/counterball/src/simulation/facts.ts",
+            "games/counterball/src/simulation/facts.test.ts",
+            "execution_state/reports/T02-F01-repair-1-implementation.md"
+          ],
+          "implementation_report": "execution_state/reports/T02-F01-repair-1-implementation.md",
+          "review_report": "execution_state/reports/T02-F01-repair-1-review.md",
+          "next_action": "Repair both geometric defects and add the required regressions. Save the report, stop, and request independent re-review. All app checks run on GitHub."
         }
       ],
-      "next_action": "C00-B first hosted run 38080345526 passed its focused 11-test suite and typechecks, then failed Prettier on two owned files. Formatting repair 1 is applied and under independent review; rerun hosted checks before accepting C00-B or preparing C00. Parent T02 remains RUNNING."
+      "next_action": "C00 is ACCEPTED for contract/schema scope. T02-F01 pure fact producer is IMPLEMENTING on exact source/test paths; hosted checks and independent review are pending. Parent T02 remains RUNNING."
     },
     {
       "id": "T03",

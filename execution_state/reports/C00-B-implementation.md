@@ -1,6 +1,6 @@
 # C00-B implementation report
 
-Status: source implemented and independent source review passed; the first hosted attempt failed only on formatting, and repair 1 is awaiting independent review plus a fresh hosted run.
+Status: ACCEPTED for calibration contract/schema scope after exact-head GitHub verification and independent source/runtime review. T02 runtime behavior remains unaccepted.
 
 ## Changes
 
@@ -26,12 +26,14 @@ The frozen guard uses a conservative energy bound and per-body `vBound`, `omegaB
 - `execution_state/tasks.json` JSON parse: PASS.
 - `git diff --check`: PASS.
 - Independent source review: PASS at `execution_state/reports/C00-B-review.md`. The review confirms the schema/contract scope and explicitly leaves calibrated-runner behavior, candidate diagnostic labels, runtime substeps, and physical settling unverified for their implementation packets.
-- No application tests, install, build, browser automation, deployment, or physics run was performed locally. The required focused protocol suite and `pnpm verify` remain pending on GitHub.
+- No application tests, install, build, browser automation, deployment, or physics run was performed locally. Required checks ran on GitHub as recorded below.
 
 ## Scope limits
 
 The simulation runner is not implemented yet. Therefore this packet has no runtime evidence that a calibrated runner rejects null, executes bounded substeps, or settles entities on the apron. Those are requirements for the runner and T02 parent gates; C00-B does not accept T02 or claim a playable game. All tuning remains provisional, and `physicsCalibration` remains null in the shipping fixture until measured values and a new config hash are accepted.
 
-The reviewer also confirmed that the pinned Babylon API issues one Havok world step per call. Hosted tests must still verify the changed protocol source and all workspace consumers on the exact pushed commit. No parent or runtime gate is accepted by this source review.
+The source reviewer confirmed that the pinned Babylon API issues one Havok world step per call. C00-B freezes the required explicit substep contract; it does not implement that runtime.
 
-The first hosted attempt was run 38080345526 on `ba59e5a40a6b2877b8be452936db73f9a64a3168`. The focused protocol suite passed 11/11 with no skips; typechecks passed; Prettier failed on `protocol.test.ts` and `schemas.ts`, so unit tests/build and later integration/browser steps did not run. Independent run review is CHANGES_REQUIRED. The formatter's exact two-file patch was applied under repair 1; see `C00-B-format-repair-1-implementation.md`. Fresh hosted checks are pending.
+The first hosted attempt was run 38080345526 on `ba59e5a40a6b2877b8be452936db73f9a64a3168`. It passed the focused 11-test suite and typechecks, then failed Prettier on `protocol.test.ts` and `schemas.ts`. The GitHub patch was applied as repair 1; see `C00-B-format-repair-1-implementation.md` and its independent review.
+
+The repaired exact source SHA `63c8cdb379a508fa9333d2ec6f3c510739a8e0ac` passed GitHub run 38080651730: focused protocol 11/11; `pnpm verify` with typecheck/lint/format/build and 24 test files/100 tests; disposable PostgreSQL migration twice; integration 1/1; and Chromium 4/4 with zero skipped, unexpected or flaky tests. Independent exact-head review PASS is `C00-B-runtime-review-run-38080651730.md`. Full logs, the production browser artifact, browser JSON, and diagnostic artifacts are downloaded under `C00-B-run-38080651730/` and their GitHub IDs/hashes are recorded in that review.

@@ -39,15 +39,53 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Create protected disposable identity test secrets
+        shell: bash
+        run: |
+          set +x
+          declare -A seen=()
+          for name in IDENTITY_SERVICE_SECRET IDENTITY_CSRF_SECRET IDENTITY_RATE_LIMIT_SECRET; do
+            value="$(openssl rand -hex 32)"
+            while [[ -n "${seen[$value]+present}" ]]; do
+              value="$(openssl rand -hex 32)"
+            done
+            seen["$value"]=1
+            printf '::add-mask::%s\n' "$value"
+            printf '%s=%s\n' "$name" "$value" >> "$GITHUB_ENV"
+          done
+      - name: Smoke-test the dedicated Workers runtime
+        run: |
+          mkdir -p .artifacts apps/realtime/tests
+          cat > apps/realtime/tests/ci-smoke.worker.test.mjs <<'EOF'
+          import { env } from "cloudflare:workers";
+          import { expect, it } from "vitest";
+
+          it("runs in the Workers runtime and reads its binding", () => {
+            expect(env.COUNTERBALL_CI_SMOKE).toBe("worker-runtime-smoke-ok");
+          });
+          EOF
+          trap 'rm -f apps/realtime/tests/ci-smoke.worker.test.mjs' EXIT
+          set -o pipefail
+          pnpm test:workers 2>&1 | tee .artifacts/workers.log
+      - name: Check workflow and root test config formatting
+        run: |
+          mkdir -p .artifacts
+          set -o pipefail
+          pnpm exec prettier --check .github/workflows/ci.yml vitest.config.ts vitest.workers.config.ts package.json 2>&1 | tee .artifacts/tooling-format.log
       - run: pnpm exec playwright install --with-deps chromium
       - name: Apply and recheck migrations on disposable PostgreSQL
         env:
           DATABASE_URL: postgres://korre:ci-disposable-only@127.0.0.1:5432/korre_test
         run: |
-          pnpm --filter @korre/api db:migrate
-          pnpm --filter @korre/api db:migrate
+          mkdir -p .artifacts
+          set -o pipefail
+          pnpm --filter @korre/api db:migrate 2>&1 | tee .artifacts/migrations.log
+          pnpm --filter @korre/api db:migrate 2>&1 | tee -a .artifacts/migrations.log
       - name: Run focused game protocol contract tests
-        run: pnpm exec vitest run packages/game-protocol/src/protocol.test.ts
+        run: |
+          mkdir -p .artifacts
+          set -o pipefail
+          pnpm exec vitest run packages/game-protocol/src/protocol.test.ts 2>&1 | tee .artifacts/protocol.log
       - name: Verify
         env:
           COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
@@ -56,6 +94,125 @@ jobs:
           mkdir -p .artifacts
           set -o pipefail
           pnpm verify 2>&1 | tee .artifacts/verify.log
+      - name: Package the exact dry-run Worker build
+        run: |
+          mkdir -p .artifacts/realtime-prebuilt/dist
+          cp -R apps/realtime/dist/. .artifacts/realtime-prebuilt/dist/
+          cp apps/realtime/wrangler.toml .artifacts/realtime-prebuilt/wrangler.toml
+          node --input-type=module <<'NODE'
+          import { createHash } from "node:crypto";
+          import { readdir, readFile, writeFile } from "node:fs/promises";
+          import path from "node:path";
+          import { execFileSync } from "node:child_process";
+
+          const root = ".artifacts/realtime-prebuilt";
+          const dist = path.join(root, "dist");
+          const files = [];
+          async function walk(directory) {
+            for (const item of await readdir(directory, { withFileTypes: true })) {
+              const absolute = path.join(directory, item.name);
+              if (item.isDirectory()) await walk(absolute);
+              else if (item.isFile()) files.push(absolute);
+            }
+          }
+          await walk(dist);
+          if (files.length === 0) throw new Error("Wrangler emitted no Worker files.");
+          const sourceConfig = await readFile("apps/realtime/wrangler.toml", "utf8");
+          const sourceMain = sourceConfig.match(/^main\s*=\s*"([^"]+)"/m)?.[1];
+          if (!sourceMain) throw new Error("Cannot identify the configured Worker entry source.");
+          const entryName = path.basename(sourceMain).replace(/\.[^.]+$/, ".js");
+          const entryPath = path.posix.join("dist", entryName);
+          if (!files.some((file) => path.relative(root, file).split(path.sep).join("/") === entryPath)) {
+            throw new Error(`Wrangler output is missing the expected entry ${entryPath}.`);
+          }
+          const rootPackage = JSON.parse(await readFile("package.json", "utf8"));
+          const gamePackage = JSON.parse(await readFile("games/counterball/package.json", "utf8"));
+          const emittedFiles = await Promise.all(files.map(async (file) => {
+            const bytes = await readFile(file);
+            return {
+              path: path.relative(root, file).split(path.sep).join("/"),
+              size: bytes.length,
+              sha256: createHash("sha256").update(bytes).digest("hex"),
+            };
+          }));
+          const configBytes = await readFile(path.join(root, "wrangler.toml"));
+          const inventory = {
+            sourceSha: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            buildMode: "wrangler-dry-run",
+            entrySource: sourceMain,
+            entryPath,
+            pinnedVersions: {
+              node: process.version,
+              pnpm: execFileSync("pnpm", ["--version"], { encoding: "utf8" }).trim(),
+              wrangler: rootPackage.devDependencies.wrangler,
+              babylonCore: gamePackage.dependencies["@babylonjs/core"],
+              havok: gamePackage.dependencies["@babylonjs/havok"],
+            },
+            wranglerConfig: {
+              path: "wrangler.toml",
+              sha256: createHash("sha256").update(configBytes).digest("hex"),
+            },
+            emittedFiles,
+          };
+          await writeFile(path.join(root, "inventory.json"), `${JSON.stringify(inventory, null, 2)}\n`);
+          NODE
+      - name: Upload the verified prebuilt Worker and inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterball-realtime-prebuilt-${{ github.sha }}
+          path: .artifacts/realtime-prebuilt/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
+      - name: Package the production browser build
+        run: |
+          mkdir -p .artifacts/web-production
+          cp -R apps/web/dist/. .artifacts/web-production/
+          node --input-type=module <<'NODE'
+          import { createHash } from "node:crypto";
+          import { readdir, readFile, writeFile } from "node:fs/promises";
+          import path from "node:path";
+
+          const root = ".artifacts/web-production";
+          const files = [];
+          async function walk(directory) {
+            for (const item of await readdir(directory, { withFileTypes: true })) {
+              const absolute = path.join(directory, item.name);
+              if (item.isDirectory()) await walk(absolute);
+              else if (item.isFile()) files.push(absolute);
+            }
+          }
+          await walk(root);
+          if (!files.some((file) => path.basename(file) === "index.html")) {
+            throw new Error("Production browser build is missing index.html.");
+          }
+          const emittedFiles = await Promise.all(files.map(async (file) => {
+            const bytes = await readFile(file);
+            return {
+              path: path.relative(root, file).split(path.sep).join("/"),
+              size: bytes.length,
+              sha256: createHash("sha256").update(bytes).digest("hex"),
+            };
+          }));
+          await writeFile(path.join(root, "build-inventory.json"), `${JSON.stringify({
+            sourceSha: process.env.GITHUB_SHA,
+            runId: process.env.GITHUB_RUN_ID,
+            runAttempt: process.env.GITHUB_RUN_ATTEMPT,
+            buildMode: "production",
+            devHarnessFlag: "unset",
+            emittedFiles,
+          }, null, 2)}\n`);
+          NODE
+      - name: Upload the exact production browser build and inventory
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterball-web-production-${{ github.sha }}
+          path: .artifacts/web-production/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: error
       - name: Preserve full verification log
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,11 +234,16 @@ jobs:
           name: counterball-intended-shot-observations
           path: .artifacts/counterball-intended-shot-observations.json
           if-no-files-found: ignore
-      - run: pnpm test:integration
+      - name: Run integration tests
+        run: |
+          set -o pipefail
+          pnpm test:integration 2>&1 | tee .artifacts/integration.log
       - name: Test the built browser preview
         env:
           COUNTERBALL_PREBUILT_PREVIEW: "1"
-        run: pnpm test:e2e --workers=1
+        run: |
+          set -o pipefail
+          pnpm test:e2e --workers=1 2>&1 | tee .artifacts/e2e.log
       - name: Upload browser preview built on GitHub
         uses: actions/upload-artifact@v4
         with:
@@ -98,6 +260,17 @@ jobs:
             test-results/
             .artifacts/browser-test-results.json
           include-hidden-files: true
+          if-no-files-found: ignore
+      - name: Upload complete hosted check logs and structured browser results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: counterball-hosted-checks-${{ github.sha }}-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
+          path: |
+            .artifacts/*.log
+            .artifacts/browser-test-results.json
+          include-hidden-files: true
+          retention-days: 14
           if-no-files-found: ignore
       - name: Prepare formatting suggestion after a failed check
         if: failure()
