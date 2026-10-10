@@ -2,7 +2,7 @@ import { createRequire } from "node:module";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine.js";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector.js";
+import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector.js";
 import {
   PhysicsEngineV2,
   PhysicsMaterialCombineMode,
@@ -14,7 +14,6 @@ import {
   COUNTERBALL_CONFIG_V1,
   ENTITY_IDS,
   parseMatchState,
-  type EntityId,
   type MatchState,
   type Vec3,
 } from "@korre/game-protocol";
@@ -121,20 +120,6 @@ async function readInitialState(): Promise<MatchState> {
 
 function asPlainVector(vector: Vector3): Vec3 {
   return { x: vector.x, y: vector.y, z: vector.z };
-}
-
-function asPlainQuaternion(quaternion: Quaternion): {
-  x: number;
-  y: number;
-  z: number;
-  w: number;
-} {
-  return {
-    x: quaternion.x,
-    y: quaternion.y,
-    z: quaternion.z,
-    w: quaternion.w,
-  };
 }
 
 function createControlledState(
@@ -304,6 +289,8 @@ function runTrial(
   let world: CounterballWorld | undefined;
   const removeObservers: Array<() => void> = [];
   let trialFailed = false;
+  let trialError: unknown;
+  let result: TrialObservation | undefined;
 
   try {
     const tiltRadians = (tiltDegrees * Math.PI) / 180;
@@ -318,22 +305,29 @@ function runTrial(
         COUNTERBALL_CONFIG_V1.simulation.gravity.z,
       ),
     });
+    const trialWorld = world;
+    if (trialWorld === undefined) {
+      throw new Error("Probe world construction returned no world.");
+    }
 
-    const physicsEngine = world.scene.getPhysicsEngine();
+    const physicsEngine = trialWorld.scene.getPhysicsEngine();
     if (!(physicsEngine instanceof PhysicsEngineV2)) {
       throw new Error("Probe world has no concrete Physics V2 engine.");
     }
     if (physicsEngine.getTimeStep() !== fixedStepSeconds) {
       throw new Error("Probe world did not use the canonical fixed step.");
     }
-    if (!world.plugin.isSupported() || world.bodies.size !== ENTITY_IDS.length) {
+    if (
+      !trialWorld.plugin.isSupported() ||
+      trialWorld.bodies.size !== ENTITY_IDS.length
+    ) {
       throw new Error("Probe did not create a supported 15-body Havok world.");
     }
 
-    const selectedCap = world.bodies.get(selectedCapId);
-    const button = world.bodies.get("button");
-    const obstacle = world.bodies.get(obstacleCapId);
-    const surface = world.staticBodies[0];
+    const selectedCap = trialWorld.bodies.get(selectedCapId);
+    const button = trialWorld.bodies.get("button");
+    const obstacle = trialWorld.bodies.get(obstacleCapId);
+    const surface = trialWorld.staticBodies[0];
     if (
       selectedCap === undefined ||
       button === undefined ||
@@ -353,10 +347,10 @@ function runTrial(
     const buttonStart = button.transformNode.position.clone();
     const obstacleStart = obstacle.transformNode.position.clone();
     const bodyNames = new Map<string, string>();
-    for (const [id, body] of world.bodies) {
+    for (const [id, body] of trialWorld.bodies) {
       bodyNames.set(body.transformNode.name, id);
     }
-    for (const body of world.staticBodies) {
+    for (const body of trialWorld.staticBodies) {
       bodyNames.set(
         body.transformNode.name,
         `static:${body.transformNode.name}`,
@@ -393,14 +387,14 @@ function runTrial(
       contacts.push({ step: currentStep, pair, type: eventType, point });
     };
 
-    for (const body of world.bodies.values()) {
+    for (const body of trialWorld.bodies.values()) {
       body.setCollisionCallbackEnabled(true);
       const observable = body.getCollisionObservable();
       const observer = observable.add(observeContact);
       removeObservers.push(() => observable.remove(observer));
     }
 
-    const zeroVelocityBeforeImpulse = [...world.bodies.values()].every(
+    const zeroVelocityBeforeImpulse = [...trialWorld.bodies.values()].every(
       (body) =>
         body.getLinearVelocity().length() === 0 &&
         body.getAngularVelocity().length() === 0,
@@ -454,14 +448,15 @@ function runTrial(
       COUNTERBALL_CONFIG_V1.geometry.buttonRadius +
       COUNTERBALL_CONFIG_V1.geometry.capRadius;
 
-    let stepFailure: unknown;
-    let hasStepFailure = false;
-    try {
+    const measureSteps = (): void => {
       for (let step = 1; step <= maximumSteps; step += 1) {
         currentStep = step;
-        world.plugin.executeStep(fixedStepSeconds, physicsEngine.getBodies());
+        trialWorld.plugin.executeStep(
+          fixedStepSeconds,
+          physicsEngine.getBodies(),
+        );
         simulatedSeconds = step * fixedStepSeconds;
-        assertFiniteWorldBodies(world, step);
+        assertFiniteWorldBodies(trialWorld, step);
 
         const capPosition = selectedCap.transformNode.position;
         const buttonPosition = button.transformNode.position;
@@ -532,7 +527,7 @@ function runTrial(
                 );
         }
 
-        const allBodiesQuiet = [...world.bodies.values()].every(
+        const allBodiesQuiet = [...trialWorld.bodies.values()].every(
           (body) =>
             body.getLinearVelocity().length() <=
               COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold &&
@@ -551,29 +546,8 @@ function runTrial(
         previousCapPosition = capPosition.clone();
         previousButtonPosition = buttonPosition.clone();
       }
-    } catch (error) {
-      hasStepFailure = true;
-      stepFailure = error;
-    } finally {
-      // Drain observers here so the outer cleanup does not release them twice.
-      const observerCleanupErrors: unknown[] = [];
-      for (const removeObserver of removeObservers.splice(0).reverse()) {
-        try {
-          removeObserver();
-        } catch (error) {
-          observerCleanupErrors.push(error);
-        }
-      }
-      if (observerCleanupErrors.length > 0 && !hasStepFailure) {
-        throw new AggregateError(
-          observerCleanupErrors,
-          "Intended-shot collision observer cleanup failed.",
-        );
-      }
-    }
-    if (hasStepFailure) {
-      throw stepFailure;
-    }
+    };
+    measureSteps();
 
     contacts.sort(
       (left, right) =>
@@ -592,7 +566,7 @@ function runTrial(
         ? null
         : maximumSignedClearanceWithinCombinedRadius >= clearanceEpsilon;
 
-    return {
+    result = {
       key: `tilt=${tiltDegrees}|impulse=${impulseMagnitude}`,
       friction,
       restitution,
@@ -634,30 +608,47 @@ function runTrial(
     };
   } catch (error) {
     trialFailed = true;
-    throw error;
-  } finally {
-    const cleanupErrors: unknown[] = [];
-    for (const removeObserver of removeObservers.reverse()) {
-      try {
-        removeObserver();
-      } catch (error) {
-        cleanupErrors.push(error);
-      }
-    }
+    trialError = error;
+  }
+
+  const cleanupErrors: unknown[] = [];
+  for (const removeObserver of removeObservers.splice(0).reverse()) {
     try {
-      world?.dispose();
+      removeObserver();
     } catch (error) {
       cleanupErrors.push(error);
-    }
-    try {
-      engine.dispose();
-    } catch (error) {
-      cleanupErrors.push(error);
-    }
-    if (cleanupErrors.length > 0 && !trialFailed) {
-      throw new AggregateError(cleanupErrors, "Intended-shot probe cleanup failed.");
     }
   }
+  try {
+    world?.dispose();
+  } catch (error) {
+    cleanupErrors.push(error);
+  }
+  try {
+    engine.dispose();
+  } catch (error) {
+    cleanupErrors.push(error);
+  }
+
+  if (trialFailed) {
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError(
+        [trialError, ...cleanupErrors],
+        "Intended-shot probe failed and cleanup also reported errors.",
+      );
+    }
+    throw trialError;
+  }
+  if (cleanupErrors.length > 0) {
+    throw new AggregateError(
+      cleanupErrors,
+      "Intended-shot probe cleanup failed.",
+    );
+  }
+  if (result === undefined) {
+    throw new Error("Intended-shot probe completed without an observation.");
+  }
+  return result;
 }
 
 function candidateKey(tiltDegrees: number, impulse: number): string {

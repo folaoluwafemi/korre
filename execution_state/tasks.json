@@ -372,6 +372,12 @@
           "detail": "Typecheck passed; ESLint stopped the hosted verify before unit tests, build, or probe execution. It reported five errors in the new probe: type-only Quaternion import, unused EntityId import, unused asPlainQuaternion helper, and two unsafe throws from finally blocks. No observation artifact was produced. Bounded ESLint repair 1 is in progress."
         },
         {
+          "command": "Independent source review: T02-B2 ESLint repair 1",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
+          "detail": "Reviewer confirmed all five run #16 lint findings are addressed, observer/world/engine cleanup still runs and surfaces errors after cleanup, and the 40-trial measurement behavior is unchanged. No local checks ran; hosted verification remains pending."
+        },
+        {
           "command": "git diff --check after T02-C2 test repair 1",
           "result": "PASS",
           "exit_code": 0,
@@ -603,12 +609,12 @@
         },
         {
           "id": "T02-B2-eslint-repair-1",
-          "status": "RUNNING",
-          "owner": "/root/toolchain_audit — source repair; /root/swarm_review — independent review",
+          "status": "IMPLEMENTED",
+          "owner": "/root/toolchain_audit — implementation; /root/swarm_review — independent review PASS; coordinator — hosted verification",
           "packet": "execution_state/packets/T02-B2-eslint-repair-1.md",
           "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
           "review_report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
-          "evidence": "Created from the five exact ESLint findings in hosted run #16. Scope is limited to unused/type-only imports and cleanup error handling in the T02-B2 probe. No local tests/builds/formatters may run."
+          "evidence": "Repair implementation and report addendum are complete in the packet's exact paths. The five run #16 lint findings were addressed by removing unused/type-only symbols and moving observer/world/engine cleanup outside finally blocks while preserving collected errors. Independent source review PASS at execution_state/reports/T02-B2-eslint-repair-1-review.md. No local tests/builds/formatters ran. Hosted verification remains pending."
         }
       ],
       "next_action": "Complete bounded T02-B2 ESLint repair 1, obtain independent review, and rerun hosted verification. Keep the canonical clearance-epsilon criterion explicitly unresolved; collect raw real-Havok observations only after the probe passes hosted lint and tests. Do not accept T02-B2 until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."

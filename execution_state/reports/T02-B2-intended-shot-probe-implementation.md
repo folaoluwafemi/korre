@@ -19,7 +19,8 @@ samples when the button enters the combined horizontal radius, all-body settle
 time or an explicit timeout, and material read-back. It asserts the exact unique
 trial tuples, the material and impulse conditions, and measurable cap/button
 movement after physical contact. It does not assert that any trial lofts.
-Observers are drained once, and each world and engine is disposed in `finally`.
+Observers are drained once, and each world and engine receives cleanup after
+every trial outcome.
 
 The complete result is written only after the assertions pass and only when
 `COUNTERBALL_INTENDED_SHOT_OUTPUT` is set to a non-empty path.
@@ -47,3 +48,23 @@ Exact changed paths:
 
 - `games/counterball/src/simulation/intendedShotProbe.test.ts`
 - `execution_state/reports/T02-B2-intended-shot-probe-implementation.md`
+
+## ESLint repair 1
+
+Hosted run `38041738500` reported five lint errors in the probe: `Quaternion`
+was imported as a runtime value despite being used only as a type, `EntityId`
+was unused, `asPlainQuaternion` was unused, and two cleanup errors were thrown
+from `finally` blocks. The repair keeps `Quaternion` as a type-only import and
+removes the unused `EntityId` import and helper.
+
+Cleanup now runs after the trial's capture block, outside `finally`. It attempts
+every observer removal, then world disposal, then engine disposal, recording
+each failure and continuing through the remaining cleanup actions. If trial
+execution and cleanup both fail, an `AggregateError` exposes the original trial
+error and all cleanup errors after cleanup completes. Measurement logic, the
+40-trial matrix, artifact timing, and null clearance classification are
+unchanged.
+
+No local test, build, typecheck, lint, or formatter was run, per the repair
+packet. Hosted verification is pending. The configured clearance epsilon is
+still absent, so the clearance-classification gap described above remains open.
