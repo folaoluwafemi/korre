@@ -372,6 +372,32 @@
           "detail": "Typecheck passed; ESLint stopped the hosted verify before unit tests, build, or probe execution. It reported five errors in the new probe: type-only Quaternion import, unused EntityId import, unused asPlainQuaternion helper, and two unsafe throws from finally blocks. No observation artifact was produced. Bounded ESLint repair 1 is in progress."
         },
         {
+          "command": "GitHub Actions run #17: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "On commit 7779b2e742f96025d8ac975c999d1a1b01713d82, workspace typecheck and ESLint passed. Prettier reported only games/counterball/src/simulation/intendedShotProbe.test.ts. Unit tests, build, probe execution, integration, and E2E did not run; no intended-shot artifact was produced. Bounded formatting repair 1 is in progress."
+        },
+        {
+          "command": "pnpm.cmd exec prettier --write games/counterball/src/simulation/intendedShotProbe.test.ts",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 1,
+          "detail": "Pinned Prettier ran only on the exact source file reported by run #17 and exited 0. The inspected diff contains line wrapping only. No local build, test, typecheck, lint, or server ran."
+        },
+        {
+          "command": "git diff --check after T02-B2 formatting repair 1",
+          "result": "PASS",
+          "exit_code": 0,
+          "repair": 1,
+          "detail": "No whitespace errors in the one-file formatting diff."
+        },
+        {
+          "command": "Independent source review: T02-B2 formatting repair 1",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-B2-format-repair-1-review.md",
+          "detail": "Reviewer confirmed the one-file diff is formatting-only and preserves cleanup, the 40-trial measurements/assertions, artifact writer, and null clearance classification. Hosted verification remains pending."
+        },
+        {
           "command": "Independent source review: T02-B2 ESLint repair 1",
           "result": "PASS",
           "report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
@@ -609,15 +635,24 @@
         },
         {
           "id": "T02-B2-eslint-repair-1",
-          "status": "IMPLEMENTED",
+          "status": "VERIFIED",
           "owner": "/root/toolchain_audit — implementation; /root/swarm_review — independent review PASS; coordinator — hosted verification",
           "packet": "execution_state/packets/T02-B2-eslint-repair-1.md",
           "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
           "review_report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
-          "evidence": "Repair implementation and report addendum are complete in the packet's exact paths. The five run #16 lint findings were addressed by removing unused/type-only symbols and moving observer/world/engine cleanup outside finally blocks while preserving collected errors. Independent source review PASS at execution_state/reports/T02-B2-eslint-repair-1-review.md. No local tests/builds/formatters ran. Hosted verification remains pending."
+          "evidence": "Repair implementation and report addendum are complete in the packet's exact paths. The five run #16 lint findings were addressed by removing unused/type-only symbols and moving observer/world/engine cleanup outside finally blocks while preserving collected errors. Independent source review PASS at execution_state/reports/T02-B2-eslint-repair-1-review.md. Run #17 passed workspace typecheck and ESLint, verifying this repair. No local tests/builds ran."
+        },
+        {
+          "id": "T02-B2-format-repair-1",
+          "status": "VERIFIED",
+          "owner": "coordinator — pinned formatter; /root/foundation_review — independent review PASS",
+          "packet": "execution_state/packets/T02-B2-format-repair-1.md",
+          "implementation_report": "execution_state/reports/T02-B2-format-repair-1-implementation.md",
+          "review_report": "execution_state/reports/T02-B2-format-repair-1-review.md",
+          "evidence": "The pinned formatter command ran only on the exact run #17 Prettier path and exited 0; git diff --check passed. Independent review PASS at execution_state/reports/T02-B2-format-repair-1-review.md confirms line wrapping only and unchanged behavior. No local build/test/typecheck/lint/server ran. Hosted verification remains pending."
         }
       ],
-      "next_action": "Complete bounded T02-B2 ESLint repair 1, obtain independent review, and rerun hosted verification. Keep the canonical clearance-epsilon criterion explicitly unresolved; collect raw real-Havok observations only after the probe passes hosted lint and tests. Do not accept T02-B2 until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "Complete the one-file T02-B2 formatting repair 1 and independent review, then rerun hosted verification. Keep the canonical clearance-epsilon criterion explicitly unresolved; collect raw real-Havok observations only after the probe passes hosted lint and tests. Do not accept T02-B2 until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",

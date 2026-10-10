@@ -253,10 +253,7 @@ function bodySpeed(body: PhysicsBody): number {
   return body.getLinearVelocity().length();
 }
 
-function assertFiniteWorldBodies(
-  world: CounterballWorld,
-  step: number,
-): void {
+function assertFiniteWorldBodies(world: CounterballWorld, step: number): void {
   for (const id of ENTITY_IDS) {
     const body = world.bodies.get(id);
     if (body === undefined) {
@@ -274,7 +271,9 @@ function assertFiniteWorldBodies(
       !Number.isFinite(linearVelocity.length()) ||
       !Number.isFinite(angularVelocity.length())
     ) {
-      throw new Error(`Havok produced a non-finite body at step ${step}: ${id}.`);
+      throw new Error(
+        `Havok produced a non-finite body at step ${step}: ${id}.`,
+      );
     }
   }
 }
@@ -407,9 +406,7 @@ function runTrial(
       new Vector3(0, 0, impulseMagnitude),
       selectedStart.clone(),
     );
-    const capImmediateVelocity = asPlainVector(
-      selectedCap.getLinearVelocity(),
-    );
+    const capImmediateVelocity = asPlainVector(selectedCap.getLinearVelocity());
     const buttonImmediateVelocity = asPlainVector(button.getLinearVelocity());
     if (
       capImmediateVelocity.z <= 0 ||
@@ -419,7 +416,9 @@ function runTrial(
       buttonImmediateVelocity.y !== 0 ||
       buttonImmediateVelocity.z !== 0
     ) {
-      throw new Error("Probe impulse was not applied only to the selected cap.");
+      throw new Error(
+        "Probe impulse was not applied only to the selected cap.",
+      );
     }
 
     let capTravelledDistance = 0;
@@ -535,10 +534,7 @@ function runTrial(
               COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
         );
         quietWindowCount = allBodiesQuiet ? quietWindowCount + 1 : 0;
-        if (
-          quietWindowCount >= settleWindowSteps &&
-          step < maximumSteps
-        ) {
+        if (quietWindowCount >= settleWindowSteps && step < maximumSteps) {
           allBodiesSettledAtSeconds = simulatedSeconds;
           break;
         }
@@ -557,8 +553,7 @@ function runTrial(
         left.type.localeCompare(right.type),
     );
     const capButtonContact = contacts.some(
-      ({ pair }) =>
-        pair.includes(selectedCapId) && pair.includes("button"),
+      ({ pair }) => pair.includes(selectedCapId) && pair.includes("button"),
     );
     const clearsByConfiguredEpsilon =
       clearanceEpsilon === null ||
@@ -682,9 +677,9 @@ describe("real Havok intended cap-into-button probe", () => {
     expect(observations).toHaveLength(40);
     expect(observedKeys).toEqual(expectedKeys);
     expect(new Set(observedKeys).size).toBe(40);
-    expect(observations.every(({ friction: value }) => value === friction)).toBe(
-      true,
-    );
+    expect(
+      observations.every(({ friction: value }) => value === friction),
+    ).toBe(true);
     expect(
       observations.every(({ restitution: value }) => value === restitution),
     ).toBe(true);
@@ -781,11 +776,11 @@ describe("real Havok intended cap-into-button probe", () => {
       havokPackage: "1.3.14",
       wasm: "@babylonjs/havok/lib/esm/HavokPhysics.wasm",
       diagnosticOnly: true,
-      setup: "selected cap receives one planar +z center impulse into tangent placed button; one movable cap lies ahead",
+      setup:
+        "selected cap receives one planar +z center impulse into tangent placed button; one movable cap lies ahead",
       fixedStepSeconds,
       maximumProbeSeconds,
-      settleWindowSeconds:
-        COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
+      settleWindowSeconds: COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds,
       linearSettleThreshold:
         COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
       angularSettleThreshold:
