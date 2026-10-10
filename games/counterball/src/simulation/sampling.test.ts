@@ -166,10 +166,7 @@ describe("pure playback sampler", () => {
   it("rejects missing, duplicate, and unknown body IDs", () => {
     const missing = createBodies().slice(1);
     const missingSampler = createPlaybackSampler(COUNTERBALL_CONFIG_V1);
-    expectSamplingError(
-      () => missingSampler.record(0, missing),
-      "invalidBody",
-    );
+    expectSamplingError(() => missingSampler.record(0, missing), "invalidBody");
 
     const duplicate = createBodies();
     duplicate[duplicate.length - 1] = createBody("button");
@@ -182,10 +179,7 @@ describe("pure playback sampler", () => {
     const unknown = createBodies();
     unknown[0] = { ...unknown[0]!, id: "spectator-piece" as EntityId };
     const unknownSampler = createPlaybackSampler(COUNTERBALL_CONFIG_V1);
-    expectSamplingError(
-      () => unknownSampler.record(0, unknown),
-      "invalidBody",
-    );
+    expectSamplingError(() => unknownSampler.record(0, unknown), "invalidBody");
   });
 
   it("rejects non-finite positions and invalid quaternions", () => {

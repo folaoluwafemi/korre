@@ -12,9 +12,7 @@ import {
 } from "@korre/game-protocol";
 
 export type PlaybackSamplingErrorCode =
-  | "invalidInput"
-  | "invalidBody"
-  | "resourceLimit";
+  "invalidInput" | "invalidBody" | "resourceLimit";
 
 /** A deterministic, engine-free error raised while building playback frames. */
 export class PlaybackSamplingError extends Error {
@@ -110,7 +108,9 @@ function copyTransforms(
 
 function normalizeBodies(bodies: readonly BodyState[]): PlaybackTransform[] {
   if (!Array.isArray(bodies) || bodies.length !== ENTITY_IDS.length) {
-    return invalidBody(`Expected exactly ${ENTITY_IDS.length} playback bodies.`);
+    return invalidBody(
+      `Expected exactly ${ENTITY_IDS.length} playback bodies.`,
+    );
   }
 
   const byId = new Map<EntityId, PlaybackTransform>();
@@ -183,10 +183,7 @@ export function createPlaybackSampler(
       "Playback sample rate must be a positive integer.",
     );
   }
-  if (
-    !Number.isFinite(maxShotDurationSeconds) ||
-    maxShotDurationSeconds <= 0
-  ) {
+  if (!Number.isFinite(maxShotDurationSeconds) || maxShotDurationSeconds <= 0) {
     throw new PlaybackSamplingError(
       "invalidInput",
       "Maximum simulated duration must be a finite positive number.",
