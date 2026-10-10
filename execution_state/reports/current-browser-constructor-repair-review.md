@@ -21,3 +21,9 @@ No remaining concrete defect was identified within the bounded constructor-conte
 No local test, build, formatter, lint, typecheck, install, server or other application run was performed. Read-only source/diff/evidence inspection only; a missing guessed run-23 log path was corrected by finding its actual evidence directory. Only this assigned report was written, with no shared-record/source edits or agent spawning.
 
 Next hosted run must pass Verify, integration and all four production-built E2E tests, with the new partial-constructor failure/retry path executed. Inspect the JSON reporter for statuses/retries and context-loss capability annotation and review actual screenshots/artifacts. Source PASS does not supply those results. A runtime addendum will be added here after the coordinator provides them.
+
+## Run 24 formatting repair — scoped source PASS
+
+Independently compared the current two-file diff against `.artifacts/run24-format/formatting-repair.patch`. The actual diff matches its two hunks only: `CounterballPreview.tsx:92` formats the existing cast union on one line and omits its optional leading union separator; `counterball-preview.spec.ts:12` wraps the existing optional three-literal mode type. The resulting TypeScript types are identical. No runtime expressions, constructor/journal/preflight logic, test branches, assertions, or values change.
+
+**PASS for this formatting-only repair.** Coordinator reports run `38056833055` / `76582ec` passed migrations, typechecks and ESLint before Prettier stopped verification; no runtime test/build success is inferred. I ran no formatter or local application check and performed no source edit. Full hosted runtime verification remains pending the next run.

@@ -89,9 +89,7 @@ function ensurePreviewWebGLContext(canvas: HTMLCanvasElement): void {
   ): WebGLRenderingContext | WebGL2RenderingContext | null => {
     try {
       return canvas.getContext(name, attributes) as
-        | WebGLRenderingContext
-        | WebGL2RenderingContext
-        | null;
+        WebGLRenderingContext | WebGL2RenderingContext | null;
     } catch {
       return null;
     }

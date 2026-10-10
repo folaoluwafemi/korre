@@ -9,7 +9,8 @@ type PreviewLifecycle = {
 
 type WindowWithPreviewLifecycle = Window & {
   __counterballPreviewLifecycle?: PreviewLifecycle;
-  __counterballPreviewWebGLMode?: "unsupported" | "constructor-failure" | "allow";
+  __counterballPreviewWebGLMode?:
+    "unsupported" | "constructor-failure" | "allow";
 };
 
 async function installLifecycleProbe(page: Page): Promise<void> {
