@@ -234,7 +234,7 @@ function isFiniteVector(value: Vector3): boolean {
   );
 }
 
-async function runTrial(
+function runTrial(
   havok: HavokRuntime,
   initial: MatchState,
   kind: ProbeKind,
@@ -242,7 +242,7 @@ async function runTrial(
   restitution: number,
   impulseMagnitude: number,
   tiltDegrees: number | null,
-): Promise<TrialObservation> {
+): TrialObservation {
   const engine = new NullEngine();
   let world: CounterballWorld | undefined;
   try {
@@ -462,7 +462,7 @@ describe("real Havok calibration probe", () => {
         for (const restitution of candidateRestitutions) {
           for (const impulse of candidateImpulses) {
             observations.push(
-              await runTrial(
+              runTrial(
                 havok,
                 initial,
                 "direct-cap",
@@ -476,7 +476,7 @@ describe("real Havok calibration probe", () => {
           for (const tiltDegrees of candidateTiltDegrees) {
             for (const impulse of candidateImpulses) {
               observations.push(
-                await runTrial(
+                runTrial(
                   havok,
                   initial,
                   "restart-button",

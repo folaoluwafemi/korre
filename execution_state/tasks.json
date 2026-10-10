@@ -217,7 +217,7 @@
       "dependencies": [
         "T01"
       ],
-      "owner": "coordinator integration; /root/toolchain_audit — independent T02-A repair 2 review",
+      "owner": "coordinator integration; /root/toolchain_audit — T02-B0 implementation; /root/swarm_review — T02-A repair 2 independent review",
       "implementation_report": null,
       "review_report": null,
       "checks": [
@@ -232,6 +232,12 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 2,
           "detail": "All workspace package typechecks, including games/counterball, passed. The root test-project typecheck failed at tests/e2e/counterball-preview.spec.ts lines 100 and 171 due to Playwright evaluate generic arity. Lint, unit tests, build, integration and E2E were skipped; no probe measurements were produced."
+        },
+        {
+          "command": "GitHub Actions run #3: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "All workspace and root test-project typechecks passed, including the calibration probe and both preview specs. Lint then failed only on @typescript-eslint/require-await at calibrationProbe.test.ts:237. Unit tests, 480-trial real-WASM probe, build, integration and E2E did not run."
         }
       ],
       "blocker": null,
@@ -267,7 +273,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Hosted run #2 passed the full games/counterball package typecheck, but root verification then failed on unrelated preview E2E TypeScript generics before lint/tests/build or probe measurements. Hosted run #3 remains required."
+          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Hosted run #2 passed the games/counterball package typecheck but failed root typecheck in preview E2E. Hosted run #3 passed all package/root typechecks, then lint found require-await on synchronous runTrial before tests/build or probe measurements. Repair 3 is independently source-reviewed PASS; hosted run #4 is required."
         },
         {
           "id": "T02-B0-repair-1",
@@ -284,9 +290,18 @@
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
           "evidence": "Imports the pinned PhysicsEngineV2 barrel export and narrows the actual scene engine before getBodies. Independent source review PASS. No local or hosted runtime checks have run after this repair; awaiting GitHub CI."
+        },
+        {
+          "id": "T02-B0-repair-3",
+          "status": "IMPLEMENTED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B0-repair-3.md",
+          "implementation_report": "execution_state/reports/T02-calibration-probe-repair-3-implementation.md",
+          "review_report": "execution_state/reports/T02-calibration-probe-repair-3-review.md",
+          "evidence": "Removed the unnecessary async/Promise wrapper and two awaits from the synchronous trial runner. Independent source review PASS. Hosted run #3 confirms all typechecks passed but lint failed before tests, so real-WASM measurements remain pending run #4. No local checks were run."
         }
       ],
-      "next_action": "Push the independently reviewed preview-test typing repair and run hosted verification. If it passes root gates, capture the real-Havok probe observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
+      "next_action": "Push the independently reviewed synchronous-runner lint repair and run hosted verification. If it reaches the real-WASM probe, capture its observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
     },
     {
       "id": "T03",
@@ -299,6 +314,12 @@
       "implementation_report": "execution_state/reports/T03-implementation.md",
       "review_report": "execution_state/reports/T03-review-repair-1.md",
       "checks": [
+        {
+          "command": "GitHub Actions run #3: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Typecheck passed, including the preview test fixes. Lint failed on @typescript-eslint/require-await in the calibration probe; tests/build did not run. Integration and E2E were skipped."
+        },
         {
           "command": "Independent source review: T03 repair 2",
           "result": "PASS",
