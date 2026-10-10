@@ -336,6 +336,30 @@
           "detail": "All 3 one-worker Chromium tests passed."
         },
         {
+          "command": "GitHub Actions run #14: pnpm verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "Hosted typecheck, ESLint, Prettier, unit tests, and build passed on 0a8b5a2a5672ec257f0e7cc4bf780bed958f0afe. This commit validates the coordinator-owned artifact wiring; the intended-shot probe source was not present."
+        },
+        {
+          "command": "GitHub Actions run #14: pnpm test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 integration test passed."
+        },
+        {
+          "command": "GitHub Actions run #14: pnpm test:e2e --workers=1",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "All 3 one-worker Chromium tests passed."
+        },
+        {
+          "command": "GitHub Actions run #14: intended-shot artifact upload step",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "The always-run upload step used the intended-shot path and correctly ignored its absence. GitHub confirmed no intended-shot artifact was uploaded; only the existing calibration artifact exists. This validates optional-path workflow behavior, not the probe."
+        },
+        {
           "command": "git diff --check after T02-C2 test repair 1",
           "result": "PASS",
           "exit_code": 0,
@@ -563,7 +587,7 @@
           "packet": "execution_state/packets/T02-B2-intended-shot-probe.md",
           "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
           "review_report": "execution_state/reports/T02-B2-intended-shot-probe-review.md",
-          "evidence": "Prerequisite T02-C0 is ACCEPTED. Worker is assigned the packet's exact test/report paths; coordinator owns the separate CI output/upload change. Probe must use real pinned Havok WASM, preserve all fifteen-body observations, and must not select production coefficients. Hosted execution and artifact review remain pending."
+          "evidence": "Prerequisite T02-C0 is ACCEPTED. Worker is assigned the packet's exact test/report paths; coordinator's separate CI output/upload change passed independent review and hosted run #14. Run #14 had no intended-shot source/output, so no such artifact was uploaded. Probe must use real pinned Havok WASM, preserve all fifteen-body observations, and must not select production coefficients. Canonical config has no clearance epsilon; raw clearance can be measured, but threshold classification is unresolved pending user direction. Hosted probe execution and artifact review remain pending."
         }
       ],
       "next_action": "Implement the real-Havok T02-B2 intended cap-into-button diagnostic and coordinator-owned artifact upload wiring. After independent source review, push for hosted verify, integration, and browser tests; retrieve and independently review all 40 observation tuples. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
