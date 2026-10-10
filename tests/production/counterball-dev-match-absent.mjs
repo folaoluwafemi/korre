@@ -26,15 +26,22 @@ async function walk(directory) {
 }
 
 await walk(buildDirectory);
-if (files.length === 0 || !files.some((file) => path.basename(file) === "index.html")) {
-  throw new Error(`Production browser output is missing or empty: ${buildDirectory}`);
+if (
+  files.length === 0 ||
+  !files.some((file) => path.basename(file) === "index.html")
+) {
+  throw new Error(
+    `Production browser output is missing or empty: ${buildDirectory}`,
+  );
 }
 
 for (const file of files) {
   const content = await readFile(file);
   for (const marker of diagnosticMarkers) {
     if (content.includes(Buffer.from(marker))) {
-      throw new Error(`Production browser output contains diagnostic marker ${JSON.stringify(marker)} in ${file}.`);
+      throw new Error(
+        `Production browser output contains diagnostic marker ${JSON.stringify(marker)} in ${file}.`,
+      );
     }
   }
 }
