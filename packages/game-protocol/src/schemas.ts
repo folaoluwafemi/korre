@@ -7,6 +7,7 @@ import type {
   GameCommand,
   MatchState,
   PlaybackFrame,
+  PhysicsCalibration,
   RoomCommandEnvelope,
   ServerEvent,
   ShotSimulation,
@@ -18,6 +19,49 @@ export const QUATERNION_NORM_TOLERANCE = 0.01;
 const finiteNumber = z.number().finite();
 const nonNegativeInteger = z.number().int().min(0);
 const uuid = z.uuid();
+
+const physicsMaterialCalibrationSchema = z.strictObject({
+  friction: finiteNumber.min(0).max(2),
+  restitution: finiteNumber.min(0).max(1),
+});
+
+const physicsDampingCalibrationSchema = z.strictObject({
+  linear: finiteNumber.min(0).max(1),
+  angular: finiteNumber.min(0).max(1),
+});
+
+const physicsCalibrationSchema: z.ZodType<PhysicsCalibration> = z.strictObject({
+  schemaVersion: z.literal(1),
+  havokVersion: z.literal("1.3.14"),
+  adapterVersion: z.literal("adapter-2"),
+  materials: z.strictObject({
+    surface: physicsMaterialCalibrationSchema,
+    cap: physicsMaterialCalibrationSchema,
+    button: physicsMaterialCalibrationSchema,
+  }),
+  damping: z.strictObject({
+    cap: physicsDampingCalibrationSchema,
+    button: physicsDampingCalibrationSchema,
+  }),
+  impulse: z.strictObject({
+    normalMax: finiteNumber.positive().max(20),
+    restartMax: finiteNumber.positive().max(20),
+    applicationHeightOffset: finiteNumber,
+  }),
+  restartLift: z.strictObject({ mode: z.literal("contact-only") }),
+  support: z.strictObject({
+    apronMargin: finiteNumber.positive().max(10_000),
+  }),
+  workload: z.strictObject({
+    maxBatchSteps: z.number().int().min(1).max(120),
+    maxWallTimeMs: z.number().int().min(100).max(30_000),
+  }),
+  tunnelling: z.strictObject({
+    maxTranslationPerSubstep: finiteNumber.positive(),
+    maxRotationPerSubstep: finiteNumber.positive().max(Math.PI / 4),
+    maxSubsteps: z.number().int().min(1).max(120),
+  }),
+});
 
 export const TEAM_IDS = ["home", "away"] as const;
 export const CAP_IDS = [
@@ -707,7 +751,41 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> =
       minimumPrivateTargetGoals: z.literal(1),
       maximumPrivateTargetGoals: z.literal(10),
     }),
-    physicsCalibration: z.null(),
+    physicsCalibration: physicsCalibrationSchema.nullable(),
+  }).superRefine((config, context) => {
+    const calibration = config.physicsCalibration;
+    if (calibration === null) {
+      return;
+    }
+
+    if (
+      Math.abs(calibration.impulse.applicationHeightOffset) >
+      config.geometry.capHeight / 2
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["physicsCalibration", "impulse", "applicationHeightOffset"],
+        message: "Application height offset must stay within half the cap height.",
+      });
+    }
+
+    const smallestColliderThickness = Math.min(
+      config.geometry.capHeight,
+      config.geometry.buttonThickness,
+      config.geometry.surfaceThickness,
+      config.geometry.goalFrameRadius * 2,
+    );
+    if (
+      calibration.tunnelling.maxTranslationPerSubstep >=
+      smallestColliderThickness
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["physicsCalibration", "tunnelling", "maxTranslationPerSubstep"],
+        message:
+          "Translation per substep must be less than the smallest configured collider thickness.",
+      });
+    }
   });
 
 export const ProtocolParseErrorCode = "invalidPayload" as const;

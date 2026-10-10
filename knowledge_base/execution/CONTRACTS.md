@@ -126,11 +126,97 @@ interface SimulationRunner {
 
 `CounterballConfig` is defined once in game-protocol, using DECISIONS numeric table and explicit adapter coefficients chosen in T02. Do not import Babylon to define it. A simulator failure throws typed `SimulationError` (`initialization`, `timeout`, `cancelled`, `invalidBody`, `resourceLimit`). An unfinished, timed-out, or cancelled shot is not a settled successful result.
 
+`CounterballConfig.physicsCalibration` is the strict nullable `PhysicsCalibration` object exported from game-protocol. Historical and initial configs keep `null`; a calibrated runner rejects null with `initialization` and never falls back to probe constants. The object fixes schema version 1, Havok 1.3.14 / `adapter-2`, surface/cap/button friction and restitution, cap/button linear and angular damping, normal/restart horizontal impulse maxima and cap application-height offset, `restartLift.mode: "contact-only"`, open-pavement support apron margin, batch-step/wall-time budgets, and translational/angular per-substep tunnelling limits. The runtime config schema checks finite numeric bounds and geometry-dependent limits; serializing a selected calibration inside CounterballConfig makes it part of `configHash`. Null is not a calibration and carries no coefficients.
+
+The engineering schema bounds are provisional input limits, not measured tuning: friction 0..2; restitution and damping 0..1; normal/restart impulse maxima greater than 0 and at most 20; absolute application-height offset at most half the configured cap height; positive apron margin at most 10,000 game units; batch steps 1..120; wall-time budget 100..30,000 ms; translation limit positive and below the smallest configured collider thickness; rotation limit positive and at most pi/4; and substep budget 1..120. The smallest thickness is taken from cap height, button thickness, surface thickness, and twice the goal-frame radius. A selected apron still needs a conservative reachable-distance proof from the accepted impulse/energy envelope and maximum shot duration. It has no wall, does not move a rule crossing plane, and does not grant a restart. If the proven reachable distance exceeds the apron, simulation fails with `resourceLimit`; it must not freeze, teleport, delete, or respawn an entity. Exceeding the batch-step or elapsed wall-time cap is `resourceLimit`; reaching maximum simulated shot duration without settling is `timeout`. These limits do not assert Cloudflare account quotas.
+
+T02-R01 error mapping remains canonical: workload/deadline exhaustion is `resourceLimit`, while cancellation is `cancelled`; neither returns partial success. While the initial calibration is null, the current `PHYSICS_VERSION` remains `havok-1.3.14/adapter-1`; when C02/C03 publish a non-null `adapter-2` calibration, update the physics version stamp and config hash together to `havok-1.3.14/adapter-2`. Diagnostic-only candidate calibrations must carry a visible candidate label and cannot be treated as accepted gameplay config.
+
+Pinned-step API check (Babylon core 9.30.0 and `@babylonjs/havok` 1.3.14): `HavokPlugin.executeStep(delta, bodies)` issues one `HP_World_Step(world, delta)` per world. `HP_World_SetIdealStepTime` adjusts solver parameters for the supplied duration; it is not a request for internal substeps. The canonical runner must divide each requested physics interval into explicit bounded calls, set the ideal step time to each actual substep duration, and record its actual durations/count. The guard uses a conservative total-energy envelope: initial kinetic energy plus the maximum configured impulse work (including its application-point rotational energy) plus the maximum gravitational potential drop allowed by configured geometry and shot duration. Since restitution is at most one and friction is nonnegative, collisions cannot add energy to this bound. For each body derive `vBound = sqrt(2*Emax/mass)`, `omegaBound = sqrt(2*Emax/Imin)` using its minimum principal inertia, and `rMax`, the farthest collider point from its centre of mass. For each configured physics tick `dt`, compute `Nrequired = max(1, ceil(max_i((vBound_i + omegaBound_i*rMax_i)*dt / maxTranslationPerSubstep)), ceil(max_i(omegaBound_i*dt / maxRotationPerSubstep)))`. Execute that tick as `Nrequired` explicit steps of `dt/Nrequired`; record their actual durations and contacts. A candidate cannot be called supported unless `Nrequired <= maxSubsteps` and the required bound is enforceable. The open-pavement margin must be at least `max_i(vHorizontalBound_i*maxShotDurationSeconds + rMax_i)` for every possible starting point on the painted pitch. If safe division requires more than `maxSubsteps`, the API cannot perform a required call, the energy/reach bound cannot be established, or any entity leaves the proven support extent, fail with `resourceLimit`; endpoint-only 120-Hz checks do not prove obstacle traversal. This same runner/config/rules package is used by local, AI, online, and deployed execution.
+
 `restart.clearanceEpsilon` is the provisional positive finite vertical diagnostic margin (D38, initially 0.005 game units). It participates in `configHash`; it is not a foul, placement permission, or source of artificial lift. Diagnostic peak clearance must never be labelled proof of a collision-free obstacle traversal.
 
 Each simulate creates an isolated world from the supplied snapshot and disposes it after the result. One module initialization may be cached as an immutable runtime promise if proven safe. No globally mutable match/world. Run fixed 1/120-second steps; capture beginning and ending frames, 30-Hz interpolable transforms, and all decisive contact/crossing facts. Facts order by step/time with stable tie-break IDs; do not derive rules from downsampled video frames. Same-step contact precedes same-step crossing for attribution only; it does not pretend to prove sub-step contact order.
 
 Rules are pure: `resolveShot(before, command, simulation, config): Resolution`. `Resolution` contains settled match state, domain events, optional restart, outcome, and any safe cap-return operations. Network lifecycle/revisions are applied by application orchestration, not physics.
+
+Current C00-B source inventory, checked before consumer packets are dispatched: `resolveShot`/`Resolution` and stateful command validation are not exported yet; `parseGameCommand` only validates the wire shape. `deriveRestartButtonPose` is exported from `games/counterball/src/features/restarts/domain/placementPose.ts`. `createCounterballScene` currently returns a Babylon `Scene`; it calls `createPieces` but does not expose a stable-ID authoritative pose update or picking API. `GameTransport` is exported by `packages/game-sdk/src/transport.ts`. No local match controller or `SimulationRunner` implementation exists yet; the latter is currently only the protocol interface. Future packets must define exact producer exports before dispatching their consumers and must reuse these canonical protocol types.
+
+The following producer APIs are frozen for their later implementation packets. The signatures are contracts, not claims that these exports already exist:
+
+```ts
+type CapReturnOperation = {
+  capId: CapEntityId;
+  position: Vec3;
+  rotation: Quat;
+};
+type Resolution = {
+  state: MatchState;
+  events: readonly DomainEvent[];
+  restart?: Restart;
+  outcome?: MatchOutcome;
+  capReturns: readonly CapReturnOperation[];
+};
+function resolveShot(
+  before: MatchState,
+  command: GameCommand,
+  simulation: ShotSimulation,
+  config: CounterballConfig,
+): Resolution;
+```
+
+`resolveShot` belongs in `games/counterball/src/features/referee/domain/resolveShot.ts`. It is pure and deterministic; it must not mutate any input. Every cap return is listed explicitly, validated by the accepted placement/formation operation, reflected in `state`, and leaves every unrelated body unchanged. `restart` and `outcome`, when present, must agree with `state.restart` and `state.outcome`.
+
+```ts
+type CommandActorContext =
+  | { kind: "unauthenticated" }
+  | { kind: "spectator"; versions: VersionStamp }
+  | { kind: "player"; team: TeamId; versions: VersionStamp };
+type CommandValidationResult =
+  | { valid: true; command: GameCommand }
+  | { valid: false; code: ActionRejectionCode };
+function validateGameCommand(
+  state: MatchState,
+  action: ActionEnvelope,
+  actor: CommandActorContext,
+  config: CounterballConfig,
+): CommandValidationResult;
+```
+
+`validateGameCommand` belongs beside the controller in `games/counterball/src/features/match/application/localMatchController.ts`. `actor` is constructed from the authenticated session and match membership (or an explicit development session); it is never read from `ActionEnvelope`. It checks protocol/config versions, state version, role/team, match status, active turn, phase, command shape/range and restart placement through the accepted placement service. Invalid results never mutate or replace `state`. Server authentication still occurs before this game API is called.
+
+```ts
+type CounterballPieceRegistry = ReadonlyMap<EntityId, PieceAssembly>;
+function createCounterballPresentation(
+  scene: Scene,
+  bodies: readonly BodyState[],
+  config?: Readonly<CounterballConfig>,
+): CounterballPieceRegistry;
+function updateCounterballPresentation(
+  registry: CounterballPieceRegistry,
+  bodies: readonly PlaybackTransform[],
+): void;
+function pickCounterballEntity(
+  registry: CounterballPieceRegistry,
+  pickInfo: PickingInfo,
+): EntityId | null;
+```
+
+These exports belong in `games/counterball/src/scene/presentation.ts` and `games/counterball/src/browser.ts`. Creation returns all 15 stable-ID pieces from `createPieces`; updates require exactly one finite transform per ID and change presentation only. Only the corresponding body meshes are pickable; a result is resolved by registry mesh identity, never a name/index or protocol mutation. `PlaybackFrame.bodies` is passed directly to the update API. The scene owner remains responsible for disposal.
+
+```ts
+type LocalMatchControllerOptions = {
+  initialState: MatchState;
+  config: CounterballConfig;
+  runner: SimulationRunner;
+  session: GameSession & { role: "player"; team: TeamId };
+};
+function createLocalMatchController(
+  options: LocalMatchControllerOptions,
+): GameTransport;
+```
+
+The controller export belongs in `games/counterball/src/features/match/application/localMatchController.ts` and implements the existing SDK `GameTransport` with one checkpoint → validate → simulate → resolve → playback → phase-release pipeline. It owns abort restoration and disposal; it does not create identity or expose a public guest path. Public AI/online access remains behind the unique-username identity gate.
 
 ## Event and rule ordering
 

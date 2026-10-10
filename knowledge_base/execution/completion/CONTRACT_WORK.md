@@ -2,6 +2,18 @@
 
 These are planned amendments, not types that already exist. Implement them through C00 and later calibration/config packets. The existing `packages/game-protocol/src/types.ts`, runtime schemas, and parent CONTRACTS remain authoritative until that reviewed change lands. Workers must not invent private alternatives.
 
+## C00-B implementation clarification
+
+C00-B freezes the type shape and validation bounds below while keeping the initial config and historical fixtures at `physicsCalibration: null`. Those bounds are schema limits, not selected coefficients. The full `CounterballConfigSchema` validates the calibration in geometry context, including the application offset and smallest collider thickness. A playable calibrated runner rejects null; diagnostics may use candidate values only when explicitly labelled.
+
+The pinned API check used Babylon core tag 9.30.0 source at `packages/dev/core/src/Physics/v2/Plugins/havokPlugin.ts` and the exact `@babylonjs/havok` 1.3.14 npm tarball (`sha512-+j2FDwLtkh5Gb//KizE8Ks3GIB/3vH8Yx9cQsMvZQpsKkH5gn089wIlJ9Yt8dJxbwBmWKGpMTIXxZE7YdOHUnQ==`, as pinned in `pnpm-lock.yaml`). Babylon's `executeStep` performs one `HP_World_Step` call. Havok's `HP_World_SetIdealStepTime` adjusts solver parameters; it does not create internal substeps. The runner therefore owns an explicit bounded substep loop. Its energy envelope includes the maximum normal/restart impulse work and application-point rotation plus the maximum gravitational potential drop allowed by geometry and shot duration. For each body derive `vBound = sqrt(2*Emax/mass)`, `omegaBound = sqrt(2*Emax/Imin)` using minimum principal inertia, and `rMax` to the farthest collider point from centre of mass. For configured tick duration `dt`, use `Nrequired = max(1, ceil(max_i((vBound_i + omegaBound_i*rMax_i)*dt/maxTranslationPerSubstep)), ceil(max_i(omegaBound_i*dt/maxRotationPerSubstep)))` explicit steps of `dt/Nrequired`. Probes and runner record actual durations/count/contacts and share this calculation. The support apron must reach at least `max_i(vHorizontalBound_i*maxShotDurationSeconds + rMax_i)` beyond every painted edge. If an energy/reach bound cannot be established, or `Nrequired > maxSubsteps`, fail with `resourceLimit`; no unsupported candidate is accepted.
+
+T02-R01 error mapping remains canonical: simulated-duration exhaustion without settlement is `timeout`; wall-clock/workload, batch/fact/frame, or displacement-budget exhaustion is `resourceLimit`; cancellation is `cancelled`. These outcomes never return partial success.
+
+The open-pavement treatment extends only the invisible physical support slab beyond the painted pitch by the calibrated apron margin. It has no side/end wall and does not change painted rule crossing planes. C02 must derive a conservative apron from the accepted impulse/energy envelope, gravity and maximum shot duration, then test side and end exits and all-15-body settling. Going beyond proven coverage is `resourceLimit`; no entity is frozen, teleported, deleted or respawned during simulation.
+
+The exact later producer signatures are frozen in the C00-B section of canonical `CONTRACTS.md`: `resolveShot` in the referee domain module; `validateGameCommand` and `createLocalMatchController` in the match application module, with the controller implementing `GameTransport`; and create/update/pick functions in the scene presentation module. The C00-B source inventory distinguishes those future contracts from current exports. Do not dispatch T02-P01, T06-R01 or T09-R01 consumers against private alternatives.
+
 ## 1. Cancellation outside the wire
 
 Current `SimulationRunner.simulate(input)` has no cancellation argument. Add an optional second argument with a portable structural signal:

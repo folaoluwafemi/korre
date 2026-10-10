@@ -64,6 +64,9 @@ Derived from execution_state/tasks.json; unassigned paths below are plan ceiling
 - Browser usability/performance fixes are in progress. T03 remains an accepted static preview; improvements require fresh independent review and hosted evidence before acceptance.
 - The catalogue table above is regenerated from tasks.json for readability. Earlier run reports below remain historical evidence, not current blockers.
 
+## C00-B source implementation
+- C00-B's nullable calibration schema, geometry bounds, open-pavement policy and future interface signatures are implemented and independently source-reviewed PASS in `reports/C00-B-review.md`. The packet remains `IMPLEMENTED`, not accepted: focused protocol tests and full verification have not yet run on the exact commit. No calibrated runner, playable flow, or deployed physics is claimed. Next: push this source/doc diff, capture exact GitHub run logs/artifacts, and obtain independent exact-head runtime review.
+
 ## Review accepted after hosted verification
 
 GitHub run 38057543954 on 22a7375e1b57a01d1bd91e23f18749ed7096d4a8: all 24 files/98 tests passed with zero skips, workspace checks/builds, migrations twice, integration and all four built-browser cases passed. No local build/test. Independent current review reports passed; no deployed physics or gameplay claim.

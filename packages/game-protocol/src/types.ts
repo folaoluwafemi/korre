@@ -328,6 +328,45 @@ export type RoomCommandFailure = {
 export type RoomCommandResponse =
   RoomCommandSuccess | InvitationCreated | RoomCommandFailure;
 
+export type PhysicsMaterialCalibration = {
+  friction: number;
+  restitution: number;
+};
+
+export type PhysicsDampingCalibration = {
+  linear: number;
+  angular: number;
+};
+
+/** Versioned, config-hashed Havok inputs. Values remain null until measured. */
+export type PhysicsCalibration = {
+  schemaVersion: 1;
+  havokVersion: "1.3.14";
+  adapterVersion: "adapter-2";
+  materials: {
+    surface: PhysicsMaterialCalibration;
+    cap: PhysicsMaterialCalibration;
+    button: PhysicsMaterialCalibration;
+  };
+  damping: {
+    cap: PhysicsDampingCalibration;
+    button: PhysicsDampingCalibration;
+  };
+  impulse: {
+    normalMax: number;
+    restartMax: number;
+    applicationHeightOffset: number;
+  };
+  restartLift: { mode: "contact-only" };
+  support: { apronMargin: number };
+  workload: { maxBatchSteps: number; maxWallTimeMs: number };
+  tunnelling: {
+    maxTranslationPerSubstep: number;
+    maxRotationPerSubstep: number;
+    maxSubsteps: number;
+  };
+};
+
 export type CounterballConfig = {
   schemaVersion: 1;
   configVersion: "counterball-config-1";
@@ -375,7 +414,7 @@ export type CounterballConfig = {
     minimumPrivateTargetGoals: 1;
     maximumPrivateTargetGoals: 10;
   };
-  physicsCalibration: null;
+  physicsCalibration: PhysicsCalibration | null;
 };
 
 export type ConfigHash = string & { readonly __brand: "ConfigHash" };

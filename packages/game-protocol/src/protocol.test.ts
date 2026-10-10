@@ -26,11 +26,49 @@ import {
 import type {
   GameCommand,
   MatchState,
+  PhysicsCalibration,
   SimulationRunOptions,
   SimulationFact,
   VersionStamp,
 } from "./types.js";
 import { ProtocolParseError } from "./schemas.js";
+
+function createPhysicsCalibration(): PhysicsCalibration {
+  const smallestColliderThickness = Math.min(
+    COUNTERBALL_CONFIG_V1.geometry.capHeight,
+    COUNTERBALL_CONFIG_V1.geometry.buttonThickness,
+    COUNTERBALL_CONFIG_V1.geometry.surfaceThickness,
+    COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius * 2,
+  );
+
+  return {
+    schemaVersion: 1,
+    havokVersion: "1.3.14",
+    adapterVersion: "adapter-2",
+    materials: {
+      surface: { friction: 0.5, restitution: 0.1 },
+      cap: { friction: 0.4, restitution: 0.2 },
+      button: { friction: 0.3, restitution: 0.2 },
+    },
+    damping: {
+      cap: { linear: 0.05, angular: 0.05 },
+      button: { linear: 0.05, angular: 0.05 },
+    },
+    impulse: {
+      normalMax: 10,
+      restartMax: 12,
+      applicationHeightOffset: 0,
+    },
+    restartLift: { mode: "contact-only" },
+    support: { apronMargin: 20 },
+    workload: { maxBatchSteps: 120, maxWallTimeMs: 15_000 },
+    tunnelling: {
+      maxTranslationPerSubstep: smallestColliderThickness / 2,
+      maxRotationPerSubstep: Math.PI / 8,
+      maxSubsteps: 120,
+    },
+  };
+}
 
 type NativeAbortSignalFits =
   AbortSignal extends NonNullable<SimulationRunOptions["signal"]>
@@ -315,6 +353,112 @@ describe("Counterball v1 protocol", () => {
     const configHash = await hashCounterballConfig();
     expect(ConfigHashSchema.parse(configHash)).toBe(configHash);
     expect(configHash).toBe(fixture.versions.configHash);
+  });
+
+  it("validates the nullable versioned calibration without changing null fixtures", async () => {
+    const calibration = createPhysicsCalibration();
+    const calibratedConfig = {
+      ...COUNTERBALL_CONFIG_V1,
+      physicsCalibration: calibration,
+    };
+
+    expect(CounterballConfigSchema.parse(COUNTERBALL_CONFIG_V1)).toEqual(
+      COUNTERBALL_CONFIG_V1,
+    );
+    expect(CounterballConfigSchema.parse(calibratedConfig)).toEqual(
+      calibratedConfig,
+    );
+    expect(await hashCanonicalJson(calibratedConfig)).not.toBe(
+      await hashCanonicalJson(COUNTERBALL_CONFIG_V1),
+    );
+
+    const smallestColliderThickness = Math.min(
+      COUNTERBALL_CONFIG_V1.geometry.capHeight,
+      COUNTERBALL_CONFIG_V1.geometry.buttonThickness,
+      COUNTERBALL_CONFIG_V1.geometry.surfaceThickness,
+      COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius * 2,
+    );
+    const invalidCalibrations: unknown[] = [
+      { ...calibration, schemaVersion: 2 },
+      { ...calibration, havokVersion: "1.3.13" },
+      { ...calibration, adapterVersion: "adapter-1" },
+      { ...calibration, unexpected: true },
+      {
+        ...calibration,
+        materials: {
+          ...calibration.materials,
+          surface: { ...calibration.materials.surface, friction: -0.01 },
+        },
+      },
+      {
+        ...calibration,
+        materials: {
+          ...calibration.materials,
+          cap: { ...calibration.materials.cap, restitution: 1.01 },
+        },
+      },
+      {
+        ...calibration,
+        damping: {
+          ...calibration.damping,
+          button: { ...calibration.damping.button, angular: Infinity },
+        },
+      },
+      {
+        ...calibration,
+        impulse: { ...calibration.impulse, normalMax: 0 },
+      },
+      {
+        ...calibration,
+        impulse: { ...calibration.impulse, restartMax: 20.01 },
+      },
+      {
+        ...calibration,
+        impulse: {
+          ...calibration.impulse,
+          applicationHeightOffset:
+            COUNTERBALL_CONFIG_V1.geometry.capHeight,
+        },
+      },
+      { ...calibration, restartLift: { mode: "assisted" } },
+      { ...calibration, support: { apronMargin: 0 } },
+      { ...calibration, support: { apronMargin: 10_000.01 } },
+      {
+        ...calibration,
+        workload: { ...calibration.workload, maxBatchSteps: 120.5 },
+      },
+      {
+        ...calibration,
+        workload: { ...calibration.workload, maxWallTimeMs: 99 },
+      },
+      {
+        ...calibration,
+        tunnelling: {
+          ...calibration.tunnelling,
+          maxTranslationPerSubstep: smallestColliderThickness,
+        },
+      },
+      {
+        ...calibration,
+        tunnelling: {
+          ...calibration.tunnelling,
+          maxRotationPerSubstep: Math.PI / 4 + 0.001,
+        },
+      },
+      {
+        ...calibration,
+        tunnelling: { ...calibration.tunnelling, maxSubsteps: 121 },
+      },
+    ];
+
+    for (const physicsCalibration of invalidCalibrations) {
+      expect(
+        CounterballConfigSchema.safeParse({
+          ...COUNTERBALL_CONFIG_V1,
+          physicsCalibration,
+        }).success,
+      ).toBe(false);
+    }
   });
 
   it("rejects values JSON would silently normalize before hashing or parsing", () => {
