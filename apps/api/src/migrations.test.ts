@@ -20,7 +20,9 @@ const enabled =
   databaseUrl !== undefined &&
   process.env["IDENTITY_TEST_DATABASE_ALLOW"] === "1";
 if (process.env["CI"] && !enabled) {
-  throw new Error("CI migration acceptance requires the opted-in test database.");
+  throw new Error(
+    "CI migration acceptance requires the opted-in test database.",
+  );
 }
 if (enabled) {
   let url: URL;

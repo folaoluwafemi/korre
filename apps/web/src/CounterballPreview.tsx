@@ -59,7 +59,9 @@ const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const MAX_RENDER_RATE = 30;
 const MIN_RENDER_INTERVAL_MS = 1000 / MAX_RENDER_RATE;
 
-function isOrbitCamera(camera: BabylonCamera | null): camera is ArcRotateCamera {
+function isOrbitCamera(
+  camera: BabylonCamera | null,
+): camera is ArcRotateCamera {
   return camera?.getClassName() === "ArcRotateCamera";
 }
 
@@ -79,9 +81,9 @@ export default function CounterballPreview({
   const [sceneReady, setSceneReady] = useState(false);
   const [viewStatus, setViewStatus] = useState("Full pitch view.");
   const [attempt, setAttempt] = useState(0);
-  const [cameraMode, setCameraMode] = useState<
-    "pitch" | "button" | "custom"
-  >("pitch");
+  const [cameraMode, setCameraMode] = useState<"pitch" | "button" | "custom">(
+    "pitch",
+  );
   const isInspectingButton = cameraMode === "button";
 
   const markCustomView = useCallback((): void => {
@@ -301,7 +303,11 @@ export default function CounterballPreview({
         adjustOrbit(-deltaX * 0.008, deltaY * 0.008);
       } else if (pointers.size === 2) {
         const nextDistance = currentPinchDistance();
-        if (nextDistance !== null && pinchDistance !== null && pinchDistance > 0) {
+        if (
+          nextDistance !== null &&
+          pinchDistance !== null &&
+          pinchDistance > 0
+        ) {
           adjustZoom(pinchDistance / nextDistance);
         }
         pinchDistance = nextDistance;
@@ -548,7 +554,8 @@ export default function CounterballPreview({
         </div>
         <p className="preview-camera-help">
           Drag to orbit. Use a two-finger pinch or mouse wheel to zoom. The
-          buttons also work with a keyboard. These controls move only the camera.
+          buttons also work with a keyboard. These controls move only the
+          camera.
         </p>
         <p className="preview-view-status" aria-live="polite">
           {viewStatus}

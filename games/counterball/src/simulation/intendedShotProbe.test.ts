@@ -794,9 +794,9 @@ describe("real Havok intended cap-into-button probe", () => {
         const minimum = Math.min(...sampleValues);
         const maximum = Math.max(...sampleValues);
         expect(observation.minSampledClearance).toBe(minimum);
-        expect(
-          observation.maximumSignedClearanceWithinCombinedRadius,
-        ).toBe(maximum);
+        expect(observation.maximumSignedClearanceWithinCombinedRadius).toBe(
+          maximum,
+        );
         expect(observation.peakExceedsConfiguredEpsilon).toBe(
           maximum >= observation.clearanceEpsilon,
         );

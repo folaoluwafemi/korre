@@ -20,7 +20,9 @@ const enabled =
   databaseUrl !== undefined &&
   process.env["IDENTITY_TEST_DATABASE_ALLOW"] === "1";
 if (process.env["CI"] && !enabled) {
-  throw new Error("CI identity acceptance requires the opted-in test database.");
+  throw new Error(
+    "CI identity acceptance requires the opted-in test database.",
+  );
 }
 if (enabled) {
   let url: URL;
@@ -54,18 +56,20 @@ function request(
   csrfToken?: string,
   address = "198.51.100.21",
 ): Promise<Response> {
-  return app.request(path, {
-    method,
-    headers: {
-      Origin: origin,
-      Authorization: `Bearer ${serviceSecret}`,
-      "CF-Connecting-IP": address,
-      ...(input === undefined ? {} : { "Content-Type": "application/json" }),
-      ...(cookie === undefined ? {} : { Cookie: cookie }),
-      ...(csrfToken === undefined ? {} : { "X-CSRF-Token": csrfToken }),
-    },
-    ...(input === undefined ? {} : { body: JSON.stringify(input) }),
-  });
+  return Promise.resolve(
+    app.request(path, {
+      method,
+      headers: {
+        Origin: origin,
+        Authorization: `Bearer ${serviceSecret}`,
+        "CF-Connecting-IP": address,
+        ...(input === undefined ? {} : { "Content-Type": "application/json" }),
+        ...(cookie === undefined ? {} : { Cookie: cookie }),
+        ...(csrfToken === undefined ? {} : { "X-CSRF-Token": csrfToken }),
+      },
+      ...(input === undefined ? {} : { body: JSON.stringify(input) }),
+    }),
+  );
 }
 
 function sessionCookie(response: Response): { cookie: string; token: string } {
@@ -73,7 +77,8 @@ function sessionCookie(response: Response): { cookie: string; token: string } {
   const token = /^__Host-korre_session=([A-Za-z0-9_-]{43})(?:;|$)/.exec(
     header,
   )?.[1];
-  if (token === undefined) throw new Error("Expected an opaque session cookie.");
+  if (token === undefined)
+    throw new Error("Expected an opaque session cookie.");
   for (const attribute of ["HttpOnly", "Secure", "SameSite=Lax", "Path=/"]) {
     expect(header.includes(attribute)).toBe(true);
   }
@@ -186,9 +191,8 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
       ).status,
     ).toBe(401);
     expect(
-      (
-        await request("/api/v1/session", "DELETE", {}, first.cookie, "forged")
-      ).status,
+      (await request("/api/v1/session", "DELETE", {}, first.cookie, "forged"))
+        .status,
     ).toBe(403);
     expect(
       (await request("/api/v1/session", "GET", undefined, first.cookie)).status,
@@ -214,7 +218,8 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
       (await request("/api/v1/session", "GET", undefined, first.cookie)).status,
     ).toBe(401);
     expect(
-      (await request("/api/v1/session", "GET", undefined, second.cookie)).status,
+      (await request("/api/v1/session", "GET", undefined, second.cookie))
+        .status,
     ).toBe(200);
     const replay = await request("/api/v1/recovery", "POST", {
       username: "HttpPlayer",
@@ -224,7 +229,8 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
     expect(replay.headers.has("Set-Cookie")).toBe(false);
     expect(await replay.json()).toMatchObject({ code: "recoveryFailed" });
 
-    if (pool === undefined) throw new Error("Test database was not initialized.");
+    if (pool === undefined)
+      throw new Error("Test database was not initialized.");
     const stored = await pool.query<{ token_hash: string }>(
       "SELECT token_hash FROM sessions WHERE player_id = $1",
       [identity.player.id],
@@ -251,11 +257,12 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
       rotated.csrfToken,
     );
     expect(logout.status).toBe(204);
+    expect((logout.headers.get("Set-Cookie") ?? "").includes("Max-Age=0")).toBe(
+      true,
+    );
     expect(
-      (logout.headers.get("Set-Cookie") ?? "").includes("Max-Age=0"),
-    ).toBe(true);
-    expect(
-      (await request("/api/v1/session", "GET", undefined, second.cookie)).status,
+      (await request("/api/v1/session", "GET", undefined, second.cookie))
+        .status,
     ).toBe(401);
   });
 
@@ -279,7 +286,8 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
       ),
     ]);
     expect(responses.map(({ status }) => status).sort()).toEqual([201, 409]);
-    if (pool === undefined) throw new Error("Test database was not initialized.");
+    if (pool === undefined)
+      throw new Error("Test database was not initialized.");
     const count = await pool.query<{ count: number }>(
       "SELECT count(*)::int AS count FROM players WHERE username_key = $1",
       ["httpconcurrent"],

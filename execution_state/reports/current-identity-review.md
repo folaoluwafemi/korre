@@ -1,0 +1,19 @@
+# Current identity improvement — independent source review
+
+**Verdict: PASS for source review. Hosted PostgreSQL execution and task acceptance remain pending.**
+
+## Scope inspected
+
+Reviewed `apps/api/scripts/migrate.mjs`, `apps/api/src/features/identity/identity.http-postgres.test.ts`, `apps/api/src/migrations.test.ts`, `execution_state/reports/current-identity-improvement.md`, the original T11 requirements and packets, relevant identity contracts/decisions, the current migration, the existing real-PostgreSQL repository tests, and CI/test configuration. No implementation or shared records were changed.
+
+## Findings
+
+- **Migration lock and history:** The runner retains advisory lock ID `1129270856`, sets a 5-second lock timeout and a 30-second statement timeout, and releases the session lock in `finally`. Each migration and its history insert run in one transaction. It hashes LF-normalized SQL and accepts only the LF hash or the equivalent CRLF-byte hash for that same SQL. It skips already-applied matching content without rewriting the stored checksum, and rejects changed or corrupted content. The migration tests exercise the real runner against PostgreSQL for repeat application, preservation of a legacy CRLF checksum, changed content, corrupted history, rollback after invalid SQL, and held-lock timeout/recovery. `.gitattributes` also fixes SQL checkout line endings to LF.
+- **Child-test isolation and cleanup:** Both new PostgreSQL suites require explicit test-database opt-in and reject non-PostgreSQL, non-loopback, non-`_test`, or query/fragment URLs. CI throws if the opt-in is absent, so required hosted cases cannot silently skip. The HTTP suite uses a generated schema and owned pools; the migration suite creates a fresh generated schema per test and isolated temporary SQL fixtures. Schema names and temporary-directory roots are checked before cleanup. Pools are closed, child processes have a bounded kill deadline, and their stdout/stderr is captured instead of printed.
+- **HTTP plus PostgreSQL path:** The new HTTP suite composes the actual Hono API routes, `IdentityService`, and `PostgresIdentityRepository` with a real `pg.Pool` in its generated schema. It tests case-insensitive conflict and concurrent claim, host-cookie attributes, cookie-based restoration, name-only rejection, CSRF rejection, wrong-username non-consumption, one-use recovery and rotation, old-session revocation, hashed-only session persistence, and logout. The existing real-PostgreSQL repository suite additionally covers session expiry, SQL-looking inputs, transaction rollback, recovery races, and persisted rate limits. The HTTP harness uses Hono's in-memory `app.request`; it exercises the real HTTP route behavior and database path, but does not prove a listening TCP server, Cloudflare/Railway proxy behavior, or browser cookie handling.
+- **Secret handling:** The tests use random in-process service credentials and capture child migration output. Assertions compare booleans, statuses, public values, and hashes without printing raw session or recovery tokens. Migration failures emit generic diagnostics rather than SQL, credentials, or connection URLs.
+- **Plan fit:** These changes address the T11 migration-history/locking and real HTTP-to-PostgreSQL evidence gaps without altering the identity contract or migration content. They do not claim deployed-edge, browser, or complete T11 acceptance.
+
+## Verification status
+
+No local build, test, lint, typecheck, formatter, migration, database connection, or server command was run for this review. Source inspection is not runtime evidence. The required hosted `pnpm verify`, `pnpm test:integration`, and `pnpm test:e2e --workers=1` checks, plus the workflow's two migration runs, remain pending. T11 must stay unaccepted until the hosted PostgreSQL suites execute with zero required database skips and the actual hosted results are reviewed.

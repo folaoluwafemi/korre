@@ -194,7 +194,9 @@ test.describe("mobile preview camera", () => {
       page.getByRole("heading", { name: "The open pitch" }),
     ).toBeVisible({ timeout: 30_000 });
     await expect(
-      page.getByText("15 pieces: 7 home caps, 7 away caps, 1 four-hole button."),
+      page.getByText(
+        "15 pieces: 7 home caps, 7 away caps, 1 four-hole button.",
+      ),
     ).toBeVisible();
     const canvas = page.getByTestId("counterball-canvas");
     const canvasFrame = page.getByTestId("counterball-canvas-frame");
@@ -248,7 +250,10 @@ test.describe("mobile preview camera", () => {
     const bounds = await canvas.boundingBox();
     expect(bounds).not.toBeNull();
     if (!bounds) return;
-    await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+    await page.mouse.move(
+      bounds.x + bounds.width / 2,
+      bounds.y + bounds.height / 2,
+    );
     await page.mouse.down();
     await page.mouse.move(
       bounds.x + bounds.width / 2 + 48,
