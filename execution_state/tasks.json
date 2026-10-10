@@ -291,7 +291,7 @@
           "command": "Independent T02-C0 shared restart pose source review",
           "result": "PASS",
           "report": "execution_state/reports/T02-C0-shared-restart-pose-review.md",
-          "detail": "Reviewer confirmed pure protocol-shaped outputs, formula parity with B0, tangent/support equations, bounds/finiteness guards and source test coverage. No local checks ran; hosted verification is pending."
+          "detail": "Reviewer confirmed pure protocol-shaped outputs, formula parity with B0, tangent/support equations, bounds/finiteness guards and source test coverage. At source-review time hosted verification was pending; GitHub run #13 later passed verify, integration, and E2E. T02-C0 is accepted."
         },
         {
           "command": "GitHub Actions run #9: pnpm verify, integration, and one-worker Chromium E2E",
@@ -395,13 +395,13 @@
           "command": "Independent source review: T02-B2 formatting repair 1",
           "result": "PASS",
           "report": "execution_state/reports/T02-B2-format-repair-1-review.md",
-          "detail": "Reviewer confirmed the one-file diff is formatting-only and preserves cleanup, the 40-trial measurements/assertions, artifact writer, and null clearance classification. Hosted verification remains pending."
+          "detail": "Reviewer confirmed the one-file diff is formatting-only and preserves cleanup, the 40-trial measurements/assertions, artifact writer, and null clearance classification. At review time hosted verification was pending; GitHub run #18 later passed the full hosted pipeline and intended-shot probe. The epsilon criterion remains unresolved."
         },
         {
           "command": "Independent source review: T02-B2 ESLint repair 1",
           "result": "PASS",
           "report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
-          "detail": "Reviewer confirmed all five run #16 lint findings are addressed, observer/world/engine cleanup still runs and surfaces errors after cleanup, and the 40-trial measurement behavior is unchanged. No local checks ran; hosted verification remains pending."
+          "detail": "Reviewer confirmed all five run #16 lint findings are addressed, observer/world/engine cleanup still runs and surfaces errors after cleanup, and the 40-trial measurement behavior is unchanged. At review time hosted verification was pending; run #18 later passed full hosted verification. No local checks were run for the source review."
         },
         {
           "command": "git diff --check after T02-C2 test repair 1",
@@ -441,13 +441,13 @@
           "command": "Independent T02-C0 format repair 1 source review",
           "result": "PASS",
           "report": "execution_state/reports/T02-C0-format-repair-1-review.md",
-          "detail": "Reviewer confirmed the two-file diff is formatting-only; formulas, validation, assertions, and behavior are unchanged. No local verification commands were run. Hosted verification remains pending."
+          "detail": "Reviewer confirmed the two-file diff is formatting-only; formulas, validation, assertions, and behavior are unchanged. At review time hosted verification was pending; GitHub run #13 later passed verify, integration, and E2E. T02-C0 is accepted."
         },
         {
           "command": "Independent source review: T02-B1 formatting repair 1",
           "result": "PASS",
           "report": "execution_state/reports/T02-B1-format-repair-1-review.md",
-          "detail": "Reviewer confirmed the one-file delta is formatting-only and preserves the env-gated full 480-observation result after all assertions. Hosted verification and artifact publication are pending."
+          "detail": "Reviewer confirmed the one-file delta is formatting-only and preserves the env-gated full 480-observation result after all assertions. At review time hosted verification and artifact publication were pending; GitHub run #8 later passed full checks and published the independently reviewed calibration artifact used for T02-B1 acceptance."
         },
         {
           "command": "Independent source review: CI format repair 1",
@@ -465,13 +465,74 @@
           "command": "Independent source review: T02-B0 repair 5",
           "result": "PASS",
           "report": "execution_state/reports/T02-calibration-probe-repair-5-review.md",
-          "detail": "Reviewer confirmed the repaired indentation, retained approved maximumTiltDegrees + 1e-9° bound and unchanged candidate/config, and found the diff limited to formatting. Hosted verification is pending."
+          "detail": "Reviewer confirmed the repaired indentation, retained approved maximumTiltDegrees + 1e-9° bound and unchanged candidate/config, and found the diff limited to formatting. At review time hosted verification was pending; GitHub run #8 later passed the real-WASM 480-trial calibration checks. T02-B0 is accepted."
         },
         {
           "command": "Independent source review: T02-B1 artifact output",
           "result": "PASS",
           "report": "execution_state/reports/T02-B1-calibration-artifact-review.md",
           "detail": "Reviewer confirmed env-gated output after assertions, matching workflow upload path, ignored artifact directory, read-only workflow permissions, and no secret dependency. Hosted artifact publication remains pending."
+        },
+        {
+          "command": "GitHub Actions run #18: pnpm verify",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "Commit 479fd74a5017640b0e9f69c26cad8e4f384aa325; typecheck, ESLint, Prettier, unit tests, build, and 40-trial intended-shot real Havok-WASM probe passed."
+        },
+        {
+          "command": "GitHub Actions run #18: pnpm test:integration",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "1 integration test."
+        },
+        {
+          "command": "GitHub Actions run #18: pnpm test:e2e --workers=1",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "3 Chromium browser tests."
+        },
+        {
+          "command": "GitHub Actions run #18 intended-shot artifact upload",
+          "result": "PASS",
+          "detail": "Artifact 11665948583; 814424 bytes; SHA-256 sha256:570ba77d2213477aee6833f1d7c59edea865f0e2266018804f9b86e9728d86ea."
+        },
+        {
+          "command": "GitHub run #18 artifact retrieval integrity",
+          "result": "PASS",
+          "detail": "Original ZIP preserved; recomputed 814424-byte length and SHA-256 sha256:570ba77d2213477aee6833f1d7c59edea865f0e2266018804f9b86e9728d86ea match GitHub artifact metadata. Extracted JSON SHA-256 is recorded in the retrieval report."
+        },
+        {
+          "command": "Independent T02-B2 run-18 artifact review",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-B2-artifact-review-run-18.md",
+          "detail": "Independent provenance and data review PASS; all 40 records are consistent, but configured clearance classification remains unresolved because epsilon is null."
+        },
+        {
+          "command": "Independent T02-B2 run-18 coordinator status audit",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T02-B2-run18-status-audit.md",
+          "detail": "Independent audit found stale present-tense hosted-pending text, imprecise JSON-hash attribution, and an outdated top-level T02 ledger summary. Exact findings are in execution_state/reports/T02-B2-run18-status-audit.md."
+        },
+        {
+          "command": "Coordinator T02-B2 run-18 status audit repair",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T02-B2-run18-status-audit-repair-1.md",
+          "detail": "Independent re-review found three remaining historical-status wording issues. See exact findings in the repair-1 review report.",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-1-review.md"
+        },
+        {
+          "command": "Coordinator T02-B2 run-18 status audit repair 2",
+          "result": "CHANGES_REQUIRED",
+          "report": "execution_state/reports/T02-B2-run18-status-audit-repair-2.md",
+          "detail": "Independent re-review found one stale hosted-verification phrase in the T02 ledger next-action cell. Other checks passed.",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-2-review.md"
+        },
+        {
+          "command": "Coordinator T02-B2 run-18 status audit repair 3",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-B2-run18-status-audit-repair-3.md",
+          "detail": "Independent review PASS; exact report confirms accurate run-18 ledger evidence and preserved epsilon/canonical-runner gates.",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-3-review.md"
         }
       ],
       "blocker": null,
@@ -613,7 +674,7 @@
           "packet": "execution_state/packets/T02-C2-format-repair-1.md",
           "implementation_report": "execution_state/reports/T02-C2-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-C2-format-repair-1-review.md",
-          "evidence": "Hosted run #11 typecheck and ESLint passed but Prettier named only the two C2 sampler files. The pinned formatter and scoped git diff --check passed; independent source review PASS at execution_state/reports/T02-C2-format-repair-1-review.md confirms five formatting-only hunks. No unit tests, build, integration, E2E, or calibration probe ran in run #11. Fresh hosted acceptance gates remain pending."
+          "evidence": "Hosted run #11 typecheck and ESLint passed but Prettier named only the two C2 sampler files. The pinned formatter and scoped git diff --check passed; independent source review PASS at execution_state/reports/T02-C2-format-repair-1-review.md confirms five formatting-only hunks. No unit tests, build, integration, E2E, or calibration probe ran in run #11. GitHub run #13 subsequently passed full verification, integration and browser E2E; T02-C2 is accepted."
         },
         {
           "id": "T02-C2-test-repair-1",
@@ -627,11 +688,12 @@
         {
           "id": "T02-B2",
           "status": "CHANGES_REQUIRED",
-          "owner": "/root/toolchain_audit — completed implementation; /root/foundation_review — independent review; coordinator — threshold resolution and hosted execution",
+          "owner": "/root/toolchain_audit — implementation complete; /root/foundation_review — source review; coordinator — epsilon decision and status, with no hosted rerun planned unless canonical inputs change",
           "packet": "execution_state/packets/T02-B2-intended-shot-probe.md",
           "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
           "review_report": "execution_state/reports/T02-B2-intended-shot-probe-review.md",
-          "evidence": "Prerequisite T02-C0 is ACCEPTED. Source implementation report and independent review are saved. Review verdict is CHANGES_REQUIRED for packet acceptance solely because canonical config has no clearance epsilon; source honestly records raw signed clearance and leaves epsilon classification null rather than inventing a threshold. Coordinator CI artifact wiring passed independent review and hosted run #14; that run had no probe source/output, so no intended-shot artifact was uploaded. The source uses pinned real Havok WASM and preserves all fifteen-body observations, but no runtime measurements exist yet. Hosted probe execution and artifact review remain pending; production coefficients are not selected."
+          "evidence": "Prerequisite T02-C0 is accepted. Source implementation and narrow lint/format repairs are independently reviewed. The source reviewer retained CHANGES_REQUIRED solely because canonical config has no clearance epsilon. GitHub Actions run #18 on commit 479fd74a5017640b0e9f69c26cad8e4f384aa325 passed full verify, including the 40-trial real pinned Havok-WASM matrix, integration, and all three one-worker Chromium tests. Artifact 11665948583 is preserved at execution_state/reports/T02-B2-intended-shot-observations-run-18.zip; the ZIP SHA-256 matches GitHub artifact metadata (570ba77d2213477aee6833f1d7c59edea865f0e2266018804f9b86e9728d86ea); the extracted JSON SHA-256 (469ee09e101e0f174cde0f7ca8686adcf09f77ab5d7c5d4493f95907838ce375) matches the archive member and staging copy. Independent run-18 artifact review PASS found eight positive raw signed-clearance maxima among 40 trials; no configured-threshold success can be inferred because every epsilon/classification field remains null. Do not accept T02-B2 or select production physics values until the canonical criterion is resolved.",
+          "artifact_review_report": "execution_state/reports/T02-B2-artifact-review-run-18.md"
         },
         {
           "id": "T02-B2-eslint-repair-1",
@@ -649,10 +711,62 @@
           "packet": "execution_state/packets/T02-B2-format-repair-1.md",
           "implementation_report": "execution_state/reports/T02-B2-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-B2-format-repair-1-review.md",
-          "evidence": "The pinned formatter command ran only on the exact run #17 Prettier path and exited 0; git diff --check passed. Independent review PASS at execution_state/reports/T02-B2-format-repair-1-review.md confirms line wrapping only and unchanged behavior. No local build/test/typecheck/lint/server ran. Hosted verification remains pending."
+          "evidence": "The pinned formatter ran only on the exact run #17 Prettier path and exited 0; diff check and independent review PASS confirmed line wrapping only. GitHub run #18 subsequently passed full verification, including Prettier and the 40-trial probe. This was a formatting-only repair; no local build/test/typecheck/lint/server ran."
+        },
+        {
+          "id": "T02-B2-hosted-run-18",
+          "status": "VERIFIED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T02-B2-artifact-review-run-18.md",
+          "implementation_report": "execution_state/reports/T02-B2-artifact-retrieval-run-18.md",
+          "evidence": "GitHub Actions run #18 on commit 479fd74a5017640b0e9f69c26cad8e4f384aa325 passed workspace verify, integration and all 3 one-worker Chromium E2E tests. The intended-shot test passed its 40-trial matrix with real pinned Havok WASM. Artifact 11665948583 was uploaded; the original ZIP and extracted JSON are preserved with matching API metadata hashes. Independent row-level artifact review later passed. This does not resolve canonical clearance epsilon."
+        },
+        {
+          "id": "T02-B2-artifact-review-run-18",
+          "status": "VERIFIED",
+          "owner": "/root/swarm_review",
+          "packet": "execution_state/packets/T02-B2-artifact-review-run-18.md",
+          "implementation_report": "execution_state/reports/T02-B2-artifact-retrieval-run-18.md",
+          "review_report": "execution_state/reports/T02-B2-artifact-review-run-18.md",
+          "evidence": "Independent report PASS. Reviewer queried GitHub provenance, verified ZIP CRC and sole JSON member, independently recomputed ZIP/JSON length and hashes, confirmed staging equality, validated all 40 ordered unique tuples and numeric/contact/material/settlement fields, and confirmed epsilon/classification remain null. Eight trials have positive raw signed-clearance maxima. The report explicitly limits trajectory reconstruction and configured-threshold claims."
+        },
+        {
+          "id": "T02-B2-status-audit-run-18",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/foundation_review",
+          "packet": "execution_state/packets/T02-B2-run18-status-audit.md",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit.md",
+          "evidence": "Independent audit at execution_state/reports/T02-B2-run18-status-audit.md found stale status wording, imprecise JSON-hash attribution, and an outdated T02 ledger summary. Run and epsilon status were otherwise verified; coordinator is repairing records."
+        },
+        {
+          "id": "T02-B2-status-audit-repair-1",
+          "status": "CHANGES_REQUIRED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-B2-run18-status-audit-repair-1.md",
+          "implementation_report": "execution_state/reports/T02-B2-run18-status-audit-repair-1.md",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-1-review.md",
+          "evidence": "Independent re-review in execution_state/reports/T02-B2-run18-status-audit-repair-1-review.md found the top-level T02 ledger still said hosted run/artifact review were outstanding and two earlier review notes needed historical framing. Other hash/owner/gate findings pass. Coordinator prepares repair 2."
+        },
+        {
+          "id": "T02-B2-status-audit-repair-2",
+          "status": "CHANGES_REQUIRED",
+          "owner": "coordinator; /root/swarm_review — independent review",
+          "packet": "execution_state/packets/T02-B2-run18-status-audit-repair-2.md",
+          "implementation_report": "execution_state/reports/T02-B2-run18-status-audit-repair-2.md",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-2-review.md",
+          "evidence": "Independent re-review at execution_state/reports/T02-B2-run18-status-audit-repair-2-review.md confirmed the historical task notes and earlier ledger phrases were corrected, but found one final stale waiting-for-run-18 phrase in the T02 table next-action cell. Coordinator is correcting that exact sentence."
+        },
+        {
+          "id": "T02-B2-status-audit-repair-3",
+          "status": "VERIFIED",
+          "owner": "coordinator; /root/foundation_review — independent review",
+          "packet": "execution_state/packets/T02-B2-run18-status-audit-repair-3.md",
+          "implementation_report": "execution_state/reports/T02-B2-run18-status-audit-repair-3.md",
+          "review_report": "execution_state/reports/T02-B2-run18-status-audit-repair-3-review.md",
+          "evidence": "Independent re-review PASS at execution_state/reports/T02-B2-run18-status-audit-repair-3-review.md. The stale hosted-verification wording is gone; the ledger accurately records run #18 success and keeps all open gates; task statuses remain T02 RUNNING and T02-B2 CHANGES_REQUIRED."
         }
       ],
-      "next_action": "Complete the one-file T02-B2 formatting repair 1 and independent review, then rerun hosted verification. Keep the canonical clearance-epsilon criterion explicitly unresolved; collect raw real-Havok observations only after the probe passes hosted lint and tests. Do not accept T02-B2 until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "Run-18 hosted verification and independent artifact review are complete, and the coordinator status records passed independent audit. T02-B2 and T02 remain open pending a human resolution of the canonical clearance epsilon and the canonical runner/facts/timeout/cancellation/restart-loft gates. T11 remains pending the user-provided disposable PostgreSQL service. Continue only work whose dependencies are ACCEPTED."
     },
     {
       "id": "T03",
