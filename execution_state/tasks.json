@@ -770,7 +770,7 @@
         },
         {
           "id": "C00-A",
-          "status": "IMPLEMENTED",
+          "status": "ACCEPTED",
           "depends_on": [
             "parent:T01"
           ],
@@ -783,7 +783,7 @@
           ],
           "owner": "coordinator — source writes released",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/toolchain_audit (source PASS); /root/swarm_review (repair PASS); /root/foundation_review (CI config PASS; prior runtime CHANGES_REQUIRED)",
+          "reviewer_identity": "/root/toolchain_audit (source and runtime PASS); /root/swarm_review (format repair PASS); /root/foundation_review (CI config PASS)",
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/C00-A-implementation.md",
           "review_report": "execution_state/reports/C00-A-review.md",
@@ -808,9 +808,10 @@
             },
             {
               "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
-              "result": "NOT RUN",
-              "environment": "GitHub required",
-              "detail": "Not reached in GitHub run 38078311528 because Prettier failed first; independent runtime review confirmed zero protocol cases ran. The standalone focused command remains outstanding."
+              "result": "PASS",
+              "environment": "GitHub Actions run 38078890667",
+              "exit_code": 0,
+              "detail": "Exact SHA 4bfecb4e6d700f85f89b7d521e168cab9489c6ec; 1 protocol test file, 10 passed, 0 skipped."
             },
             {
               "command": "pnpm verify",
@@ -832,22 +833,55 @@
               "detail": "Confirmed exact SHA, formatter failure, zero protocol cases, and skipped integration/browser checks."
             },
             {
+              "command": "Independent C00-A exact-head runtime review",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-A-runtime-review-run-38078890667.md",
+              "detail": "Run 38078890667 matched SHA 4bfecb4e6d700f85f89b7d521e168cab9489c6ec and verified focused/full tests, migrations, integration, browser results, and artifact provenance."
+            },
+            {
               "command": "pnpm verify after formatter repair",
-              "result": "NOT RUN",
-              "environment": "GitHub required",
-              "detail": "Push the reviewed repair first; all app checks remain remote-only."
+              "result": "PASS",
+              "environment": "GitHub Actions run 38078890667",
+              "exit_code": 0,
+              "detail": "Exact SHA 4bfecb4e6d700f85f89b7d521e168cab9489c6ec; typecheck/lint/format/build passed; Vitest 24 files and 99 tests passed, zero skipped. Full log is preserved under execution_state/reports/C00-A-run-38078890667."
             },
             {
               "command": "Coordinator CI support: focused protocol step",
-              "result": "IMPLEMENTED",
+              "result": "PASS",
               "environment": "shared GitHub Actions config",
-              "detail": "Added the exact packet command before Verify in .github/workflows/ci.yml. Independent config review PASS at execution_state/reports/C00-A-ci-review.md; hosted execution is pending."
+              "detail": "Exact standalone command ran before Verify. Independent config review PASS at execution_state/reports/C00-A-ci-review.md; runtime PASS in run 38078890667."
+            },
+            {
+              "command": "Disposable PostgreSQL migration and recheck",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38078890667",
+              "detail": "Two runs each verified one forward-only migration on the disposable PostgreSQL 17 service."
+            },
+            {
+              "command": "pnpm test:integration",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38078890667",
+              "exit_code": 0,
+              "detail": "1 integration test passed."
+            },
+            {
+              "command": "pnpm test:e2e --workers=1",
+              "result": "PASS",
+              "environment": "GitHub Actions run 38078890667",
+              "exit_code": 0,
+              "detail": "4 Chromium tests passed; 0 skipped, unexpected, or flaky."
+            },
+            {
+              "command": "Independent C00-A hosted runtime review",
+              "result": "PASS",
+              "report": "execution_state/reports/C00-A-runtime-review-run-38078890667.md",
+              "detail": "Exact SHA and artifacts inspected; contract verified, while cancellation execution remains unimplemented in T02."
             }
           ],
-          "next_action": "Source and CI changes are independently reviewed; push and run the focused protocol command plus full verify on GitHub."
+          "next_action": "Accepted protocol contract packet. Continue with the next packet only after checking its exact record and accepted dependencies."
         }
       ],
-      "next_action": "C00-A source and focused-CI changes are independently reviewed and await a fresh exact-head hosted run. T02 remains RUNNING until its full simulation gates pass."
+      "next_action": "C00-A ACCEPTED after exact-head hosted verification; continue the next ready T02 child. Parent T02 remains RUNNING until its full simulation gates pass."
     },
     {
       "id": "T03",

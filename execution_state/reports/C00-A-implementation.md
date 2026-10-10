@@ -1,6 +1,6 @@
 # C00-A implementation report
 
-**Status: IMPLEMENTED; format repair 1 is independently reviewed; fresh hosted verification pending.**
+**Status: ACCEPTED by coordinator after exact-head hosted verification and independent review.**
 
 ## Change
 
@@ -20,13 +20,19 @@ The packet's standalone focused Vitest command was absent from the pre-existing 
 
 - `node scripts/check-completion-plan.mjs --packet C00-A` — PASS; card ready before dispatch because original parent T01 is ACCEPTED.
 - GitHub Actions run 38078311528 on `324550eded86381597e82c4cb184d8620dcb51d4` — CHANGES_REQUIRED. Disposable PostgreSQL migrations and all package/root typechecks passed. Prettier stopped `pnpm verify` on `packages/game-protocol/src/protocol.test.ts` and `packages/game-protocol/src/types.ts`; unit tests/build did not run, and integration/browser checks were skipped. Full verify log: `execution_state/reports/C00-A-run-38078311528-verify/verify.log`.
-- `pnpm exec vitest run packages/game-protocol/src/protocol.test.ts` — NOT RUN in the failed hosted attempt; zero protocol cases ran. The standalone command remains required if it can be made available on GitHub without changing the packet's owned paths.
+- `pnpm exec vitest run packages/game-protocol/src/protocol.test.ts` — PASS in GitHub Actions run 38078890667 on `4bfecb4e6d700f85f89b7d521e168cab9489c6ec`; one file, 10 passed, zero skipped.
 - GitHub formatter artifact `execution_state/reports/C00-A-run-38078311528-formatting/formatting-repair.patch` — `git apply --check` PASS; applied only to the two protocol files owned by C00-A.
 - Independent source review — PASS; see `execution_state/reports/C00-A-review.md`.
 - Independent format re-review — PASS; see `execution_state/reports/C00-A-format-repair-review.md`.
-- Independent runtime review — CHANGES_REQUIRED; see `execution_state/reports/C00-A-runtime-review.md`.
-- Coordinator CI support change — `.github/workflows/ci.yml` now runs the packet's exact focused protocol command before `pnpm verify`; independent configuration review PASS is at `execution_state/reports/C00-A-ci-review.md`.
-- Fresh exact-head runtime verification — NOT RUN; required after pushing the reviewed repair.
+- Coordinator CI support change — `.github/workflows/ci.yml` runs the packet's exact focused protocol command before `pnpm verify`; independent configuration review PASS is at `execution_state/reports/C00-A-ci-review.md`.
+- `pnpm verify` — PASS in the same exact-head run: 24 test files, 99 passed, zero skipped, typecheck/lint/format/build passed.
+- Disposable PostgreSQL migration/recheck — PASS; one forward-only migration verified on each of two runs.
+- `pnpm test:integration` — PASS, one test.
+- `pnpm test:e2e --workers=1` — PASS, four Chromium tests; browser JSON reports zero skipped, unexpected, or flaky tests.
+- Independent runtime review — PASS; see `execution_state/reports/C00-A-runtime-review-run-38078890667.md`. It confirms exact SHA, actual artifacts, and limitations.
+- The prior run 38078311528 runtime review (`C00-A-runtime-review.md`) remains historical CHANGES_REQUIRED evidence and was superseded by the passing exact-head run after the bounded formatting repair.
+
+The passing run's GitHub artifacts were downloaded under `execution_state/reports/C00-A-run-38078890667/` and the complete job log is `execution_state/reports/C00-A-run-38078890667-github.log`. Artifact provenance/digests are recorded in the independent runtime review. These artifacts confirm a static preview build; they do not prove playable simulation or deployment.
 
 No application install, build, unit test, browser run, migration, or deployment ran locally. Existing remote baseline run 38057543954 is unrelated to these changes.
 
@@ -34,4 +40,4 @@ No application install, build, unit test, browser run, migration, or deployment 
 
 No live deployed Counterball gameplay consumer is recorded in current integration/deployment state. The additive event reason must still be checked against any staging/version deployed before release. This packet only freezes the interface; no runner currently proves cancellation timing or cleanup. T02 remains RUNNING and no gameplay gate is accepted by this change.
 
-Next: push the independently reviewed source/config repair, then run the exact focused command and full verification on GitHub. Record all commands and test counts before acceptance.
+Accepted as a protocol contract packet only. T02 remains RUNNING: no runner implements cancellation timing, batching, resource cleanup, or checkpoint restoration yet. Continue with the next packet only after checking its full dependencies in the completion plan.
