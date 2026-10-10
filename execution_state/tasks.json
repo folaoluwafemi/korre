@@ -217,7 +217,7 @@
       "dependencies": [
         "T01"
       ],
-      "owner": "coordinator integration; /root/toolchain_audit — T02-B0 implementation; /root/swarm_review — T02-A repair 2 and B0/B1 measurement review; /root/foundation_review — independent C0 source review",
+      "owner": "coordinator integration; /root/toolchain_audit — completed T02-B0 and C2 packets; /root/swarm_review — T02-A repair 2 and B0/B1 measurement review; /root/foundation_review — independent C0 source and repair reviews",
       "implementation_report": null,
       "review_report": null,
       "checks": [
@@ -298,6 +298,12 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 1,
           "detail": "On commit 8140f6700a0954fe576f5f3fe17687e850f0ec59, workspace/root typechecks passed. Hosted Prettier reported only placementPose.ts and placementPose.test.ts. Unit tests/build did not run; artifact upload completed without observations; integration and E2E were skipped. Formatting-only repair 1 is in progress."
+        },
+        {
+          "command": "GitHub Actions run #10: pnpm verify, integration, and one-worker Chromium E2E",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "On commit 5f4be8baaf320842917fc48322519f7a7b3b420a, typecheck, ESLint, and Prettier passed. Unit tests reported 69 passed, 8 PostgreSQL skipped, and one failure in the flat placement pose test due to exact floating-point object equality. Build did not run; integration/E2E were skipped. The calibration artifact was uploaded as ID 11664859147 (104,314 bytes), but was not downloaded or independently hash-checked for this run."
         },
         {
           "command": "pnpm.cmd exec prettier --write games/counterball/src/features/restarts/domain/placementPose.ts games/counterball/src/features/restarts/domain/placementPose.test.ts",
@@ -441,12 +447,12 @@
         },
         {
           "id": "T02-C0",
-          "status": "REVIEWING",
+          "status": "CHANGES_REQUIRED",
           "owner": "coordinator",
           "packet": "execution_state/packets/T02-C0-shared-restart-pose.md",
           "implementation_report": "execution_state/reports/T02-C0-shared-restart-pose-implementation.md",
           "review_report": "execution_state/reports/T02-C0-shared-restart-pose-review.md",
-          "evidence": "Coordinator implemented a pure tangent pose helper and focused unit tests. Independent source review PASS at execution_state/reports/T02-C0-shared-restart-pose-review.md. Run #9 passed typechecks but stopped at Prettier on exactly two new files before tests/build. Formatting repair 1 is implemented and awaits independent diff review plus a new hosted run. T02 remains RUNNING."
+          "evidence": "Coordinator implemented a pure tangent pose helper and focused unit tests. Independent source review PASS at execution_state/reports/T02-C0-shared-restart-pose-review.md; formatting repair 1 also passed independent diff review. Run #10 passed typecheck, ESLint, and Prettier, then found one over-strict exact floating-point assertion (69 passed, 8 PostgreSQL skipped). Test repair 1 replaces exact equality with 12-place component comparisons; independent review PASS at execution_state/reports/T02-C0-test-repair-1-review.md. The formula is unchanged. New hosted verify, integration, and E2E checks remain pending; T02 remains RUNNING."
         },
         {
           "id": "T02-C0-format-repair-1",
@@ -455,10 +461,28 @@
           "packet": "execution_state/packets/T02-C0-format-repair-1.md",
           "implementation_report": "execution_state/reports/T02-C0-format-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-C0-format-repair-1-review.md",
-          "evidence": "The pinned Prettier-only command completed successfully on the two files named by hosted run #9. Independent source review PASS at execution_state/reports/T02-C0-format-repair-1-review.md; only the hosted integration run remains pending."
+          "evidence": "The pinned Prettier-only command completed successfully on the two files named by hosted run #9. Independent source review PASS at execution_state/reports/T02-C0-format-repair-1-review.md. The formatter repair itself is verified; C0 still needs passing hosted unit tests/build, integration, and E2E."
+        },
+        {
+          "id": "T02-C0-test-repair-1",
+          "status": "IMPLEMENTED",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T02-C0-test-repair-1.md",
+          "implementation_report": "execution_state/reports/T02-C0-test-repair-1-implementation.md",
+          "review_report": "execution_state/reports/T02-C0-test-repair-1-review.md",
+          "evidence": "Coordinator replaced only the flat-pose test's exact position/quaternion object equality with per-component 12-place comparisons; expected formulas and helper are unchanged. Independent diff review PASS at execution_state/reports/T02-C0-test-repair-1-review.md. No local build/test/check ran; new hosted verify, integration, and E2E checks are pending."
+        },
+        {
+          "id": "T02-C2",
+          "status": "IMPLEMENTED",
+          "owner": "/root/toolchain_audit",
+          "packet": "execution_state/packets/T02-C2-playback-sampling.md",
+          "implementation_report": "execution_state/reports/T02-C2-sampling-implementation.md",
+          "review_report": "execution_state/reports/T02-C2-sampling-review.md",
+          "evidence": "Pure, Babylon-free sampler implementation and synthetic-body tests are complete under the exact packet paths; implementation report marks every check NOT RUN. T01 and T02-A are accepted prerequisites. Independent review by /root/foundation_review passed at execution_state/reports/T02-C2-sampling-review.md; hosted CI is required before acceptance."
         }
       ],
-      "next_action": "Finish the Prettier-only repair named in T02-C0-format-repair-1, obtain independent diff review, then rerun hosted verification, integration, and one-worker browser tests. Next run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. After inspecting those data, define bounded versioned config/cancellation decisions, implement canonical facts, sampling, timeout/invalid-body handling and runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "C0 test-only repair passed independent review; run hosted verification, integration, and one-worker browser tests. C2 implementation and independent source review passed; hosted CI remains required before acceptance. After C0 is accepted, run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. Then define bounded versioned config/cancellation decisions, implement canonical facts and the runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",

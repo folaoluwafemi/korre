@@ -15,12 +15,19 @@ describe("deriveRestartButtonPose", () => {
     const cap = { x: 1.25, y: config.geometry.capHeight / 2, z: -2.5 };
     const pose = deriveRestartButtonPose(cap, 0, 0, config);
 
-    expect(pose.position).toEqual({
-      x: cap.x,
-      y: config.geometry.surfaceY + config.geometry.buttonThickness / 2,
-      z: cap.z + config.geometry.capRadius + config.geometry.buttonRadius,
-    });
-    expect(pose.rotation).toEqual({ x: 0, y: 0, z: 0, w: 1 });
+    expect(pose.position.x).toBeCloseTo(cap.x, 12);
+    expect(pose.position.y).toBeCloseTo(
+      config.geometry.surfaceY + config.geometry.buttonThickness / 2,
+      12,
+    );
+    expect(pose.position.z).toBeCloseTo(
+      cap.z + config.geometry.capRadius + config.geometry.buttonRadius,
+      12,
+    );
+    expect(pose.rotation.x).toBeCloseTo(0, 12);
+    expect(pose.rotation.y).toBeCloseTo(0, 12);
+    expect(pose.rotation.z).toBeCloseTo(0, 12);
+    expect(pose.rotation.w).toBeCloseTo(1, 12);
   });
 
   it("uses oriented cylindrical support at the maximum configured tilt", () => {
