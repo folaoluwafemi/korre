@@ -32,11 +32,10 @@ import type {
 } from "./types.js";
 import { ProtocolParseError } from "./schemas.js";
 
-type NativeAbortSignalFits = AbortSignal extends NonNullable<
-  SimulationRunOptions["signal"]
->
-  ? true
-  : false;
+type NativeAbortSignalFits =
+  AbortSignal extends NonNullable<SimulationRunOptions["signal"]>
+    ? true
+    : false;
 const nativeAbortSignalFits: NativeAbortSignalFits = true;
 
 type FixtureCase = {

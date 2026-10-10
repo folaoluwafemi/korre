@@ -1,0 +1,37 @@
+diff --git a/packages/game-protocol/src/protocol.test.ts b/packages/game-protocol/src/protocol.test.ts
+index 564d816..67d51c7 100644
+--- a/packages/game-protocol/src/protocol.test.ts
++++ b/packages/game-protocol/src/protocol.test.ts
+@@ -32,11 +32,10 @@ import type {
+ } from "./types.js";
+ import { ProtocolParseError } from "./schemas.js";
+ 
+-type NativeAbortSignalFits = AbortSignal extends NonNullable<
+-  SimulationRunOptions["signal"]
+->
+-  ? true
+-  : false;
++type NativeAbortSignalFits =
++  AbortSignal extends NonNullable<SimulationRunOptions["signal"]>
++    ? true
++    : false;
+ const nativeAbortSignalFits: NativeAbortSignalFits = true;
+ 
+ type FixtureCase = {
+diff --git a/packages/game-protocol/src/types.ts b/packages/game-protocol/src/types.ts
+index 2c91922..10a0131 100644
+--- a/packages/game-protocol/src/types.ts
++++ b/packages/game-protocol/src/types.ts
+@@ -152,11 +152,7 @@ export interface SimulationRunner {
+ }
+ 
+ export type SimulationErrorCode =
+-  | "initialization"
+-  | "timeout"
+-  | "cancelled"
+-  | "invalidBody"
+-  | "resourceLimit";
++  "initialization" | "timeout" | "cancelled" | "invalidBody" | "resourceLimit";
+ 
+ export type SimulationError = Error & {
+   readonly code: SimulationErrorCode;

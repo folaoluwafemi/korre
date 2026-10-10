@@ -152,11 +152,7 @@ export interface SimulationRunner {
 }
 
 export type SimulationErrorCode =
-  | "initialization"
-  | "timeout"
-  | "cancelled"
-  | "invalidBody"
-  | "resourceLimit";
+  "initialization" | "timeout" | "cancelled" | "invalidBody" | "resourceLimit";
 
 export type SimulationError = Error & {
   readonly code: SimulationErrorCode;

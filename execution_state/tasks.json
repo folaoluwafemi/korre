@@ -548,7 +548,7 @@
         },
         {
           "id": "T02-A-repair-1",
-          "status": "REVIEWING",
+          "status": "IMPLEMENTED",
           "owner": "/root/swarm_review implemented; /root/toolchain_audit reviewing",
           "packet": "execution_state/packets/T02-A-repair-1.md",
           "review_report": "execution_state/reports/T02-A-review-repair-1.md",
@@ -770,7 +770,7 @@
         },
         {
           "id": "C00-A",
-          "status": "REVIEWING",
+          "status": "IMPLEMENTED",
           "depends_on": [
             "parent:T01"
           ],
@@ -783,8 +783,8 @@
           ],
           "owner": "coordinator — source writes released",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/toolchain_audit (source review complete)",
-          "attempt_count": 0,
+          "reviewer_identity": "/root/toolchain_audit (source PASS); /root/swarm_review (repair PASS); /root/foundation_review (CI config PASS; prior runtime CHANGES_REQUIRED)",
+          "attempt_count": 1,
           "implementation_report": "execution_state/reports/C00-A-implementation.md",
           "review_report": "execution_state/reports/C00-A-review.md",
           "checks": [
@@ -810,19 +810,44 @@
               "command": "pnpm exec vitest run packages/game-protocol/src/protocol.test.ts",
               "result": "NOT RUN",
               "environment": "GitHub required",
-              "detail": "Do not execute application tests on laptop; exact commit must be tested on GitHub."
+              "detail": "Not reached in GitHub run 38078311528 because Prettier failed first; independent runtime review confirmed zero protocol cases ran. The standalone focused command remains outstanding."
             },
             {
               "command": "pnpm verify",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions run 38078311528",
+              "exit_code": 1,
+              "detail": "Exact SHA 324550eded86381597e82c4cb184d8620dcb51d4: disposable DB migrations and all workspace/root typechecks passed; Prettier failed on protocol.test.ts and types.ts before unit tests/build. Full log at execution_state/reports/C00-A-run-38078311528-verify/verify.log. Integration/browser steps were skipped."
+            },
+            {
+              "command": "GitHub formatter artifact repair attempt 1",
+              "result": "PASS",
+              "environment": "GitHub-generated artifact; source-only application",
+              "detail": "Saved patch passed git apply --check and touched only protocol.test.ts and types.ts. Independent formatter repair review PASS at execution_state/reports/C00-A-format-repair-review.md."
+            },
+            {
+              "command": "Independent C00-A runtime evidence review",
+              "result": "CHANGES_REQUIRED",
+              "report": "execution_state/reports/C00-A-runtime-review.md",
+              "detail": "Confirmed exact SHA, formatter failure, zero protocol cases, and skipped integration/browser checks."
+            },
+            {
+              "command": "pnpm verify after formatter repair",
               "result": "NOT RUN",
               "environment": "GitHub required",
-              "detail": "Includes type/lint/format/unit/build; exact commit must be verified on GitHub."
+              "detail": "Push the reviewed repair first; all app checks remain remote-only."
+            },
+            {
+              "command": "Coordinator CI support: focused protocol step",
+              "result": "IMPLEMENTED",
+              "environment": "shared GitHub Actions config",
+              "detail": "Added the exact packet command before Verify in .github/workflows/ci.yml. Independent config review PASS at execution_state/reports/C00-A-ci-review.md; hosted execution is pending."
             }
           ],
-          "next_action": "Source review PASS; commit/push, then run the focused protocol test and full verification on the exact GitHub head."
+          "next_action": "Source and CI changes are independently reviewed; push and run the focused protocol command plus full verify on GitHub."
         }
       ],
-      "next_action": "C00-A is source-reviewed and awaiting exact-head GitHub verification. T02 remains RUNNING until its full simulation gates pass."
+      "next_action": "C00-A source and focused-CI changes are independently reviewed and await a fresh exact-head hosted run. T02 remains RUNNING until its full simulation gates pass."
     },
     {
       "id": "T03",
