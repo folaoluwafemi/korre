@@ -15,3 +15,9 @@ Required hosted checks are defined in `execution_state/packets/current-review.md
 
 ## Hosted repair 1
 Run 38047177729 on commit21f3a44 applied the actual migration twice successfully, then stopped at API typecheck: Hono app.request returns Response or Promise<Response>, while the test helper promised only Promise<Response>. No unit/build/integration/E2E pass is claimed for that run. Coordinator wraps the result with Promise.resolve, preserving both sync/async behavior. The run's remote Prettier suggestion was downloaded, inspected (five source/test files, formatting only), and applied; no local formatter or build ran. Re-review and fresh GitHub checks pending.
+
+## Browser lifecycle repair 1
+Independent browser review identified a restore/dispose race in pinned Babylon: the raw restored event allowed retry before Babylon's queued asynchronous resource rebuild completed. Coordinator sets the supported doNotHandleContextLost engine option. This preview's own lost/restored handlers stop rendering and enable manual reconstruction of the entire scene/engine; no old Babylon rebuild is queued. Pinned abstractEngine.pure.d.ts declares the option and thinEngine.pure.js omits automatic lost/restored listeners when enabled. No runtime pass is inferred from source. Fresh built-browser checks and independent re-review required.
+
+## Hosted repair 2
+Run38047344796 on af887af passed all workspace and root-test typechecks, then ESLint found two unsafe explicit throws inside test cleanup finally blocks. No unit/build/integration/E2E result is claimed. Coordinator replaced these cleanup blocks with sequential best-effort cleanup, retains verified schema/path guards, collects failures, and raises AggregateError after cleanup. Invalid targets are never dropped/deleted. Tests/checks remain required; no lint rule is disabled. This integrates the independent browser lifecycle repair described above and needs fresh hosted checks.

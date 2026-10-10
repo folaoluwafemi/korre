@@ -334,6 +334,9 @@ export default function CounterballPreview({
         {
           preserveDrawingBuffer: true,
           stencil: true,
+          // Recovery rebuilds the whole preview. Do not queue Babylon's separate
+          // asynchronous restore against an engine that retry may dispose.
+          doNotHandleContextLost: true,
           limitDeviceRatio: MAX_DEVICE_PIXEL_RATIO,
         },
         true,

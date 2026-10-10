@@ -137,30 +137,42 @@ describe.skipIf(!enabled)("migration runner with REAL PostgreSQL", () => {
   });
 
   afterEach(async () => {
+    const cleanupErrors: unknown[] = [];
     try {
       await pool?.end();
-    } finally {
-      pool = undefined;
-      try {
-        if (
-          admin !== undefined &&
-          /^cb_migrate_test_[a-f0-9]{32}$/.test(schemaName)
-        ) {
+    } catch (error) {
+      cleanupErrors.push(error);
+    }
+    pool = undefined;
+    if (admin !== undefined) {
+      if (!/^cb_migrate_test_[a-f0-9]{32}$/.test(schemaName)) {
+        cleanupErrors.push(new Error("Unsafe migration schema cleanup."));
+      } else {
+        try {
           await admin.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
-        }
-      } finally {
-        if (temporaryDirectory !== undefined) {
-          const target = resolve(temporaryDirectory);
-          if (
-            dirname(target) !== resolve(tmpdir()) ||
-            !target.startsWith(join(resolve(tmpdir()), "korre-migrate-test-"))
-          ) {
-            throw new Error("Unsafe migration fixture cleanup.");
-          }
-          await rm(target, { recursive: true, force: true });
-          temporaryDirectory = undefined;
+        } catch (error) {
+          cleanupErrors.push(error);
         }
       }
+    }
+    if (temporaryDirectory !== undefined) {
+      const target = resolve(temporaryDirectory);
+      if (
+        dirname(target) !== resolve(tmpdir()) ||
+        !target.startsWith(join(resolve(tmpdir()), "korre-migrate-test-"))
+      ) {
+        cleanupErrors.push(new Error("Unsafe migration fixture cleanup."));
+      } else {
+        try {
+          await rm(target, { recursive: true, force: true });
+          temporaryDirectory = undefined;
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError(cleanupErrors, "Migration test cleanup failed.");
     }
   });
 

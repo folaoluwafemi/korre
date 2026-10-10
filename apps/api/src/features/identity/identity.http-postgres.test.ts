@@ -138,19 +138,30 @@ describe.skipIf(!enabled)("identity HTTP with REAL PostgreSQL", () => {
   });
 
   afterAll(async () => {
+    const cleanupErrors: unknown[] = [];
     try {
       await pool?.end();
-    } finally {
-      if (admin !== undefined) {
+    } catch (error) {
+      cleanupErrors.push(error);
+    }
+    if (admin !== undefined) {
+      if (!/^cb_http_test_[a-f0-9]{32}$/.test(schemaName)) {
+        cleanupErrors.push(new Error("Unsafe test schema cleanup."));
+      } else {
         try {
-          if (!/^cb_http_test_[a-f0-9]{32}$/.test(schemaName)) {
-            throw new Error("Unsafe test schema cleanup.");
-          }
           await admin.query(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`);
-        } finally {
-          await admin.end();
+        } catch (error) {
+          cleanupErrors.push(error);
         }
       }
+      try {
+        await admin.end();
+      } catch (error) {
+        cleanupErrors.push(error);
+      }
+    }
+    if (cleanupErrors.length > 0) {
+      throw new AggregateError(cleanupErrors, "Identity test cleanup failed.");
     }
   });
 
