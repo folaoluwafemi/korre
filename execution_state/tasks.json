@@ -217,7 +217,7 @@
       "dependencies": [
         "T01"
       ],
-      "owner": "coordinator integration; /root/toolchain_audit — T02-B0 implementation; /root/swarm_review — T02-A repair 2 independent review",
+      "owner": "coordinator integration; /root/toolchain_audit — T02-B0 implementation; /root/swarm_review — T02-A repair 2 and B0/B1 measurement review; /root/foundation_review — independent C0 source review",
       "implementation_report": null,
       "review_report": null,
       "checks": [
@@ -276,6 +276,24 @@
           "detail": "All workspace/root typechecks and ESLint passed. Prettier flagged only calibrationProbe.test.ts. The upload step ran and tolerated the absent file; tests, artifact generation, build, integration, and E2E were skipped."
         },
         {
+          "command": "GitHub Actions run #8: pnpm verify, integration, and one-worker Chromium E2E",
+          "result": "PASS",
+          "exit_code": 0,
+          "detail": "On commit 7d5469d377e1923410068fcdca61cb146419987d, full verify passed; the 480-trial real Havok-WASM probe generated and uploaded artifact counterball-calibration-observations (ID 11664084850); integration passed; all 3 one-worker Chromium tests passed. The downloaded JSON contains 80 direct and 400 restart observations. Independent data review passed matrix integrity and documented physical limitations; this does not accept T02 or select physics defaults."
+        },
+        {
+          "command": "Independent T02-B0/B1 calibration artifact review",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-calibration-observations-review-1.md",
+          "detail": "Reviewer verified artifact provenance and all 480 expected tuples, then documented the reverse-direction restart, missing button apex/clearance and all-body settling evidence, and one unsettled trial. It did not select production physics coefficients or accept T02."
+        },
+        {
+          "command": "Independent T02-C0 shared restart pose source review",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-C0-shared-restart-pose-review.md",
+          "detail": "Reviewer confirmed pure protocol-shaped outputs, formula parity with B0, tangent/support equations, bounds/finiteness guards and source test coverage. No local checks ran; hosted verification is pending."
+        },
+        {
           "command": "Independent source review: T02-B1 formatting repair 1",
           "result": "PASS",
           "report": "execution_state/reports/T02-B1-format-repair-1-review.md",
@@ -311,11 +329,11 @@
       "packet_progress": [
         {
           "id": "T02-A",
-          "status": "VERIFIED",
+          "status": "ACCEPTED",
           "owner": "/root/toolchain_audit implemented; /root/swarm_review reviewed",
           "packet": "execution_state/packets/T02-A.md",
           "review_report": "execution_state/reports/T02-A-review.md",
-          "evidence": "The original Scene cleanup finding is repaired. Constructor repair 2 now covers real native-world allocation followed by collector construction failure; independent review PASS. Parent T02-A awaits integrated package/root checks."
+          "evidence": "The original Scene cleanup finding is repaired. Constructor repair 2 covers real native-world allocation followed by collector construction failure; independent repair-2 review PASS. GitHub run #8 passed full workspace verification, including the real Havok 480-trial probe and runtime/world tests; integration and browser suites also passed. T02-A world construction and lifecycle are accepted."
         },
         {
           "id": "T02-A-repair-1",
@@ -335,11 +353,11 @@
         },
         {
           "id": "T02-B0",
-          "status": "RUNNING",
+          "status": "ACCEPTED",
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
-          "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Runs #1–#4 repaired type/export, preview typing, async lint, and formatting issues. Run #5 passed typecheck/lint/format and 57 tests (8 PostgreSQL skips), then the probe failed its 60° float-conversion preflight before Havok initialization. Repair 4 adds a 1e-9° tolerance and repair 5 fixes its formatting; both have independent source reports. Run #6 passed verify, integration, and 3 browser tests; the calibration test asserts all 480 actual Havok-WASM trials passed. Vitest suppressed the successful test's console record, so no numerical data or coordinator coefficient decision has been recorded. A CI artifact output is being added before T02 acceptance."
+          "review_report": "execution_state/reports/T02-calibration-observations-review-1.md",
+          "evidence": "Probe source repairs have independent source reviews. GitHub run #8 passed the full 480-trial real Havok-WASM assertion and published the complete observation matrix, preserved at execution_state/reports/T02-calibration-observations-run-8.json. Independent review passed artifact integrity and all 480 expected tuples; limitations and the unsettled trial are documented in execution_state/reports/T02-calibration-observations-review-1.md. No production physics defaults have been selected."
         },
         {
           "id": "T02-B0-repair-1",
@@ -395,15 +413,24 @@
         },
         {
           "id": "T02-B1",
-          "status": "IMPLEMENTED",
+          "status": "ACCEPTED",
           "owner": "/root/toolchain_audit — probe output; coordinator — CI upload; /root/foundation_review — independent review",
           "packet": "execution_state/packets/T02-B1-calibration-artifact.md",
           "implementation_report": "execution_state/reports/T02-B1-calibration-artifact-implementation.md",
-          "review_report": "execution_state/reports/T02-B1-calibration-artifact-review.md",
-          "evidence": "Adds an env-gated full JSON record after probe assertions and uploads it as a read-only GitHub Actions artifact. Independent source/config review PASS. Run #7 passed typechecks/ESLint but failed Prettier before tests, so no artifact was generated; formatting-only repair is in progress. A later hosted run must publish and validate all 480 records."
+          "review_report": "execution_state/reports/T02-calibration-observations-review-1.md",
+          "evidence": "Adds an env-gated full JSON record after probe assertions and uploads it as a read-only GitHub Actions artifact. Independent source/config review PASS. Run #7 failed Prettier before tests; formatting-only repair was independently reviewed PASS. Run #8 passed verify, integration, and all 3 Chromium tests, then published artifact 11664084850 on commit 7d5469d. The extracted full matrix is preserved at execution_state/reports/T02-calibration-observations-run-8.json (SHA-256 B81E5D190E7D81E540E6657F1D39BA805F177545C93075B604B7DD6818D59013); independent data review passed matrix integrity and documented limitations. No coordinator tuning choice has been made."
+        },
+        {
+          "id": "T02-C0",
+          "status": "REVIEWING",
+          "owner": "coordinator",
+          "packet": "execution_state/packets/T02-C0-shared-restart-pose.md",
+          "implementation_report": "execution_state/reports/T02-C0-shared-restart-pose-implementation.md",
+          "review_report": "execution_state/reports/T02-C0-shared-restart-pose-review.md",
+          "evidence": "Coordinator implemented a pure tangent pose helper and focused unit tests. Independent source review PASS at execution_state/reports/T02-C0-shared-restart-pose-review.md. Per user instruction, no local checks ran; hosted CI is pending. T02 remains RUNNING."
         }
       ],
-      "next_action": "Persist the successful probe's full observation matrix as a hosted artifact, independently review its data, and make the coordinator coefficient decision. Then complete the separate deployed Cloudflare Havok gate before accepting T02."
+      "next_action": "Run hosted verification, integration, and one-worker browser tests for reviewed T02-C0. Then run T02-B2's intended cap-into-button real-WASM diagnostic without freezing production coefficients. After inspecting those data, define bounded versioned config/cancellation decisions, implement canonical facts, sampling, timeout/invalid-body handling and runner, and pass all real-WASM gates before accepting T02. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",
