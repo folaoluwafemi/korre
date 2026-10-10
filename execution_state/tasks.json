@@ -226,6 +226,12 @@
           "result": "CHANGES_REQUIRED",
           "exit_code": 2,
           "detail": "Hosted typecheck found calibrationProbe.test.ts(353,66): getBodies does not exist on generic IPhysicsEngine. Integration and E2E steps were skipped. Repair 1 is in progress; no probe measurements were produced."
+        },
+        {
+          "command": "GitHub Actions run #2: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 2,
+          "detail": "All workspace package typechecks, including games/counterball, passed. The root test-project typecheck failed at tests/e2e/counterball-preview.spec.ts lines 100 and 171 due to Playwright evaluate generic arity. Lint, unit tests, build, integration and E2E were skipped; no probe measurements were produced."
         }
       ],
       "blocker": null,
@@ -261,7 +267,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "execution_state/packets/T02-B0-calibration-probe.md",
           "review_report": "execution_state/reports/T02-calibration-probe-review.md",
-          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Remote typecheck/test/lint and all probe measurements still await hosted run #2."
+          "evidence": "Probe source is saved. Remote run #1 found a generic Physics engine type error. Repair 1 received independent CHANGES_REQUIRED because the pinned v2 barrel exports PhysicsEngineV2, not PhysicsEngine. Repair 2 imports and narrows the actual PhysicsEngineV2 export; independent source review PASS confirms the getBodies call and unchanged trial semantics. Hosted run #2 passed the full games/counterball package typecheck, but root verification then failed on unrelated preview E2E TypeScript generics before lint/tests/build or probe measurements. Hosted run #3 remains required."
         },
         {
           "id": "T02-B0-repair-1",
@@ -280,7 +286,7 @@
           "evidence": "Imports the pinned PhysicsEngineV2 barrel export and narrows the actual scene engine before getBodies. Independent source review PASS. No local or hosted runtime checks have run after this repair; awaiting GitHub CI."
         }
       ],
-      "next_action": "Run the bounded real-Havok coefficient/tilt probe in the GitHub runner without freezing shared config; capture its observations, then complete runtime review and coordinator coefficient decision before the canonical runner packet."
+      "next_action": "Push the independently reviewed preview-test typing repair and run hosted verification. If it passes root gates, capture the real-Havok probe observations and complete runtime review plus the coordinator coefficient decision before the canonical runner packet."
     },
     {
       "id": "T03",
@@ -289,14 +295,31 @@
       "dependencies": [
         "T01"
       ],
-      "owner": "/root/foundation_review — repair complete; /root/swarm_review — independent repair review",
+      "owner": "/root/foundation_review — repairs 1 and 2; /root/toolchain_audit — independent repair 2 source review",
       "implementation_report": "execution_state/reports/T03-implementation.md",
       "review_report": "execution_state/reports/T03-review-repair-1.md",
       "checks": [
         {
+          "command": "Independent source review: T03 repair 2",
+          "result": "PASS",
+          "report": "execution_state/reports/T03-review-repair-2.md",
+          "detail": "Reviewer confirmed both evaluate callback type annotations match the pinned Playwright API and preview/WebGL2 assertions remain intact. Hosted verification is still pending."
+        },
+        {
+          "command": "GitHub Actions run #2: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 2,
+          "detail": "The Counterball package typecheck passed. Root test-project typecheck failed at lines 100 and 171 of tests/e2e/counterball-preview.spec.ts; lint, unit tests, build, integration and E2E did not run."
+        },
+        {
           "command": "GitHub Actions run #1: pnpm test:e2e --workers=1",
           "result": "SKIPPED",
           "detail": "The workflow stopped at pnpm verify after the T02 calibration probe type error; the remote browser job did not execute."
+        },
+        {
+          "command": "GitHub Actions run #2: pnpm test:e2e --workers=1",
+          "result": "SKIPPED",
+          "detail": "The workflow stopped during root typecheck after the workspace package typechecks; the remote browser job did not execute."
         },
         {
           "command": "pnpm.cmd test:e2e",
@@ -336,9 +359,18 @@
           "packet": "execution_state/packets/T03-repair-1.md",
           "review_report": "execution_state/reports/T03-review-repair-1.md",
           "evidence": "Implementation report records a passing fresh-server one-worker Chromium run and actual inspection/narrow screenshots. Independent repair review confirms the source repairs but reports pnpm.cmd test:e2e exit 1: home passed, both preview tests stayed on the Suspense loading fallback and timed out; no root cause is confirmed. Counterball 17 tests and web 1 test passed before the laptop-build restriction. Supported-file lint passed; CSS lint is unsupported by current config. Do not accept pending diagnosed passing browser proof and remaining root gates."
+        },
+        {
+          "id": "T03-repair-2",
+          "status": "IMPLEMENTED",
+          "owner": "/root/foundation_review",
+          "packet": "execution_state/packets/T03-repair-2.md",
+          "implementation_report": "execution_state/reports/T03-repair-2-implementation.md",
+          "review_report": "execution_state/reports/T03-review-repair-2.md",
+          "evidence": "Removed the unsupported evaluate generic at both WebGL checks and annotated callback result types. Independent source review PASS. No local commands were run; hosted root verification, probe measurements, integration and browser E2E remain pending."
         }
       ],
-      "next_action": "Push the reviewable branch to run the one-worker GitHub browser job; diagnose the preview route timeout from that run, repair only if a cause is confirmed, then complete required package/root integration gates and independent review. Keep T05 blocked until T03 is ACCEPTED."
+      "next_action": "Run hosted pnpm verify, integration, and one-worker browser E2E on the independently reviewed repair 2 commit. If a gate fails, repair the confirmed cause and obtain a new independent review. Keep T05 blocked until T03 is ACCEPTED."
     },
     {
       "id": "T04",

@@ -97,7 +97,7 @@ test("renders the real scene and cleans up before a preview remount", async ({
     name: "Counterball scene preview. 15 pieces: 7 home caps, 7 away caps, 1 four-hole button.",
   });
   await expect(canvas).toBeVisible();
-  const contextVersion = await canvas.evaluate<string | null>((element) => {
+  const contextVersion = await canvas.evaluate((element): string | null => {
     const renderingCanvas = element as HTMLCanvasElement;
     const context =
       renderingCanvas.getContext("webgl2") ??
@@ -168,7 +168,7 @@ test("inspects the fixture button and remains usable at 390 by 844", async ({
     name: "Counterball scene preview. 15 pieces: 7 home caps, 7 away caps, 1 four-hole button.",
   });
   await expect(canvas).toBeVisible();
-  const webGlVersion = await canvas.evaluate<string | null>((element) => {
+  const webGlVersion = await canvas.evaluate((element): string | null => {
     const renderingCanvas = element as HTMLCanvasElement;
     const context = renderingCanvas.getContext("webgl2");
     const version: unknown = context?.getParameter(context.VERSION);
