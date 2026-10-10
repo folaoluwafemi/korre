@@ -366,6 +366,12 @@
           "detail": "Reviewer found the pinned real-WASM source path, 40-trial matrix, finite/settlement checks, raw clearance measurements, assertion-before-artifact behavior, and cleanup consistent with scope. Packet acceptance remains blocked solely by the missing canonical clearance epsilon; no local tests/builds ran and runtime evidence is pending."
         },
         {
+          "command": "GitHub Actions run #16: pnpm verify",
+          "result": "CHANGES_REQUIRED",
+          "exit_code": 1,
+          "detail": "Typecheck passed; ESLint stopped the hosted verify before unit tests, build, or probe execution. It reported five errors in the new probe: type-only Quaternion import, unused EntityId import, unused asPlainQuaternion helper, and two unsafe throws from finally blocks. No observation artifact was produced. Bounded ESLint repair 1 is in progress."
+        },
+        {
           "command": "git diff --check after T02-C2 test repair 1",
           "result": "PASS",
           "exit_code": 0,
@@ -594,9 +600,18 @@
           "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
           "review_report": "execution_state/reports/T02-B2-intended-shot-probe-review.md",
           "evidence": "Prerequisite T02-C0 is ACCEPTED. Source implementation report and independent review are saved. Review verdict is CHANGES_REQUIRED for packet acceptance solely because canonical config has no clearance epsilon; source honestly records raw signed clearance and leaves epsilon classification null rather than inventing a threshold. Coordinator CI artifact wiring passed independent review and hosted run #14; that run had no probe source/output, so no intended-shot artifact was uploaded. The source uses pinned real Havok WASM and preserves all fifteen-body observations, but no runtime measurements exist yet. Hosted probe execution and artifact review remain pending; production coefficients are not selected."
+        },
+        {
+          "id": "T02-B2-eslint-repair-1",
+          "status": "RUNNING",
+          "owner": "/root/toolchain_audit — source repair; /root/swarm_review — independent review",
+          "packet": "execution_state/packets/T02-B2-eslint-repair-1.md",
+          "implementation_report": "execution_state/reports/T02-B2-intended-shot-probe-implementation.md",
+          "review_report": "execution_state/reports/T02-B2-eslint-repair-1-review.md",
+          "evidence": "Created from the five exact ESLint findings in hosted run #16. Scope is limited to unused/type-only imports and cleanup error handling in the T02-B2 probe. No local tests/builds/formatters may run."
         }
       ],
-      "next_action": "Resolve whether T02-B2 classifies only raw signed clearance or needs a canonical configured epsilon. In parallel, run the independently reviewed real-Havok probe on GitHub to collect raw observations; do not mark the packet accepted until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
+      "next_action": "Complete bounded T02-B2 ESLint repair 1, obtain independent review, and rerun hosted verification. Keep the canonical clearance-epsilon criterion explicitly unresolved; collect raw real-Havok observations only after the probe passes hosted lint and tests. Do not accept T02-B2 until its threshold criterion is resolved, hosted gates pass, and the artifact is independently reviewed. Then make the explicitly provisional config/loft decision and continue to the bounded canonical runner packet. T02 remains open until runner/facts/timeout/cancellation and real-WASM gates pass. T04 is a separate follow-on dependency, not a prerequisite to T02 acceptance."
     },
     {
       "id": "T03",
