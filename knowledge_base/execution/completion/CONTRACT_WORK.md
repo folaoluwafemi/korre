@@ -79,7 +79,7 @@ The fields cover:
 - Restart impulse policy: initial `contact-only`. Any assisted lift is an explicit different versioned mode with reviewed formula and evidence, never a hidden kick.
 - Physics support coverage outside the painted pitch and workload limits, if added under the geometry/simulation section instead.
 
-Freeze exact TypeScript fields and corresponding runtime schema together in C00. Use a single exported calibration type for diagnostics and the production adapter. Null remains allowed for historical scaffold fixtures but cannot silently fall back to probe constants. C02 publishes measured values; C03 updates all fixture version/hash tags and freezes the accepted config before gameplay consumers start.
+Freeze exact TypeScript fields and corresponding runtime schema together in C00. `PhysicsCalibration` remains the shared type for candidate calibration diagnostics and the production adapter. The separately reviewed `DiagnosticPhysicsGuard` applies only to the bounded D01 browser direct-shot diagnostic; it contains no calibration coefficients and is never a fallback for a calibrated runner. Null remains allowed for historical scaffold fixtures but cannot silently fall back to probe constants. C02 publishes measured values; C03 updates all fixture version/hash tags and freezes the accepted config before gameplay consumers start.
 
 Do not select production coefficients from the 480/40-row observations alone. All-15-body settling and actual whole-button obstacle traversal remain required. The normal/restart policy must use identical config and code for browser, Node tests and deployed physics.
 
@@ -90,6 +90,8 @@ The current physical support slab ends at the painted boundary. Exited bodies ca
 Preferred proposed engineering treatment: open horizontal pavement continues beyond the painted lines. Give the physical support a config-hashed apron whose extent is derived conservatively from the accepted impulse/energy bound and maximum simulated duration. It has no enclosing wall, no bounce-back permission and no change to rule crossing planes. Test side/end exits and settling on it. If an object exceeds the proven supported bounds, fail safely and restore the checkpoint; never report it as settled.
 
 If measured energy/coverage cannot make that bounded treatment reliable, present a separate reviewed exit-body policy to the coordinator. Do not quietly freeze, teleport, delete or respawn a body during simulation. Cap returns happen through explicit pure resolution/placement after facts are recorded, preserving every unrelated cap.
+
+T02-GC01 selects a separate diagnostic fallback for only the accepted D01 raw centre impulse. It hashes a 325-unit open apron and bounds each body's centre-of-mass drop below its initial rest height to 0.01125 over the whole trial. The probe must use conservative full-collider sweep bounds before every actual Havok substep, include the possible gravitational work in its energy envelope, and stop before a step that could exceed the bound. This does not require continuous contact with the pavement; loft remains possible. If the sweep, energy, mass, or actual material properties cannot be established, the trial fails with `resourceLimit`. It does not calibrate or unlock the ordinary runner. `maxBatchSteps` is explicitly actual `executeStep` calls between yields, not nominal 120-Hz ticks.
 
 ## 4. Internal interfaces to freeze before multiple consumers
 

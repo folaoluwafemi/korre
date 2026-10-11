@@ -1,0 +1,30 @@
+# T02-GC01 diagnostic guard contract — independent review
+
+Date: 2026-10-11
+
+## Verdict
+
+**CHANGES_REQUIRED.** The diagnostic scope, exact D01 input, energy-drop derivation, selected guard arithmetic, fail-closed requirements, and separation from measured calibration are sound as a documented design. The source report correctly says no runtime support proof exists. Two documentation issues prevent accepting this coordinator card as written: the assigned decision log was not updated, and the contract contradicts itself about whether the schema/config versions change.
+
+## Findings
+
+1. **The required coordinator decision is missing.** The exact T02-GC01 record assigns `execution_state/DECISIONS.md` as a write path and calls for a coordinator decision. The current file has no entry for this diagnostic guard. `git status --short` and `git diff HEAD` show no change to that path, while the implementation report at `execution_state/reports/T02-GC01-implementation.md:8-12` says all three assigned paths were authored. Add a decision-log entry recording the exact diagnostic scope, selected fail-closed policy, schema/config version plan, `physicsCalibration: null`, and limits. This is the smallest repair; it does not require another policy choice.
+
+2. **The version/hash statement is contradictory.** `CONTRACTS.md:320` says `CounterballConfig.schemaVersion` and `configVersion` advance to 2. Its final paragraph at `:363` says the envelope “changes the canonical config hash only.” Reconcile this sentence: the diagnostic amendment changes the canonical config hash and config schema/config version; it leaves protocol wire version and physics adapter version unchanged, and accepts no calibration or runtime gate. Keep every fixture hash update as a required implementation step.
+
+## Checks against the accepted analysis and input
+
+- `node scripts/check-completion-plan.mjs --packet T02-GC01` returns PASS and extracts the exact record as ready. The checker explicitly says this is plan consistency only, not implementation or runtime evidence.
+- The exact tuple is consistent with the accepted D01 artifact review: fixture `counterball-protocol-fixtures-v1`, match `00000000-0000-4000-8000-000000000001`, selected `home-6`, raw impulse `{x:0,y:0,z:8}`, applied once at the cap centre `{x:0,y:0.06,z:-4}`. It is not a normalized power mapping or a general/restart input. The cited hosted run used the pinned WASM under NullEngine; it did not prove the guard or browser/deployed behavior.
+- The arithmetic in the implementation report checks out to its stated precision. Initial centre impulse energy is 32. The all-body mass is `14×1 + 0.15 = 14.15`; a `0.01125` maximum COM drop under gravity magnitude `9.81` contributes `1.561629375`, so `33.561629375` rounds upward to the selected ceiling 34 with `0.438370625` allowance. This is an explicit coordinator-selected diagnostic bound, not solver-passivity evidence.
+- With that 34-unit ceiling and the configured cylinder sizes/masses, the cap/button minimum principal inertias and farthest-point radii yield the reported displayed speed, angular-speed, and sweep values. For `dt=1/120`, point-sweep limit `0.01125`, and rotation limit `pi/8`, the conservative translation/rotation counts are cap `19/2` and button `48/7`; `Nrequired=48` fits the selected 48-call cap. The apron calculation is `21.2916258969×15 + 0.1319327480 = 319.5063212`, so 325 is a conservative rounded margin. Use full-precision values in an implementation and verify actual pinned-Havok masses/inertias rather than treating these analytic cylinder values as measurements.
+- The work limits are internally consistent: 1,800 nominal ticks × 48 actual calls is 86,400 calls per trial; batches of at most 120 actual calls require at most 720 batches; 30,000 ms is a ceiling, not a claim the run will finish in that time. The contract now defines batch units explicitly.
+- The 0.20 slab and `0.01125` point-sweep/drop limits are mutually conservative only if the runner proves the complete swept collider path at each actual `executeStep` boundary, checks the whole-trial COM-drop/energy bounds, and stops before a step whose conservative sweep could exceed them. Endpoint-only transforms cannot establish either full-collider containment or vertical nonpenetration. `worldFactory.ts:185-188,211-220` still sets one nominal fixed step per call and creates a slab only the pitch size; it has no diagnostic apron, substep loop, or swept support test. This review accepts the requirement wording as a future implementation gate, not as existing support.
+
+## Calibration and runtime limits
+
+The new contract keeps the diagnostic guard separate from `PhysicsCalibration`; it does not choose friction, restitution, damping, production impulse mapping, or restart lift. It explicitly limits the diagnostic field to this fixture/input, includes it in the canonical hash, requires config-schema/config-version 2, keeps protocol version 1, and says ordinary calibrated local/AI/online/deployed runners must reject null calibration rather than consume this envelope. These are appropriate boundaries. The runtime `packages/game-protocol/src/config.ts` is still schema/config version 1 with `physicsCalibration: null` and has no `diagnosticGuard` field; no type/schema/config or runner code was changed by this documentation card.
+
+No runtime behavior is proven. A later implementation must add and test the strict typed/schema field, update every config-hash fixture, preserve `physicsCalibration: null`, ensure only the explicit diagnostic entry can read the guard, read and validate actual pinned Havok material/mass properties without assuming defaults, and enforce full-collider swept bounds through every `executeStep`. Any unavailable property, unsafe sweep, energy mismatch, unsupported extent, or exhausted step/batch/wall limit must fail with a typed non-success result. This report does not accept the diagnostic implementation, T02, calibration, loft traversal, gameplay, or deployed Havok.
+
+No application tests, builds, physics trials, browser checks, or deployment checks were run for this review.

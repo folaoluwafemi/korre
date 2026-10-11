@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-81 bounded cards cover 21 remaining parents. Initially ready: C01-DIAG-BUILD.
+83 bounded cards cover 21 remaining parents. Initially ready: T02-GC02, T02-L01, T02-BR01.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -17,6 +17,8 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | C02 | T02 | Publish only evidence-supported calibration and support settings | coordinator | T02-L02, T02-D01, C01-H | 5 |
 | C03 | T02 | Accept canonical calibration handoff for real runner | coordinator | C02 | 0 |
 | COMPLETION-GRAPH-REPAIR-2 | T02 | Synchronize the accepted fact-repair graph and close its stale failed card | coordinator | T02-F01-ROTATION-1, T02-F01-ROTATION-1-FORMAT-REPAIR-2 | 3 |
+| T02-GC01 | T02 | Freeze a hashed diagnostic-only direct-shot guard | coordinator | C00, T02-D01, T02-GA01 | 3 |
+| T02-GC02 | T02 | Add the hashed diagnostic guard to protocol config | coordinator | C00, T02-GC01, T02-D01, T02-GA01 | 5 |
 | T02-D01 | T02 | Measure direct-shot impulse response on the canonical fixture | worker | C00-B, C01, T02-B0, T02-A, C00 | 1 |
 | T02-F01 | T02 | Implement pure simulation facts from physics-step observations | worker | T02-C0, T02-C2, C00-A, C00 | 2 |
 | T02-F01-ROTATION-1 | T02 | Replace endpoint-axis travel with a conservative rotational support bound | worker | T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 2 |

@@ -710,5 +710,171 @@
       "If the validator reports a cycle, conflicting writer, or stale ready status, do not accept this card.",
       "If any runtime claim is introduced, remove it and document only checks actually performed."
     ]
+  },
+  {
+    "id": "T02-GC01",
+    "parent": "T02",
+    "role": "coordinator",
+    "title": "Freeze a hashed diagnostic-only direct-shot guard",
+    "depends_on": [
+      "C00",
+      "T02-D01",
+      "T02-GA01"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
+      "execution_state/reports/T02-D01-repair-2-format-review.md",
+      "execution_state/reports/C01-P-T02-D01-run-38100635457-runtime-review.md",
+      "execution_state/reports/T02-guard-contract-analysis-2.md",
+      "execution_state/reports/T02-guard-contract-analysis-2-review.md",
+      "packages/game-protocol/src/config.ts",
+      "games/counterball/src/simulation/worldFactory.ts"
+    ],
+    "write_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md"
+    ],
+    "outputs": [
+      "An independently reviewed coordinator decision and canonical contract for one diagnostic-only, config-hashed raw direct impulse. PhysicsCalibration stays null; ordinary local, AI, online and deployed play cannot consume this envelope."
+    ],
+    "steps": [
+      "Use only accepted D01's exact at-rest home-6 centre impulse {x:0,y:0,z:8} at {x:0,y:0.06,z:-4}; do not map it to user power or generalize to restarts/off-centre input.",
+      "Select a separate diagnostic envelope with energy ceiling 34 units: initial J^2/(2m)=32, plus all 14.15 dynamic mass units times configured gravity 9.81 and a maximum centre-of-mass drop of 0.01125 game units below each at-rest reference height at any point in the complete trial (1.561629375), rounded upward by 0.438370625. The probe must enforce this global displacement bound from conservative full-substep sweeps and reject before any step whose swept COM could exceed it.",
+      "Use cylinder minimum inertias from configured dimensions/masses and farthest collider radii; at E=34 derive full-precision sweep and rotation limits for each body. Freeze maxTranslationPerSubstep=0.01125, maxRotationPerSubstep=pi/8 and maxSubstepsPerTick=48 only if the derivation yields Nrequired<=48 for all 15 bodies; otherwise stop and recompute the entire envelope.",
+      "Freeze a 325-unit invisible open support apron from every painted edge, no walls. Enforce swept full-collider horizontal containment. The vertical fallback is a global 0.01125-COM-drop bound relative to each body's initial rest height, not a continuous-floor-contact claim; the 0.20 support slab plus per-call swept collider bound prevents passing through it. Include that bounded potential drop in E and fail closed on an unprovable sweep or larger drop.",
+      "Before the impulse, inspect the actual pinned Havok material values for the surface and every dynamic shape; require finite nonnegative friction and restitution in [0,1], and require actual masses/inertias no less conservative than the derived bounds. Do not alter D01's diagnostic material setup or assume undocumented engine defaults.",
+      "Define workload units explicitly: at most 15 seconds/1,800 nominal 120-Hz ticks, 86,400 actual public Havok executeStep calls total, at most 120 actual calls between host yields, and at most 30,000 ms wall time. Exhaustion is resourceLimit with no partial success; these limits do not assert the trial will fit the wall budget.",
+      "Keep frame/fact limits at the accepted protocol limits, preserve open green pavement/crossing planes, label the envelope diagnostic-only, and specify config schema/hash versioning plus the requirement to update every config-hash fixture."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-GC01",
+        "environment": "local-document",
+        "expected": "The exact coordinator packet is ready from accepted C00, T02-D01, T02-GA01 and original T01; this is plan consistency only."
+      },
+      {
+        "command": "Independent source review of the three exact contract/decision paths against the formulas, selected bounds and diagnostic-only boundary",
+        "environment": "source-review",
+        "expected": "PASS only if all derived values are conservative, input/workload semantics are explicit, physicsCalibration remains null, loft is allowed, and no runtime support proof or calibration is claimed."
+      }
+    ],
+    "acceptance": [
+      "The separate guard has a narrow immutable input domain, canonical identity, hash/version plan, strict fail-closed behavior and no production/gameplay use.",
+      "The exact energy, inertia, substep, apron and workload arithmetic is independently checked; any swept support or energy uncertainty returns resourceLimit.",
+      "The supported vertical-drop term is bounded over the entire solver substep, not just endpoint samples; any body leaving the apron or exceeding the vertical budget cannot continue.",
+      "All numerical choices are identified as coordinator-selected diagnostic policy, not measured Havok behavior or PhysicsCalibration."
+    ],
+    "negative_cases": [
+      "Do not fill physicsCalibration or claim measured materials, damping, restart lift, traversal, settling, calibration or playability.",
+      "Do not rely on endpoint poses, apron width alone, default solver passivity without pinned evidence, or a nominal tick count as an actual Havok substep count.",
+      "Do not add general impulses, restart cases, player power mapping, walls, or a production runner to this packet."
+    ],
+    "review_questions": [
+      "Do the mass/inertia, total-mass gravitational-work, speed, full-collider sweep, apron and total-call derivations use conservative values and correct units?",
+      "Can the stated support drop be bounded throughout each executeStep interval, including rotation, rather than inferred from endpoint transforms?",
+      "Are maxBatchSteps semantics actual Havok calls, and do timeout/resource/cancellation outcomes fail closed without partial success?",
+      "Does the policy remain separate from PhysicsCalibration and unavailable as an ordinary game-play calibration/default?"
+    ],
+    "stop_conditions": [
+      "If actual solver behaviour cannot be bounded by the accepted envelope or a swept support check cannot enforce it, do not select/hash these values; derive a finite alternative or leave BR01 and T02-L01 blocked.",
+      "If review needs a changed limit, input or physical assumption, update the derivation first and obtain a fresh independent review before source work."
+    ]
+  },
+  {
+    "role": "coordinator",
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-GC02",
+      "execution_state/reports/T02-GC01-implementation.md",
+      "execution_state/reports/T02-GC01-repair-1-review.md",
+      "execution_state/reports/T02-GC02-config-surface-audit.md",
+      "packages/game-protocol/src/index.ts",
+      "packages/game-protocol/src/types.ts",
+      "packages/game-protocol/src/schemas.ts",
+      "packages/game-protocol/src/config.ts",
+      "packages/game-protocol/src/protocol.test.ts",
+      "tests/fixtures/counterball-v1.json"
+    ],
+    "write_paths": [
+      "packages/game-protocol/src/types.ts",
+      "packages/game-protocol/src/schemas.ts",
+      "packages/game-protocol/src/config.ts",
+      "packages/game-protocol/src/protocol.test.ts",
+      "tests/fixtures/counterball-v1.json"
+    ],
+    "steps": [
+      "Implement the exact DiagnosticPhysicsGuard TypeScript type from the accepted GC01 contract, add the required diagnosticGuard field, and advance only the outer CounterballConfig schemaVersion/configVersion to 2. The nested guard schemaVersion remains 1; PhysicsCalibration.schemaVersion remains 1; protocol version and wire messages remain unchanged.",
+      "Implement a strict runtime schema for every fixed guard field and nested object. Require the exact scope, fixture/match/cap identity, raw impulse/application point, energy/drop/apron/tunnelling/workload constants from GC01. Reject unknown, missing, or altered guard values. Preserve strict config parsing and all existing PhysicsCalibration validation.",
+      "Add the exact GC01 diagnosticGuard object to the frozen canonical config while preserving physicsCalibration:null and the existing COUNTERBALL_CONFIG_V1 export for source compatibility. The guard is included through the existing hashCounterballConfig canonical hash path. Do not create a gameplay fallback or diagnostic consumer.",
+      "Extend protocol tests to prove the version split, exact guard acceptance, rejection of altered nested identity/limits/unknown fields, preservation of null calibration, unchanged protocol-v1 contracts, stable canonical hashing, and rejection behavior for existing invalid calibration cases.",
+      "Recompute and replace all eight configHash values in tests/fixtures/counterball-v1.json using the canonical config hash produced by source. Do not add the guard to serialized match-state fixtures and do not update unrelated fixture fields.",
+      "Keep this card limited to the five assigned paths. No runner/world/apron/substep/runtime diagnostic access, calibration coefficients, browser controls, gameplay input mapping, package/lockfile, CI, or deployment changes."
+    ],
+    "outputs": [
+      "The strict GC01 diagnostic guard is part of the version-2 canonical protocol config and its hash; all eight protocol fixture version hashes match it. No runtime consumer or physical proof is claimed."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-GC02",
+        "environment": "local-document",
+        "expected": "The exact coordinator card is ready only after accepted C00, T02-GC01, T02-D01 and T02-GA01; this is plan consistency only."
+      },
+      {
+        "command": "Independent source review of the five exact protocol/config/fixture paths",
+        "environment": "source-review",
+        "expected": "PASS only if strict literals/schema/type match GC01, only outer config version changes, physicsCalibration remains null, all eight fixture config hashes match, and no consumer/runtime fallback is added."
+      },
+      {
+        "command": "Exact-head GitHub CI workflow: focused game-protocol test, pnpm verify, integration, and one-worker Chromium E2E",
+        "environment": "github",
+        "expected": "All named jobs complete on the reviewed source SHA with exit 0, actual test/browser counts and no skipped cases in the required suites; retain full logs and artifacts and obtain independent exact-run review."
+      }
+    ],
+    "acceptance": [
+      "The public barrel exports the new guard type through its existing wildcard exports without an extra path or altered consumer API.",
+      "CounterballConfig schema/config versions are exactly 2; nested guard and PhysicsCalibration schemas remain version 1; protocol version/messages remain 1.",
+      "The strict config schema accepts the exact immutable GC01 guard and rejects altered or additional guard fields while preserving all existing calibration checks.",
+      "The frozen shared config contains diagnosticGuard and physicsCalibration:null; canonical hashing includes the guard; every one of the eight fixture hashes matches that config.",
+      "Independent source review and exact-head hosted verification pass. Acceptance is limited to protocol config/type/schema/hash fixtures, not runtime enforcement, T02, BR01, first flick, calibration, gameplay, or deployed Havok."
+    ],
+    "negative_cases": [
+      "Do not populate physicsCalibration or use diagnosticGuard as a fallback for calibrated local, AI, online, or deployed play.",
+      "Do not alter protocol wire schemas/version, gameplay version/rules, physical limits, D39, fixture state bodies, or the accepted D01 input.",
+      "Do not change package manifests/lockfile, rename the existing COUNTERBALL_CONFIG_V1 public export, add a guard consumer, or claim the envelope is enforced at runtime.",
+      "Do not skip or weaken a failed test, leave stale fixture hashes, or count a local/mock/Node-only check as hosted browser/WASM/deployed evidence."
+    ],
+    "review_questions": [
+      "Are all guard fields exact strict literals and represented identically by TypeScript, Zod, frozen config and hash tests?",
+      "Did only the outer config schema/config version advance, without accidentally changing PhysicsCalibration.schemaVersion, PROTOCOL_VERSION, message schemas or existing exports?",
+      "Do all eight fixture hashes equal the exact canonical hash, with no unrelated fixture edits?",
+      "Does physicsCalibration remain null, with no code consuming diagnosticGuard as a gameplay default or fallback?",
+      "Do the exact SHA GitHub logs show every required suite ran and passed without hidden skips?"
+    ],
+    "stop_conditions": [
+      "If the public type/schema/export or fixtures require a sixth path, stop and revise this coordinator card before editing it.",
+      "If existing protocol consumers require a wire-version change, stop and reconcile the compatibility contract before source changes.",
+      "If any required suite skips/fails or hosted SHA differs from the reviewed tree, do not accept; preserve logs and open a bounded repair."
+    ],
+    "id": "T02-GC02",
+    "parent": "T02",
+    "title": "Add the hashed diagnostic guard to protocol config",
+    "depends_on": [
+      "C00",
+      "T02-GC01",
+      "T02-D01",
+      "T02-GA01"
+    ],
+    "required_parent_acceptance": [
+      "T01"
+    ],
+    "catalogue": "COORDINATOR_PACKETS.json"
   }
 ]

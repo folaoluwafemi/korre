@@ -367,9 +367,33 @@ export type PhysicsCalibration = {
   };
 };
 
-export type CounterballConfig = {
+/** Fixed envelope for the accepted D01 browser direct-impulse diagnostic only. */
+export type DiagnosticPhysicsGuard = {
   schemaVersion: 1;
-  configVersion: "counterball-config-1";
+  scope: "browser-direct-impulse-v1";
+  fixtureId: "counterball-protocol-fixtures-v1";
+  matchId: "00000000-0000-4000-8000-000000000001";
+  capId: "home-6";
+  impulse: { x: 0; y: 0; z: 8 };
+  applicationPoint: { x: 0; y: 0.06; z: -4 };
+  maxMechanicalEnergy: 34;
+  maxRestHeightDrop: 0.01125;
+  supportApronMargin: 325;
+  tunnelling: {
+    maxPointSweepPerSubstep: 0.01125;
+    maxRotationPerSubstep: 0.39269908169872414;
+    maxSubstepsPerTick: 48;
+  };
+  workload: {
+    maxTotalSubsteps: 86400;
+    maxBatchSubsteps: 120;
+    maxWallTimeMs: 30000;
+  };
+};
+
+export type CounterballConfig = {
+  schemaVersion: 2;
+  configVersion: "counterball-config-2";
   geometry: {
     pitchWidth: number;
     pitchLength: number;
@@ -415,6 +439,7 @@ export type CounterballConfig = {
     maximumPrivateTargetGoals: 10;
   };
   physicsCalibration: PhysicsCalibration | null;
+  diagnosticGuard: DiagnosticPhysicsGuard;
 };
 
 export type ConfigHash = string & { readonly __brand: "ConfigHash" };

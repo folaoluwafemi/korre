@@ -314,3 +314,50 @@ Transport provides typed `sendAction`, `subscribe`, `getSnapshot`, `connect`, an
 - Session identity and membership determine action rights, never username/client claims.
 - Same committed result for players and spectators; duplicate requests grant no second shot.
 - Config/rules/engine versions frozen per room; changed versions do not join incompatible rooms silently.
+
+## Diagnostic-only direct-shot guard
+
+The browser direct-shot diagnostic is a separate, narrowly scoped experiment. It uses the strict `CounterballConfig.diagnosticGuard` field added by the reviewed config-schema-2 amendment; it does not populate `physicsCalibration`, which remains `null` until C02/C03 have accepted physical measurements. The diagnostic guard is included in the canonical config hash and is consumed only by the explicit diagnostic entry. A calibrated local, AI, online, or deployed runner must use `physicsCalibration` and reject `null`; it must not fall back to this diagnostic envelope. The existing protocol version remains 1 because no wire message shape changes; `CounterballConfig.schemaVersion` and `configVersion` advance to 2.
+
+The only accepted input is the D01 at-rest canonical fixture: select `home-6`, apply exactly `{x:0,y:0,z:8}` at `{x:0,y:0.06,z:-4}`, once. This is raw Havok impulse evidence, not a normalized player power or a general command mapping. No restart, off-centre impulse, initial velocity, extra force, or alternative fixture is inside this guard.
+
+The coordinator-selected diagnostic energy ceiling is 34 game-energy units. The initial centre impulse contributes `8²/(2×1)=32`. The fallback maximum centre-of-mass drop is 0.01125 game units below each body's at-rest reference height over the entire trial. If all 14.15 units of dynamic mass reach that bound under configured gravity magnitude 9.81, gravitational work is `14.15×9.81×0.01125=1.561629375`; rounding the sum 33.561629375 upward to 34 leaves 0.438370625 units of rounding allowance, not evidence of solver passivity. The probe must enforce this global drop bound over every swept substep and abort before any next step whose conservative swept bound could cross it. It also checks observed total mechanical energy at every step and fails on energy above 34. Loft remains allowed. This is a finite energy fallback, not a claim of continuous floor contact or measured solver passivity.
+
+Before applying the impulse, the probe reads the actual pinned Havok material and mass properties from the constructed shapes/bodies. Static/dynamic friction must be finite and nonnegative, restitution finite and in `[0,1]`, and actual mass/inertias must support the conservative configured bounds. If these facts are unavailable or outside the domain, stop with `resourceLimit`; do not assume undocumented defaults or change D01 material setup.
+
+For every shape, use its minimum principal inertia and farthest collider radius. At energy 34 derive `vBound=sqrt(2E/mass)` and `omegaBound=sqrt(2E/Imin)`. For a nominal tick `dt=1/120`, compute the required calls using the pinned C00 combined linear/angular sweep expression and the configured translation/rotation limits. The selected limits are 0.01125 game units per full-collider point per actual Havok call and `pi/8` radians per call. The maximum derived count is 48 calls per nominal tick, below the frozen 48-call cap. If actual properties or any observed energy require more, return `resourceLimit`; do not clamp a count or proceed with a larger step.
+
+The physical open support apron extends 325 game units beyond every painted edge and has no wall. A conservative full-collider swept bound must remain inside this support extent. Vertically, the guard allows at most 0.01125 COM drop below each initial rest reference; the 0.20-thick support slab and maximum 0.01125 full-collider point sweep prevent one call from crossing the slab. Check the whole swept interval, not only endpoint transforms. Painted pitch boundaries, goal rules, visible green concrete and button-hole presentation do not change.
+
+The workload is 15 seconds, 1,800 nominal ticks, at most 86,400 actual public `HavokPlugin.executeStep` calls per trial (1,800×48), at most 120 actual calls between host yields, and at most 30,000 ms wall time. `maxBatchSteps` means actual Havok calls, never nominal ticks. The resulting maximum is 720 batches. Budget exhaustion, cancellation, an unsupported sweep, energy/property mismatch, missing fact, or elapsed wall cap returns a typed non-settled failure and no partial successful result. The limits bound work but do not claim a 30-second run will succeed. Protocol fact/frame maxima remain the existing canonical limits.
+
+The strict field shape is:
+
+```ts
+type DiagnosticPhysicsGuard = {
+  schemaVersion: 1;
+  scope: "browser-direct-impulse-v1";
+  fixtureId: "counterball-protocol-fixtures-v1";
+  matchId: "00000000-0000-4000-8000-000000000001";
+  capId: "home-6";
+  impulse: { x: 0; y: 0; z: 8 };
+  applicationPoint: { x: 0; y: 0.06; z: -4 };
+  maxMechanicalEnergy: 34;
+  maxRestHeightDrop: 0.01125;
+  supportApronMargin: 325;
+  tunnelling: {
+    maxPointSweepPerSubstep: 0.01125;
+    maxRotationPerSubstep: Math.PI / 8;
+    maxSubstepsPerTick: 48;
+  };
+  workload: {
+    maxTotalSubsteps: 86400;
+    maxBatchSubsteps: 120;
+    maxWallTimeMs: 30000;
+  };
+};
+```
+
+The runtime schema is strict and rejects an altered input identity or any extra field. The world uses the diagnostic apron only for the explicit probe while calibration is null; the playable runner continues to require and use `physicsCalibration`. The guard has no hidden fallback mode.
+
+This envelope changes the canonical config hash and advances `CounterballConfig.schemaVersion` and `configVersion` to 2. It leaves protocol version 1 and the physics adapter version unchanged. It does not accept C02 calibration, all-15-body settling, collision-free button traversal, real-browser interaction, T02, T05 or deployed Havok; every config-hash fixture must be updated with the implementation.

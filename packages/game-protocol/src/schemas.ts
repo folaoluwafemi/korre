@@ -4,6 +4,7 @@ import type {
   ActionEnvelope,
   CounterballConfig,
   ControlEnvelope,
+  DiagnosticPhysicsGuard,
   GameCommand,
   MatchState,
   PlaybackFrame,
@@ -62,6 +63,38 @@ const physicsCalibrationSchema: z.ZodType<PhysicsCalibration> = z.strictObject({
     maxSubsteps: z.number().int().min(1).max(120),
   }),
 });
+
+const diagnosticPhysicsGuardSchema: z.ZodType<DiagnosticPhysicsGuard> =
+  z.strictObject({
+    schemaVersion: z.literal(1),
+    scope: z.literal("browser-direct-impulse-v1"),
+    fixtureId: z.literal("counterball-protocol-fixtures-v1"),
+    matchId: z.literal("00000000-0000-4000-8000-000000000001"),
+    capId: z.literal("home-6"),
+    impulse: z.strictObject({
+      x: z.literal(0),
+      y: z.literal(0),
+      z: z.literal(8),
+    }),
+    applicationPoint: z.strictObject({
+      x: z.literal(0),
+      y: z.literal(0.06),
+      z: z.literal(-4),
+    }),
+    maxMechanicalEnergy: z.literal(34),
+    maxRestHeightDrop: z.literal(0.01125),
+    supportApronMargin: z.literal(325),
+    tunnelling: z.strictObject({
+      maxPointSweepPerSubstep: z.literal(0.01125),
+      maxRotationPerSubstep: z.literal(0.39269908169872414),
+      maxSubstepsPerTick: z.literal(48),
+    }),
+    workload: z.strictObject({
+      maxTotalSubsteps: z.literal(86_400),
+      maxBatchSubsteps: z.literal(120),
+      maxWallTimeMs: z.literal(30_000),
+    }),
+  });
 
 export const TEAM_IDS = ["home", "away"] as const;
 export const CAP_IDS = [
@@ -701,8 +734,8 @@ export const RoomCommandResponseSchema = z.union([
 
 export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
   .strictObject({
-    schemaVersion: z.literal(1),
-    configVersion: z.literal("counterball-config-1"),
+    schemaVersion: z.literal(2),
+    configVersion: z.literal("counterball-config-2"),
     geometry: z.strictObject({
       pitchWidth: finiteNumber.positive(),
       pitchLength: finiteNumber.positive(),
@@ -752,6 +785,7 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
       maximumPrivateTargetGoals: z.literal(10),
     }),
     physicsCalibration: physicsCalibrationSchema.nullable(),
+    diagnosticGuard: diagnosticPhysicsGuardSchema,
   })
   .superRefine((config, context) => {
     const calibration = config.physicsCalibration;

@@ -7,8 +7,8 @@ import type {
 } from "./types.js";
 
 const config = {
-  schemaVersion: 1,
-  configVersion: "counterball-config-1",
+  schemaVersion: 2,
+  configVersion: "counterball-config-2",
   geometry: {
     pitchWidth: 12,
     pitchLength: 20,
@@ -58,6 +58,29 @@ const config = {
   // T02 supplies measured/pinned Havok adapter coefficients. This protocol
   // fixture config intentionally makes no uncalibrated physics claim.
   physicsCalibration: null,
+  // GC01 diagnostic policy only; never a gameplay calibration or fallback.
+  diagnosticGuard: {
+    schemaVersion: 1,
+    scope: "browser-direct-impulse-v1",
+    fixtureId: "counterball-protocol-fixtures-v1",
+    matchId: "00000000-0000-4000-8000-000000000001",
+    capId: "home-6",
+    impulse: { x: 0, y: 0, z: 8 },
+    applicationPoint: { x: 0, y: 0.06, z: -4 },
+    maxMechanicalEnergy: 34,
+    maxRestHeightDrop: 0.01125,
+    supportApronMargin: 325,
+    tunnelling: {
+      maxPointSweepPerSubstep: 0.01125,
+      maxRotationPerSubstep: 0.39269908169872414,
+      maxSubstepsPerTick: 48,
+    },
+    workload: {
+      maxTotalSubsteps: 86_400,
+      maxBatchSubsteps: 120,
+      maxWallTimeMs: 30_000,
+    },
+  },
 } as const satisfies CounterballConfig;
 
 function deepFreeze<T>(value: T): Readonly<T> {
