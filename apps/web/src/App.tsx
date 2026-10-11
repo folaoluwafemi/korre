@@ -1,6 +1,10 @@
 import { lazy, Suspense, useEffect, useState, type MouseEvent } from "react";
 
 const CounterballPreview = lazy(() => import("./CounterballPreview.js"));
+const CounterballDirectProbe =
+  import.meta.env.VITE_COUNTERBALL_DEV_HARNESS === "1"
+    ? lazy(() => import("./CounterballDirectProbe.js"))
+    : null;
 const CounterballRendererDiagnostic =
   import.meta.env.VITE_COUNTERBALL_DEV_HARNESS === "1"
     ? lazy(() => import("./CounterballRendererDiagnostic.js"))
@@ -35,6 +39,39 @@ export default function App() {
     event.preventDefault();
     navigate("/preview");
   };
+
+  const handleDirectProbeLink = (
+    event: MouseEvent<HTMLAnchorElement>,
+  ): void => {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    event.preventDefault();
+    navigate("/diagnostic/direct-shot");
+  };
+
+  if (
+    CounterballDirectProbe !== null &&
+    pathname === "/diagnostic/direct-shot"
+  ) {
+    return (
+      <Suspense
+        fallback={
+          <main id="main" tabIndex={-1}>
+            Loading the browser physics diagnostic…
+          </main>
+        }
+      >
+        <CounterballDirectProbe onNavigateHome={() => navigate("/")} />
+      </Suspense>
+    );
+  }
 
   if (pathname === "/preview") {
     return (
@@ -104,6 +141,16 @@ export default function App() {
                 Open the Counterball scene preview
                 <span aria-hidden="true">↗</span>
               </a>
+              {CounterballDirectProbe === null ? null : (
+                <a
+                  className="text-link"
+                  href="/diagnostic/direct-shot"
+                  onClick={handleDirectProbeLink}
+                >
+                  Try the browser flick diagnostic
+                  <span aria-hidden="true">↗</span>
+                </a>
+              )}
             </div>
             <div className="concrete-study" aria-hidden="true">
               <div className="study-line study-line-one" />
