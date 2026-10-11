@@ -2905,12 +2905,12 @@
         },
         {
           "id": "T02-BR01",
-          "status": "BLOCKED",
+          "status": "RUNNING",
           "role": "worker",
           "title": "Expose a bounded browser-WASM direct-shot diagnostic",
-          "owner": "/root/foundation_review",
-          "author_identity": "/root/foundation_review",
-          "reviewer_identity": "/root/run_evidence_review — independent stop-condition review PASS; no source or runtime review applies",
+          "owner": "/root/toolchain_audit — implementation attempt 2",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review — independent source reviewer reserved after implementation",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-BR01",
           "depends_on": [
             "T02-D01",
@@ -2929,21 +2929,26 @@
             "execution_state/reports/T02-P01-acceptance.md",
             "execution_state/reports/C01-H-repair-1-run-38102448918-runtime-review.md",
             "execution_state/reports/C01-DIAG-BUILD-run-38096445369.md",
-            "execution_state/reports/C01-DIAG-BUILD-acceptance.md"
+            "execution_state/reports/C01-DIAG-BUILD-acceptance.md",
+            "execution_state/reports/T02-GC02-run-38108207411.md",
+            "execution_state/reports/T02-GC02-run-38108207411-review.md",
+            "execution_state/reports/T02-GR01-pinned-api-audit.md",
+            "execution_state/reports/T02-GR01-pinned-api-audit-review.md",
+            "execution_state/reports/T02-GR01-guard-feasibility-review.md"
           ],
           "write_paths": [
             "games/counterball/src/simulation/browserDirectProbe.ts",
             "games/counterball/src/simulation/browserDirectProbe.test.ts",
             "games/counterball/src/browser.ts",
-            "execution_state/reports/T02-BR01-implementation-1.md"
+            "execution_state/reports/T02-BR01-implementation-2.md"
           ],
           "outputs": [
             "A browser-only diagnostic entry that creates the existing canonical fixture through worldFactory and pinned Havok/WASM, applies exactly one accepted D01 measured direct-impulse candidate, advances a bounded real simulation, and returns serializable transforms, contacts and typed termination.",
             "No production default power mapping or playable route; this diagnostic can only be invoked by the explicit diagnostic build."
           ],
-          "implementation_report": "execution_state/reports/T02-BR01-implementation-1.md",
-          "review_report": "execution_state/reports/T02-BR01-stop-review-1.md",
-          "attempt_count": 1,
+          "implementation_report": "execution_state/reports/T02-BR01-implementation-2.md",
+          "review_report": "execution_state/reports/T02-BR01-source-review-2.md",
+          "attempt_count": 2,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-BR01",
@@ -2957,15 +2962,27 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-BR01-stop-review-1.md",
               "detail": "Independent review confirms the selected config-hashed workload/substep guard is genuinely absent, no source was changed, and no runtime/flick claim follows. The worker followed the packet stop condition."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-BR01 after GC02 acceptance",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact browser diagnostic record re-extracted after T02-GC02 acceptance; T02-D01, T02-P01, C01, C01-H and required parent T01 are accepted. Plan consistency only."
+            },
+            {
+              "command": "T02-BR01 attempt 2 source implementation and independent review",
+              "result": "PENDING",
+              "environment": "source-review",
+              "detail": "Implementation may proceed only if every selected diagnosticGuard bound is enforced from accepted config and pinned browser Havok. Otherwise stop before source changes and report the exact missing runtime capability."
             }
           ],
-          "implementation_note": "Freeze the diagnostic-only export as runBrowserDirectProbe(engine: AbstractEngine, options?: SimulationRunOptions): Promise<BrowserDirectProbeResult>, exported only from @korre/counterball/browser. Keep BrowserDirectProbeResult local to this browser diagnostic; it is not a wire/event type or a production ShotSimulation. Include fixtureId/matchId, the fixed input provenance, canonical PlaybackFrame[] (from createPlaybackSampler), final BodyState[], actual entity-to-entity ContactFact[] and a serializable discriminated termination using SimulationErrorCode. Use only accepted D01 row key impulse=8|aim=straight-at-button: home-6, raw impulse vector {x:0,y:0,z:8}, applied at its canonical starting center {x:0,y:0.06,z:-4}; never map it to player power or change the input. The exact accepted row recorded button/home-6 contact, 291 ticks and settlement at 2.425 seconds; those are provenance expectations, not guaranteed hard-coded outputs. Initialize the pinned browser Havok loader, reuse createCounterballWorld and the canonical initial fixture, and do not import NullEngine, Node filesystem/crypto/module adapters, create another world/config, or mock physics. Use COUNTERBALL_CONFIG_V1 fixedStepSeconds (1/120), maxShotDurationSeconds (15), settle thresholds/window and 30-Hz createPlaybackSampler; cap steps at the derived canonical maximum, contact facts at COUNTERBALL_PROTOCOL_LIMITS.maxSimulationFactsPerShot, and frames with the sampler limit. Yield to the host once per integral playback sampling interval and observe the existing portable aborted signal at each tick. Treat timeout, cancellation, non-finite/missing bodies, init errors and output/work limits as typed non-settled termination with no partial success. Remove every observer and dispose the owned world on every outcome; the caller-owned Engine is not disposed. No private coefficients, config/contract edits, renderer/UI changes, E2E edits, hidden lift, or playable route. If a required C00 bound is absent, stop and report that exact coordinator contract dependency instead of inventing a private limit.",
+          "implementation_note": "Expose runBrowserDirectProbe(engine: AbstractEngine, options?: SimulationRunOptions): Promise<BrowserDirectProbeResult> only from @korre/counterball/browser; keep its result local to this diagnostic, not a wire/event type or production ShotSimulation. Use only accepted D01 key impulse=8|aim=straight-at-button: home-6, raw impulse {x:0,y:0,z:8}, at {x:0,y:0.06,z:-4}; never alter it or map player power. Use accepted COUNTERBALL_CONFIG_V1.diagnosticGuard only for diagnostic enforcement; physicsCalibration stays null and is never a fallback. Derive actual Havok substeps, bounds, batch count, host yield, cancellation, output limits and wall-time from that hashed guard and C00, and report each actual call. Read back active pinned-Havok mass/inertia and use only canonical worldFactory geometry. Enforce full-collider support/apron and finite/energy/sweep bounds each actual substep. Fixed-orientation shape casts are not a rotational sweep proof: use a reviewer-verifiable conservative envelope or stop before writing/running if the full interval cannot be bounded. Keep playback sampling at the accepted 30-Hz sampler, capture serializable transforms/actual contacts and typed termination; fail closed on any missing fact, rejected premise, guard violation, timeout, cancellation, non-finite body or workload/output limit. Remove observers and dispose the owned world in all outcomes; never dispose the caller Engine. Do not add private limits, coefficients, fixture/config/contract edits, Node adapter/mock, UI/E2E change, hidden lift, gameplay route or calibration claim. If any accepted bound cannot be enforced, write the stop report and do not apply the impulse.",
           "acceptance": [
             "The browser entry exposes a bounded, typed, disposable diagnostic using the real pinned browser Havok/WASM loader and existing fixture/world factory.",
             "Returned observations include actual transforms, contacts and typed termination; any missing fact, timeout, wall limit or C00 guard violation fails the diagnostic.",
             "The card does not claim a browser movement pass or accept T02/T05; BR02 performs actual Chromium interaction/render proof."
           ],
-          "next_action": "BLOCKED before source changes. Coordinator must add and independently review a hashed guard/workload policy separable from measured physics calibration, plus enforceable recorded substeps, or otherwise supply accepted measured settings. Then re-extract and rematerialize BR01 with the same D01 tuple. No implementation/runtime/flick acceptance."
+          "next_action": "Attempt 2 is RUNNING after GC02 accepted the hashed diagnosticGuard fields. Worker must prove every accepted bound can be enforced in pinned browser Havok or stop before source changes/input. Independent source review and exact-head GitHub checks are required; no browser flick or runtime safety is accepted by this assignment."
         },
         {
           "id": "T02-GA01",
@@ -3079,12 +3096,12 @@
         },
         {
           "id": "T02-GC02",
-          "status": "IMPLEMENTED",
+          "status": "ACCEPTED",
           "role": "coordinator",
           "title": "Add the hashed diagnostic guard to protocol config",
           "owner": "coordinator",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/foundation_review — independent source review PASS",
+          "reviewer_identity": "/root/foundation_review — independent source review PASS; /root/foundation_review — independent exact-run review PASS",
           "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-GC02",
           "depends_on": [
             "C00",
@@ -3161,15 +3178,27 @@
             },
             {
               "command": "Exact-head GitHub CI workflow after formatting repair 1 and independent run review",
-              "result": "PENDING",
-              "environment": "github"
+              "result": "PASS",
+              "environment": "github",
+              "exit_code": 0,
+              "run_id": 38108207411,
+              "source_sha": "9bb388fb51de06c021e25f03828d10d6ffc86091",
+              "report": "execution_state/reports/T02-GC02-run-38108207411.md",
+              "detail": "Exact-head hosted verification passed focused protocol 12/12, verify 28 files/147 tests, Worker smoke 1/1, migrations twice, integration 1/1, and production-preview Chromium 4/4 with zero test skips/retries/flakes. The diagnostic-browser inventory was empty; this does not prove a flick, gameplay, runtime guard, or deployed physics."
+            },
+            {
+              "command": "Independent exact-run provenance, test-count, and artifact-inventory review for run 38108207411",
+              "result": "PASS",
+              "environment": "evidence-review",
+              "report": "execution_state/reports/T02-GC02-run-38108207411-review.md",
+              "detail": "All nine artifact records tie to exact run/SHA; production 452, diagnostic 454, Worker 3, and browser preview 452 inventories reconcile with no missing/extra/hash/size mismatches. Empty diagnostic-browser inventory and gameplay evidence limits are explicit."
             }
           ],
           "implementation_note": "Coordinator owns all five coupled protocol/config/hash paths. Do not add runtime consumers. No local application checks are allowed; source review precedes exact-head GitHub verification.",
-          "next_action": "Commit/push the reviewed formatting-only source repair, then run full exact-head GitHub verification and independent exact-run review. Do not accept GC02 unless all required suites complete without skips."
+          "next_action": "Accepted for strict protocol/config/schema/hash-fixture scope only. Runtime guard enforcement, full-collider swept support, calibrated physics, the first browser flick, playable local match, and deployed Havok remain open. Proceed only to the next exact catalogue card whose recorded dependencies are ACCEPTED; preserve the stop condition when the configured guard cannot be enforced."
         }
       ],
-      "next_action": "T02-GC02 formatting repair 1 is applied and independently reviewed. Commit/push it and rerun full hosted verification. Runtime guard enforcement and swept-step support remain absent; BR01/L01 remain blocked."
+      "next_action": "T02-GC02 is ACCEPTED only for the strict diagnostic config/schema/hash fixture surface on exact SHA 9bb388fb51de06c021e25f03828d10d6ffc86091 / GitHub run 38108207411. T02-BR01 attempt 2 is materialized after fresh exact extraction; it must enforce or fail closed against the hashed diagnostic guard, with independent source review and exact-head hosted checks. The analytical safety review does not prove actual inertia, solver energy bounds, per-substep swept support, or wall-time feasibility. No first flick, playable match, or deployed Havok is accepted."
     },
     {
       "id": "T03",
