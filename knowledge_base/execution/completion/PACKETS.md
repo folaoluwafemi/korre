@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-83 bounded cards cover 21 remaining parents. Initially ready: T02-GC02, T02-L01, T02-BR01.
+85 bounded cards cover 21 remaining parents. Initially ready: T02-L01, T02-BR02-CI-ESCALATION-1.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -26,7 +26,9 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L02 | T02 | Run one bounded local refinement or record no eligible restart | worker | T02-L01 | 1 |
 | T02-P01 | T02 | Provide stable scene pose update and entity picking API | worker | parent:T03, C00, C01-H | 4 |
 | T02-BR01 | T02 | Expose a bounded browser-WASM direct-shot diagnostic | worker | T02-D01, T02-P01, C01, C01-H | 3 |
-| T02-BR02 | T02 | Show the first real direct shot in the diagnostic browser | coordinator | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H | 3 |
+| T02-BR02 | T02 | Show the first real direct shot in the diagnostic browser | coordinator | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H, T02-BR02-FORMAT-REPAIR-1 | 0 |
+| T02-BR02-CI-ESCALATION-1 | T02 | Classify exact-head BR02 formatting failure before another source edit | coordinator | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H | 0 |
+| T02-BR02-FORMAT-REPAIR-1 | T02 | Apply only the exact hosted BR02 formatting artifact | worker | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H, T02-BR02-CI-ESCALATION-1 | 2 |
 | T02-R01 | T02 | Implement isolated asynchronous runner and host entrypoints | worker | T02-F01, T02-W01, T02-C0, T02-C2, C00-A, C00-B, C03, C00 | 3 |
 | T02-R02 | T02 | Prove direct shot movement in pinned Havok WASM | worker | T02-R01, T02-D01, C03 | 1 |
 | T02-R03 | T02 | Prove placed restart pose and physical traversal | worker | T02-R02, T02-L02, C02, C03 | 1 |

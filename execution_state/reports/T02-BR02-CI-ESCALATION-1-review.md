@@ -1,0 +1,23 @@
+# T02-BR02 CI escalation 1 — independent packet review
+
+Date: 2026-10-11
+
+## Verdict
+
+**PASS for the bounded escalation and packet amendment. Runtime: NOT PROVEN.** The diagnosis matches the independent PASS run-evidence report. The proposed formatter retry is limited to the exact hosted patch and its two source paths. The amendment leaves BR02 as an evidence-only gate and preserves its browser and production-exclusion requirements. No browser flick, product build, physics trial, or deployed runtime evidence was produced by this review.
+
+## Evidence and patch boundary
+
+Run 38127641051 checked SHA `e8ae3546f2ef8f409c1f5532fdc23999c3bec32a`. The PASS evidence review confirms 37 counted workflow steps: 23 succeeded, 1 failed, 13 skipped, 0 pending. Typecheck and ESLint passed; Prettier alone failed on `CounterballDirectProbe.tsx` and `counterball-direct-probe.spec.ts`. Worker smoke passed 1/1 and focused protocol tests passed 12/12 with zero skips. The full suite, product builds, integration, production-exclusion check, and BR02 browser/WebGL spec did not run ([run review](execution_state/reports/T02-BR02-run-38127641051-review.md:5), [run report](execution_state/reports/T02-BR02-run-38127641051.md:5)). The coordinator diagnosis reports these limits accurately ([diagnosis](execution_state/reports/T02-BR02-CI-ESCALATION-1.md:7)).
+
+I inspected the retained patch and independently checked its size and SHA-256: 4,674 bytes, `442bf7fbfd79a61e1b9982e55cd20a5701801379354ffcc80fb94a171ccfa0d5`. It has only the two named BR02 paths; the hunks change wrapping/layout, while expressions and test assertions remain unchanged. The coordinator's read-only `git apply --stat`/`--check` evidence on the stated base is consistent; I did not apply the patch. The formatter packet pins that exact SHA and base and grants source writes only to those two files ([LOCAL_PACKETS.json](knowledge_base/execution/completion/LOCAL_PACKETS.json:626), [patch review](execution_state/reports/T02-BR02-run-38127641051-review.md:30)). Its implementation and review report paths are now explicit fields, matching `tasks.json`; shared status, configuration, contracts, and ownership are not worker write paths ([LOCAL_PACKETS.json](knowledge_base/execution/completion/LOCAL_PACKETS.json:713), [tasks.json](execution_state/tasks.json:3708)).
+
+## Preserved gate and graph
+
+The evidence-only BR02 record retains its original accepted dependencies (`T02-BR01`, `T02-D01`, `T02-P01`, `parent:T03`, `C01`, and `C01-H`) and adds the formatter card as a prerequisite. It keeps the real Chromium/WebGL proof, exact trace and transform/pixel evidence, failure/retry and teardown checks, diagnostic/not-playable labeling, and production exclusion requirements. It still forbids a production-reachable dev route and any inference of gameplay power or calibration ([LOCAL_PACKETS.json](knowledge_base/execution/completion/LOCAL_PACKETS.json:468), [tasks.json](execution_state/tasks.json:3380)).
+
+C01-H is already ACCEPTED in the task record, and the current operations contract explicitly routes `tests/e2e/counterball-direct-probe.spec.ts` through the diagnostic `dist-dev` selection, with no fallback if that artifact is missing ([tasks.json](execution_state/tasks.json:2570), [OPERATIONS.md](knowledge_base/execution/completion/OPERATIONS.md:72), [LOCAL_PACKETS.json](knowledge_base/execution/completion/LOCAL_PACKETS.json:499)). The evidence gate still requires proof that the exact hosted run collected and executed that spec and checked the ordinary production artifact.
+
+All three packet extractions passed plan consistency. The escalation packet is ready; the formatter packet remains not ready until the escalation is accepted; BR02 remains not ready until the formatter packet is accepted. Task status and OWNERSHIP keep the formatter unassigned until this review passes, so there is no premature or overlapping source writer ([OWNERSHIP.md](execution_state/OWNERSHIP.md:198), [tasks.json](execution_state/tasks.json:3633), [tasks.json](execution_state/tasks.json:3710)). SWARM's bounded-repair rule supports stopping the original author and routing the exact formatting artifact through a separately owned packet ([SWARM.md](knowledge_base/execution/SWARM.md:225), [OPERATIONS.md](knowledge_base/execution/completion/OPERATIONS.md:110)).
+
+The packet checks were re-extracted with `node scripts/check-completion-plan.mjs --packet T02-BR02-CI-ESCALATION-1`, `... --packet T02-BR02-FORMAT-REPAIR-1`, and `... --packet T02-BR02`; each returned **PASS for plan consistency only**. No application check or runtime was run. BR02/T02 remain unaccepted until the exact reviewed hosted run supplies the required no-skip browser and production-exclusion evidence.

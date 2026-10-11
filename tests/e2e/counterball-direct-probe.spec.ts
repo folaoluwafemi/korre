@@ -118,7 +118,9 @@ async function flickAndReadTrace(
   expect(trace.impulse).toEqual({ x: 0, y: 0, z: 8 });
   expect(trace.applicationPoint).toEqual({ x: 0, y: 0.06, z: -4 });
   expect(trace.settledBodyCount).toBe(15);
-  expect(trace.contactPairs).toContainEqual(expect.arrayContaining(["home-6", "button"]));
+  expect(trace.contactPairs).toContainEqual(
+    expect.arrayContaining(["home-6", "button"]),
+  );
   expect(trace.capMovement).toBeGreaterThan(0.0001);
   expect(trace.buttonMovement).toBeGreaterThan(0.0001);
   expect(trace.changedWebGlPixels).toBeGreaterThan(0);
