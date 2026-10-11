@@ -16,8 +16,9 @@
   },
   "scripts": {
     "test": "vitest run --root ../.. --config vitest.config.ts games/counterball/src",
-    "typecheck": "node --input-type=module -e \"for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }\" && tsc --noEmit -p tsconfig.json",
-    "build": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "node --input-type=module -e \"for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }\" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json",
+    "build": "tsc --noEmit -p tsconfig.json",
+    "check:headless-bundle": "node --input-type=module -e \"import { build } from 'esbuild'; import { fileURLToPath } from 'node:url'; import { relative, sep } from 'node:path'; const publicUrl = import.meta.resolve('@korre/counterball/headless'); const entry = fileURLToPath(publicUrl); const entryRelative = relative(process.cwd(), entry).split(sep).join('/'); if (!entryRelative.endsWith('/src/headless.ts') && entryRelative !== 'src/headless.ts') throw new Error('Unexpected public headless entry: ' + entryRelative); const result = await build({ entryPoints: [entry], absWorkingDir: process.cwd(), bundle: true, write: false, platform: 'browser', conditions: ['workerd', 'worker'], format: 'esm', target: 'es2022', metafile: true, treeShaking: false, minifyWhitespace: true }); const normalize = (value) => value.split(String.fromCharCode(92)).join('/'); const inputPaths = Object.keys(result.metafile.inputs).map(normalize); if (!inputPaths.some((value) => value === entryRelative || value.endsWith('/' + entryRelative))) throw new Error('Public headless entry is absent from the resolved bundle graph.'); const forbiddenPaths = inputPaths.filter((value) => (value === 'src/browser.ts' || value.endsWith('/src/browser.ts')) || value.includes('/apps/web/') || value.includes('/node_modules/react/') || value.includes('/node_modules/react-dom/') || value.includes('/@babylonjs/core/Engines/engine.js') || value.includes('/@babylonjs/core/Engines/webgpuEngine.js')); if (forbiddenPaths.length) throw new Error('Headless bundle reaches browser-only modules: ' + forbiddenPaths.join(', ')); const output = result.outputFiles.map((file) => file.text).join(' '); const isIdent = (value) => value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9') || value === '_' || value === '$'); const hasGlobal = (name) => { for (let at = output.indexOf(name); at !== -1; at = output.indexOf(name, at + 1)) if (!isIdent(output[at - 1]) && !isIdent(output[at + name.length])) return true; return false; }; const forbiddenGlobals = ['React', 'ReactDOM', 'window', 'document', 'HTMLElement', 'HTMLCanvasElement', 'DOMParser', 'localStorage', 'sessionStorage'].filter(hasGlobal); if (forbiddenGlobals.length) throw new Error('Headless bundle references browser globals: ' + forbiddenGlobals.join(', ')); const entryOutputs = Object.values(result.metafile.outputs).filter((item) => item.entryPoint && (normalize(item.entryPoint) === entryRelative || normalize(item.entryPoint).endsWith('/' + entryRelative))); if (entryOutputs.length !== 1 || result.outputFiles.length !== 1 || result.outputFiles[0].contents.length === 0) throw new Error('Expected one nonempty bundle emitted from the public headless entry.'); console.log('Public Counterball headless Worker-target bundle boundary passed.');\""
   },
   "dependencies": {
     "@babylonjs/core": "9.30.0",
@@ -25,5 +26,8 @@
     "@babylonjs/loaders": "9.30.0",
     "@korre/game-protocol": "workspace:*",
     "@korre/game-sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

@@ -552,7 +552,7 @@
           "detail": "Final F01 source and formatting passed all required hosted suites, integration and browser preview; 139 unit tests, 4 browser tests, 0 skipped tests. This is not T02 parent/deployed/playability acceptance."
         }
       ],
-      "blocker": "C01-P coordinator type/export work and T02-D01 direct-shot source work are in progress on disjoint paths. T02 remains open; C01-H and BR01 are next for a real browser flick, while full match and deployed Havok remain later gates.",
+      "blocker": "C01-P remains unaccepted pending source/runtime review of a hosted headless-export bundle check. T02-D01 real WASM runtime evidence is pending. T02-L01 requires a coordinator-frozen/hashable per-substep guard and enforcement plan.",
       "packet": "execution_state/packets/T02-A.md",
       "packet_progress": [
         {
@@ -2358,7 +2358,7 @@
           "owner": "coordinator",
           "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-P",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/foundation_review — independent source/config review pending",
+          "reviewer_identity": "/root/run_evidence_review — independent repair-1 source review PASS; exact-hosted runtime review pending",
           "depends_on": [
             "C01"
           ],
@@ -2369,9 +2369,9 @@
             "apps/realtime/tsconfig.json",
             "pnpm-lock.yaml"
           ],
-          "implementation_report": "execution_state/reports/C01-P-implementation.md",
+          "implementation_report": "execution_state/reports/C01-P-repair-1-implementation.md",
           "review_report": "execution_state/reports/C01-P-review.md",
-          "attempt_count": 1,
+          "attempt_count": 2,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet C01-P",
@@ -2385,9 +2385,51 @@
               "environment": "source-review",
               "report": "execution_state/reports/C01-P-review.md",
               "detail": "Reviewer passed the explicit browser/headless export map, the hosted Node import.meta.resolve check, React/DOM separation, and pinned Worker types. Runtime and headless-runner bundle evidence remain pending the exact-hosted check and later runner consumer."
+            },
+            {
+              "command": "GitHub exact-head pnpm verify",
+              "result": "PASS",
+              "environment": "GitHub Actions",
+              "run_id": 38099267822,
+              "source_sha": "560f632aeee24717a0ca5249677580fd963d8ce2",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38099267822"
+            },
+            {
+              "command": "Independent C01-P exact-head runtime/artifact review",
+              "result": "RUNNING",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-P-run-38099267822-review.md",
+              "detail": "Exact SHA 560f632aeee24717a0ca5249677580fd963d8ce2, GitHub run 38099267822 completed successfully; reviewer is checking no-skip counts, package checks and artifact provenance."
+            },
+            {
+              "command": "Independent C01-P exact-head runtime/artifact review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-P-run-38099267822-review.md",
+              "detail": "Exact run 38099267822 passed, but the Worker artifact was only the health stub and did not import the public headless export; no package-entry bundle graph evidence."
+            },
+            {
+              "command": "C01-P repair 1 static manifest/lock inspection",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/C01-P-repair-1-implementation.md",
+              "detail": "Pinned esbuild 0.28.2 already exists in lock; package importer agrees; public export resolution is bundled in memory using Worker conditions and browser modules/globals are rejected."
+            },
+            {
+              "command": "Independent C01-P repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-P-repair-1-review.md",
+              "detail": "Public headless export, Worker-oriented bundle graph/output assertions, path normalization, command quoting, lock pin and React/ReactDOM/DOM sentinels passed source review. The emitted-global check is a finite sentinel list; runtime is NOT RUN."
+            },
+            {
+              "command": "git diff --check -- games/counterball/package.json pnpm-lock.yaml",
+              "result": "PASS",
+              "environment": "local-source",
+              "detail": "No whitespace errors in the two changed C01-P-owned source/config paths."
             }
           ],
-          "next_action": "Run exact-head GitHub pnpm verify to validate the frozen lockfile, both subpath resolutions, package typechecks and existing regression suites; independently inspect the exact run before acceptance."
+          "next_action": "Run exact-head GitHub pnpm verify with the reviewed package-boundary probe and T02-D01 source. Independently inspect exact runtime logs and emitted artifacts; do not accept C01-P without the bundle check, or T02-D01 without all six real-WASM rows."
         },
         {
           "id": "T02-D01",
@@ -2395,7 +2437,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-D01",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/run_evidence_review — independent source and artifact review pending",
+          "reviewer_identity": "/root/foundation_review — independent repair-1 source review PASS; /root/toolchain_audit assigned exact-hosted runtime/artifact review",
           "depends_on": [
             "C00-B",
             "C01",
@@ -2416,20 +2458,90 @@
           ],
           "implementation_report": "execution_state/reports/T02-D01-implementation.md",
           "review_report": "execution_state/reports/T02-D01-review.md",
-          "attempt_count": 1,
+          "attempt_count": 2,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-D01",
               "result": "PASS",
               "environment": "local-document",
               "detail": "Exact six-case real-WASM direct-shot packet reports ready; all original dependencies are accepted."
+            },
+            {
+              "command": "Independent T02-D01 initial source review",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-D01-review.md",
+              "detail": "Selected-cap movement was recorded but not asserted; runtime remains NOT RUN."
+            },
+            {
+              "command": "T02-D01 repair 1 scoped git diff --check",
+              "result": "PASS",
+              "environment": "local-source",
+              "report": "execution_state/reports/T02-D01-repair-1-implementation.md",
+              "detail": "Worker reports a finite >=1e-4 per-step movement assertion for each of six trials; no application/runtime command ran."
+            },
+            {
+              "command": "Independent T02-D01 repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-D01-repair-1-review.md",
+              "detail": "Every one of six rows requires finite selected-cap per-step movement >= 1e-4 world units after a physics step; source proves non-vacuous recorded deltas. RUNTIME NOT RUN."
             }
           ],
           "implementation_note": "Use only actual pinned Havok WASM and the canonical fixture. Keep all six input cases and assertions; do not change config. For the env-gated JSON, preserve the existing 40-observation intended-shot artifact and add a separate directImpulseProbe field to the same COUNTERBALL_INTENDED_SHOT_OUTPUT JSON only after all six assertions pass. Because Vitest files may run in parallel, wait with a bounded timeout for the existing 40-row producer file to be complete/parseable before atomically merging; fail rather than clobber or silently omit the artifact. The CI verify step already sets and uploads this path. No workflow/config writes.",
-          "next_action": "Implement the six exact tuples and deterministic artifact merge in the single assigned test file; local checks limited to packet extraction and git diff --check. Stop for independent source review; GitHub pnpm verify runs after reviewed integration with C01-P."
+          "next_action": "Run exact-head GitHub pnpm verify with the reviewed probe. Independently inspect the six real-WASM rows in the merged artifact and the exact no-skip/test counts; keep runtime pending until artifact and test counts are proven."
+        },
+        {
+          "id": "T02-L01",
+          "status": "BLOCKED",
+          "owner": "/root/run_evidence_review",
+          "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+          "author_identity": "/root/run_evidence_review",
+          "reviewer_identity": "/root/foundation_review — independent stop-condition review PASS",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00"
+          ],
+          "read_paths": [
+            "execution_state/packets/T02-runner-design-audit-1.md",
+            "execution_state/reports/T02-runner-design-audit-1.md",
+            "execution_state/reports/T02-calibration-observations-review-1.md",
+            "games/counterball/src/simulation/worldFactory.ts",
+            "games/counterball/src/features/restarts/domain/placementPose.ts",
+            "games/counterball/src/simulation/sampling.ts",
+            "games/counterball/src/simulation/intendedShotProbe.test.ts"
+          ],
+          "write_paths": [
+            "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+          ],
+          "implementation_report": "execution_state/reports/T02-L01-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-review.md",
+          "attempt_count": 1,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact diagnostic card extracted; all six listed dependencies independently confirmed ACCEPTED before materialization."
+            },
+            {
+              "command": "Independent T02-L01 stop-condition review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-review.md",
+              "detail": "Accepted contract contains only guard schema bounds, not selected hashable limits/substep schedule; current stepping source lacks required substep instrumentation. Packet correctly stops before trials."
+            }
+          ],
+          "implementation_note": "Source only: implement exactly the packet fixed 24 tuple matrix, real pinned Havok WASM/world/placement/sampler, every 1/120 s state, actual contacts, conservative full-overlap swept clearance, whole-button before/after extent crossing and frozen C00 hashed substep guard. Preserve the canonical config and all 15 bodies, require all-15-body finite settling, and label finite-step limitations honestly. Zero eligible candidates are valid. Write env-gated structured output only after all 24 unique ordered tuples and integrity assertions pass. No local application command; hosted pnpm verify and separate independent raw artifact review remain required. No workflow, shared contract/config/status, production tuning or Wrangler edits.",
+          "next_action": "Resume T02-L01 only after a coordinator-owned contract/config repair supplies selected hashable guard settings and enforceable per-candidate substep checks; keep the original 24 tuples and all packet requirements.",
+          "blocker": "Coordinator must freeze/hash concrete linear/angular guard values and a justified substep schedule, then define how the public Havok stepping boundary enforces/checks them. Current schema-only guard and single fixed-tick executeStep do not satisfy the packet. No trials or source artifact exist."
         }
       ],
-      "next_action": "Complete C01-P and T02-D01 in parallel; rotate independent source reviewers, then run one exact-head GitHub verify and audit the emitted artifacts. Preserve the C01-DIAG-BUILD acceptance boundary and prioritize C01-H/BR01 for the first real browser flick."
+      "next_action": "C01-P repair 1 has independent source PASS and awaits exact-hosted package-bundle verification; T02-D01 repair source has independent source PASS and is paired with that hosted real-WASM run. C01-H waits on C01-P acceptance before first browser-flick work. T02-L01 remains blocked at its independently reviewed guard stop condition."
     },
     {
       "id": "T03",
