@@ -591,7 +591,7 @@ function hasSimulationErrorCode(error: unknown): error is SimulationError {
   const code = (error as Partial<SimulationError>).code;
   return (
     typeof code === "string" &&
-    simulationErrorCodes.has(code as SimulationErrorCode)
+    simulationErrorCodes.has(code)
   );
 }
 
@@ -1095,7 +1095,6 @@ export async function runBrowserDirectProbe(
   let result: BrowserDirectProbeResult | undefined;
   const contacts: BrowserDirectProbeContact[] = [];
   const seenContacts = new Set<string>();
-  let deferredCallbackError: SimulationError | undefined;
   let currentStep = 0;
 
   const checkLimits = (): void => {
@@ -1668,10 +1667,6 @@ export async function runBrowserDirectProbe(
             y: 1,
             z: 0,
           });
-          const lowestPoint =
-            sample.state.position.y -
-            (metric.height / 2) * Math.abs(axis.y) -
-            metric.radius * Math.sqrt(Math.max(0, 1 - axis.y * axis.y));
           const clearances = resourceGuard(() =>
             checkDiagnosticSweptEnvelope(
               {
@@ -1726,11 +1721,8 @@ export async function runBrowserDirectProbe(
         batchCalls += 1;
         actualSubstepDurationsSeconds.push(plan.substepSeconds);
         checkLimits();
-        if (
-          callbackFailure !== undefined ||
-          deferredCallbackError !== undefined
-        ) {
-          throw callbackFailure ?? deferredCallbackError;
+        if (callbackFailure !== undefined) {
+          throw callbackFailure;
         }
         checkObservedState(readBodySamples(metrics));
         if (batchCalls >= guard.workload.maxBatchSubsteps) {
