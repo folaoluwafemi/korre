@@ -107,7 +107,37 @@ async function flickAndReadTrace(
   await page.mouse.up();
 
   const result = page.getByTestId("probe-result");
-  await expect(result).toBeVisible({ timeout: 120_000 });
+  const error = page.getByTestId("probe-error");
+  await expect
+    .poll(
+      async () => (await result.isVisible()) || (await error.isVisible()),
+      { timeout: 30_000 },
+    )
+    .toBe(true);
+  if (await error.isVisible()) {
+    const errorText = await error.textContent();
+    if (!errorText) throw new Error("The direct-probe error is empty.");
+    const lifecycleBeforeCleanup = await lifecycle(page);
+    await testInfo.attach("counterball-direct-probe-error.json", {
+      body: JSON.stringify(
+        { error: errorText, lifecycleBeforeCleanup },
+        null,
+        2,
+      ),
+      contentType: "application/json",
+    });
+    await assertUnmountedAtBaseline(page);
+    const lifecycleAfterCleanup = await lifecycle(page);
+    await testInfo.attach("counterball-direct-probe-error-teardown.json", {
+      body: JSON.stringify(
+        { error: errorText, lifecycleAfterCleanup },
+        null,
+        2,
+      ),
+      contentType: "application/json",
+    });
+    throw new Error(`Direct browser diagnostic failed: ${errorText}`);
+  }
   const traceText = await result.textContent();
   if (!traceText) throw new Error("The direct-shot trace is empty.");
   const trace = JSON.parse(traceText) as ProbeTrace;

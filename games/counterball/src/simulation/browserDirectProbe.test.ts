@@ -9,6 +9,7 @@ import {
   errorWithCleanup,
   formatNativeMassMismatch,
   isDiagnosticShiftedEnergyWithinLimit,
+  isNativeMassMismatch,
   normalizeDiagnosticError,
   resourceGuard,
   type DiagnosticEnergyBody,
@@ -20,17 +21,42 @@ const maximumDrop = COUNTERBALL_CONFIG_V1.diagnosticGuard.maxRestHeightDrop;
 const maximumEnergy = COUNTERBALL_CONFIG_V1.diagnosticGuard.maxMechanicalEnergy;
 
 describe("browser direct diagnostic mass message", () => {
-  it("prints all mass values without precision loss", () => {
+  it("projects the canonical button mass to the observed native value", () => {
+    expect(Math.fround(0.15)).toBe(0.15000000596046448);
+  });
+
+  it("prints each mass value without rounding", () => {
     expect(
       formatNativeMassMismatch(
         "button",
         0.15,
-        0.15000000000000002,
+        Math.fround(0.15),
+        Math.fround(0.15) + 2 ** -24,
         1.4210854715202004e-14,
       ),
     ).toBe(
-      "Body button native mass 0.15000000000000002 differs from canonical configured mass 0.15 (absolute difference 2.7755575615628914e-17; tolerance 1.4210854715202004e-14).",
+      "Body button native mass 0.15000006556510925 differs from projected expected mass 0.15000000596046448 (canonical configured mass 0.15; absolute difference 5.960464477539063e-8; tolerance 1.4210854715202004e-14).",
     );
+  });
+
+  it("rejects only a strict excess beyond the unchanged tolerance", () => {
+    const projected = Math.fround(0.15);
+    const tolerance = Number.EPSILON * Math.max(1, 0.15) * 64;
+
+    expect(isNativeMassMismatch(projected, projected, tolerance)).toBe(false);
+    expect(
+      isNativeMassMismatch(projected + tolerance, projected, tolerance),
+    ).toBe(false);
+    expect(
+      isNativeMassMismatch(
+        projected + tolerance + Number.EPSILON,
+        projected,
+        tolerance,
+      ),
+    ).toBe(true);
+    expect(
+      isNativeMassMismatch(projected + 2 ** -24, projected, tolerance),
+    ).toBe(true);
   });
 });
 

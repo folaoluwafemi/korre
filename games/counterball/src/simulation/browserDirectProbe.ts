@@ -50,12 +50,21 @@ export type BrowserDirectProbeContact = {
 /** Formats mass diagnostics with shortest round-trip numeric values. */
 export function formatNativeMassMismatch(
   bodyId: string,
-  expectedMass: number,
+  canonicalMass: number,
+  projectedMass: number,
   nativeMass: number,
   tolerance: number,
 ): string {
-  const absoluteDifference = Math.abs(nativeMass - expectedMass);
-  return `Body ${bodyId} native mass ${String(nativeMass)} differs from canonical configured mass ${String(expectedMass)} (absolute difference ${String(absoluteDifference)}; tolerance ${String(tolerance)}).`;
+  const absoluteDifference = Math.abs(nativeMass - projectedMass);
+  return `Body ${bodyId} native mass ${String(nativeMass)} differs from projected expected mass ${String(projectedMass)} (canonical configured mass ${String(canonicalMass)}; absolute difference ${String(absoluteDifference)}; tolerance ${String(tolerance)}).`;
+}
+
+export function isNativeMassMismatch(
+  nativeMass: number,
+  projectedMass: number,
+  tolerance: number,
+): boolean {
+  return Math.abs(nativeMass - projectedMass) > tolerance;
 }
 
 /** Diagnostic-only result. This is deliberately not a wire or shot type. */
@@ -808,16 +817,22 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
     ) {
       fail("resourceLimit", `Body ${id} has unusable native mass properties.`);
     }
+    const projectedExpectedMass = Math.fround(definition.expectedMass);
     const expectedMassTolerance =
       Number.EPSILON * Math.max(1, definition.expectedMass) * 64;
     if (
-      Math.abs(nativeMass - definition.expectedMass) > expectedMassTolerance
+      isNativeMassMismatch(
+        nativeMass,
+        projectedExpectedMass,
+        expectedMassTolerance,
+      )
     ) {
       fail(
         "resourceLimit",
         formatNativeMassMismatch(
           id,
           definition.expectedMass,
+          projectedExpectedMass,
           nativeMass,
           expectedMassTolerance,
         ),

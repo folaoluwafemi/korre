@@ -3811,11 +3811,11 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-BR02-FORMAT-REPAIR-1-implementation.md",
           "review_report": "execution_state/reports/T02-BR02-FORMAT-REPAIR-1-review.md",
-          "status": "CHANGES_REQUIRED",
-          "owner": "coordinator; formatting source review is PASS, but the exact-head hosted acceptance gate failed at the BR02 runtime check",
+          "status": "SUPERSEDED",
+          "owner": "coordinator — superseded by the evidence-led BR02 native-mass repair; its exact formatting-only diff remains in source, but its hosted BR02 gate failed at the mass preflight",
           "author_identity": "/root",
           "reviewer_identity": "/root/run_evidence_review — source diff PASS; /root/br02_review — exact-head runtime review CHANGES_REQUIRED",
-          "next_action": "Formatting-only source diff remains independently PASS, but its exact-head hosted gate did not pass. Keep this card CHANGES_REQUIRED. A separately materialized and independently reviewed coordinator runtime escalation/repair must resolve the pre-shot mass guard; do not edit source under the formatter card or treat its hosted failure as BR02 proof.",
+          "next_action": "Closed as SUPERSEDED by T02-BR02-OBSERVED-MASS-PROJECTION-1 to serialize the shared E2E source path. The exact reviewed formatting patch remains in the source base; the successor must re-run the full focused browser gate. This status is not ACCEPTED evidence for BR02/T02.",
           "started_at": "2026-10-11"
         },
         {
@@ -3898,6 +3898,25 @@
               "command": "Independent exact-head diagnosis artifact review",
               "environment": "source-review",
               "expected": "PASS confirms exact SHA/run, real WASM request, test counts, numeric native readback and no shot/movement claims; any missing numeric evidence keeps this card CHANGES_REQUIRED."
+            },
+            {
+              "command": "Independent source review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-BR02-MASS-READBACK-1-scope-review.md",
+              "detail": "Diagnostic-only first-failure scope; cap readbacks deferred."
+            },
+            {
+              "command": "GitHub run 38142200238",
+              "result": "EXPECTED_DIAGNOSTIC_FAILURE",
+              "exit_code": 1,
+              "report": "execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238.md",
+              "detail": "Verify/integration/preview passed; real Chromium/WASM captured button mass and both diagnostic tests stopped before impulse, zero skips."
+            },
+            {
+              "command": "Independent exact-run evidence review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238-review.md",
+              "detail": "Provenance and proof limits confirmed; no successful-shot claim."
             }
           ],
           "acceptance": [
@@ -3930,18 +3949,20 @@
             "T01",
             "T03"
           ],
-          "status": "REVIEWING",
-          "owner": "Coordinator — source implementation and independent source review complete; exact-head GitHub verification pending",
+          "status": "ACCEPTED",
+          "owner": "coordinator — accepted for diagnostic readback evidence only; T02 and BR02 remain open",
           "author_identity": "/root/toolchain_audit",
           "reviewer_identity": "/root/br02_review — independent review of amended first-failure scope and exact diff; /root/foundation_review — reserved for later hosted observation evidence review",
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-implementation.md",
-          "review_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-scope-review.md",
+          "review_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238-review.md",
+          "source_review_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-scope-review.md",
           "prior_review_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-source-review.md",
           "scope_amendment_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-scope-amendment.md",
-          "evidence": "Amended first-failing-body criterion and exact two-file source diff received independent SOURCE PASS at execution_state/reports/T02-BR02-MASS-READBACK-1-scope-review.md. Reviewer confirms unchanged guard/tolerance and that cap outcomes remain explicitly deferred. Runtime NOT RUN; hosted verification is now the next gate.",
-          "next_action": "Coordinator commits/pushes the exact source-reviewed SHA for the existing GitHub workflow. It must pass full pnpm verify and collect both focused Chromium diagnostic cases with zero skips and pinned WASM; the error/report must explicitly say cap checks were unmeasured. No shot is claimed.",
-          "started_at": "2026-10-11"
+          "evidence": "Source scope review PASS (execution_state/reports/T02-BR02-MASS-READBACK-1-scope-review.md) and independent exact-run evidence review PASS (execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238-review.md). On exact SHA bf80bfb028310e77005e74a5b9c41c00bfbe9b98, GitHub run 38142200238 passed pnpm verify (29 files/161 tests), integration (1/1), and built preview (4/4). Focused real Chromium suite had 0 passed, 2 failed, 0 skipped; both cases fetched pinned WASM and stopped before impulse on button readback 0.15000000596046448 vs configured 0.15. Cap masses are unmeasured; cleanup after the retry mass error is unverified. This is accepted solely as diagnostic evidence, not as a shot or playable result.",
+          "next_action": "Accepted as diagnostic-only evidence. The captured native button value exactly equals Math.fround(0.15), while the pinned public API does not promise exact scalar round-trip. Proceed only through T02-BR02-OBSERVED-MASS-PROJECTION-1, which must keep the canonical mass unchanged and the numeric rejection bound strict; T02 and BR02 remain open until a real browser shot and retry cleanup pass.",
+          "started_at": "2026-10-11",
+          "acceptance_report": "execution_state/reports/T02-BR02-MASS-READBACK-1-acceptance.md"
         },
         {
           "id": "T02-BR02-PINNED-MASS-API-AUDIT-1",
@@ -3950,9 +3971,65 @@
           "implementation_report": "execution_state/reports/T02-BR02-pinned-mass-api-audit-1.md",
           "review_report": "execution_state/reports/T02-BR02-pinned-mass-api-audit-1-review.md",
           "evidence": "Exact locally installed Babylon core 9.30.0 and Havok 1.3.14 JS semantics independently reviewed PASS. Setter path requests configured 0.15 and getter returns native tuple mass, but API source does not promise exact round-trip precision and the ignored native setter result is not visible through the public wrapper. Hosted mismatch magnitude/cause remains unknown; this acceptance is source-audit scope only."
+        },
+        {
+          "id": "T02-BR02-OBSERVED-MASS-PROJECTION-1",
+          "parent": "T02",
+          "title": "Use the observed native mass representation without weakening the guard",
+          "role": "worker",
+          "depends_on": [
+            "T02-BR02-MASS-READBACK-1"
+          ],
+          "required_parent_acceptance": [
+            "T01",
+            "T03"
+          ],
+          "catalogue": "LOCAL_PACKETS.json",
+          "ready": true,
+          "status": "REVIEWING",
+          "owner": "coordinator integration after source review PASS; exact-head GitHub verification pending",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/foundation_review — independent source review; /root/br02_review — independent exact-run evidence review",
+          "write_paths": [
+            "games/counterball/src/simulation/browserDirectProbe.ts",
+            "games/counterball/src/simulation/browserDirectProbe.test.ts",
+            "tests/e2e/counterball-direct-probe.spec.ts",
+            "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-implementation.md"
+          ],
+          "attempt_count": 0,
+          "implementation_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-implementation.md",
+          "source_review_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-source-review.md",
+          "review_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-review.md",
+          "evidence": "Implementation report execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-implementation.md records exactly three assigned source files, unchanged canonical masses/setter and strict tolerance, prompt E2E errors, scoped git diff --check exit 0, hashes, and all application checks NOT RUN. Rotated independent source review PASS at execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-source-review.md. Exact-head GitHub checks pending; no runtime/shot result yet.",
+          "next_action": "Coordinator commits only reviewed implementation/status/reports, pushes the exact SHA, and runs GitHub pnpm verify plus focused one-worker diagnostic Chromium. /root/br02_review owns only the independent exact-run report. Keep status REVIEWING until hosted evidence review; on any failure follow a new bounded repair card.",
+          "supersedes": [
+            "T02-BR02-FORMAT-REPAIR-1"
+          ],
+          "started_at": "2026-10-11",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-BR02-OBSERVED-MASS-PROJECTION-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact record ready; readback dependency ACCEPTED; prior failed formatter writer explicitly superseded."
+            },
+            {
+              "command": "git diff --check -- three assigned source/test files",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Coordinator recheck; no application commands run."
+            },
+            {
+              "command": "Independent exact source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-source-review.md",
+              "detail": "Three-path scope, canonical masses/setter, strict bound, tests, and fast E2E diagnostics confirmed. Runtime NOT RUN."
+            }
+          ]
         }
       ],
-      "next_action": "The exact run failure, runtime diagnosis, pinned API audit, and scope amendment are documented. T02-BR02-MASS-READBACK-1 remains in REVIEWING after the first reviewer found the cap-readback acceptance was not possible with the existing fail-fast loop. Wait for independent review of the amended first-failure-only criterion, then run its real-Chromium readback on GitHub. Do not widen the tolerance or claim cap outcomes."
+      "next_action": "The diagnostic mass readback card is accepted and the observed-mass projection source diff passed independent review. Exact SHA commit and GitHub verify/browser run are next; no local app checks run. T02/BR02 remain open until a real shot, retry and teardown pass."
     },
     {
       "id": "T03",

@@ -3049,5 +3049,120 @@
       "If any proposed implementation changes the mass guard or unrelated paths, stop and return it for a separate reviewed repair packet.",
       "If required tests are skipped, the run SHA differs, or WASM is not fetched by Chromium, keep this diagnostic packet unaccepted."
     ]
+  },
+  {
+    "id": "T02-BR02-OBSERVED-MASS-PROJECTION-1",
+    "parent": "T02",
+    "title": "Use the observed native mass representation without weakening the guard",
+    "role": "worker",
+    "depends_on": [
+      "T02-BR02-MASS-READBACK-1"
+    ],
+    "supersedes": [
+      "T02-BR02-FORMAT-REPAIR-1"
+    ],
+    "read_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/simulation/browserDirectProbe.test.ts",
+      "tests/e2e/counterball-direct-probe.spec.ts",
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "packages/game-protocol/src/config.ts",
+      "execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238.md",
+      "execution_state/reports/T02-BR02-MASS-READBACK-1-run-38142200238-review.md",
+      "execution_state/reports/T02-BR02-pinned-mass-api-audit-1.md",
+      "execution_state/reports/T02-BR02-pinned-mass-api-audit-1-review.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/SWARM.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/simulation/browserDirectProbe.test.ts",
+      "tests/e2e/counterball-direct-probe.spec.ts"
+    ],
+    "outputs": [
+      "A diagnostic native-mass expectation derived from the canonical configured mass using the observed representation candidate Math.fround; the canonical config and setter input remain unchanged, and the existing strict Number.EPSILON-derived rejection tolerance is retained around the projected expectation.",
+      "Unit tests showing the observed 0.15 mapping, exact diagnostics for canonical/projected/native values, and rejection when native readback differs beyond the unchanged bound.",
+      "Focused browser tests that surface probe-error promptly, capture error and lifecycle evidence, and verify the retry error path can be cleaned up; a passing run must instead prove the real pointer flick, contact, movement, WebGL pixel changes, all 15 settled bodies, retry, and teardown using actual Chromium Havok/WASM."
+    ],
+    "scope_amendment": "The measured value 0.15000000596046448 equals Math.fround(0.15) exactly. This is an observed numerical match and a testable candidate for the browser-native expected value, not a claim that the pinned public API documents float32 storage or guarantees this projection for every mass. The implementation must keep the canonical 0.15 config and setter request intact, retain the strict existing rejection tolerance after projection, and let a real-browser scan falsify the candidate for any of the remaining body masses. Any remaining mismatch stops before impulse and leaves that body plus later cap outcomes unclaimed.",
+    "steps": [
+      "Extract this exact record with node scripts/check-completion-plan.mjs --packet T02-BR02-OBSERVED-MASS-PROJECTION-1; confirm its only dependency, T02-BR02-MASS-READBACK-1, is ACCEPTED before editing.",
+      "Read the exact browser value and both independent readback reviews, plus the pinned package audit. Confirm 0.15000000596046448 is the numeric result of Math.fround(0.15); describe it as an observed numerical match, not as a vendor guarantee.",
+      "Change only the browser diagnostic mass expectation: preserve configured mass and PhysicsBody.setMassProperties input; compare native readback to Math.fround(configuredMass) with the existing Number.EPSILON * max(1, expected) * 64 bound. Do not increase, round away, disable, or replace the rejection bound.",
+      "Keep failure text round-trip precise and include body ID, canonical configured mass, projected expected native value, actual native getter value, absolute delta and the unchanged tolerance. Preserve fail-closed behavior for non-finite/invalid mass and every other existing guard.",
+      "Add focused pure tests for Math.fround(0.15) and strict mismatch rejection. These are math/formatter tests only and are not Havok evidence.",
+      "Update only the focused direct-probe E2E helper so it waits at most 30 seconds for either probe-result or probe-error. On error, attach exact text and lifecycle state, run the existing Back-to-Counterball disposal path, assert engine/listener/observer baseline after unmount, then fail with the visible error instead of timing out for 120 seconds. Preserve the blocked-WASM retry and success assertions.",
+      "Do not edit protocol/config mass, setters, bodies/colliders, impulse, sweep/energy limits, UX/product renderer, workflows, fixtures or other paths. Do not claim a shot if any mass, guard, or runtime failure stops the probe.",
+      "Run only git diff --check locally. No local install, application tests, typecheck, build, browser, physics, server, Wrangler, Railway or deployment command.",
+      "Write a unique implementation report with exact diff paths/hash, local hygiene output and app commands NOT RUN; then release all three source paths for independent review.",
+      "After source review PASS, coordinator publishes the exact reviewed SHA and runs GitHub pnpm verify plus the focused one-worker diagnostic Chromium suite. Capture complete logs, no-skip/retry counts, WASM network response, both browser traces, result/error contexts, screenshots and teardown attachments; never rewrite a failure as a pass."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-BR02-OBSERVED-MASS-PROJECTION-1",
+        "environment": "local-document",
+        "expected": "The exact card is READY and its sole dependency T02-BR02-MASS-READBACK-1 is ACCEPTED."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "Only the three exact assigned source/test files changed and hygiene passes; no application command ran locally."
+      },
+      {
+        "command": "pnpm verify on the exact reviewed SHA",
+        "environment": "github",
+        "expected": "Typecheck, lint, formatting, all unit tests and builds pass with exact counts and no suppressed application test failures."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1 on the exact reviewed SHA",
+        "environment": "github",
+        "expected": "Both focused tests are collected with zero skips/retries against real Chromium and real pinned Havok/WASM. Success requires actual direct flick plus retry, movement/contact/render evidence, and teardown; any diagnostic error is reported promptly with exact context and is a failure, not acceptance."
+      },
+      {
+        "command": "Independent exact source-diff review",
+        "environment": "source-review",
+        "expected": "PASS confirms only projected expected mass comparison, its pure tests, and prompt E2E error/cleanup capture changed; config/setter/tolerance magnitude/impulse/physics limits and other behavior are preserved."
+      },
+      {
+        "command": "Independent exact-head GitHub evidence review",
+        "environment": "source-review",
+        "expected": "PASS confirms exact SHA/run, real WASM response, zero skips/retries, browser shot/contact/pixel/settle evidence, successful retry and lifecycle cleanup. A failed probe remains CHANGES_REQUIRED with its actual error and teardown evidence."
+      }
+    ],
+    "acceptance": [
+      "Canonical protocol config remains button mass 0.15 and cap mass 1; worldFactory continues sending those exact values to Havok. No canonical mass or product physics value changes.",
+      "Only expected native readback is projected with Math.fround. The existing strict epsilon formula is retained, applied after projection, and a difference beyond it still fails closed with exact values.",
+      "The focused unit tests, complete hosted pnpm verify, and independent source review pass on the source under test.",
+      "The focused actual-browser suite has zero skips and retries and loads the pinned Havok/WASM over a successful browser request. Both direct flick and post-WASM-retry flick pass; each has 15 settled bodies, expected selected cap/impulse/application point, contact, nonzero button/cap movement and changed WebGL pixels, with disposal back at baseline.",
+      "If the run reaches a diagnostic error instead of both real shots, it is fast and contains the exact failing body/value plus lifecycle evidence; the card stays CHANGES_REQUIRED and does not claim caps after a first-mismatch guard.",
+      "Independent exact-run review confirms the captured artifacts and all proof limits. This card alone does not accept parent T02, BR02, deployed Havok, a playable match, AI, online, social or staging."
+    ],
+    "negative_cases": [
+      "Do not alter configured masses, setters, collisions, material, gravity, impulse, game rules, hashed guard inputs, tolerances, substeps, sweep/energy limits, or any public gameplay behavior.",
+      "Do not treat Math.fround as a pinned Babylon/Havok API guarantee; it is the explicit candidate tested against actual native getter evidence.",
+      "Do not widen tolerance, bypass a mass/guard failure, fabricate readbacks, accept Node/mock/dry-run physics, or call this a real shot without the browser impulse/trace/pixel evidence.",
+      "Do not change skipped-test settings or weaken existing direct-probe, WASM retry, cleanup, contact, movement, settling, or rendering assertions.",
+      "Do not run local app/install/build/test/browser/physics commands, use Wrangler/Railway, or deploy."
+    ],
+    "review_questions": [
+      "Does the sole expected-mass change match the captured exact Math.fround(0.15) value while leaving canonical mass writes unchanged?",
+      "Is the strict tolerance formula unchanged, fail-closed, and tested with values beyond its bound?",
+      "Does a mismatch fail before impulse with enough numeric context to identify its body, and does the focused E2E stop waiting quickly while preserving error/cleanup evidence?",
+      "Did actual Chromium fetch WASM and perform both pointer flicks with the required trace, movement, contact, changed pixels, all-body settling, retry and lifecycle proof with zero skips/retries?",
+      "Are caps reported only if their real browser checks are reached and passed?"
+    ],
+    "stop_conditions": [
+      "If the observed button value is not exactly reproduced by the projected expectation test, stop and report the discrepancy; do not choose another conversion without separate review.",
+      "If any body mass fails the strict projected check, preserve the first-failing-body values and leave that body and any later masses unclaimed; do not weaken the bound or proceed by bypass.",
+      "If the attempt fails before a real impulse, WASM is mocked/missing, tests skip/retry, source SHA differs, or lifecycle cannot be checked, do not accept this card.",
+      "If source changes escape the three assigned paths or touch canonical mass/config/physics limits, stop for a separate reviewed card."
+    ],
+    "catalogue": "LOCAL_PACKETS.json",
+    "required_parent_acceptance": [
+      "T01",
+      "T03"
+    ]
   }
 ]
