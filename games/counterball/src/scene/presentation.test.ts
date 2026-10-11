@@ -39,7 +39,10 @@ function withScene(run: (scene: Scene) => void): void {
   }
 }
 
-function pick(mesh: PickingInfo["pickedMesh"], hit = mesh !== null): PickingInfo {
+function pick(
+  mesh: PickingInfo["pickedMesh"],
+  hit = mesh !== null,
+): PickingInfo {
   const info = new PickingInfo();
   info.hit = hit;
   info.pickedMesh = mesh;
@@ -60,9 +63,7 @@ function snapshotRoots(
   );
 }
 
-function playbackTransforms(
-  bodies: readonly BodyState[],
-): PlaybackTransform[] {
+function playbackTransforms(bodies: readonly BodyState[]): PlaybackTransform[] {
   return bodies.map((body, index) => ({
     id: body.id,
     position: {
@@ -140,9 +141,14 @@ describe("Counterball presentation registry", () => {
         new Vector3(firstHole.x, 0, firstHole.z),
         worldMatrix,
       );
-      const worldUp = Vector3.TransformNormal(Vector3.Up(), worldMatrix).normalize();
+      const worldUp = Vector3.TransformNormal(
+        Vector3.Up(),
+        worldMatrix,
+      ).normalize();
       const holeRay = new Ray(
-        worldCenter.add(worldUp.scale(COUNTERBALL_CONFIG_V1.geometry.buttonThickness)),
+        worldCenter.add(
+          worldUp.scale(COUNTERBALL_CONFIG_V1.geometry.buttonThickness),
+        ),
         worldUp.scale(-1),
         COUNTERBALL_CONFIG_V1.geometry.buttonThickness * 3,
       );

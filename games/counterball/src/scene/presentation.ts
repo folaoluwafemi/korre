@@ -93,13 +93,17 @@ function validateSnapshots(
       );
     }
     if (transforms.has(snapshot.id)) {
-      throw new TypeError("Presentation update contains a duplicate entity ID.");
+      throw new TypeError(
+        "Presentation update contains a duplicate entity ID.",
+      );
     }
     transforms.set(snapshot.id, snapshot);
   }
 
   if (ENTITY_IDS.some((id) => !transforms.has(id))) {
-    throw new TypeError("Presentation update is missing a canonical entity ID.");
+    throw new TypeError(
+      "Presentation update is missing a canonical entity ID.",
+    );
   }
 
   return transforms;

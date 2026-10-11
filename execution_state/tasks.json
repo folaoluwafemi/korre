@@ -2750,8 +2750,8 @@
           "outputs": [
             "Stable EntityId-to-PieceAssembly map with coordinator-frozen pose-update and picking signatures."
           ],
-          "implementation_report": "execution_state/reports/T02-P01-escalation-repair-implementation.md",
-          "review_report": "execution_state/reports/T02-P01-review.md",
+          "implementation_report": "execution_state/reports/T02-P01-run-38104733678-formatting-implementation.md",
+          "review_report": "execution_state/reports/T02-P01-run-38104733678-formatting-review.md",
           "attempt_count": 3,
           "checks": [
             {
@@ -2845,6 +2845,30 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-P01-escalation-repair-review.md",
               "detail": "Confirmed the correction is exactly the three diagnosed bracket accesses and preserves unknown guards, short-circuit checks, duplicate/missing validation, atomicity and frozen signatures. Runtime pending."
+            },
+            {
+              "command": "GitHub Actions run 38104733678: pnpm verify",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions",
+              "exit_code": 1,
+              "run_id": 38104733678,
+              "source_sha": "bb48025e66360836b946fff36d2b467d41476e30",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38104733678",
+              "detail": "Workspace/package typechecks and ESLint passed. Prettier found formatting differences in presentation.ts and presentation.test.ts. Unit tests, builds, integration, browser tests and diagnostic execution did not run. Full logs and the workflow-generated formatting patch are preserved under execution_state/reports/T02-P01-run-38104733678-*."
+            },
+            {
+              "command": "Coordinator formatting-only correction from the run 38104733678 generated patch",
+              "result": "PASS",
+              "environment": "source-change",
+              "report": "execution_state/reports/T02-P01-run-38104733678-formatting-implementation.md",
+              "detail": "Applied only the generated line-wrap changes to the two packet-owned presentation files after the saved patch passed git apply --check."
+            },
+            {
+              "command": "Independent review of the run 38104733678 formatting-only correction",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-P01-run-38104733678-formatting-review.md",
+              "detail": "Reviewer confirmed the saved patch matches the current two-file diff and changes layout only; no runtime claim."
             }
           ],
           "implementation_note": "Implement only the frozen exports in CONTRACTS.md: createCounterballPresentation(scene, bodies, config?) returns ReadonlyMap<EntityId, PieceAssembly>; updateCounterballPresentation(registry, readonly PlaybackTransform[]) returns void; pickCounterballEntity(registry, PickingInfo) returns EntityId|null. Use createPieces and PieceAssembly.id/root/bodyMesh. Updates are presentation-only and require exactly one finite transform for all 15 IDs. Resolve picks by registered body-mesh identity; only the body meshes are pickable. Keep button holes visible and do not edit App.tsx, rules, config, contracts, CI, tasks, status, or any other path. Test all 15 IDs, malformed snapshots, quaternion updates, button/cap picking, details/hole misses and scene disposal.",
@@ -2852,10 +2876,10 @@
             "A scene consumer can update every piece from a canonical authoritative snapshot and pick its stable EntityId.",
             "Picking and camera movement do not mutate protocol state or rules."
           ],
-          "next_action": "Independent diagnosis and source review for the coordinator correction passed. Run the exact reviewed source on GitHub with full artifacts; if checks pass, obtain independent exact-head runtime/artifact review before VERIFIED."
+          "next_action": "Formatting-only correction and independent source review passed. Commit this exact two-file source diff with its reports, run pnpm verify on the resulting exact SHA, then obtain independent runtime/artifact review."
         }
       ],
-      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 independent source review is complete; exact-head runtime/artifact verification remains. Keep BR01 blocked until T02-P01 is ACCEPTED. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from the current evidence."
+      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 formatting correction and independent source review passed; run the exact reviewed SHA on GitHub. Keep BR01 blocked until T02-P01 is ACCEPTED. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from current evidence."
     },
     {
       "id": "T03",
