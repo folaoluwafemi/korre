@@ -355,3 +355,13 @@ The rotated source review of the bounded formatting repair passed at `execution_
 
 
 Independent exact-run review of [38155542248](https://github.com/folaoluwafemi/korre/actions/runs/38155542248) is saved at `execution_state/reports/T02-L01-guard-schema-run-38155542248-independent-review.md`: exact SHA, attempt and four artifacts match; focused protocol passed 13/13 and Worker smoke 1/1, both zero-skip, but verify failed at Prettier. Unit tests, builds, integration, built-preview and diagnostic browser checks were not reached. No L01/Havok/playability evidence resulted. The source-only formatting repair independently passed; coordinator may publish and rerun but cannot accept the card from this failed run.
+
+
+## Coordinator checkpoint — schema exact-head verification passed on 970ea3d
+
+GitHub run [38156205255](https://github.com/folaoluwafemi/korre/actions/runs/38156205255) on `970ea3d430fa751aa19ad8a037a359d7b23417c4` passed focused protocol tests (13/13), `pnpm verify` (29 files, 164 tests, no skips), integration (1/1), built preview (4/4), diagnostic Chromium (2/2), production exclusion, Worker/browser packaging, disposable migration checks, and Worker smoke (1/1). Preview and diagnostic browser suites report zero skips, unexpected/flaky results. Rotated exact-run/artifact review passed at `execution_state/reports/T02-L01-guard-schema-run-38156205255-independent-review.md`, confirming all nine archive sizes and SHA-256 hashes. Coordinator run report: `execution_state/reports/T02-L01-guard-schema-run-38156205255.md`. This remains schema-only: no L01 matrix, Havok restart trial, deployment, or playable behavior. Final independent five-path source review at exact SHA is pending before schema acceptance.
+
+
+## Acceptance — T02-L01-GUARD-SCHEMA-1
+
+Accepted for strict hashed protocol/config/schema/fixture scope on exact SHA `970ea3d430fa751aa19ad8a037a359d7b23417c4`; report `execution_state/reports/T02-L01-guard-schema-acceptance-1.md`. Final five-path source review passed at `execution_state/reports/T02-L01-guard-schema-final-source-review-970ea3d.md`; exact-head hosted run/artifact review passed at `execution_state/reports/T02-L01-guard-schema-run-38156205255-independent-review.md`. CI proved protocol 13/13, 164/164 workspace tests across 29 files, integration 1/1, built preview 4/4 and existing diagnostic Chromium 2/2, with no test skips/flaky retries; all nine GitHub artifact archive hashes/sizes matched. The card remains schema-only: no loft matrix, runtime guard, deployed Havok, calibration or playable flow is implied. T02-L01 is now READY with its original dependencies preserved. Coordinator next must split its five exact write paths into bounded disjoint core/browser/artifact packets under T02 before dispatch.
