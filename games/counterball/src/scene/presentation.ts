@@ -22,43 +22,80 @@ function isEntityId(value: unknown): value is EntityId {
   return typeof value === "string" && canonicalEntityIds.has(value);
 }
 
-function hasFiniteComponents(
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function isFiniteVector3(
   value: unknown,
-  keys: readonly string[],
-): boolean {
-  if (typeof value !== "object" || value === null) return false;
-  const components = value as Record<string, unknown>;
-  return keys.every(
-    (key) =>
-      typeof components[key] === "number" &&
-      Number.isFinite(components[key]),
+): value is PlaybackTransform["position"] {
+  if (!isRecord(value)) return false;
+  const { x, y, z } = value;
+  return (
+    typeof x === "number" &&
+    Number.isFinite(x) &&
+    typeof y === "number" &&
+    Number.isFinite(y) &&
+    typeof z === "number" &&
+    Number.isFinite(z)
+  );
+}
+
+function isFiniteQuaternion(
+  value: unknown,
+): value is PlaybackTransform["rotation"] {
+  if (!isRecord(value)) return false;
+  const { x, y, z, w } = value;
+  return (
+    typeof x === "number" &&
+    Number.isFinite(x) &&
+    typeof y === "number" &&
+    Number.isFinite(y) &&
+    typeof z === "number" &&
+    Number.isFinite(z) &&
+    typeof w === "number" &&
+    Number.isFinite(w)
+  );
+}
+
+function isPlaybackTransform(value: unknown): value is PlaybackTransform {
+  return (
+    isRecord(value) &&
+    isEntityId(value.id) &&
+    isFiniteVector3(value.position) &&
+    isFiniteQuaternion(value.rotation)
   );
 }
 
 function validateSnapshots(
   bodies: readonly PlaybackTransform[],
 ): ReadonlyMap<EntityId, PlaybackTransform> {
-  if (!Array.isArray(bodies) || bodies.length !== ENTITY_IDS.length) {
+  const untrustedBodies: unknown = bodies;
+  if (
+    !isUnknownArray(untrustedBodies) ||
+    untrustedBodies.length !== ENTITY_IDS.length
+  ) {
     throw new TypeError(
       "Presentation updates require exactly one transform for each canonical entity ID.",
     );
   }
 
+  const snapshots = untrustedBodies;
   const transforms = new Map<EntityId, PlaybackTransform>();
-  for (const body of bodies) {
-    if (typeof body !== "object" || body === null || !isEntityId(body.id)) {
-      throw new TypeError("Presentation update contains an unknown entity ID.");
+  for (const snapshot of snapshots) {
+    if (!isPlaybackTransform(snapshot)) {
+      throw new TypeError(
+        "Presentation update requires canonical IDs and finite transforms.",
+      );
     }
-    if (transforms.has(body.id)) {
+    if (transforms.has(snapshot.id)) {
       throw new TypeError("Presentation update contains a duplicate entity ID.");
     }
-    if (
-      !hasFiniteComponents(body.position, ["x", "y", "z"]) ||
-      !hasFiniteComponents(body.rotation, ["x", "y", "z", "w"])
-    ) {
-      throw new TypeError("Presentation transforms must contain finite values.");
-    }
-    transforms.set(body.id, body);
+    transforms.set(snapshot.id, snapshot);
   }
 
   if (ENTITY_IDS.some((id) => !transforms.has(id))) {
