@@ -278,3 +278,9 @@ Hosted test repair 1 for run 38167503608 is assigned to `/root/toolchain_audit`,
 The test-only implementation report is saved at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-test-repair-1-implementation.md`; `/root/toolchain_audit` has released its exact path. Scoped `git diff --check` passed. `/root/foundation_review` now owns only the independent review report; coordinator retains shared status and exact-head hosted run.
 
 Hosted test repair 1 source review PASS: `execution_state/reports/T02-L01-ARTIFACT-1-hosted-test-repair-1-review.md`. Source changes are released; `/root` owns exact-head GitHub verification and shared status.
+
+Hosted formatting repair 1 is assigned to `/root/toolchain_audit`, with `/root/br02_review` as rotated independent reviewer. Author may write only `games/counterball/src/simulation/loftCoarseProbe.ts`, its test, and the repair implementation report. Reviewer may write only `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-review.md`. Apply only the exact hosted Prettier patch; verify formatting-only scope and scoped diff hygiene. No local app checks.
+
+Hosted formatting implementation report is saved at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-implementation.md`; `/root/toolchain_audit` released both source paths. `/root/br02_review` owns only `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-review.md`; coordinator retains status and hosted-run integration.
+
+Hosted formatting repair 1 source review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-review.md`. `/root/toolchain_audit` and `/root/br02_review` have released their paths. `/root` owns exact-head GitHub verification and shared status.

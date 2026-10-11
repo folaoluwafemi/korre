@@ -1,4 +1,7 @@
-import { COUNTERBALL_CONFIG_V1, hashCounterballConfig } from "@korre/game-protocol";
+import {
+  COUNTERBALL_CONFIG_V1,
+  hashCounterballConfig,
+} from "@korre/game-protocol";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   LOFT_COARSE_TUPLES,
@@ -43,9 +46,14 @@ beforeAll(async () => {
   canonicalConfigHash = await hashCounterballConfig();
 });
 
-function requiredItem<T>(values: readonly T[], index: number, label: string): T {
+function requiredItem<T>(
+  values: readonly T[],
+  index: number,
+  label: string,
+): T {
   const value = values[index];
-  if (value === undefined) throw new Error(`${label} is missing from the test fixture.`);
+  if (value === undefined)
+    throw new Error(`${label} is missing from the test fixture.`);
   return value;
 }
 
@@ -65,7 +73,9 @@ function matrixMetadata(
     fixturePayloadSha256: guard.fixture.payloadSha256,
     fixtureFileSha256: "b".repeat(64),
     physicsVersion: guard.physicsVersion,
-    adapterVersion: guard.physicsVersion.slice(guard.physicsVersion.lastIndexOf("/") + 1),
+    adapterVersion: guard.physicsVersion.slice(
+      guard.physicsVersion.lastIndexOf("/") + 1,
+    ),
     wasmSha256: guard.wasmSha256,
     matchId: guard.matchId,
     runtimeIdentity: "Chromium / Playwright diagnostic runner",
@@ -157,8 +167,10 @@ function caseMetadata(
   const settlingWindow = {
     startTick: 0,
     endTick: 59,
-    linearSpeedThreshold: COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
-    angularSpeedThreshold: COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
+    linearSpeedThreshold:
+      COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
+    angularSpeedThreshold:
+      COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
     ticks: Array.from({ length: 60 }, (_, tick) => ({
       tick,
       linearSpeeds: Array.from({ length: 15 }, () => 0),
@@ -187,7 +199,11 @@ function caseMetadata(
   };
 }
 
-function bodyRow(tuple: LoftCoarseTuple, nominalTick: number, id: LoftCoarseEntityId) {
+function bodyRow(
+  tuple: LoftCoarseTuple,
+  nominalTick: number,
+  id: LoftCoarseEntityId,
+) {
   return { tuple, nominalTick, ...bodyState(id) };
 }
 
@@ -208,7 +224,11 @@ function sweepRow(
     nominalTick,
     actualCheckedCallCount,
     maximumShiftedEnergy: { value: 1, callIndex },
-    maximumCandidateRelativeComDrop: { value: 0.001, bodyId: "home-0", callIndex },
+    maximumCandidateRelativeComDrop: {
+      value: 0.001,
+      bodyId: "home-0",
+      callIndex,
+    },
     minimumApronMargin: { value: 1, bodyId: "home-0", callIndex },
     minimumSlabUndersideMargin: { value: 1, bodyId: "home-0", callIndex },
     maximumPointSweep: { value: 0.001, bodyId: "home-0", callIndex },
@@ -224,7 +244,10 @@ function sweepRow(
   } as const;
 }
 
-function sweepRowsFor(tuple: LoftCoarseTuple, callsPerInterval: readonly number[]) {
+function sweepRowsFor(
+  tuple: LoftCoarseTuple,
+  callsPerInterval: readonly number[],
+) {
   return callsPerInterval.map((calls, tick) => sweepRow(tuple, tick, calls));
 }
 
@@ -254,11 +277,17 @@ function caseAt(
   options: CaseOptions = {},
 ): LoftCoarseCase {
   const tickCount = options.tickCount ?? 2;
-  const callsPerInterval = options.callsPerInterval ?? Array.from({ length: tickCount - 1 }, () => 1);
-  const executeStepCalls = callsPerInterval.reduce((sum, calls) => sum + calls, 0);
+  const callsPerInterval =
+    options.callsPerInterval ?? Array.from({ length: tickCount - 1 }, () => 1);
+  const executeStepCalls = callsPerInterval.reduce(
+    (sum, calls) => sum + calls,
+    0,
+  );
   const metadata = caseMetadata(index, identity, {
     executeStepCalls,
-    batches: options.batchCount ?? Math.ceil(executeStepCalls / guard.workload.maximumCallsPerBatch),
+    batches:
+      options.batchCount ??
+      Math.ceil(executeStepCalls / guard.workload.maximumCallsPerBatch),
     wallTimeMs: options.wallTimeMs ?? 1,
     ...options.metadata,
   });
@@ -293,13 +322,20 @@ function collectingSink(): {
   const aborted: unknown[] = [];
   return {
     sink: {
-      write: (chunk) => { chunks.push(new Uint8Array(chunk)); },
-      abort: (reason) => { aborted.push(reason); },
+      write: (chunk) => {
+        chunks.push(new Uint8Array(chunk));
+      },
+      abort: (reason) => {
+        aborted.push(reason);
+      },
     },
     chunks,
     aborted,
     text: () => {
-      const byteLength = chunks.reduce((total, chunk) => total + chunk.byteLength, 0);
+      const byteLength = chunks.reduce(
+        (total, chunk) => total + chunk.byteLength,
+        0,
+      );
       const bytes = new Uint8Array(byteLength);
       let offset = 0;
       for (const chunk of chunks) {
@@ -326,7 +362,9 @@ function countingSink(): {
         bytes += chunk.byteLength;
         largestChunk = Math.max(largestChunk, chunk.byteLength);
       },
-      abort: (reason) => { aborted.push(reason); },
+      abort: (reason) => {
+        aborted.push(reason);
+      },
     },
     getBytes: () => bytes,
     getLargestChunk: () => largestChunk,
@@ -334,13 +372,15 @@ function countingSink(): {
   };
 }
 
-async function run(options: {
-  metadata?: LoftCoarseMatrixMetadata;
-  cases?: AsyncIterable<LoftCoarseCase>;
-  change?: (index: number, value: LoftCoarseCase) => LoftCoarseCase;
-  signal?: AbortSignal;
-  sink?: LoftCoarseByteSink;
-} = {}) {
+async function run(
+  options: {
+    metadata?: LoftCoarseMatrixMetadata;
+    cases?: AsyncIterable<LoftCoarseCase>;
+    change?: (index: number, value: LoftCoarseCase) => LoftCoarseCase;
+    signal?: AbortSignal;
+    sink?: LoftCoarseByteSink;
+  } = {},
+) {
   const metadata = options.metadata ?? matrixMetadata();
   const collected = collectingSink();
   const result = await writeLoftCoarseMatrix({
@@ -352,7 +392,10 @@ async function run(options: {
   return { result, collected };
 }
 
-function exactCaseLimits(index: number, identity: LoftCoarseMatrixMetadata): LoftCoarseCase {
+function exactCaseLimits(
+  index: number,
+  identity: LoftCoarseMatrixMetadata,
+): LoftCoarseCase {
   const callsPerInterval = Array.from({ length: 1_800 }, () => 48);
   return caseAt(index, identity, {
     tickCount: 1_801,
@@ -366,16 +409,34 @@ function exactCaseLimits(index: number, identity: LoftCoarseMatrixMetadata): Lof
 describe("writeLoftCoarseMatrix", () => {
   it("exposes the exact unique tuple order from the frozen four axes", () => {
     expect(LOFT_COARSE_TUPLES).toEqual([
-      [0.75, 45, 6, -15], [0.75, 45, 6, 0], [0.75, 45, 6, 15],
-      [0.75, 45, 8, -15], [0.75, 45, 8, 0], [0.75, 45, 8, 15],
-      [0.75, 60, 6, -15], [0.75, 60, 6, 0], [0.75, 60, 6, 15],
-      [0.75, 60, 8, -15], [0.75, 60, 8, 0], [0.75, 60, 8, 15],
-      [1, 45, 6, -15], [1, 45, 6, 0], [1, 45, 6, 15],
-      [1, 45, 8, -15], [1, 45, 8, 0], [1, 45, 8, 15],
-      [1, 60, 6, -15], [1, 60, 6, 0], [1, 60, 6, 15],
-      [1, 60, 8, -15], [1, 60, 8, 0], [1, 60, 8, 15],
+      [0.75, 45, 6, -15],
+      [0.75, 45, 6, 0],
+      [0.75, 45, 6, 15],
+      [0.75, 45, 8, -15],
+      [0.75, 45, 8, 0],
+      [0.75, 45, 8, 15],
+      [0.75, 60, 6, -15],
+      [0.75, 60, 6, 0],
+      [0.75, 60, 6, 15],
+      [0.75, 60, 8, -15],
+      [0.75, 60, 8, 0],
+      [0.75, 60, 8, 15],
+      [1, 45, 6, -15],
+      [1, 45, 6, 0],
+      [1, 45, 6, 15],
+      [1, 45, 8, -15],
+      [1, 45, 8, 0],
+      [1, 45, 8, 15],
+      [1, 60, 6, -15],
+      [1, 60, 6, 0],
+      [1, 60, 6, 15],
+      [1, 60, 8, -15],
+      [1, 60, 8, 0],
+      [1, 60, 8, 15],
     ] satisfies readonly LoftCoarseTuple[]);
-    expect(new Set(LOFT_COARSE_TUPLES.map((tuple) => tuple.join("/"))).size).toBe(24);
+    expect(
+      new Set(LOFT_COARSE_TUPLES.map((tuple) => tuple.join("/"))).size,
+    ).toBe(24);
   });
 
   it("streams deterministic compact JSON, full precision and exact basic totals", async () => {
@@ -396,9 +457,13 @@ describe("writeLoftCoarseMatrix", () => {
       },
     });
     expect(first.collected.text()).toContain('"configHash":"');
-    expect(first.result.matrixBytes).toBe(new TextEncoder().encode(first.collected.text()).byteLength);
+    expect(first.result.matrixBytes).toBe(
+      new TextEncoder().encode(first.collected.text()).byteLength,
+    );
     expect(first.result.envelopeBytes).toBeGreaterThan(0);
-    expect(first.collected.chunks.every((chunk) => chunk.byteLength <= 256 * 1_024)).toBe(true);
+    expect(
+      first.collected.chunks.every((chunk) => chunk.byteLength <= 256 * 1_024),
+    ).toBe(true);
   });
 
   it("canonicalizes object-key order and preserves negative zero and precision", async () => {
@@ -410,30 +475,50 @@ describe("writeLoftCoarseMatrix", () => {
     });
     const first = await run({
       metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, bodyRows: [rowWithPrecision(current.metadata.tuple), ...current.bodyRows.slice(1)] }
-        : current,
+      change: (index, current) =>
+        index === 0
+          ? {
+              ...current,
+              bodyRows: [
+                rowWithPrecision(current.metadata.tuple),
+                ...current.bodyRows.slice(1),
+              ],
+            }
+          : current,
     });
     const second = await run({
       metadata: identity,
-      change: (index, current) => index === 0
-        ? {
-            ...current,
-            bodyRows: [{
-              ...rowWithPrecision(current.metadata.tuple),
-              position: { x: -0.12345678901234568, y: 1, z: 2 },
-              angularVelocity: { z: 0, x: -0, y: 0 },
-            }, ...current.bodyRows.slice(1)],
-          }
-        : current,
+      change: (index, current) =>
+        index === 0
+          ? {
+              ...current,
+              bodyRows: [
+                {
+                  ...rowWithPrecision(current.metadata.tuple),
+                  position: { x: -0.12345678901234568, y: 1, z: 2 },
+                  angularVelocity: { z: 0, x: -0, y: 0 },
+                },
+                ...current.bodyRows.slice(1),
+              ],
+            }
+          : current,
     });
     expect(first.collected.text()).toBe(second.collected.text());
     expect(first.collected.text()).toContain("-0.12345678901234568");
     const parsed = JSON.parse(first.collected.text()) as {
-      cases: Array<{ bodyRows: Array<{ position: { x: number }; angularVelocity: { x: number } }> }>;
+      cases: Array<{
+        bodyRows: Array<{
+          position: { x: number };
+          angularVelocity: { x: number };
+        }>;
+      }>;
     };
     const firstCase = requiredItem(parsed.cases, 0, "serialized first case");
-    const firstRow = requiredItem(firstCase.bodyRows, 0, "serialized first body row");
+    const firstRow = requiredItem(
+      firstCase.bodyRows,
+      0,
+      "serialized first body row",
+    );
     expect(Object.is(firstRow.position.x, -0.12345678901234568)).toBe(true);
     expect(Object.is(firstRow.angularVelocity.x, -0)).toBe(true);
   });
@@ -442,159 +527,244 @@ describe("writeLoftCoarseMatrix", () => {
     const identity = matrixMetadata();
     const missingMatrixField = { ...identity } as Record<string, unknown>;
     delete missingMatrixField["fixtureId"];
-    await expect(run({ metadata: missingMatrixField as never })).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      run({ metadata: missingMatrixField as never }),
+    ).rejects.toMatchObject({ code: "invalid" });
 
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => {
-        if (index !== 0) return current;
-        const metadata = { ...current.metadata } as Record<string, unknown>;
-        delete metadata["initialStateHash"];
-        return { ...current, metadata: metadata as never };
-      },
-    })).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const metadata = { ...current.metadata } as Record<string, unknown>;
+          delete metadata["initialStateHash"];
+          return { ...current, metadata: metadata as never };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
 
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => {
-        if (index !== 0) return current;
-        const dynamicBodies = current.metadata.dynamicBodies.map((body, bodyIndex) =>
-          bodyIndex === 0
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const dynamicBodies = current.metadata.dynamicBodies.map(
+            (body, bodyIndex) =>
+              bodyIndex === 0
+                ? {
+                    ...body,
+                    configuredMassProjection: {
+                      configuredMass:
+                        body.configuredMassProjection.configuredMass,
+                      projectedMass:
+                        body.configuredMassProjection.projectedMass,
+                      tolerance: body.configuredMassProjection.tolerance,
+                      withinTolerance: true,
+                    } as never,
+                  }
+                : body,
+          );
+          return {
+            ...current,
+            metadata: { ...current.metadata, dynamicBodies },
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
             ? {
-                ...body,
-                configuredMassProjection: {
-                  configuredMass: body.configuredMassProjection.configuredMass,
-                  projectedMass: body.configuredMassProjection.projectedMass,
-                  tolerance: body.configuredMassProjection.tolerance,
-                  withinTolerance: true,
-                } as never,
+                ...current,
+                metadata: { ...current.metadata, unapproved: true } as never,
               }
-            : body,
-        );
-        return { ...current, metadata: { ...current.metadata, dynamicBodies } };
-      },
-    })).rejects.toMatchObject({ code: "invalid" });
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
 
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, metadata: { ...current.metadata, unapproved: true } as never }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
-
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => {
-        if (index !== 0) return current;
-        const staticBodies = current.metadata.staticBodies.map((body, bodyIndex) =>
-          bodyIndex === 0 ? { ...body, id: "unrelated-static" } : body,
-        );
-        return { ...current, metadata: { ...current.metadata, staticBodies } };
-      },
-    })).rejects.toMatchObject({ code: "invalid" });
-
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, bodyRows: [{ ...requiredItem(current.bodyRows, 0, "body row"), rotation: undefined } as never] }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
-
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, bodyRows: current.bodyRows.slice(0, 15) }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
-
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? {
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const staticBodies = current.metadata.staticBodies.map(
+            (body, bodyIndex) =>
+              bodyIndex === 0 ? { ...body, id: "unrelated-static" } : body,
+          );
+          return {
             ...current,
-            contactRows: [{ ...contactRow(current.metadata.tuple), unexpected: true } as never],
-          }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
+            metadata: { ...current.metadata, staticBodies },
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
 
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? {
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                bodyRows: [
+                  {
+                    ...requiredItem(current.bodyRows, 0, "body row"),
+                    rotation: undefined,
+                  } as never,
+                ],
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? { ...current, bodyRows: current.bodyRows.slice(0, 15) }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                contactRows: [
+                  {
+                    ...contactRow(current.metadata.tuple),
+                    unexpected: true,
+                  } as never,
+                ],
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                sweepRows: [
+                  {
+                    ...requiredItem(current.sweepRows, 0, "sweep row"),
+                    maximumPointSweep: { value: 0.001, bodyId: "home-0" },
+                  } as never,
+                ],
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const wrongObstacle = sweepRow(current.metadata.tuple, 0, 1);
+          return {
             ...current,
-            sweepRows: [{
-              ...requiredItem(current.sweepRows, 0, "sweep row"),
-              maximumPointSweep: { value: 0.001, bodyId: "home-0" },
-            } as never],
-          }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
-
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => {
-        if (index !== 0) return current;
-        const wrongObstacle = sweepRow(current.metadata.tuple, 0, 1);
-        return {
-          ...current,
-          sweepRows: [{
-            ...wrongObstacle,
-            minimumWholeButtonObstacleClearance: {
-              ...wrongObstacle.minimumWholeButtonObstacleClearance,
-              obstaclePair: ["button", "home-2"],
-            },
-          } as never],
-        };
-      },
-    })).rejects.toMatchObject({ code: "invalid" });
+            sweepRows: [
+              {
+                ...wrongObstacle,
+                minimumWholeButtonObstacleClearance: {
+                  ...wrongObstacle.minimumWholeButtonObstacleClearance,
+                  obstaclePair: ["button", "home-2"],
+                },
+              } as never,
+            ],
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
   });
 
   it("preserves duplicate contact callbacks and enforces the 64-byte event bound", async () => {
     const identity = matrixMetadata();
     const boundary = await run({
       metadata: identity,
-      change: (index, current) => index === 0
-        ? {
-            ...current,
-            contactRows: [{ ...contactRow(current.metadata.tuple), eventType: "x".repeat(64) }],
-          }
-        : current,
+      change: (index, current) =>
+        index === 0
+          ? {
+              ...current,
+              contactRows: [
+                {
+                  ...contactRow(current.metadata.tuple),
+                  eventType: "x".repeat(64),
+                },
+              ],
+            }
+          : current,
     });
     expect(boundary.result.contactRows).toBe(1);
 
     const accepted = await run({
       metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, contactRows: [contactRow(current.metadata.tuple), contactRow(current.metadata.tuple)] }
-        : current,
+      change: (index, current) =>
+        index === 0
+          ? {
+              ...current,
+              contactRows: [
+                contactRow(current.metadata.tuple),
+                contactRow(current.metadata.tuple),
+              ],
+            }
+          : current,
     });
     expect(accepted.result.contactRows).toBe(2);
 
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, contactRows: [{ ...contactRow(current.metadata.tuple), eventType: "x".repeat(65) }] }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                contactRows: [
+                  {
+                    ...contactRow(current.metadata.tuple),
+                    eventType: "x".repeat(65),
+                  },
+                ],
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
   });
 
   it("rejects non-finite and over-limit metadata before returning success", async () => {
     const identity = matrixMetadata({ runtimeIdentity: "x".repeat(65_537) });
-    await expect(run({ metadata: identity })).rejects.toMatchObject({ code: "resourceLimit" });
-    await expect(run({
-      metadata: matrixMetadata(),
-      change: (index, current) => {
-        if (index !== 0) return current;
-        const bodyRows = current.bodyRows.map((row, rowIndex) =>
-          rowIndex === 0 ? { ...row, position: vec3(Number.NaN) } : row,
-        );
-        return { ...current, bodyRows };
-      },
-    })).rejects.toMatchObject({ code: "invalid" });
+    await expect(run({ metadata: identity })).rejects.toMatchObject({
+      code: "resourceLimit",
+    });
+    await expect(
+      run({
+        metadata: matrixMetadata(),
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const bodyRows = current.bodyRows.map((row, rowIndex) =>
+            rowIndex === 0 ? { ...row, position: vec3(Number.NaN) } : row,
+          );
+          return { ...current, bodyRows };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
 
-    await expect(run({
-      metadata: matrixMetadata({ configHash: "0".repeat(64) }),
-    })).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      run({
+        metadata: matrixMetadata({ configHash: "0".repeat(64) }),
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
   });
 
   it("accepts exact per-case and aggregate row/workload limits using a discard sink", async () => {
@@ -622,57 +792,95 @@ describe("writeLoftCoarseMatrix", () => {
       wallTimeMs: guard.workload.maximumWallTimeMatrixMs,
     });
     expect(result.matrixBytes).toBe(counted.getBytes());
-    expect(result.matrixBytes).toBeLessThanOrEqual(guard.artifact.maximumMatrixBytes);
+    expect(result.matrixBytes).toBeLessThanOrEqual(
+      guard.artifact.maximumMatrixBytes,
+    );
     expect(counted.getLargestChunk()).toBeLessThanOrEqual(256 * 1_024);
   });
 
   it("rejects body/contact/sweep count and workload values at limit plus one", async () => {
     const identity = matrixMetadata();
     const maxCase = exactCaseLimits(0, identity);
-    const firstBodyRow = requiredItem(maxCase.bodyRows, 0, "maximum-case body row");
-    const firstSweepRow = requiredItem(maxCase.sweepRows, 0, "maximum-case sweep row");
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, bodyRows: [...maxCase.bodyRows, firstBodyRow] }
-        : current,
-    })).rejects.toMatchObject({ code: "resourceLimit" });
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, contactRows: Array.from({ length: 8_193 }, () => contactRow(current.metadata.tuple)) }
-        : current,
-    })).rejects.toMatchObject({ code: "resourceLimit" });
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, sweepRows: [...maxCase.sweepRows, firstSweepRow] }
-        : current,
-    })).rejects.toMatchObject({ code: "invalid" });
-    await expect(run({
-      metadata: identity,
-      change: (index, current) => index === 0
-        ? { ...current, sweepRows: [...maxCase.sweepRows, firstSweepRow, firstSweepRow] }
-        : current,
-    })).rejects.toMatchObject({ code: "resourceLimit" });
+    const firstBodyRow = requiredItem(
+      maxCase.bodyRows,
+      0,
+      "maximum-case body row",
+    );
+    const firstSweepRow = requiredItem(
+      maxCase.sweepRows,
+      0,
+      "maximum-case sweep row",
+    );
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? { ...current, bodyRows: [...maxCase.bodyRows, firstBodyRow] }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "resourceLimit" });
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                contactRows: Array.from({ length: 8_193 }, () =>
+                  contactRow(current.metadata.tuple),
+                ),
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "resourceLimit" });
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? { ...current, sweepRows: [...maxCase.sweepRows, firstSweepRow] }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) =>
+          index === 0
+            ? {
+                ...current,
+                sweepRows: [...maxCase.sweepRows, firstSweepRow, firstSweepRow],
+              }
+            : current,
+      }),
+    ).rejects.toMatchObject({ code: "resourceLimit" });
 
     for (const metadataPatch of [
       { executeStepCalls: guard.workload.maximumExecuteStepCallsPerCase + 1 },
       { batches: guard.workload.maximumBatchesPerCase + 1 },
       { wallTimeMs: guard.workload.maximumWallTimePerCaseMs + 1 },
     ]) {
-      await expect(run({
-        metadata: identity,
-        change: (index, current) => index === 0
-          ? { ...current, metadata: { ...current.metadata, ...metadataPatch } }
-          : current,
-      })).rejects.toMatchObject({ code: "resourceLimit" });
+      await expect(
+        run({
+          metadata: identity,
+          change: (index, current) =>
+            index === 0
+              ? {
+                  ...current,
+                  metadata: { ...current.metadata, ...metadataPatch },
+                }
+              : current,
+        }),
+      ).rejects.toMatchObject({ code: "resourceLimit" });
     }
   });
 
   it("waits for sink backpressure before consuming the next case", async () => {
     let releaseWrite!: () => void;
-    const firstWrite = new Promise<void>((resolve) => { releaseWrite = resolve; });
+    const firstWrite = new Promise<void>((resolve) => {
+      releaseWrite = resolve;
+    });
     let writeCount = 0;
     let advancedPastFirstCase = false;
     const identity = matrixMetadata();
@@ -690,8 +898,14 @@ describe("writeLoftCoarseMatrix", () => {
       advancedPastFirstCase = true;
       for (let index = 1; index < 24; index += 1) yield caseAt(index, identity);
     }
-    const pending = writeLoftCoarseMatrix({ metadata: identity, cases: slowCases(), sink, signal: new AbortController().signal });
-    while (writeCount === 0) await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    const pending = writeLoftCoarseMatrix({
+      metadata: identity,
+      cases: slowCases(),
+      sink,
+      signal: new AbortController().signal,
+    });
+    while (writeCount === 0)
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
     expect(writeCount).toBe(1);
     expect(advancedPastFirstCase).toBe(false);
     releaseWrite();
@@ -703,13 +917,22 @@ describe("writeLoftCoarseMatrix", () => {
     const controller = new AbortController();
     const identity = matrixMetadata();
     let markStarted!: () => void;
-    const started = new Promise<void>((resolve) => { markStarted = resolve; });
+    const started = new Promise<void>((resolve) => {
+      markStarted = resolve;
+    });
     let releaseWrite!: () => void;
-    const unresolvedWrite = new Promise<void>((resolve) => { releaseWrite = resolve; });
+    const unresolvedWrite = new Promise<void>((resolve) => {
+      releaseWrite = resolve;
+    });
     const aborted: unknown[] = [];
     const sink: LoftCoarseByteSink = {
-      write: () => { markStarted(); return unresolvedWrite; },
-      abort: (reason) => { aborted.push(reason); },
+      write: () => {
+        markStarted();
+        return unresolvedWrite;
+      },
+      abort: (reason) => {
+        aborted.push(reason);
+      },
     };
     async function* firstMaximumCase() {
       await Promise.resolve();
@@ -726,7 +949,9 @@ describe("writeLoftCoarseMatrix", () => {
     controller.abort(new Error("cancel probe"));
     await expect(pending).rejects.toMatchObject({ code: "cancelled" });
     expect(aborted).toHaveLength(1);
-    expect(requiredItem(aborted, 0, "abort reason")).toMatchObject({ code: "cancelled" });
+    expect(requiredItem(aborted, 0, "abort reason")).toMatchObject({
+      code: "cancelled",
+    });
     releaseWrite();
   });
 
@@ -735,13 +960,24 @@ describe("writeLoftCoarseMatrix", () => {
     const aborted: unknown[] = [];
     const identity = matrixMetadata();
     const sink: LoftCoarseByteSink = {
-      write: () => { throw failure; },
-      abort: (reason) => { aborted.push(reason); },
+      write: () => {
+        throw failure;
+      },
+      abort: (reason) => {
+        aborted.push(reason);
+      },
     };
-    const cases = orderedCases(identity, (index, current) => index === 0
-      ? exactCaseLimits(0, identity)
-      : current);
-    await expect(writeLoftCoarseMatrix({ metadata: identity, cases, sink, signal: new AbortController().signal })).rejects.toBe(failure);
+    const cases = orderedCases(identity, (index, current) =>
+      index === 0 ? exactCaseLimits(0, identity) : current,
+    );
+    await expect(
+      writeLoftCoarseMatrix({
+        metadata: identity,
+        cases,
+        sink,
+        signal: new AbortController().signal,
+      }),
+    ).rejects.toBe(failure);
     expect(aborted).toEqual([failure]);
   });
 
@@ -749,21 +985,27 @@ describe("writeLoftCoarseMatrix", () => {
     const failure = new Error("disk write failed");
     const abortFailure = new Error("sink abort failed");
     const identity = matrixMetadata();
-    const cases = () => orderedCases(identity, (index, current) => index === 0
-      ? exactCaseLimits(0, identity)
-      : current);
+    const cases = () =>
+      orderedCases(identity, (index, current) =>
+        index === 0 ? exactCaseLimits(0, identity) : current,
+      );
     const rejection = await writeLoftCoarseMatrix({
       metadata: identity,
       cases: cases(),
       sink: {
-        write: () => { throw failure; },
-        abort: () => { throw abortFailure; },
+        write: () => {
+          throw failure;
+        },
+        abort: () => {
+          throw abortFailure;
+        },
       },
       signal: new AbortController().signal,
     }).catch((error: unknown) => error);
 
     expect(rejection).toBeInstanceOf(AggregateError);
-    if (!(rejection instanceof AggregateError)) throw new Error("Expected both failures to be aggregated.");
+    if (!(rejection instanceof AggregateError))
+      throw new Error("Expected both failures to be aggregated.");
     expect(rejection.errors).toEqual([failure, abortFailure]);
     expect(rejection.cause).toBe(failure);
 
@@ -771,7 +1013,9 @@ describe("writeLoftCoarseMatrix", () => {
       metadata: identity,
       cases: cases(),
       sink: {
-        write: () => { throw failure; },
+        write: () => {
+          throw failure;
+        },
         abort: () => {
           const erroredStream = new ReadableStream<void>({
             start(controller) {
@@ -786,7 +1030,9 @@ describe("writeLoftCoarseMatrix", () => {
 
     expect(undefinedAbortRejection).toBeInstanceOf(AggregateError);
     if (!(undefinedAbortRejection instanceof AggregateError)) {
-      throw new Error("Expected an undefined abort failure to be retained in the aggregate.");
+      throw new Error(
+        "Expected an undefined abort failure to be retained in the aggregate.",
+      );
     }
     expect(undefinedAbortRejection.errors).toEqual([failure, undefined]);
     expect(undefinedAbortRejection.cause).toBe(failure);
