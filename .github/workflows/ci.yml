@@ -71,7 +71,7 @@ jobs:
         run: |
           mkdir -p .artifacts
           set -o pipefail
-          pnpm exec prettier --check .github/workflows/ci.yml vitest.config.ts vitest.workers.config.ts package.json 2>&1 | tee .artifacts/tooling-format.log
+          pnpm exec prettier --check .github/workflows/ci.yml playwright.config.ts vitest.config.ts vitest.integration.config.ts vitest.workers.config.ts apps/web/tsconfig.server.json package.json 2>&1 | tee .artifacts/tooling-format.log
       - run: pnpm exec playwright install --with-deps chromium
       - name: Apply and recheck migrations on disposable PostgreSQL
         env:
@@ -323,6 +323,57 @@ jobs:
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: error
+      - name: Run every produced local diagnostic browser suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          diagnostic_specs="$(node --input-type=module <<'NODE'
+          import { access, readFile, writeFile } from "node:fs/promises";
+
+          const candidates = [
+            ["T02-BR02", "tests/e2e/counterball-direct-probe.spec.ts"],
+            ["T02-R05", "tests/e2e/counterball-physics.spec.ts"],
+            ["T02-R07", "tests/e2e/counterball-physics.spec.ts"],
+            ["T05-F02", "tests/e2e/local-flick.spec.ts"],
+            ["T08-R01", "tests/e2e/local-restart.spec.ts"],
+            ["T09-R02", "tests/e2e/local-match.spec.ts"],
+            ["T21-P02", "tests/e2e/counterball-cinematic.spec.ts"],
+          ];
+          const state = JSON.parse(await readFile("execution_state/tasks.json", "utf8"));
+          const statusByPacket = new Map();
+          for (const task of state.tasks) {
+            for (const packet of task.packet_progress ?? []) {
+              statusByPacket.set(packet.id, packet.status);
+            }
+          }
+          const requiredStatuses = new Set(["IMPLEMENTED", "REVIEWING", "VERIFIED", "ACCEPTED"]);
+          const produced = [];
+          for (const [packetId, file] of candidates) {
+            let exists = true;
+            try {
+              await access(file);
+            } catch {
+              exists = false;
+            }
+            if (requiredStatuses.has(statusByPacket.get(packetId)) && !exists) {
+              throw new Error(`${packetId} is ${statusByPacket.get(packetId)} but its browser spec is missing: ${file}`);
+            }
+            if (exists && !produced.includes(file)) produced.push(file);
+          }
+          await writeFile(".artifacts/diagnostic-e2e-files.json", `${JSON.stringify({ files: produced }, null, 2)}\n`);
+          if (produced.length === 0) {
+            console.error("No local diagnostic browser producer exists on this commit; no empty test command was run.");
+          }
+          process.stdout.write(produced.join(" "));
+          NODE
+          )"
+          if [ -n "$diagnostic_specs" ]; then
+            printf 'Running produced diagnostic browser specs: %s\n' "$diagnostic_specs"
+            COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e $diagnostic_specs --workers=1 2>&1 | tee .artifacts/e2e-diagnostic.log
+          else
+            printf 'No produced diagnostic browser specs on this commit.\n' | tee .artifacts/e2e-diagnostic.log
+          fi
       - name: Upload browser review evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -331,7 +382,7 @@ jobs:
           path: |
             execution_state/reports/T03-*.png
             test-results/
-            .artifacts/browser-test-results.json
+            .artifacts/browser-test-results*.json
           include-hidden-files: true
           if-no-files-found: ignore
       - name: Upload complete hosted check logs and structured browser results
@@ -341,7 +392,8 @@ jobs:
           name: counterball-hosted-checks-${{ github.sha }}-run-${{ github.run_id }}-attempt-${{ github.run_attempt }}
           path: |
             .artifacts/*.log
-            .artifacts/browser-test-results.json
+            .artifacts/browser-test-results*.json
+            .artifacts/diagnostic-e2e-files.json
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: ignore

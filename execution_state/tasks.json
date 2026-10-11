@@ -2567,6 +2567,72 @@
           "next_action": "Accepted as six real-WASM diagnostic observations only. Do not treat raw impulses as normalized player power; use the measurements to inform a separately reviewed bounded tuning decision. No deployed or playable result follows."
         },
         {
+          "id": "C01-H",
+          "status": "REVIEWING",
+          "owner": "coordinator",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-H",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review — independent harness/config review pending",
+          "depends_on": [
+            "C01-P"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/completion/OPERATIONS.md",
+            "playwright.config.ts",
+            "apps/web/tsconfig.json",
+            "apps/api/src/config.ts",
+            "knowledge_base/execution/completion/ONLINE_PACKETS.json",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json"
+          ],
+          "write_paths": [
+            "apps/web/tsconfig.server.json",
+            "package.json",
+            "playwright.config.ts",
+            ".github/workflows/ci.yml",
+            "vitest.config.ts"
+          ],
+          "implementation_report": "execution_state/reports/C01-H-implementation.md",
+          "review_report": "execution_state/reports/C01-H-review.md",
+          "attempt_count": 1,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C01-H",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact coordinator card is ready after C01-P and T01 acceptance; diagnostic and service-aware producers remain separately owned."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet C01-H",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact C01-H record is ready; this check validates plan consistency only."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-source",
+              "exit_code": 0
+            },
+            {
+              "command": ".\\node_modules\\.bin\\prettier.cmd --write .github/workflows/ci.yml playwright.config.ts vitest.config.ts package.json apps/web/tsconfig.server.json",
+              "result": "PASS",
+              "environment": "local-source-format",
+              "exit_code": 0,
+              "detail": "Configuration formatting only; no application build or test."
+            },
+            {
+              "command": "Independent C01-H source/config review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-H-review.md",
+              "detail": "Reviewer verified route precedence, complete catalogue mapping, fail-closed artifact behavior, service exclusions, and server type/test discovery. Hosted runtime remains pending."
+            }
+          ],
+          "implementation_note": "Keep current production static regressions on the production dist. COUNTERBALL_DEV_E2E=1 must take precedence and serve only prebuilt dist-dev, with startup failing when the artifact is missing. Explicitly map future filename candidates from LOCAL_PACKETS and ONLINE_PACKETS to production, local diagnostic, identity-service, or online-service mode and server owner. No fake identity/online service config. Do not run a diagnostic test collection until its accepted producer has created the exact file; its named consumer card must fail if collection is empty. Add the separate dist-dev diagnostic Playwright step only when it has a produced candidate. Include current web server config inputs in the Node typecheck project and include apps/web/server tests in Node Vitest while preserving Worker exclusions. No culture, rule or physics changes.",
+          "next_action": "Commit and push this exact reviewed source revision. Await GitHub pnpm verify and production prebuilt browser checks; record diagnostic execution only if a mapped spec exists."
+        },
+        {
           "id": "T02-L01",
           "status": "BLOCKED",
           "owner": "/root/run_evidence_review",
