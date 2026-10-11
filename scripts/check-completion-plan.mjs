@@ -131,7 +131,9 @@ if (errors.length) {
 } else {
   const acceptedPackets = new Set(state.tasks.flatMap((task) => task.packet_progress ?? []).filter((packet) => packet.status === "ACCEPTED").map((packet) => packet.id));
   const supersededPackets = new Set(state.tasks.flatMap((task) => task.packet_progress ?? []).filter((packet) => packet.status === "SUPERSEDED").map((packet) => packet.id));
-  const isReady = (packet) => !acceptedPackets.has(packet.id)
+  const recordedStatus = new Map(state.tasks.flatMap((task) => task.packet_progress ?? []).map((packet) => [packet.id, packet.status]));
+  const isReady = (packet) => (recordedStatus.get(packet.id) === undefined || ["PLANNED", "READY"].includes(recordedStatus.get(packet.id)))
+    && !acceptedPackets.has(packet.id)
     && !supersededPackets.has(packet.id)
     && requiredParents.get(packet.id).every((id) => parents.get(id).status === "ACCEPTED")
     && requiredPackets.get(packet.id).every((id) => acceptedPackets.has(id));

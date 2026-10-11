@@ -2940,5 +2940,114 @@
       "Stop if project TypeScript/test configuration cannot discover the test without a shared config edit.",
       "Stop if review finds the label could be mistaken for playable/gameplay evidence."
     ]
+  },
+  {
+    "id": "T02-BR02-MASS-READBACK-1",
+    "parent": "T02",
+    "title": "Capture the exact pinned-browser native button-mass readback",
+    "role": "worker",
+    "depends_on": [
+      "T02-BR01",
+      "T02-D01",
+      "T02-P01",
+      "T02-GC02",
+      "C01",
+      "C01-H",
+      "T02-BR02-CI-ESCALATION-1",
+      "T02-BR02-PINNED-MASS-API-AUDIT-1",
+      "parent:T03"
+    ],
+    "supersedes": [],
+    "read_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/simulation/browserDirectProbe.test.ts",
+      "tests/e2e/counterball-direct-probe.spec.ts",
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "execution_state/reports/T02-BR02-run-38139294487.md",
+      "execution_state/reports/T02-BR02-run-38139294487-review.md",
+      "execution_state/reports/T02-BR02-runtime-diagnosis-1-review.md",
+      "execution_state/reports/T02-BR02-pinned-mass-api-audit-1.md",
+      "execution_state/reports/T02-BR02-pinned-mass-api-audit-1-review.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+      "knowledge_base/execution/SWARM.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/simulation/browserDirectProbe.test.ts"
+    ],
+    "outputs": [
+      "A diagnostic-only browser error that records configured mass, native Havok readback, absolute difference, and the unchanged current comparison tolerance at round-trip-safe numeric precision.",
+      "A focused unit test for the diagnostic formatting helper. No physics comparison, tolerance, config, fixture, gameplay, UI, workflow or public-build behavior changes."
+    ],
+    "scope_amendment": "After the independent source review found that readBodyMetrics intentionally stops at the first ENTITY_IDS mass rejection, this card's browser evidence is limited to the first failing body's readback (button in the current diagnostic ordering). Other cap masses are explicitly unmeasured and are not a condition of this immediate button-readback card; any cap mass claim or repair must be backed by a separate evidence step.",
+    "steps": [
+      "Extract this exact record with node scripts/check-completion-plan.mjs --packet T02-BR02-MASS-READBACK-1; verify every explicit and inherited dependency is ACCEPTED before editing.",
+      "Read both independent PASS reports for the exact run diagnosis and pinned mass API audit. Keep the measured runtime value as an unknown until the real browser artifact captures it.",
+      "Add a pure formatter for the existing mass mismatch diagnostic that displays body id, configured mass, returned native mass, absolute difference and unchanged tolerance with enough significant digits to round-trip each JavaScript number.",
+      "Change only the existing mismatch message to use that formatter. Preserve the guard expression and every acceptance assertion; do not normalize, round, or compare a different mass value.",
+      "Add one focused unit test proving the formatted values retain the exact numbers supplied and include the current tolerance. Do not add a mock result as Havok evidence.",
+      "Run only git diff --check locally; do not install dependencies or run application checks, browser, physics, build or deployment commands.",
+      "Write the unique implementation report with exact paths/diff, hashes, local command results, and all application commands NOT RUN; then release source ownership for independent review.",
+      "After source review PASS, coordinator publishes the exact reviewed commit and captures the full GitHub run, structured browser results, error contexts, traces and artifact hashes. The diagnostic browser cases are expected to reproduce the current pre-shot guard rejection while exposing the exact values; do not describe them as successful shots."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-BR02-MASS-READBACK-1",
+        "environment": "local-document",
+        "expected": "At dispatch the exact packet was READY with every listed dependency ACCEPTED. During this amended source review its runtime status is REVIEWING, so the checker must not advertise it as ready for a new dispatch."
+      },
+      {
+        "command": "git diff --check",
+        "environment": "local-document",
+        "expected": "Only the two assigned source/test paths are changed and whitespace hygiene passes; no app command runs locally."
+      },
+      {
+        "command": "pnpm verify on the exact reviewed SHA",
+        "environment": "github",
+        "expected": "Typecheck, lint, formatting, all unit tests and builds pass, including the numeric-diagnostic unit test, with exact no-skip counts preserved."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1 on the exact reviewed SHA",
+        "environment": "github",
+        "expected": "Real Chromium and pinned browser WASM collect both existing diagnostic cases without skips; each may still fail at the known pre-shot mass guard, but its visible error context must preserve configured mass, native readback, delta and unchanged tolerance. Capture the complete non-pass result honestly; this is a readback observation, not a shot."
+      },
+      {
+        "command": "Independent exact source-diff review",
+        "environment": "source-review",
+        "expected": "PASS confirms only diagnostic numeric reporting and its unit test changed; guard math, threshold, physics, UI, product build and assertions are unchanged."
+      },
+      {
+        "command": "Independent exact-head diagnosis artifact review",
+        "environment": "source-review",
+        "expected": "PASS confirms exact SHA/run, real WASM request, test counts, numeric native readback and no shot/movement claims; any missing numeric evidence keeps this card CHANGES_REQUIRED."
+      }
+    ],
+    "acceptance": [
+      "The exact real-browser error exposes the first failing body's ID, configured value, native getter value, absolute difference and unchanged tolerance with round-trip-safe precision; for the current ENTITY_IDS order the first failing body is the button.",
+      "The browser attempt is confirmed to stop before impulse; neither this card nor its artifact claims a successful shot, transforms, contacts, changed pixels, Havok deployment or playable match.",
+      "The pure formatting unit test and full hosted pnpm verify pass; source review and exact-run diagnosis review pass independently.",
+      "The existing focused browser tests are collected with zero skips and real WASM responses; their artifact preserves the button's exact mismatch values and explicitly states that later cap checks are unmeasured because the existing guard stops at the first mismatch.",
+      "Only the two assigned paths changed; T02-BR02 and T02 remain open. This card accepts diagnosis data only and exists to authorize a separate evidence-led mass repair."
+    ],
+    "negative_cases": [
+      "Do not widen, loosen, round, replace, or bypass the mass comparison; do not infer float32/native conversion without the captured value and pinned-source evidence.",
+      "Do not infer, claim, or accept any cap mass result from this first-mismatch browser error.",
+      "Do not alter impulses, world construction, calibration/config, protocol, fixtures, UI, workflow, assertions or any path outside the exact two files.",
+      "Do not claim the known failed browser case, Node unit test, screenshot, or diagnostic scene is a successful flick or playable game.",
+      "Do not run local application installs, builds, tests, browser/physics, services, Wrangler, Railway or deployment."
+    ],
+    "review_questions": [
+      "Does the error formatter report precisely the native getter value and configured expected value without changing the guard calculation?",
+      "Do the unit tests prove the precise values and unchanged threshold appear in the message?",
+      "Does the exact real-browser artifact confirm the first failing entity and its exact mismatch before impulse, while clearly leaving cap outcomes unmeasured?",
+      "Are the expected browser-suite failures and all proof limits distinguished from a successful shot?"
+    ],
+    "stop_conditions": [
+      "If the browser diagnostic cannot retain the exact values in the uploaded error context or run artifact, stop and propose a narrower evidence-capture card; do not guess a conversion or tolerance.",
+      "If any proposed implementation changes the mass guard or unrelated paths, stop and return it for a separate reviewed repair packet.",
+      "If required tests are skipped, the run SHA differs, or WASM is not fetched by Chromium, keep this diagnostic packet unaccepted."
+    ]
   }
 ]

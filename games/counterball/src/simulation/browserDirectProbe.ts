@@ -47,6 +47,17 @@ export type BrowserDirectProbeContact = {
   point: Vec3 | null;
 };
 
+/** Formats mass diagnostics with shortest round-trip numeric values. */
+export function formatNativeMassMismatch(
+  bodyId: string,
+  expectedMass: number,
+  nativeMass: number,
+  tolerance: number,
+): string {
+  const absoluteDifference = Math.abs(nativeMass - expectedMass);
+  return `Body ${bodyId} native mass ${String(nativeMass)} differs from canonical configured mass ${String(expectedMass)} (absolute difference ${String(absoluteDifference)}; tolerance ${String(tolerance)}).`;
+}
+
 /** Diagnostic-only result. This is deliberately not a wire or shot type. */
 export type BrowserDirectProbeResult = {
   scope: "browser-direct-impulse-v1";
@@ -804,7 +815,12 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
     ) {
       fail(
         "resourceLimit",
-        `Body ${id} native mass differs from its canonical configured mass.`,
+        formatNativeMassMismatch(
+          id,
+          definition.expectedMass,
+          nativeMass,
+          expectedMassTolerance,
+        ),
       );
     }
     const farthestPointRadius =

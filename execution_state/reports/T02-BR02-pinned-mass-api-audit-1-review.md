@@ -1,0 +1,13 @@
+# T02-BR02 pinned mass API audit 1 review
+
+**Verdict: PASS, with a boundary note.** The audit's source reading and its proposed immediate diagnostic are supported by the pinned packages. It does not infer a native scalar width or invent the missing runtime mass value.
+
+I checked the workspace pins (`games/counterball/package.json` and `pnpm-lock.yaml:180-184`) and the installed package manifests: Babylon core 9.30.0 and Havok 1.3.14. In the installed Babylon plugin, `_internalUpdateMassProperties()` recomputes properties, overlays the supplied mass, and calls `HP_Body_SetMassProperties` without consuming its result (`havokPlugin.js:1007-1024`). The public `PhysicsBody.setMassProperties()` delegates to the plugin and is declared `void` (`physicsBody.js:249-250`, `physicsBody.d.ts:187`). The Havok declaration types the tuple's mass slot as `number` and types native set/get calls as result tuples (`HavokPhysics.d.ts:110-115, 334-337`); it does not specify the scalar's storage precision or guarantee an exact round trip.
+
+The getter behavior is also described accurately: the Babylon plugin takes the second element of `HP_Body_GetMassProperties()` without checking the result code, then copies tuple element `[1]` directly into the returned `mass` (`havokPlugin.js:999-1005, 1133-1137`). This establishes the JS-level readback path; it does not establish the native value before the browser run.
+
+The repo source confirms the configured `0.15` value is passed through `body.setMassProperties({ mass })` (`worldFactory.ts:190-208, 296-312`). The browser guard compares readback with that expected value at `browserDirectProbe.ts:800-808`. For `0.15`, the stated bound evaluates to `1.4210854715202004e-14`. The prior browser error shows only that this comparison failed; it does not show the readback, setter result, or discrepancy size.
+
+Capturing the button's expected mass, getter readback, absolute delta, and applied tolerance immediately before rejection is therefore a sound, narrowly scoped next diagnostic. It supplies the missing observation without relaxing a canonical invariant or assuming float32. If the readback remains discrepant, the report correctly calls for separate investigation before changing the mass rule. One boundary note: Babylon's public body setter discards Havok's `Result`, so any future attempt to observe that result must identify a version-pinned, supported access path rather than imply that the current body API returns it.
+
+This was read-only package/source inspection. No install, build, test, browser, physics, or deployment command ran. The exact runtime value and cause remain unknown until a fresh real-browser run records them.

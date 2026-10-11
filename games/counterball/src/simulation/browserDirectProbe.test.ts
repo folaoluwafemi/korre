@@ -7,6 +7,7 @@ import {
   createDiagnosticSweepGuard,
   deriveDiagnosticSweepPlan,
   errorWithCleanup,
+  formatNativeMassMismatch,
   isDiagnosticShiftedEnergyWithinLimit,
   normalizeDiagnosticError,
   resourceGuard,
@@ -17,6 +18,21 @@ import {
 const gravity = Math.abs(COUNTERBALL_CONFIG_V1.simulation.gravity.y);
 const maximumDrop = COUNTERBALL_CONFIG_V1.diagnosticGuard.maxRestHeightDrop;
 const maximumEnergy = COUNTERBALL_CONFIG_V1.diagnosticGuard.maxMechanicalEnergy;
+
+describe("browser direct diagnostic mass message", () => {
+  it("prints all mass values without precision loss", () => {
+    expect(
+      formatNativeMassMismatch(
+        "button",
+        0.15,
+        0.15000000000000002,
+        1.4210854715202004e-14,
+      ),
+    ).toBe(
+      "Body button native mass 0.15000000000000002 differs from canonical configured mass 0.15 (absolute difference 2.7755575615628914e-17; tolerance 1.4210854715202004e-14).",
+    );
+  });
+});
 
 function makeEnergyBodies(): DiagnosticEnergyBody[] {
   return ENTITY_IDS.map((id) => {
