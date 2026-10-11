@@ -1,7 +1,11 @@
 import { readdirSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { defineConfig, devices } from "@playwright/test";
+import {
+  defineConfig,
+  devices,
+  type ReporterDescription,
+} from "@playwright/test";
 
 const productionSpecs = [
   "home.spec.ts",
@@ -81,16 +85,18 @@ const selectedSpecs = diagnosticMode ? diagnosticSpecs : productionSpecs;
 const jsonReportPath = diagnosticMode
   ? ".artifacts/browser-test-results-diagnostic.json"
   : ".artifacts/browser-test-results.json";
+const ciReporters: ReporterDescription[] = [
+  ["github"],
+  ["json", { outputFile: jsonReportPath }],
+];
 
 export default defineConfig({
   testDir: "./tests/e2e",
   testMatch: selectedSpecs.map((filename) => `**/${filename}`),
   fullyParallel: true,
-  forbidOnly: Boolean(process.env.CI),
+  forbidOnly: Boolean(process.env["CI"]),
   retries: 0,
-  reporter: process.env.CI
-    ? ["github", ["json", { outputFile: jsonReportPath }]]
-    : "list",
+  reporter: process.env["CI"] ? ciReporters : "list",
   use: {
     baseURL: "http://127.0.0.1:5173",
     trace: "retain-on-failure",
@@ -100,7 +106,7 @@ export default defineConfig({
     command: webCommand,
     url: "http://127.0.0.1:5173",
     reuseExistingServer:
-      !process.env.CI && !diagnosticMode && !productionPrebuiltMode,
+      !process.env["CI"] && !diagnosticMode && !productionPrebuiltMode,
     timeout: 60_000,
   },
 });

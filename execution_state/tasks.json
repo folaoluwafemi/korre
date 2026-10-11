@@ -2572,7 +2572,7 @@
           "owner": "coordinator",
           "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#C01-H",
           "author_identity": "coordinator",
-          "reviewer_identity": "/root/foundation_review — independent harness/config review pending",
+          "reviewer_identity": "/root/run_evidence_review — independent repair review pending",
           "depends_on": [
             "C01-P"
           ],
@@ -2592,9 +2592,9 @@
             ".github/workflows/ci.yml",
             "vitest.config.ts"
           ],
-          "implementation_report": "execution_state/reports/C01-H-implementation.md",
-          "review_report": "execution_state/reports/C01-H-review.md",
-          "attempt_count": 1,
+          "implementation_report": "execution_state/reports/C01-H-repair-1-implementation.md",
+          "review_report": "execution_state/reports/C01-H-repair-1-review.md",
+          "attempt_count": 2,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet C01-H",
@@ -2627,10 +2627,38 @@
               "environment": "source-review",
               "report": "execution_state/reports/C01-H-review.md",
               "detail": "Reviewer verified route precedence, complete catalogue mapping, fail-closed artifact behavior, service exclusions, and server type/test discovery. Hosted runtime remains pending."
+            },
+            {
+              "command": "GitHub Actions verify, run 38102191450, SHA 5693a92d1c81c4e1b28f8be9e73b537eb2d2f82a",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "exit_code": 2,
+              "report": "execution_state/reports/C01-H-run-38102191450-hosted-checks/verify.log",
+              "detail": "Install, config formatting, Workers smoke, disposable PostgreSQL migrations and protocol tests passed. Verify stopped at the new Node config project: three process.env.CI accesses violated noPropertyAccessFromIndexSignature and the reporter array failed Playwright ReporterDescription typing. Lint/unit/build/integration/E2E and later artifact steps did not run."
+            },
+            {
+              "command": "git diff --check",
+              "result": "PASS",
+              "environment": "local-source",
+              "exit_code": 0
+            },
+            {
+              "command": ".\\node_modules\\.bin\\prettier.cmd --write playwright.config.ts",
+              "result": "PASS",
+              "environment": "local-source-format",
+              "exit_code": 0,
+              "detail": "Source formatting only; no files changed."
+            },
+            {
+              "command": "Independent C01-H repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-H-repair-1-review.md",
+              "detail": "Confirmed strict indexed env access and Playwright ReporterDescription tuples; routing behavior is unchanged. Hosted rerun remains pending."
             }
           ],
           "implementation_note": "Keep current production static regressions on the production dist. COUNTERBALL_DEV_E2E=1 must take precedence and serve only prebuilt dist-dev, with startup failing when the artifact is missing. Explicitly map future filename candidates from LOCAL_PACKETS and ONLINE_PACKETS to production, local diagnostic, identity-service, or online-service mode and server owner. No fake identity/online service config. Do not run a diagnostic test collection until its accepted producer has created the exact file; its named consumer card must fail if collection is empty. Add the separate dist-dev diagnostic Playwright step only when it has a produced candidate. Include current web server config inputs in the Node typecheck project and include apps/web/server tests in Node Vitest while preserving Worker exclusions. No culture, rule or physics changes.",
-          "next_action": "Commit and push this exact reviewed source revision. Await GitHub pnpm verify and production prebuilt browser checks; record diagnostic execution only if a mapped spec exists."
+          "next_action": "Commit and push the independently reviewed type-only repair; rerun full GitHub verify and production prebuilt browser checks on the exact new SHA."
         },
         {
           "id": "T02-L01",
