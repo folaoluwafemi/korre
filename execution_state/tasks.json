@@ -2427,9 +2427,26 @@
               "result": "PASS",
               "environment": "local-source",
               "detail": "No whitespace errors in the two changed C01-P-owned source/config paths."
+            },
+            {
+              "command": "GitHub exact-head pnpm verify",
+              "result": "FAIL",
+              "environment": "GitHub Actions",
+              "run_id": 38100370679,
+              "source_sha": "9bbf997e1e19f0cd6fb961be7db7a743b675a994",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38100370679",
+              "report": "execution_state/reports/C01-P-run-38100370679-artifacts/counterball-verification-log/verify.log",
+              "detail": "Games package typechecks and the new headless Worker-target esbuild boundary check passed. Root lint then stopped at Prettier formatting in the concurrent D01 source file; full verify and dependent test/build/browser suites did not complete."
+            },
+            {
+              "command": "Independent review of exact-hosted run 38100370679",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/C01-P-T02-D01-run-38100370679-runtime-review.md",
+              "detail": "The C01-P package-boundary subcheck passed, but overall verify stopped at D01 formatting before test/build/browser suites; the run cannot accept either packet."
             }
           ],
-          "next_action": "Run exact-head GitHub pnpm verify with the reviewed package-boundary probe and T02-D01 source. Independently inspect exact runtime logs and emitted artifacts; do not accept C01-P without the bundle check, or T02-D01 without all six real-WASM rows."
+          "next_action": "After the D01 formatting-only repair has independent review, rerun exact-head GitHub pnpm verify. The package-boundary probe itself passed on 9bbf997e1e19f0cd6fb961be7db7a743b675a994, but overall verify stopped before acceptance."
         },
         {
           "id": "T02-D01",
@@ -2437,7 +2454,7 @@
           "owner": "/root/toolchain_audit",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-D01",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/foundation_review — independent repair-1 source review PASS; /root/toolchain_audit assigned exact-hosted runtime/artifact review",
+          "reviewer_identity": "/root/foundation_review — repair-1 source PASS; /root/run_evidence_review — repair-2 formatting-only source PASS; /root/toolchain_audit — exact run 38100370679 reviewed, no D01 runtime artifact",
           "depends_on": [
             "C00-B",
             "C01",
@@ -2456,9 +2473,9 @@
           "write_paths": [
             "games/counterball/src/simulation/directImpulseProbe.test.ts"
           ],
-          "implementation_report": "execution_state/reports/T02-D01-implementation.md",
+          "implementation_report": "execution_state/reports/T02-D01-repair-2-format-implementation.md",
           "review_report": "execution_state/reports/T02-D01-review.md",
-          "attempt_count": 2,
+          "attempt_count": 3,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-D01",
@@ -2486,10 +2503,41 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-D01-repair-1-review.md",
               "detail": "Every one of six rows requires finite selected-cap per-step movement >= 1e-4 world units after a physics step; source proves non-vacuous recorded deltas. RUNTIME NOT RUN."
+            },
+            {
+              "command": "GitHub exact-head pnpm verify before D01 runtime",
+              "result": "FAIL",
+              "environment": "GitHub Actions",
+              "run_id": 38100370679,
+              "source_sha": "9bbf997e1e19f0cd6fb961be7db7a743b675a994",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38100370679",
+              "report": "execution_state/reports/T02-D01-repair-2-format-implementation.md",
+              "detail": "Hosted typecheck completed, then root Prettier rejected the D01 source. Verify stopped before Vitest, so directImpulseProbe real-WASM runtime and its six rows are NOT RUN."
+            },
+            {
+              "command": "Prettier format and targeted check for the D01-owned source file",
+              "result": "PASS",
+              "environment": "local-source-format",
+              "report": "execution_state/reports/T02-D01-repair-2-format-implementation.md",
+              "detail": "Applied the pinned formatter and reran its targeted check with exit 0; scoped git diff check passed. No application build/test/browser/physics command ran locally."
+            },
+            {
+              "command": "Independent T02-D01 repair 2 formatting source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-D01-repair-2-format-review.md",
+              "detail": "The one-file diff is formatting-only and consistent with the report. RUNTIME remains unproven; hosted run 38100370679 stopped before Vitest."
+            },
+            {
+              "command": "Independent hosted runtime review for run 38100370679",
+              "result": "NOT_RUN",
+              "environment": "GitHub Actions artifact-review",
+              "report": "execution_state/reports/C01-P-T02-D01-run-38100370679-runtime-review.md",
+              "detail": "Reviewer confirmed no intended-shot artifact exists, so zero of six D01 rows were available. The run failed at formatting before Vitest; this is not a physics failure."
             }
           ],
           "implementation_note": "Use only actual pinned Havok WASM and the canonical fixture. Keep all six input cases and assertions; do not change config. For the env-gated JSON, preserve the existing 40-observation intended-shot artifact and add a separate directImpulseProbe field to the same COUNTERBALL_INTENDED_SHOT_OUTPUT JSON only after all six assertions pass. Because Vitest files may run in parallel, wait with a bounded timeout for the existing 40-row producer file to be complete/parseable before atomically merging; fail rather than clobber or silently omit the artifact. The CI verify step already sets and uploads this path. No workflow/config writes.",
-          "next_action": "Run exact-head GitHub pnpm verify with the reviewed probe. Independently inspect the six real-WASM rows in the merged artifact and the exact no-skip/test counts; keep runtime pending until artifact and test counts are proven."
+          "next_action": "After independent review confirms repair 2 is formatting-only, rerun the exact-hosted full verify. Independently inspect the six real-WASM rows in the merged artifact and exact no-skip/test counts; runtime remains NOT RUN until those artifacts are proven."
         },
         {
           "id": "T02-L01",
@@ -2541,7 +2589,7 @@
           "blocker": "Coordinator must freeze/hash concrete linear/angular guard values and a justified substep schedule, then define how the public Havok stepping boundary enforces/checks them. Current schema-only guard and single fixed-tick executeStep do not satisfy the packet. No trials or source artifact exist."
         }
       ],
-      "next_action": "C01-P repair 1 has independent source PASS and awaits exact-hosted package-bundle verification; T02-D01 repair source has independent source PASS and is paired with that hosted real-WASM run. C01-H waits on C01-P acceptance before first browser-flick work. T02-L01 remains blocked at its independently reviewed guard stop condition."
+      "next_action": "Run 38100370679 on SHA 9bbf997e1e19f0cd6fb961be7db7a743b675a994 passed package typechecks and the C01-P headless bundle probe but stopped at D01 Prettier before tests. D01 formatting repair 2 is applied and under independent review; retry full hosted verify after review. C01-H waits on C01-P acceptance. T02-L01 remains blocked at its independently reviewed guard stop condition."
     },
     {
       "id": "T03",
