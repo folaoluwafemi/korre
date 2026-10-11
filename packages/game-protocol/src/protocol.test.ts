@@ -123,7 +123,8 @@ function changePrimitiveAtPath(
     if (typeof part !== "number") {
       throw new TypeError("Array guard path must use a numeric index.");
     }
-    return value.map((entry, index) =>
+    const entries: readonly unknown[] = value;
+    return entries.map((entry, index) =>
       index === part ? changePrimitiveAtPath(entry, path, depth + 1) : entry,
     );
   }
