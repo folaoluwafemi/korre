@@ -744,4 +744,44 @@ describe("writeLoftCoarseMatrix", () => {
     await expect(writeLoftCoarseMatrix({ metadata: identity, cases, sink, signal: new AbortController().signal })).rejects.toBe(failure);
     expect(aborted).toEqual([failure]);
   });
+
+  it("retains both operation and abort failures with the operation error as cause", async () => {
+    const failure = new Error("disk write failed");
+    const abortFailure = new Error("sink abort failed");
+    const identity = matrixMetadata();
+    const cases = () => orderedCases(identity, (index, current) => index === 0
+      ? exactCaseLimits(0, identity)
+      : current);
+    const rejection = await writeLoftCoarseMatrix({
+      metadata: identity,
+      cases: cases(),
+      sink: {
+        write: () => { throw failure; },
+        abort: () => { throw abortFailure; },
+      },
+      signal: new AbortController().signal,
+    }).catch((error: unknown) => error);
+
+    expect(rejection).toBeInstanceOf(AggregateError);
+    if (!(rejection instanceof AggregateError)) throw new Error("Expected both failures to be aggregated.");
+    expect(rejection.errors).toEqual([failure, abortFailure]);
+    expect(rejection.cause).toBe(failure);
+
+    const undefinedAbortRejection = await writeLoftCoarseMatrix({
+      metadata: identity,
+      cases: cases(),
+      sink: {
+        write: () => { throw failure; },
+        abort: () => Promise.reject(undefined),
+      },
+      signal: new AbortController().signal,
+    }).catch((error: unknown) => error);
+
+    expect(undefinedAbortRejection).toBeInstanceOf(AggregateError);
+    if (!(undefinedAbortRejection instanceof AggregateError)) {
+      throw new Error("Expected an undefined abort failure to be retained in the aggregate.");
+    }
+    expect(undefinedAbortRejection.errors).toEqual([failure, undefined]);
+    expect(undefinedAbortRejection.cause).toBe(failure);
+  });
 });

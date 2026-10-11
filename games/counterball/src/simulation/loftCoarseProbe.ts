@@ -1433,11 +1433,17 @@ export async function writeLoftCoarseMatrix({
       envelopeBytes: matrixBytes - bytesBeforeEnvelope - 1,
     };
   } catch (error) {
+    let abortFailed = false;
+    let abortFailure: unknown;
     try {
       await sink.abort(error);
-    } catch (abortError) {
+    } catch (caughtAbortFailure) {
+      abortFailed = true;
+      abortFailure = caughtAbortFailure;
+    }
+    if (abortFailed) {
       throw new AggregateError(
-        [error, abortError],
+        [error, abortFailure],
         "Matrix artifact failed and the byte sink also failed to abort.",
         { cause: error },
       );
