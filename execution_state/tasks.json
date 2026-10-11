@@ -2722,12 +2722,12 @@
         },
         {
           "id": "T02-P01",
-          "status": "REVIEWING",
+          "status": "ACCEPTED",
           "role": "worker",
           "title": "Provide stable scene pose update and entity picking API",
           "owner": "/root/foundation_review",
           "author_identity": "/root/foundation_review",
-          "reviewer_identity": "/root/toolchain_audit — initial source PASS and coordinator-fix independent PASS; /root/run_evidence_review — repair 1 and repair 2 source PASS plus escalation diagnosis",
+          "reviewer_identity": "/root/toolchain_audit — initial source PASS, coordinator-fix PASS, exact run 38105089422 runtime/artifact PASS; /root/run_evidence_review — repair and formatting reviews PASS plus escalation diagnosis",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-P01",
           "depends_on": [
             "parent:T03",
@@ -2751,7 +2751,7 @@
             "Stable EntityId-to-PieceAssembly map with coordinator-frozen pose-update and picking signatures."
           ],
           "implementation_report": "execution_state/reports/T02-P01-run-38104733678-formatting-implementation.md",
-          "review_report": "execution_state/reports/T02-P01-run-38104733678-formatting-review.md",
+          "review_report": "execution_state/reports/T02-P01-run-38105089422-runtime-review.md",
           "attempt_count": 3,
           "checks": [
             {
@@ -2869,6 +2869,31 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-P01-run-38104733678-formatting-review.md",
               "detail": "Reviewer confirmed the saved patch matches the current two-file diff and changes layout only; no runtime claim."
+            },
+            {
+              "command": "GitHub Actions run 38105089422: pnpm verify, integration and built-browser checks",
+              "result": "PASS",
+              "environment": "GitHub Actions",
+              "exit_code": 0,
+              "run_id": 38105089422,
+              "source_sha": "98abd0caf819f0f08ba093fb51aa6556ba2aae88",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38105089422",
+              "report": "execution_state/reports/T02-P01-run-38105089422-hosted-verification.md",
+              "detail": "Exact-head hosted gate passed. Main Vitest: 28 files/146 tests passed (no skips reported); focused protocol 11/11; integration 1/1; Chromium built-browser 4/4, one worker, zero retries. Build, diagnostics-isolation, and artifact upload steps completed. Existing browser scenarios remain idle-scene/recovery/cleanup only; no flick or match claim."
+            },
+            {
+              "command": "Independent exact-run T02-P01 runtime and artifact review",
+              "result": "PASS",
+              "environment": "runtime-artifact-review",
+              "report": "execution_state/reports/T02-P01-run-38105089422-runtime-review.md",
+              "detail": "Confirmed exact run SHA/conclusion, presentation.test.ts 5/5, full verify 28 files/146 tests with no skipped tests reported, Chromium 4/4 with zero skipped/flaky/unexpected/retried cases, and all 452 production file hashes/path entries match both inventory and browser-preview artifact. No gameplay, flick, WebGL-picking, or deployed-Havok claim."
+            },
+            {
+              "command": "T02-P01 coordinator acceptance",
+              "result": "ACCEPTED",
+              "environment": "task-transition",
+              "report": "execution_state/reports/T02-P01-acceptance.md",
+              "detail": "Accepts the stable-ID presentation API and exact-head hosted evidence only. Parent T02 remains RUNNING; actual flick, match, and deployed Havok remain open."
             }
           ],
           "implementation_note": "Implement only the frozen exports in CONTRACTS.md: createCounterballPresentation(scene, bodies, config?) returns ReadonlyMap<EntityId, PieceAssembly>; updateCounterballPresentation(registry, readonly PlaybackTransform[]) returns void; pickCounterballEntity(registry, PickingInfo) returns EntityId|null. Use createPieces and PieceAssembly.id/root/bodyMesh. Updates are presentation-only and require exactly one finite transform for all 15 IDs. Resolve picks by registered body-mesh identity; only the body meshes are pickable. Keep button holes visible and do not edit App.tsx, rules, config, contracts, CI, tasks, status, or any other path. Test all 15 IDs, malformed snapshots, quaternion updates, button/cap picking, details/hole misses and scene disposal.",
@@ -2876,10 +2901,10 @@
             "A scene consumer can update every piece from a canonical authoritative snapshot and pick its stable EntityId.",
             "Picking and camera movement do not mutate protocol state or rules."
           ],
-          "next_action": "Formatting-only correction and independent source review passed. Commit this exact two-file source diff with its reports, run pnpm verify on the resulting exact SHA, then obtain independent runtime/artifact review."
+          "next_action": "Accepted at exact SHA 98abd0c/run 38105089422 for presentation API and hosted tests only. Materialize T02-BR01 under T02 after its exact checker record reports ready; keep direct browser flick and T02-L01 substep-guard requirements open."
         }
       ],
-      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 formatting correction and independent source review passed; run the exact reviewed SHA on GitHub. Keep BR01 blocked until T02-P01 is ACCEPTED. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from current evidence."
+      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 is ACCEPTED for presentation API and exact-hosted verification only at run 38105089422. Extract and materialize T02-BR01 if its checker gate is ready; it is the next browser-WASM direct-shot diagnostic toward the first interactive flick. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from current evidence."
     },
     {
       "id": "T03",
