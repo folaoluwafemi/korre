@@ -1,7 +1,4 @@
-import {
-  COUNTERBALL_CONFIG_V1,
-  ENTITY_IDS,
-} from "@korre/game-protocol";
+import { COUNTERBALL_CONFIG_V1, ENTITY_IDS } from "@korre/game-protocol";
 import { describe, expect, it } from "vitest";
 import {
   checkDiagnosticSweptEnvelope,
@@ -84,7 +81,8 @@ describe("browser direct diagnostic guard math", () => {
 
     const impulseTarget = 32;
     const selected = bodies[1];
-    if (selected === undefined) throw new Error("Selected cap fixture is missing.");
+    if (selected === undefined)
+      throw new Error("Selected cap fixture is missing.");
     selected.linearVelocity.x = Math.sqrt((2 * impulseTarget) / selected.mass);
     const afterImpulse = computeDiagnosticShiftedEnergy(
       bodies,
@@ -92,10 +90,7 @@ describe("browser direct diagnostic guard math", () => {
       maximumDrop,
     );
     expect(afterImpulse.kineticEnergy).toBeCloseTo(32, 12);
-    expect(afterImpulse.shiftedMechanicalEnergy).toBeCloseTo(
-      33.561629375,
-      12,
-    );
+    expect(afterImpulse.shiftedMechanicalEnergy).toBeCloseTo(33.561629375, 12);
     expect(
       isDiagnosticShiftedEnergyWithinLimit(
         afterImpulse.shiftedMechanicalEnergy,
@@ -109,9 +104,9 @@ describe("browser direct diagnostic guard math", () => {
     expect(
       isDiagnosticShiftedEnergyWithinLimit(34 + Number.EPSILON * 34, 34),
     ).toBe(false);
-    expect(isDiagnosticShiftedEnergyWithinLimit(Number.POSITIVE_INFINITY, 34)).toBe(
-      false,
-    );
+    expect(
+      isDiagnosticShiftedEnergyWithinLimit(Number.POSITIVE_INFINITY, 34),
+    ).toBe(false);
   });
 
   it("accepts the exact per-body drop boundary and rejects any further drop", () => {

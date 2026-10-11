@@ -1,0 +1,1101 @@
+diff --git a/games/counterball/src/simulation/browserDirectProbe.test.ts b/games/counterball/src/simulation/browserDirectProbe.test.ts
+index f62e9a9..86a26fb 100644
+--- a/games/counterball/src/simulation/browserDirectProbe.test.ts
++++ b/games/counterball/src/simulation/browserDirectProbe.test.ts
+@@ -1,7 +1,4 @@
+-import {
+-  COUNTERBALL_CONFIG_V1,
+-  ENTITY_IDS,
+-} from "@korre/game-protocol";
++import { COUNTERBALL_CONFIG_V1, ENTITY_IDS } from "@korre/game-protocol";
+ import { describe, expect, it } from "vitest";
+ import {
+   checkDiagnosticSweptEnvelope,
+@@ -84,7 +81,8 @@ describe("browser direct diagnostic guard math", () => {
+ 
+     const impulseTarget = 32;
+     const selected = bodies[1];
+-    if (selected === undefined) throw new Error("Selected cap fixture is missing.");
++    if (selected === undefined)
++      throw new Error("Selected cap fixture is missing.");
+     selected.linearVelocity.x = Math.sqrt((2 * impulseTarget) / selected.mass);
+     const afterImpulse = computeDiagnosticShiftedEnergy(
+       bodies,
+@@ -92,10 +90,7 @@ describe("browser direct diagnostic guard math", () => {
+       maximumDrop,
+     );
+     expect(afterImpulse.kineticEnergy).toBeCloseTo(32, 12);
+-    expect(afterImpulse.shiftedMechanicalEnergy).toBeCloseTo(
+-      33.561629375,
+-      12,
+-    );
++    expect(afterImpulse.shiftedMechanicalEnergy).toBeCloseTo(33.561629375, 12);
+     expect(
+       isDiagnosticShiftedEnergyWithinLimit(
+         afterImpulse.shiftedMechanicalEnergy,
+@@ -109,9 +104,9 @@ describe("browser direct diagnostic guard math", () => {
+     expect(
+       isDiagnosticShiftedEnergyWithinLimit(34 + Number.EPSILON * 34, 34),
+     ).toBe(false);
+-    expect(isDiagnosticShiftedEnergyWithinLimit(Number.POSITIVE_INFINITY, 34)).toBe(
+-      false,
+-    );
++    expect(
++      isDiagnosticShiftedEnergyWithinLimit(Number.POSITIVE_INFINITY, 34),
++    ).toBe(false);
+   });
+ 
+   it("accepts the exact per-body drop boundary and rejects any further drop", () => {
+diff --git a/games/counterball/src/simulation/browserDirectProbe.ts b/games/counterball/src/simulation/browserDirectProbe.ts
+index 4442c83..2f76977 100644
+--- a/games/counterball/src/simulation/browserDirectProbe.ts
++++ b/games/counterball/src/simulation/browserDirectProbe.ts
+@@ -192,8 +192,7 @@ function finiteQuaternion(value: Quat): boolean {
+   }
+   const norm = Math.hypot(value.x, value.y, value.z, value.w);
+   return (
+-    Number.isFinite(norm) &&
+-    Math.abs(norm - 1) <= QUATERNION_NORM_TOLERANCE
++    Number.isFinite(norm) && Math.abs(norm - 1) <= QUATERNION_NORM_TOLERANCE
+   );
+ }
+ 
+@@ -289,7 +288,9 @@ export function computeDiagnosticShiftedEnergy(
+       !finiteVector(body.linearVelocity) ||
+       !finiteVector(body.angularVelocityPrincipal)
+     ) {
+-      throw new RangeError("Energy input contains a non-finite or invalid value.");
++      throw new RangeError(
++        "Energy input contains a non-finite or invalid value.",
++      );
+     }
+     if (body.centerOfMassY < body.restY - maximumDrop) {
+       throw new RangeError("Body COM is below its permitted rest-height drop.");
+@@ -301,12 +302,9 @@ export function computeDiagnosticShiftedEnergy(
+       inertia.x * omega.x * omega.x +
+       inertia.y * omega.y * omega.y +
+       inertia.z * omega.z * omega.z;
+-    kineticEnergy +=
+-      0.5 * body.mass * (linearSquared + rotationalUnitEnergy);
++    kineticEnergy += 0.5 * body.mass * (linearSquared + rotationalUnitEnergy);
+     shiftedPotential +=
+-      body.mass *
+-      gravity *
+-      (body.centerOfMassY - (body.restY - maximumDrop));
++      body.mass * gravity * (body.centerOfMassY - (body.restY - maximumDrop));
+   }
+ 
+   const shiftedMechanicalEnergy = kineticEnergy + shiftedPotential;
+@@ -360,20 +358,17 @@ export function deriveDiagnosticSweepPlan(
+       (2 * limits.maxMechanicalEnergy) / body.mass,
+     );
+     const angularSpeedBound = Math.sqrt(
+-      (2 * limits.maxMechanicalEnergy) /
+-        (body.mass * body.minimumUnitInertia),
++      (2 * limits.maxMechanicalEnergy) / (body.mass * body.minimumUnitInertia),
+     );
+     const pointSpeedBound =
+       linearSpeedBound + angularSpeedBound * body.farthestPointRadius;
+     requiredSubsteps = Math.max(
+       requiredSubsteps,
+       Math.ceil(
+-        (pointSpeedBound * fixedStepSeconds) /
+-          limits.maxPointSweepPerSubstep,
++        (pointSpeedBound * fixedStepSeconds) / limits.maxPointSweepPerSubstep,
+       ),
+       Math.ceil(
+-        (angularSpeedBound * fixedStepSeconds) /
+-          limits.maxRotationPerSubstep,
++        (angularSpeedBound * fixedStepSeconds) / limits.maxRotationPerSubstep,
+       ),
+     );
+     return { linearSpeedBound, angularSpeedBound, pointSpeedBound };
+@@ -397,7 +392,9 @@ export function deriveDiagnosticSweepPlan(
+     maximumPointSweep > limits.maxPointSweepPerSubstep ||
+     maximumRotationSweep > limits.maxRotationPerSubstep
+   ) {
+-    throw new RangeError("Derived substep does not satisfy the hashed sweep limits.");
++    throw new RangeError(
++      "Derived substep does not satisfy the hashed sweep limits.",
++    );
+   }
+   return {
+     substepsPerTick: requiredSubsteps,
+@@ -452,7 +449,9 @@ export function checkDiagnosticSweptEnvelope(
+     limits.maxRestHeightDrop < 0 ||
+     Math.abs(body.axisY) > 1
+   ) {
+-    throw new RangeError("Swept-envelope limits are outside their valid domain.");
++    throw new RangeError(
++      "Swept-envelope limits are outside their valid domain.",
++    );
+   }
+   const pointSweep = body.pointSpeedBound * limits.deltaSeconds;
+   const comDropSweep = body.linearSpeedBound * limits.deltaSeconds;
+@@ -464,24 +463,16 @@ export function checkDiagnosticSweptEnvelope(
+     apronHalfLength -
+       (Math.abs(body.centerOfMass.z) + body.farthestPointRadius + pointSweep),
+   );
+-  const radialAxisSupport = body.radius * Math.sqrt(
+-    Math.max(0, 1 - body.axisY * body.axisY),
+-  );
++  const radialAxisSupport =
++    body.radius * Math.sqrt(Math.max(0, 1 - body.axisY * body.axisY));
+   const lowestPoint =
+-    body.originY -
+-    (body.height / 2) * Math.abs(body.axisY) -
+-    radialAxisSupport;
+-  const surfaceClearance =
+-    lowestPoint - pointSweep - limits.surfaceUnderside;
++    body.originY - (body.height / 2) * Math.abs(body.axisY) - radialAxisSupport;
++  const surfaceClearance = lowestPoint - pointSweep - limits.surfaceUnderside;
+   const restDropClearance =
+     body.centerOfMass.y -
+     comDropSweep -
+     (body.restY - limits.maxRestHeightDrop);
+-  if (
+-    apronClearance < 0 ||
+-    surfaceClearance < 0 ||
+-    restDropClearance < 0
+-  ) {
++  if (apronClearance < 0 || surfaceClearance < 0 || restDropClearance < 0) {
+     throw new RangeError("A full-collider swept guard would be crossed.");
+   }
+   return { apronClearance, surfaceClearance, restDropClearance };
+@@ -518,7 +509,10 @@ export function cleanupDiagnosticResources(
+ 
+   const restored =
+     hooks.restoreSurface === undefined
+-      ? (errors.push(new Error("Attached diagnostic shape has no restoration operation.")), false)
++      ? (errors.push(
++          new Error("Attached diagnostic shape has no restoration operation."),
++        ),
++        false)
+       : attempt(hooks.restoreSurface);
+   if (restored) {
+     disposeReplacement();
+@@ -583,7 +577,10 @@ function diagnosticError(
+   message: string,
+   cause?: unknown,
+ ): SimulationError {
+-  const error = new Error(message, cause === undefined ? undefined : { cause }) as SimulationError;
++  const error = new Error(
++    message,
++    cause === undefined ? undefined : { cause },
++  ) as SimulationError;
+   error.name = "BrowserDirectProbeError";
+   Object.defineProperty(error, "code", { value: code, enumerable: true });
+   return error;
+@@ -592,7 +589,10 @@ function diagnosticError(
+ function hasSimulationErrorCode(error: unknown): error is SimulationError {
+   if (!(error instanceof Error)) return false;
+   const code = (error as Partial<SimulationError>).code;
+-  return typeof code === "string" && simulationErrorCodes.has(code as SimulationErrorCode);
++  return (
++    typeof code === "string" &&
++    simulationErrorCodes.has(code as SimulationErrorCode)
++  );
+ }
+ 
+ /** Converts untyped failures at a known boundary while preserving typed failures. */
+@@ -634,7 +634,10 @@ function fail(code: SimulationErrorCode, message: string): never {
+   throw diagnosticError(code, message);
+ }
+ 
+-function parseFixture(): { fixtureId: string; state: ReturnType<typeof parseMatchState> } {
++function parseFixture(): {
++  fixtureId: string;
++  state: ReturnType<typeof parseMatchState>;
++} {
+   const candidate: unknown = fixtureJson;
+   if (
+     candidate === null ||
+@@ -657,7 +660,10 @@ function parseFixture(): { fixtureId: string; state: ReturnType<typeof parseMatc
+ function requireShape(body: PhysicsBody, id: EntityId): PhysicsShape {
+   const shape = body.shape;
+   if (shape === null || shape.type !== PhysicsShapeType.CYLINDER) {
+-    fail("resourceLimit", `Body ${id} does not have the canonical cylinder shape.`);
++    fail(
++      "resourceLimit",
++      `Body ${id} does not have the canonical cylinder shape.`,
++    );
+   }
+   return shape;
+ }
+@@ -682,15 +688,16 @@ function validateMaterial(material: PhysicsMaterial, label: string): void {
+     typeof material.restitutionCombine !== "number" ||
+     !validMaterialCombineModes.has(material.restitutionCombine)
+   ) {
+-    fail("resourceLimit", `${label} has missing or out-of-domain native material values.`);
++    fail(
++      "resourceLimit",
++      `${label} has missing or out-of-domain native material values.`,
++    );
+   }
+ }
+ 
+ function isValidCollisionMask(value: number): boolean {
+   return (
+-    Number.isSafeInteger(value) &&
+-    value >= -0x80000000 &&
+-    value <= 0xffffffff
++    Number.isSafeInteger(value) && value >= -0x80000000 && value <= 0xffffffff
+   );
+ }
+ 
+@@ -732,7 +739,10 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+       !isValidCollisionMask(filterMembershipMask) ||
+       !isValidCollisionMask(filterCollideMask)
+     ) {
+-      fail("resourceLimit", `Dynamic body ${id} has invalid native collision filters.`);
++      fail(
++        "resourceLimit",
++        `Dynamic body ${id} has invalid native collision filters.`,
++      );
+     }
+     const transform = body.transformNode;
+     if (
+@@ -741,7 +751,10 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+       transform.scaling.y !== 1 ||
+       transform.scaling.z !== 1
+     ) {
+-      fail("resourceLimit", `Dynamic body ${id} has unsupported parent or scale geometry.`);
++      fail(
++        "resourceLimit",
++        `Dynamic body ${id} has unsupported parent or scale geometry.`,
++      );
+     }
+     const props = body.getMassProperties();
+     const centerOfMassLocal = {
+@@ -773,13 +786,22 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+     ) {
+       fail("resourceLimit", `Body ${id} has unusable native mass properties.`);
+     }
+-    const expectedMassTolerance = Number.EPSILON * Math.max(1, definition.expectedMass) * 64;
+-    if (Math.abs(props.mass - definition.expectedMass) > expectedMassTolerance) {
+-      fail("resourceLimit", `Body ${id} native mass differs from its canonical configured mass.`);
++    const expectedMassTolerance =
++      Number.EPSILON * Math.max(1, definition.expectedMass) * 64;
++    if (
++      Math.abs(props.mass - definition.expectedMass) > expectedMassTolerance
++    ) {
++      fail(
++        "resourceLimit",
++        `Body ${id} native mass differs from its canonical configured mass.`,
++      );
+     }
+     const farthestPointRadius =
+-      Math.hypot(centerOfMassLocal.x, centerOfMassLocal.y, centerOfMassLocal.z) +
+-      Math.hypot(definition.radius, definition.height / 2);
++      Math.hypot(
++        centerOfMassLocal.x,
++        centerOfMassLocal.y,
++        centerOfMassLocal.z,
++      ) + Math.hypot(definition.radius, definition.height / 2);
+     if (!Number.isFinite(farthestPointRadius) || farthestPointRadius <= 0) {
+       fail("resourceLimit", `Body ${id} has an invalid collider radius bound.`);
+     }
+@@ -812,7 +834,10 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+     !isValidCollisionMask(surfaceMembership) ||
+     !isValidCollisionMask(surfaceCollide)
+   ) {
+-    fail("resourceLimit", "Static support has invalid native collision filters.");
++    fail(
++      "resourceLimit",
++      "Static support has invalid native collision filters.",
++    );
+   }
+   for (const metric of metrics) {
+     if (
+@@ -823,7 +848,10 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+         surfaceCollide,
+       )
+     ) {
+-      fail("resourceLimit", `Dynamic body ${metric.id} cannot collide with the support surface.`);
++      fail(
++        "resourceLimit",
++        `Dynamic body ${metric.id} cannot collide with the support surface.`,
++      );
+     }
+   }
+   for (let first = 0; first < metrics.length; first += 1) {
+@@ -840,7 +868,10 @@ function readBodyMetrics(world: CounterballWorld): RuntimeBodyMetrics[] {
+           right.filterCollideMask,
+         )
+       ) {
+-        fail("resourceLimit", "Canonical dynamic bodies have incompatible collision filters.");
++        fail(
++          "resourceLimit",
++          "Canonical dynamic bodies have incompatible collision filters.",
++        );
+       }
+     }
+   }
+@@ -865,7 +896,11 @@ function readBodySamples(
+       },
+       `Body ${metric.id} transform quaternion`,
+     );
+-    const position = { x: node.position.x, y: node.position.y, z: node.position.z };
++    const position = {
++      x: node.position.x,
++      y: node.position.y,
++      z: node.position.z,
++    };
+     const linearVelocityValue = metric.body.getLinearVelocity();
+     const angularVelocityValue = metric.body.getAngularVelocity();
+     const linearVelocity = {
+@@ -878,15 +913,20 @@ function readBodySamples(
+       y: angularVelocityValue.y,
+       z: angularVelocityValue.z,
+     };
+-    if (!finiteVector(position) || !finiteVector(linearVelocity) || !finiteVector(angularVelocity)) {
+-      fail("invalidBody", `Body ${metric.id} has non-finite transforms or velocity.`);
++    if (
++      !finiteVector(position) ||
++      !finiteVector(linearVelocity) ||
++      !finiteVector(angularVelocity)
++    ) {
++      fail(
++        "invalidBody",
++        `Body ${metric.id} has non-finite transforms or velocity.`,
++      );
+     }
+     const centerOfMassOffset = rotateVector(rotation, metric.centerOfMassLocal);
+     const centerOfMass = addVectors(position, centerOfMassOffset);
+     const principalWorld = normalizedQuaternion(
+-      Quaternion.FromArray([
+-        ...Object.values(rotation),
+-      ]).multiply(
++      Quaternion.FromArray([...Object.values(rotation)]).multiply(
+         Quaternion.FromArray([
+           metric.inertiaOrientation.x,
+           metric.inertiaOrientation.y,
+@@ -915,12 +955,16 @@ function energyInputs(
+   metrics: readonly RuntimeBodyMetrics[],
+   samples: readonly RuntimeBodySample[],
+ ): DiagnosticEnergyBody[] {
+-  if (metrics.length !== samples.length || metrics.some((metric) => !Number.isFinite(metric.restY))) {
++  if (
++    metrics.length !== samples.length ||
++    metrics.some((metric) => !Number.isFinite(metric.restY))
++  ) {
+     fail("invalidBody", "Body energy references are incomplete.");
+   }
+   return metrics.map((metric, index) => {
+     const sample = samples[index];
+-    if (sample === undefined) fail("invalidBody", `Missing body sample ${metric.id}.`);
++    if (sample === undefined)
++      fail("invalidBody", `Missing body sample ${metric.id}.`);
+     return {
+       mass: metric.mass,
+       inertiaUnitMass: metric.inertiaUnitMass,
+@@ -943,7 +987,10 @@ function assertAtRestFixture(samples: readonly RuntimeBodySample[]): void {
+       angularVelocity.y !== 0 ||
+       angularVelocity.z !== 0
+     ) {
+-      fail("resourceLimit", "Accepted D01 input requires the at-rest canonical fixture.");
++      fail(
++        "resourceLimit",
++        "Accepted D01 input requires the at-rest canonical fixture.",
++      );
+     }
+   }
+ }
+@@ -964,11 +1011,20 @@ function assertGlobalApronReach(
+       Math.abs(sample.state.position.x) > geometry.pitchWidth / 2 ||
+       Math.abs(sample.state.position.z) > geometry.pitchLength / 2
+     ) {
+-      fail("resourceLimit", `Body ${metric.id} starts outside the painted pitch.`);
++      fail(
++        "resourceLimit",
++        `Body ${metric.id} starts outside the painted pitch.`,
++      );
+     }
+-    const reach = bound.linearSpeedBound * COUNTERBALL_CONFIG_V1.simulation.maxShotDurationSeconds + metric.farthestPointRadius;
++    const reach =
++      bound.linearSpeedBound *
++        COUNTERBALL_CONFIG_V1.simulation.maxShotDurationSeconds +
++      metric.farthestPointRadius;
+     if (reach > guard.supportApronMargin) {
+-      fail("resourceLimit", `Body ${metric.id} exceeds the hashed support apron reach.`);
++      fail(
++        "resourceLimit",
++        `Body ${metric.id} exceeds the hashed support apron reach.`,
++      );
+     }
+   }
+ }
+@@ -979,7 +1035,9 @@ function crossPairName(event: IPhysicsCollisionEvent): [string, string] {
+   return first.localeCompare(second) <= 0 ? [first, second] : [second, first];
+ }
+ 
+-function finiteContactPoint(point: IPhysicsCollisionEvent["point"]): Vec3 | null {
++function finiteContactPoint(
++  point: IPhysicsCollisionEvent["point"],
++): Vec3 | null {
+   if (
+     point === null ||
+     point === undefined ||
+@@ -1002,7 +1060,8 @@ function nowMs(): number {
+ 
+ function jsonBytes(value: unknown): number {
+   const json = JSON.stringify(value);
+-  if (json === undefined) fail("resourceLimit", "Diagnostic result did not serialize.");
++  if (json === undefined)
++    fail("resourceLimit", "Diagnostic result did not serialize.");
+   return new TextEncoder().encode(json).byteLength;
+ }
+ 
+@@ -1030,7 +1089,10 @@ export async function runBrowserDirectProbe(
+       fail("cancelled", "Browser direct diagnostic was cancelled.");
+     }
+     if (nowMs() - startedAt > guard.workload.maxWallTimeMs) {
+-      fail("resourceLimit", "Browser direct diagnostic exceeded its wall-time limit.");
++      fail(
++        "resourceLimit",
++        "Browser direct diagnostic exceeded its wall-time limit.",
++      );
+     }
+   };
+ 
+@@ -1041,7 +1103,10 @@ export async function runBrowserDirectProbe(
+       fixture.fixtureId !== guard.fixtureId ||
+       fixture.state.matchId !== guard.matchId
+     ) {
+-      fail("invalidBody", "Canonical fixture identity does not match the hashed diagnostic guard.");
++      fail(
++        "invalidBody",
++        "Canonical fixture identity does not match the hashed diagnostic guard.",
++      );
+     }
+     const havok = await initializeHavokRuntime();
+     checkLimits();
+@@ -1060,7 +1125,10 @@ export async function runBrowserDirectProbe(
+     }
+     const physicsEngine = world.scene.getPhysicsEngine();
+     if (!(physicsEngine instanceof PhysicsEngineV2)) {
+-      fail("initialization", "Diagnostic world did not create PhysicsEngineV2.");
++      fail(
++        "initialization",
++        "Diagnostic world did not create PhysicsEngineV2.",
++      );
+     }
+     const physicsBodies = physicsEngine.getBodies();
+     if (
+@@ -1068,7 +1136,10 @@ export async function runBrowserDirectProbe(
+       world.staticBodies.length !== 7 ||
+       [...world.bodies.values()].some((body) => !physicsBodies.includes(body))
+     ) {
+-      fail("invalidBody", "Havok world does not contain the canonical bodies and static frame.");
++      fail(
++        "invalidBody",
++        "Havok world does not contain the canonical bodies and static frame.",
++      );
+     }
+ 
+     surfaceBody = world.staticBodies.find(
+@@ -1111,7 +1182,10 @@ export async function runBrowserDirectProbe(
+       surfaceBody.transformNode.scaling.y !== 1 ||
+       surfaceBody.transformNode.scaling.z !== 1
+     ) {
+-      fail("resourceLimit", "Canonical surface transform differs from the open pitch slab.");
++      fail(
++        "resourceLimit",
++        "Canonical surface transform differs from the open pitch slab.",
++      );
+     }
+     const originalMaterial = originalSurfaceShape.material;
+     validateMaterial(originalMaterial, "Canonical support surface");
+@@ -1126,7 +1200,10 @@ export async function runBrowserDirectProbe(
+       !Number.isFinite(originalDensity) ||
+       originalDensity < 0
+     ) {
+-      fail("resourceLimit", "Canonical support surface filters or density are invalid.");
++      fail(
++        "resourceLimit",
++        "Canonical support surface filters or density are invalid.",
++      );
+     }
+     const apronWidth = geometry.pitchWidth + 2 * guard.supportApronMargin;
+     const apronLength = geometry.pitchLength + 2 * guard.supportApronMargin;
+@@ -1137,16 +1214,15 @@ export async function runBrowserDirectProbe(
+       apronLength !== 670 ||
+       geometry.surfaceThickness !== 0.2
+     ) {
+-      fail("resourceLimit", "Hashed diagnostic apron geometry is not the accepted 662 by 0.2 by 670 box.");
++      fail(
++        "resourceLimit",
++        "Hashed diagnostic apron geometry is not the accepted 662 by 0.2 by 670 box.",
++      );
+     }
+     replacementShape = new PhysicsShapeBox(
+       Vector3.Zero(),
+       Quaternion.Identity(),
+-      new Vector3(
+-        apronWidth,
+-        geometry.surfaceThickness,
+-        apronLength,
+-      ),
++      new Vector3(apronWidth, geometry.surfaceThickness, apronLength),
+       world.scene,
+     );
+     replacementShape.material = { ...originalMaterial };
+@@ -1164,23 +1240,39 @@ export async function runBrowserDirectProbe(
+       replacementShape.density !== originalDensity ||
+       !sameMaterial(replacementMaterial, originalMaterial)
+     ) {
+-      fail("resourceLimit", "Diagnostic apron did not preserve the native surface material/filter.");
++      fail(
++        "resourceLimit",
++        "Diagnostic apron did not preserve the native surface material/filter.",
++      );
+     }
+     replacementAttached = true;
+     surfaceBody.shape = replacementShape;
+     if (surfaceBody.shape !== replacementShape) {
+-      fail("resourceLimit", "Diagnostic apron could not be attached to the surface body.");
++      fail(
++        "resourceLimit",
++        "Diagnostic apron could not be attached to the surface body.",
++      );
+     }
+ 
+     const metrics = readBodyMetrics(world);
+     for (const staticBody of world.staticBodies) {
+       const shape = staticBody.shape;
+-      if (shape === null) fail("invalidBody", "Static collider is missing its shape.");
+-      validateMaterial(shape.material, `Static body ${staticBody.transformNode.name}`);
++      if (shape === null)
++        fail("invalidBody", "Static collider is missing its shape.");
++      validateMaterial(
++        shape.material,
++        `Static body ${staticBody.transformNode.name}`,
++      );
+       const staticMembership = shape.filterMembershipMask;
+       const staticCollide = shape.filterCollideMask;
+-      if (!isValidCollisionMask(staticMembership) || !isValidCollisionMask(staticCollide)) {
+-        fail("resourceLimit", `Static body ${staticBody.transformNode.name} has invalid native collision filters.`);
++      if (
++        !isValidCollisionMask(staticMembership) ||
++        !isValidCollisionMask(staticCollide)
++      ) {
++        fail(
++          "resourceLimit",
++          `Static body ${staticBody.transformNode.name} has invalid native collision filters.`,
++        );
+       }
+       for (const metric of metrics) {
+         if (
+@@ -1191,7 +1283,10 @@ export async function runBrowserDirectProbe(
+             staticCollide,
+           )
+         ) {
+-          fail("resourceLimit", `Dynamic body ${metric.id} cannot collide with static body ${staticBody.transformNode.name}.`);
++          fail(
++            "resourceLimit",
++            `Dynamic body ${metric.id} cannot collide with static body ${staticBody.transformNode.name}.`,
++          );
+         }
+       }
+     }
+@@ -1233,14 +1328,21 @@ export async function runBrowserDirectProbe(
+         guard.maxRestHeightDrop,
+       ),
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(
+-      initialEnergy.shiftedMechanicalEnergy,
+-      guard.maxMechanicalEnergy,
+-    )) {
+-      fail("resourceLimit", "Initial fixture exceeds the shifted mechanical-energy guard.");
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(
++        initialEnergy.shiftedMechanicalEnergy,
++        guard.maxMechanicalEnergy,
++      )
++    ) {
++      fail(
++        "resourceLimit",
++        "Initial fixture exceeds the shifted mechanical-energy guard.",
++      );
+     }
+ 
+-    const selectedIndex = metrics.findIndex((metric) => metric.id === guard.capId);
++    const selectedIndex = metrics.findIndex(
++      (metric) => metric.id === guard.capId,
++    );
+     const selected = metrics[selectedIndex];
+     const selectedSample = initialSamples[selectedIndex];
+     if (selected === undefined || selectedSample === undefined) {
+@@ -1249,7 +1351,10 @@ export async function runBrowserDirectProbe(
+     const inputImpulse: Vec3 = { ...guard.impulse };
+     const applicationPoint: Vec3 = { ...guard.applicationPoint };
+     const linearDelta = scaleVector(inputImpulse, 1 / selected.mass);
+-    const lever = subtractVectors(applicationPoint, selectedSample.centerOfMass);
++    const lever = subtractVectors(
++      applicationPoint,
++      selectedSample.centerOfMass,
++    );
+     const angularImpulseWorld = cross(lever, inputImpulse);
+     const bodyRotation = selectedSample.state.rotation;
+     const principalWorld = normalizedQuaternion(
+@@ -1277,17 +1382,18 @@ export async function runBrowserDirectProbe(
+       y: torquePrincipal.y / (selected.mass * selected.inertiaUnitMass.y),
+       z: torquePrincipal.z / (selected.mass * selected.inertiaUnitMass.z),
+     };
+-    const predictedInputs = energyInputs(metrics, initialSamples).map((item, index) =>
+-      index === selectedIndex
+-        ? {
+-            ...item,
+-            linearVelocity: addVectors(item.linearVelocity, linearDelta),
+-            angularVelocityPrincipal: addVectors(
+-              item.angularVelocityPrincipal,
+-              angularDeltaPrincipal,
+-            ),
+-          }
+-        : item,
++    const predictedInputs = energyInputs(metrics, initialSamples).map(
++      (item, index) =>
++        index === selectedIndex
++          ? {
++              ...item,
++              linearVelocity: addVectors(item.linearVelocity, linearDelta),
++              angularVelocityPrincipal: addVectors(
++                item.angularVelocityPrincipal,
++                angularDeltaPrincipal,
++              ),
++            }
++          : item,
+     );
+     const predictedImpulseEnergy = resourceGuard(() =>
+       computeDiagnosticShiftedEnergy(
+@@ -1296,33 +1402,55 @@ export async function runBrowserDirectProbe(
+         guard.maxRestHeightDrop,
+       ),
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(
+-      predictedImpulseEnergy.shiftedMechanicalEnergy,
+-      guard.maxMechanicalEnergy,
+-    )) {
+-      fail("resourceLimit", "Accepted D01 impulse exceeds the energy guard for native mass properties.");
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(
++        predictedImpulseEnergy.shiftedMechanicalEnergy,
++        guard.maxMechanicalEnergy,
++      )
++    ) {
++      fail(
++        "resourceLimit",
++        "Accepted D01 impulse exceeds the energy guard for native mass properties.",
++      );
+     }
+ 
+     const bodyNames = new Map<string, string>();
+-    for (const metric of metrics) bodyNames.set(metric.body.transformNode.name, metric.id);
+-    for (const body of world.staticBodies) bodyNames.set(body.transformNode.name, body.transformNode.name);
++    for (const metric of metrics)
++      bodyNames.set(metric.body.transformNode.name, metric.id);
++    for (const body of world.staticBodies)
++      bodyNames.set(body.transformNode.name, body.transformNode.name);
+     let callbackFailure: SimulationError | undefined;
+     const observeContact = (event: IPhysicsCollisionEvent): void => {
+       try {
+         const [first, second] = crossPairName(event);
+         const firstId = bodyNames.get(first);
+         const secondId = bodyNames.get(second);
+-        if (firstId === undefined || secondId === undefined || firstId === secondId) {
+-          callbackFailure ??= diagnosticError("invalidBody", "Collision event references an unknown or identical body.");
++        if (
++          firstId === undefined ||
++          secondId === undefined ||
++          firstId === secondId
++        ) {
++          callbackFailure ??= diagnosticError(
++            "invalidBody",
++            "Collision event references an unknown or identical body.",
++          );
+           return;
+         }
+         const pair: [string, string] =
+-          firstId.localeCompare(secondId) <= 0 ? [firstId, secondId] : [secondId, firstId];
++          firstId.localeCompare(secondId) <= 0
++            ? [firstId, secondId]
++            : [secondId, firstId];
+         const eventType = String(event.type);
+         const key = `${currentStep}|${pair[0]}|${pair[1]}|${eventType}`;
+         if (seenContacts.has(key)) return;
+-        if (contacts.length >= COUNTERBALL_PROTOCOL_LIMITS.maxSimulationFactsPerShot) {
+-          callbackFailure ??= diagnosticError("resourceLimit", "Diagnostic contact facts exceed the protocol limit.");
++        if (
++          contacts.length >=
++          COUNTERBALL_PROTOCOL_LIMITS.maxSimulationFactsPerShot
++        ) {
++          callbackFailure ??= diagnosticError(
++            "resourceLimit",
++            "Diagnostic contact facts exceed the protocol limit.",
++          );
+           return;
+         }
+         seenContacts.add(key);
+@@ -1334,7 +1462,11 @@ export async function runBrowserDirectProbe(
+           point: finiteContactPoint(event.point),
+         });
+       } catch (error) {
+-        callbackFailure ??= diagnosticError("invalidBody", "Collision callback could not be serialized.", error);
++        callbackFailure ??= diagnosticError(
++          "invalidBody",
++          "Collision callback could not be serialized.",
++          error,
++        );
+       }
+     };
+     for (const body of world.bodies.values()) {
+@@ -1357,15 +1489,23 @@ export async function runBrowserDirectProbe(
+         guard.maxRestHeightDrop,
+       ),
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(
+-      postImpulseEnergy.shiftedMechanicalEnergy,
+-      guard.maxMechanicalEnergy,
+-    )) {
+-      fail("resourceLimit", "Applied D01 impulse exceeds the shifted energy guard.");
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(
++        postImpulseEnergy.shiftedMechanicalEnergy,
++        guard.maxMechanicalEnergy,
++      )
++    ) {
++      fail(
++        "resourceLimit",
++        "Applied D01 impulse exceeds the shifted energy guard.",
++      );
+     }
+ 
+     const sampler = createPlaybackSampler(COUNTERBALL_CONFIG_V1);
+-    sampler.record(0, postImpulseSamples.map(({ state }) => state));
++    sampler.record(
++      0,
++      postImpulseSamples.map(({ state }) => state),
++    );
+     const fixedStep = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds;
+     const maximumTicks = Math.floor(
+       COUNTERBALL_CONFIG_V1.simulation.maxShotDurationSeconds / fixedStep,
+@@ -1374,7 +1514,8 @@ export async function runBrowserDirectProbe(
+     let maximumRestReferencedEnergy =
+       postImpulseEnergy.shiftedMechanicalEnergy -
+       metrics.reduce(
+-        (sum, metric) => sum + metric.mass * gravityMagnitude * guard.maxRestHeightDrop,
++        (sum, metric) =>
++          sum + metric.mass * gravityMagnitude * guard.maxRestHeightDrop,
+         0,
+       );
+     let maximumRestDrop = 0;
+@@ -1396,7 +1537,9 @@ export async function runBrowserDirectProbe(
+       COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds / fixedStep,
+     );
+ 
+-    const checkObservedState = (samples: readonly RuntimeBodySample[]): void => {
++    const checkObservedState = (
++      samples: readonly RuntimeBodySample[],
++    ): void => {
+       const energy = resourceGuard(() =>
+         computeDiagnosticShiftedEnergy(
+           energyInputs(metrics, samples),
+@@ -1404,13 +1547,21 @@ export async function runBrowserDirectProbe(
+           dropLimit,
+         ),
+       );
+-      if (!isDiagnosticShiftedEnergyWithinLimit(
+-        energy.shiftedMechanicalEnergy,
+-        guard.maxMechanicalEnergy,
+-      )) {
+-        fail("resourceLimit", "Observed shifted mechanical energy exceeds the hashed guard.");
++      if (
++        !isDiagnosticShiftedEnergyWithinLimit(
++          energy.shiftedMechanicalEnergy,
++          guard.maxMechanicalEnergy,
++        )
++      ) {
++        fail(
++          "resourceLimit",
++          "Observed shifted mechanical energy exceeds the hashed guard.",
++        );
+       }
+-      maximumShiftedEnergy = Math.max(maximumShiftedEnergy, energy.shiftedMechanicalEnergy);
++      maximumShiftedEnergy = Math.max(
++        maximumShiftedEnergy,
++        energy.shiftedMechanicalEnergy,
++      );
+       const constantShift = metrics.reduce(
+         (sum, metric) => sum + metric.mass * gravityMagnitude * dropLimit,
+         0,
+@@ -1423,12 +1574,22 @@ export async function runBrowserDirectProbe(
+         const metric = metrics[index];
+         const sample = samples[index];
+         const bound = plan.bodies[index];
+-        if (metric === undefined || sample === undefined || bound === undefined) {
+-          fail("invalidBody", "Observed guard state is missing a canonical body.");
++        if (
++          metric === undefined ||
++          sample === undefined ||
++          bound === undefined
++        ) {
++          fail(
++            "invalidBody",
++            "Observed guard state is missing a canonical body.",
++          );
+         }
+         const drop = metric.restY - sample.centerOfMass.y;
+         if (drop > dropLimit) {
+-          fail("resourceLimit", `Body ${metric.id} exceeded the COM-drop guard.`);
++          fail(
++            "resourceLimit",
++            `Body ${metric.id} exceeded the COM-drop guard.`,
++          );
+         }
+         maximumRestDrop = Math.max(maximumRestDrop, drop);
+         const axis = rotateVector(sample.state.rotation, { x: 0, y: 1, z: 0 });
+@@ -1439,18 +1600,29 @@ export async function runBrowserDirectProbe(
+         const actualSurfaceClearance =
+           lowestPoint - (geometry.surfaceY - geometry.surfaceThickness);
+         if (actualSurfaceClearance < 0) {
+-          fail("resourceLimit", `Body ${metric.id} penetrated the support slab underside.`);
++          fail(
++            "resourceLimit",
++            `Body ${metric.id} penetrated the support slab underside.`,
++          );
+         }
+         const apronClearance = Math.min(
+-          geometry.pitchWidth / 2 + guard.supportApronMargin -
++          geometry.pitchWidth / 2 +
++            guard.supportApronMargin -
+             (Math.abs(sample.centerOfMass.x) + metric.farthestPointRadius),
+-          geometry.pitchLength / 2 + guard.supportApronMargin -
++          geometry.pitchLength / 2 +
++            guard.supportApronMargin -
+             (Math.abs(sample.centerOfMass.z) + metric.farthestPointRadius),
+         );
+         if (apronClearance < 0) {
+-          fail("resourceLimit", `Body ${metric.id} left the diagnostic support apron.`);
++          fail(
++            "resourceLimit",
++            `Body ${metric.id} left the diagnostic support apron.`,
++          );
+         }
+-        minimumSurfaceClearance = Math.min(minimumSurfaceClearance, actualSurfaceClearance);
++        minimumSurfaceClearance = Math.min(
++          minimumSurfaceClearance,
++          actualSurfaceClearance,
++        );
+         minimumApronClearance = Math.min(minimumApronClearance, apronClearance);
+       }
+     };
+@@ -1459,7 +1631,10 @@ export async function runBrowserDirectProbe(
+       for (let substep = 0; substep < plan.substepsPerTick; substep += 1) {
+         checkLimits();
+         if (actualCalls >= guard.workload.maxTotalSubsteps) {
+-          fail("resourceLimit", "Diagnostic exceeded the total actual-substep limit.");
++          fail(
++            "resourceLimit",
++            "Diagnostic exceeded the total actual-substep limit.",
++          );
+         }
+         const before = readBodySamples(metrics);
+         checkObservedState(before);
+@@ -1467,10 +1642,18 @@ export async function runBrowserDirectProbe(
+           const metric = metrics[index];
+           const sample = before[index];
+           const bound = plan.bodies[index];
+-          if (metric === undefined || sample === undefined || bound === undefined) {
++          if (
++            metric === undefined ||
++            sample === undefined ||
++            bound === undefined
++          ) {
+             fail("invalidBody", "Pre-step sweep is missing a canonical body.");
+           }
+-          const axis = rotateVector(sample.state.rotation, { x: 0, y: 1, z: 0 });
++          const axis = rotateVector(sample.state.rotation, {
++            x: 0,
++            y: 1,
++            z: 0,
++          });
+           const lowestPoint =
+             sample.state.position.y -
+             (metric.height / 2) * Math.abs(axis.y) -
+@@ -1498,17 +1681,29 @@ export async function runBrowserDirectProbe(
+               },
+             ),
+           );
+-          minimumApronClearance = Math.min(minimumApronClearance, clearances.apronClearance);
+-          minimumSurfaceClearance = Math.min(minimumSurfaceClearance, clearances.surfaceClearance);
++          minimumApronClearance = Math.min(
++            minimumApronClearance,
++            clearances.apronClearance,
++          );
++          minimumSurfaceClearance = Math.min(
++            minimumSurfaceClearance,
++            clearances.surfaceClearance,
++          );
+           const rotationSweep = bound.angularSpeedBound * plan.substepSeconds;
+           if (rotationSweep > guard.tunnelling.maxRotationPerSubstep) {
+-            fail("resourceLimit", "Pre-step rotational sweep exceeds the hashed guard.");
++            fail(
++              "resourceLimit",
++              "Pre-step rotational sweep exceeds the hashed guard.",
++            );
+           }
+           maximumRotationSweep = Math.max(maximumRotationSweep, rotationSweep);
+         }
+         const plannedPointSweep = plan.maximumPointSweep;
+         if (plannedPointSweep > guard.tunnelling.maxPointSweepPerSubstep) {
+-          fail("resourceLimit", "Pre-step point sweep exceeds the hashed guard.");
++          fail(
++            "resourceLimit",
++            "Pre-step point sweep exceeds the hashed guard.",
++          );
+         }
+         maximumPointSweep = Math.max(maximumPointSweep, plannedPointSweep);
+         currentStep = actualCalls + 1;
+@@ -1517,14 +1712,19 @@ export async function runBrowserDirectProbe(
+         batchCalls += 1;
+         actualSubstepDurationsSeconds.push(plan.substepSeconds);
+         checkLimits();
+-        if (callbackFailure !== undefined || deferredCallbackError !== undefined) {
++        if (
++          callbackFailure !== undefined ||
++          deferredCallbackError !== undefined
++        ) {
+           throw callbackFailure ?? deferredCallbackError;
+         }
+         checkObservedState(readBodySamples(metrics));
+         if (batchCalls >= guard.workload.maxBatchSubsteps) {
+           batchSizes.push(batchCalls);
+           batchCalls = 0;
+-          await new Promise<void>((resolve) => globalThis.setTimeout(resolve, 0));
++          await new Promise<void>((resolve) =>
++            globalThis.setTimeout(resolve, 0),
++          );
+           checkLimits();
+         }
+       }
+@@ -1533,17 +1733,18 @@ export async function runBrowserDirectProbe(
+       checkObservedState(tickSamples);
+       const bodyStates = tickSamples.map(({ state }) => state);
+       sampler.record(tick, bodyStates);
+-      const allQuiet = tickSamples.every(({ state }) =>
+-        Math.hypot(
+-          state.linearVelocity.x,
+-          state.linearVelocity.y,
+-          state.linearVelocity.z,
+-        ) <= minLinear &&
+-        Math.hypot(
+-          state.angularVelocity.x,
+-          state.angularVelocity.y,
+-          state.angularVelocity.z,
+-        ) <= minAngular,
++      const allQuiet = tickSamples.every(
++        ({ state }) =>
++          Math.hypot(
++            state.linearVelocity.x,
++            state.linearVelocity.y,
++            state.linearVelocity.z,
++          ) <= minLinear &&
++          Math.hypot(
++            state.angularVelocity.x,
++            state.angularVelocity.y,
++            state.angularVelocity.z,
++          ) <= minAngular,
+       );
+       quietTicks = allQuiet ? quietTicks + 1 : 0;
+       if (quietTicks >= quietWindowTicks) {
+@@ -1558,7 +1759,10 @@ export async function runBrowserDirectProbe(
+       }
+     }
+     if (settledBodies === undefined) {
+-      fail("timeout", "Diagnostic did not settle within the configured simulated duration.");
++      fail(
++        "timeout",
++        "Diagnostic did not settle within the configured simulated duration.",
++      );
+     }
+     if (batchCalls > 0) batchSizes.push(batchCalls);
+     const frames = sampler.finish();
+@@ -1566,7 +1770,10 @@ export async function runBrowserDirectProbe(
+       frames.length > COUNTERBALL_PROTOCOL_LIMITS.maxPlaybackFramesPerShot ||
+       contacts.length > COUNTERBALL_PROTOCOL_LIMITS.maxSimulationFactsPerShot
+     ) {
+-      fail("resourceLimit", "Diagnostic output exceeds the canonical protocol limits.");
++      fail(
++        "resourceLimit",
++        "Diagnostic output exceeds the canonical protocol limits.",
++      );
+     }
+     const elapsedMs = nowMs() - startedAt;
+     result = {
+@@ -1584,7 +1791,11 @@ export async function runBrowserDirectProbe(
+       batchSizes,
+       settledBodies,
+       frames,
+-      contacts: contacts.map((contact) => ({ ...contact, pair: [...contact.pair] as [string, string], point: contact.point === null ? null : { ...contact.point } })),
++      contacts: contacts.map((contact) => ({
++        ...contact,
++        pair: [...contact.pair] as [string, string],
++        point: contact.point === null ? null : { ...contact.point },
++      })),
+       guardObservations: {
+         maximumShiftedMechanicalEnergy: maximumShiftedEnergy,
+         maximumRestReferencedMechanicalEnergy: maximumRestReferencedEnergy,
+@@ -1596,8 +1807,13 @@ export async function runBrowserDirectProbe(
+         substepsPerTick: plan.substepsPerTick,
+       },
+     };
+-    if (jsonBytes(result) > COUNTERBALL_PROTOCOL_LIMITS.maxPlaybackSnapshotBytes) {
+-      fail("resourceLimit", "Serialized diagnostic output exceeds the one-megabyte protocol limit.");
++    if (
++      jsonBytes(result) > COUNTERBALL_PROTOCOL_LIMITS.maxPlaybackSnapshotBytes
++    ) {
++      fail(
++        "resourceLimit",
++        "Serialized diagnostic output exceeds the one-megabyte protocol limit.",
++      );
+     }
+     checkLimits();
+   } catch (error) {
+@@ -1608,22 +1824,32 @@ export async function runBrowserDirectProbe(
+     removeObservers,
+     replacementAttached,
+     restoreSurface:
+-      replacementAttached && surfaceBody !== undefined && originalSurfaceShape !== undefined
++      replacementAttached &&
++      surfaceBody !== undefined &&
++      originalSurfaceShape !== undefined
+         ? () => {
+             surfaceBody.shape = originalSurfaceShape;
+             if (surfaceBody.shape !== originalSurfaceShape) {
+-              throw new Error("Original support shape restoration was not confirmed.");
++              throw new Error(
++                "Original support shape restoration was not confirmed.",
++              );
+             }
+           }
+         : undefined,
+     disposeReplacement:
+-      replacementShape === undefined ? undefined : () => replacementShape?.dispose(),
++      replacementShape === undefined
++        ? undefined
++        : () => replacementShape?.dispose(),
+     disposeWorld: () => world?.dispose(),
+   });
+-  if (primaryError !== undefined) throw errorWithCleanup(primaryError, cleanupErrors);
++  if (primaryError !== undefined)
++    throw errorWithCleanup(primaryError, cleanupErrors);
+   if (cleanupErrors.length > 0) {
+     throw errorWithCleanup(
+-      diagnosticError("initialization", "Browser direct diagnostic cleanup failed."),
++      diagnosticError(
++        "initialization",
++        "Browser direct diagnostic cleanup failed.",
++      ),
+       cleanupErrors,
+     );
+   }
