@@ -391,9 +391,100 @@ export type DiagnosticPhysicsGuard = {
   };
 };
 
+/** Strict config-hashed identity and bounds for the restart-loft diagnostic only. */
+export type RestartLoftDiagnosticGuard = {
+  schemaVersion: 1;
+  scope: "restart-loft-coarse-matrix-v1";
+  matrixId: "counterball-l01-grid-v1";
+  algorithmVersion: "loft-coarse-probe-v1";
+  protocolVersion: 1;
+  configSchemaVersion: 3;
+  physicsVersion: "havok-1.3.14/adapter-1";
+  fixture: {
+    id: "counterball-protocol-fixtures-v1";
+    payloadSha256: "6ce26e4203017e446687dfd8ad95106ba582f09420f8c623129c7d1bbe6b625d";
+  };
+  matchId: "00000000-0000-4000-8000-000000000001";
+  wasmSha256: "026917766f534c156286f07975850978dabf17c42e742bbfaaebbcb2215e4e11";
+  matrix: {
+    gapOffsets: readonly [0.75, 1];
+    tiltDegrees: readonly [45, 60];
+    impulseMagnitudes: readonly [6, 8];
+    azimuthDegrees: readonly [-15, 0, 15];
+    nestedAxisOrder: readonly ["gap", "tilt", "impulse", "azimuth"];
+  };
+  setup: {
+    selectedCapId: "home-0";
+    obstacleCapId: "home-1";
+    buttonId: "button";
+    selectedCapXZ: readonly [0, -5];
+    capRestHeight: "surfaceY+capHeight/2";
+    buttonPoseFunction: "deriveRestartButtonPose";
+    obstacleGapAxis: "world-positive-Z";
+    fillerOrder: "canonical-entity-order";
+    fillerX: readonly [-4.5, 4.5];
+    fillerZ: readonly [-8, -5, -2, 1, 4, 7];
+    initialStateHashAlgorithm: "hashCanonicalJson-v1";
+    capsIdentityRotation: true;
+    allDynamicVelocitiesZero: true;
+    impulseDirection: readonly [0, 0, 1];
+    impulseApplicationPoint: "actual-native-world-COM";
+    supportApronMargin: 325;
+  };
+  materials: {
+    shapeCount: 22;
+    friction: 0.15;
+    staticFriction: 0.15;
+    restitution: 0;
+    frictionCombine: "MINIMUM";
+    restitutionCombine: "MAXIMUM";
+    readbackPolicy: "exact-setter-value";
+  };
+  energy: {
+    formulaVersion: "shifted-mechanical-energy-v1";
+    gravityMagnitude: 9.81;
+    maximum: 34;
+    maximumRestComDrop: 0.01125;
+    nativeMassProjection: "Math.fround(configuredMass)";
+    nativeMassToleranceMultiplier: 64;
+    restReference: "tuple-initial-native-COM-y";
+  };
+  sweep: {
+    maximumPointSweepPerCall: 0.01125;
+    maximumRotationPerCall: 0.39269908169872414;
+    maximumCallsPerNominalTick: 48;
+    verticalClearanceMargin: 0.005;
+  };
+  workload: {
+    maximumNominalTicksPerCase: 1800;
+    maximumExecuteStepCallsPerCase: 86400;
+    maximumExecuteStepCallsMatrix: 2073600;
+    maximumBatchesPerCase: 720;
+    maximumBatchesMatrix: 17280;
+    maximumCallsPerBatch: 120;
+    maximumWallTimePerCaseMs: 30000;
+    maximumWallTimeMatrixMs: 720000;
+  };
+  artifact: {
+    sampleRateHz: 120;
+    maximumBodyRowsPerCase: 27015;
+    maximumBodyRowsMatrix: 648360;
+    maximumContactsPerCase: 8192;
+    maximumContactsMatrix: 196608;
+    maximumSweepRowsPerCase: 1801;
+    maximumBodyOrContactRowBytes: 512;
+    maximumSweepRowBytes: 1024;
+    maximumCaseBytes: 20971520;
+    maximumMatrixBytes: 504365056;
+    maximumCaseMetadataBytes: 65536;
+    maximumMatrixMetadataBytes: 65536;
+    maximumEventTypeBytes: 64;
+  };
+};
+
 export type CounterballConfig = {
-  schemaVersion: 2;
-  configVersion: "counterball-config-2";
+  schemaVersion: 3;
+  configVersion: "counterball-config-3";
   geometry: {
     pitchWidth: number;
     pitchLength: number;
@@ -440,6 +531,7 @@ export type CounterballConfig = {
   };
   physicsCalibration: PhysicsCalibration | null;
   diagnosticGuard: DiagnosticPhysicsGuard;
+  restartLoftDiagnosticGuard: RestartLoftDiagnosticGuard;
 };
 
 export type ConfigHash = string & { readonly __brand: "ConfigHash" };

@@ -71,6 +71,82 @@ function createPhysicsCalibration(): PhysicsCalibration {
   };
 }
 
+type PrimitivePath = readonly (number | string)[];
+
+function getPrimitivePaths(
+  value: unknown,
+  path: PrimitivePath = [],
+): PrimitivePath[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((entry, index) =>
+      getPrimitivePaths(entry, [...path, index]),
+    );
+  }
+  if (value !== null && typeof value === "object") {
+    return Object.entries(value).flatMap(([key, entry]) =>
+      getPrimitivePaths(entry, [...path, key]),
+    );
+  }
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return [path];
+  }
+  return [];
+}
+
+function changePrimitiveAtPath(
+  value: unknown,
+  path: PrimitivePath,
+  depth = 0,
+): unknown {
+  if (depth === path.length) {
+    if (typeof value === "string") {
+      return `${value}-changed`;
+    }
+    if (typeof value === "number") {
+      return value + 1;
+    }
+    if (typeof value === "boolean") {
+      return !value;
+    }
+    throw new TypeError("Expected a string, number, or boolean guard leaf.");
+  }
+
+  const part = path[depth];
+  if (part === undefined) {
+    throw new TypeError("Guard leaf path ended unexpectedly.");
+  }
+  if (Array.isArray(value)) {
+    if (typeof part !== "number") {
+      throw new TypeError("Array guard path must use a numeric index.");
+    }
+    return value.map((entry, index) =>
+      index === part ? changePrimitiveAtPath(entry, path, depth + 1) : entry,
+    );
+  }
+  if (value !== null && typeof value === "object") {
+    if (typeof part !== "string") {
+      throw new TypeError("Object guard path must use a string key.");
+    }
+    const record = value as Record<string, unknown>;
+    return {
+      ...record,
+      [part]: changePrimitiveAtPath(record[part], path, depth + 1),
+    };
+  }
+  throw new TypeError("Guard leaf path crossed a primitive value.");
+}
+
+function isDeepFrozen(value: unknown): boolean {
+  if (value === null || typeof value !== "object") {
+    return true;
+  }
+  return Object.isFrozen(value) && Object.values(value).every(isDeepFrozen);
+}
+
 type NativeAbortSignalFits =
   AbortSignal extends NonNullable<SimulationRunOptions["signal"]>
     ? true
@@ -318,8 +394,8 @@ describe("Counterball v1 protocol", () => {
     );
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1)).toBe(true);
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1.geometry)).toBe(true);
-    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(2);
-    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-2");
+    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(3);
+    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-3");
     expect(PROTOCOL_VERSION).toBe(1);
     expect(COUNTERBALL_CONFIG_V1.bodies.capsPerTeam).toBe(7);
     expect(COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius).toBe(0.06);
@@ -433,6 +509,52 @@ describe("Counterball v1 protocol", () => {
         diagnosticGuard: { ...guard, maxMechanicalEnergy: 35 },
       }),
     ).not.toBe(await hashCanonicalJson(COUNTERBALL_CONFIG_V1));
+  });
+
+  it("strictly pins every restart-loft diagnostic guard field in the config hash", async () => {
+    const guard = COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard;
+    expect(
+      CounterballConfigSchema.parse(COUNTERBALL_CONFIG_V1)
+        .restartLoftDiagnosticGuard,
+    ).toEqual(guard);
+    expect(isDeepFrozen(guard)).toBe(true);
+
+    const paths = getPrimitivePaths(guard);
+    expect(paths.length).toBeGreaterThan(0);
+    expect(paths).toContainEqual(["setup", "capsIdentityRotation"]);
+    expect(paths).toContainEqual(["setup", "allDynamicVelocitiesZero"]);
+    const baselineHash = await hashCounterballConfig();
+    for (const path of paths) {
+      const changedGuard = changePrimitiveAtPath(guard, path);
+      expect(
+        CounterballConfigSchema.safeParse({
+          ...COUNTERBALL_CONFIG_V1,
+          restartLoftDiagnosticGuard: changedGuard,
+        }).success,
+      ).toBe(false);
+      expect(
+        await hashCanonicalJson({
+          ...COUNTERBALL_CONFIG_V1,
+          restartLoftDiagnosticGuard: changedGuard,
+        }),
+      ).not.toBe(baselineHash);
+    }
+
+    expect(
+      CounterballConfigSchema.safeParse({
+        ...COUNTERBALL_CONFIG_V1,
+        restartLoftDiagnosticGuard: null,
+      }).success,
+    ).toBe(false);
+    expect(
+      CounterballConfigSchema.safeParse({
+        ...COUNTERBALL_CONFIG_V1,
+        restartLoftDiagnosticGuard: {
+          ...guard,
+          matrix: { ...guard.matrix, unexpected: true },
+        },
+      }).success,
+    ).toBe(false);
   });
 
   it("validates the nullable versioned calibration without changing null fixtures", async () => {

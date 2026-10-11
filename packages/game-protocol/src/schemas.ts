@@ -10,6 +10,7 @@ import type {
   PlaybackFrame,
   PhysicsCalibration,
   RoomCommandEnvelope,
+  RestartLoftDiagnosticGuard,
   ServerEvent,
   ShotSimulation,
   VersionStamp,
@@ -93,6 +94,121 @@ const diagnosticPhysicsGuardSchema: z.ZodType<DiagnosticPhysicsGuard> =
       maxTotalSubsteps: z.literal(86_400),
       maxBatchSubsteps: z.literal(120),
       maxWallTimeMs: z.literal(30_000),
+    }),
+  });
+
+const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
+  z.strictObject({
+    schemaVersion: z.literal(1),
+    scope: z.literal("restart-loft-coarse-matrix-v1"),
+    matrixId: z.literal("counterball-l01-grid-v1"),
+    algorithmVersion: z.literal("loft-coarse-probe-v1"),
+    protocolVersion: z.literal(1),
+    configSchemaVersion: z.literal(3),
+    physicsVersion: z.literal("havok-1.3.14/adapter-1"),
+    fixture: z.strictObject({
+      id: z.literal("counterball-protocol-fixtures-v1"),
+      payloadSha256: z.literal(
+        "6ce26e4203017e446687dfd8ad95106ba582f09420f8c623129c7d1bbe6b625d",
+      ),
+    }),
+    matchId: z.literal("00000000-0000-4000-8000-000000000001"),
+    wasmSha256: z.literal(
+      "026917766f534c156286f07975850978dabf17c42e742bbfaaebbcb2215e4e11",
+    ),
+    matrix: z.strictObject({
+      gapOffsets: z.tuple([z.literal(0.75), z.literal(1)]),
+      tiltDegrees: z.tuple([z.literal(45), z.literal(60)]),
+      impulseMagnitudes: z.tuple([z.literal(6), z.literal(8)]),
+      azimuthDegrees: z.tuple([
+        z.literal(-15),
+        z.literal(0),
+        z.literal(15),
+      ]),
+      nestedAxisOrder: z.tuple([
+        z.literal("gap"),
+        z.literal("tilt"),
+        z.literal("impulse"),
+        z.literal("azimuth"),
+      ]),
+    }),
+    setup: z.strictObject({
+      selectedCapId: z.literal("home-0"),
+      obstacleCapId: z.literal("home-1"),
+      buttonId: z.literal("button"),
+      selectedCapXZ: z.tuple([z.literal(0), z.literal(-5)]),
+      capRestHeight: z.literal("surfaceY+capHeight/2"),
+      buttonPoseFunction: z.literal("deriveRestartButtonPose"),
+      obstacleGapAxis: z.literal("world-positive-Z"),
+      fillerOrder: z.literal("canonical-entity-order"),
+      fillerX: z.tuple([z.literal(-4.5), z.literal(4.5)]),
+      fillerZ: z.tuple([
+        z.literal(-8),
+        z.literal(-5),
+        z.literal(-2),
+        z.literal(1),
+        z.literal(4),
+        z.literal(7),
+      ]),
+      initialStateHashAlgorithm: z.literal("hashCanonicalJson-v1"),
+      capsIdentityRotation: z.literal(true),
+      allDynamicVelocitiesZero: z.literal(true),
+      impulseDirection: z.tuple([
+        z.literal(0),
+        z.literal(0),
+        z.literal(1),
+      ]),
+      impulseApplicationPoint: z.literal("actual-native-world-COM"),
+      supportApronMargin: z.literal(325),
+    }),
+    materials: z.strictObject({
+      shapeCount: z.literal(22),
+      friction: z.literal(0.15),
+      staticFriction: z.literal(0.15),
+      restitution: z.literal(0),
+      frictionCombine: z.literal("MINIMUM"),
+      restitutionCombine: z.literal("MAXIMUM"),
+      readbackPolicy: z.literal("exact-setter-value"),
+    }),
+    energy: z.strictObject({
+      formulaVersion: z.literal("shifted-mechanical-energy-v1"),
+      gravityMagnitude: z.literal(9.81),
+      maximum: z.literal(34),
+      maximumRestComDrop: z.literal(0.01125),
+      nativeMassProjection: z.literal("Math.fround(configuredMass)"),
+      nativeMassToleranceMultiplier: z.literal(64),
+      restReference: z.literal("tuple-initial-native-COM-y"),
+    }),
+    sweep: z.strictObject({
+      maximumPointSweepPerCall: z.literal(0.01125),
+      maximumRotationPerCall: z.literal(0.39269908169872414),
+      maximumCallsPerNominalTick: z.literal(48),
+      verticalClearanceMargin: z.literal(0.005),
+    }),
+    workload: z.strictObject({
+      maximumNominalTicksPerCase: z.literal(1800),
+      maximumExecuteStepCallsPerCase: z.literal(86400),
+      maximumExecuteStepCallsMatrix: z.literal(2073600),
+      maximumBatchesPerCase: z.literal(720),
+      maximumBatchesMatrix: z.literal(17280),
+      maximumCallsPerBatch: z.literal(120),
+      maximumWallTimePerCaseMs: z.literal(30000),
+      maximumWallTimeMatrixMs: z.literal(720000),
+    }),
+    artifact: z.strictObject({
+      sampleRateHz: z.literal(120),
+      maximumBodyRowsPerCase: z.literal(27015),
+      maximumBodyRowsMatrix: z.literal(648360),
+      maximumContactsPerCase: z.literal(8192),
+      maximumContactsMatrix: z.literal(196608),
+      maximumSweepRowsPerCase: z.literal(1801),
+      maximumBodyOrContactRowBytes: z.literal(512),
+      maximumSweepRowBytes: z.literal(1024),
+      maximumCaseBytes: z.literal(20971520),
+      maximumMatrixBytes: z.literal(504365056),
+      maximumCaseMetadataBytes: z.literal(65536),
+      maximumMatrixMetadataBytes: z.literal(65536),
+      maximumEventTypeBytes: z.literal(64),
     }),
   });
 
@@ -734,8 +850,8 @@ export const RoomCommandResponseSchema = z.union([
 
 export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
   .strictObject({
-    schemaVersion: z.literal(2),
-    configVersion: z.literal("counterball-config-2"),
+    schemaVersion: z.literal(3),
+    configVersion: z.literal("counterball-config-3"),
     geometry: z.strictObject({
       pitchWidth: finiteNumber.positive(),
       pitchLength: finiteNumber.positive(),
@@ -786,6 +902,7 @@ export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
     }),
     physicsCalibration: physicsCalibrationSchema.nullable(),
     diagnosticGuard: diagnosticPhysicsGuardSchema,
+    restartLoftDiagnosticGuard: restartLoftDiagnosticGuardSchema,
   })
   .superRefine((config, context) => {
     const calibration = config.physicsCalibration;

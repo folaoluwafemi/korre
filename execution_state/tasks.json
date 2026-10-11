@@ -596,7 +596,7 @@
           "detail": "Checker extracted T02-BR02-MASS-READBACK-1; all explicit accepted dependencies and inherited T01/T03 parent dependencies are satisfied. Only this READY card is initially dispatchable."
         }
       ],
-      "blocker": "C01-P and T02-D01 are accepted only for the package-boundary and diagnostic real-WASM measurements listed in their reports. T02-L01 still requires a coordinator-frozen/hashable per-substep guard and enforceable substep schedule; no loft trials ran. The T02 parent, deployed Cloudflare Havok and playable match remain open.",
+      "blocker": "BR02 is accepted only for the diagnostic direct-shot/retry proof on GitHub run 38145098173. T02 remains RUNNING. L01 remains blocked before implementation or trials until the separately hashed restart-loft guard/setup/workload/output contract is independently reviewed and accepted; the 24-case matrix has not run. Deployed Cloudflare Havok and playable local match remain open.",
       "packet": "execution_state/packets/T02-A.md",
       "packet_progress": [
         {
@@ -2728,19 +2728,44 @@
             "T02-B0",
             "T02-C0",
             "T02-C2",
-            "C00"
+            "C00",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1"
           ],
           "read_paths": [
-            "execution_state/packets/T02-runner-design-audit-1.md",
+            "AGENTS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-SCHEMA-1",
+            "execution_state/tasks.json",
             "execution_state/reports/T02-runner-design-audit-1.md",
             "execution_state/reports/T02-calibration-observations-review-1.md",
+            "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-review-4.md",
             "games/counterball/src/simulation/worldFactory.ts",
             "games/counterball/src/features/restarts/domain/placementPose.ts",
             "games/counterball/src/simulation/sampling.ts",
-            "games/counterball/src/simulation/intendedShotProbe.test.ts"
+            "games/counterball/src/simulation/intendedShotProbe.test.ts",
+            "games/counterball/src/simulation/browserDirectProbe.ts",
+            "games/counterball/src/browser.ts",
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "packages/game-protocol/src/config.ts",
+            "packages/game-protocol/src/types.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "tests/fixtures/counterball-v1.json",
+            "tests/e2e/counterball-direct-probe.spec.ts",
+            ".github/workflows/ci.yml",
+            "playwright.config.ts"
           ],
           "write_paths": [
-            "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+            "games/counterball/src/simulation/loftCoarseProbe.ts",
+            "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+            "games/counterball/src/browser.ts",
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "tests/e2e/counterball-direct-probe.spec.ts"
           ],
           "implementation_report": "execution_state/reports/T02-L01-implementation.md",
           "review_report": "execution_state/reports/T02-L01-guard-amendment-math-review-1.md",
@@ -2748,49 +2773,81 @@
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-L01",
-              "result": "PASS",
               "environment": "local-document",
-              "detail": "Exact diagnostic card extracted; all six listed dependencies independently confirmed ACCEPTED before materialization."
+              "expected": "Exact matrix packet is ready only after contract and schema cards plus all original dependencies are ACCEPTED; no implementation/runtime evidence."
             },
             {
-              "command": "Independent T02-L01 stop-condition review",
-              "result": "PASS",
+              "command": "git diff --check -- games/counterball/src/simulation/loftCoarseProbe.ts games/counterball/src/simulation/loftCoarseProbe.test.ts games/counterball/src/browser.ts apps/web/src/CounterballDirectProbe.tsx tests/e2e/counterball-direct-probe.spec.ts",
+              "environment": "local-document",
+              "expected": "Five exact source paths pass whitespace hygiene; no app build/test is run locally."
+            },
+            {
+              "command": "pnpm verify on the exact reviewed SHA",
+              "environment": "github",
+              "expected": "Pure helpers, types, lint, formatting and product build pass; this check alone is not L01 physics evidence."
+            },
+            {
+              "command": "GitHub CI diagnostic Chromium suite on exact reviewed SHA: COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e $diagnostic_specs --workers=1",
+              "environment": "github",
+              "expected": "The expanded diagnostic_specs contains tests/e2e/counterball-direct-probe.spec.ts; the L01 test runs in Chromium with real pinned Havok, no skips/retries, within 20-minute job and its raised test deadline, and uploads the complete attached artifact under test-results/."
+            },
+            {
+              "command": "Independent exact source and raw artifact review",
               "environment": "source-review",
-              "report": "execution_state/reports/T02-L01-review.md",
-              "detail": "Accepted contract contains only guard schema bounds, not selected hashable limits/substep schedule; current stepping source lacks required substep instrumentation. Packet correctly stops before trials."
-            },
-            {
-              "command": "Coordinator T02-L01 guard-scope and pinned-API audit",
-              "result": "CHANGES_REQUIRED",
-              "environment": "read-only-analysis",
-              "report": "execution_state/reports/T02-L01-guard-resolution-audit-1.md",
-              "detail": "Stopped before trials. The accepted direct-shot guard cannot authorize restart-loft inputs; conditional per-call bounds and diagnostic apron need a distinct hashed policy and do not prove continuous Havok traversal."
-            },
-            {
-              "command": "Independent T02-L01 guard-scope audit review",
-              "result": "PASS",
-              "environment": "source-review",
-              "report": "execution_state/reports/T02-L01-guard-resolution-review-1.md",
-              "detail": "Independent review confirmed the scope mismatch, pinned public API limits, and need for coordinator-owned hashed guard/schema work. No runtime or physics was run."
-            },
-            {
-              "command": "Coordinator T02-L01 guard-amendment math proposal",
-              "result": "CHANGES_REQUIRED",
-              "environment": "read-only-analysis",
-              "report": "execution_state/reports/T02-L01-guard-amendment-math-1.md",
-              "detail": "Conditional arithmetic retains ceiling 34 only under centered mass-1 impulse/at-rest premises; candidate setup, impulse application, per-case and aggregate workload/output identity remain unfrozen. Stop before trials."
-            },
-            {
-              "command": "Independent T02-L01 guard-amendment math review",
-              "result": "PASS",
-              "environment": "source-review",
-              "report": "execution_state/reports/T02-L01-guard-amendment-math-review-1.md",
-              "detail": "Reviewer verified conditional arithmetic and confirmed trials are not authorized until exact setup/guard semantics are separately frozen and hashed. Runtime/physics NOT RUN."
+              "expected": "PASS verifies all 24 cases/provenance/guard and byte assertions, source SHA, actual hosted Chromium/Havok result, compact result, attached artifact integrity, zero skips/retries, and stated finite-step limitations."
             }
           ],
           "implementation_note": "Source only: implement exactly the packet fixed 24 tuple matrix, real pinned Havok WASM/world/placement/sampler, every 1/120 s state, actual contacts, conservative full-overlap swept clearance, whole-button before/after extent crossing and frozen C00 hashed substep guard. Preserve the canonical config and all 15 bodies, require all-15-body finite settling, and label finite-step limitations honestly. Zero eligible candidates are valid. Write env-gated structured output only after all 24 unique ordered tuples and integrity assertions pass. No local application command; hosted pnpm verify and separate independent raw artifact review remain required. No workflow, shared contract/config/status, production tuning or Wrangler edits.",
-          "next_action": "Math proposal review passed conditionally. Coordinator must now freeze a separate strict hashed restart-loft guard plus exact per-case setup/application and matrix workload/output semantics, obtain independent contract review, and materialize the coordinator-owned config/contract packet. Preserve the original 24 tuples; no L01 source or physics trial may begin before that packet is accepted.",
-          "blocker": "The accepted browser-direct guard is scoped to one D01 direct shot and cannot cover L01. The restart packet does not freeze all candidate setup/application semantics or matrix-wide workload/output limits. Conditional math is not accepted policy or runtime proof. A separate strict hash identity, justified enforceable substep schedule, support/drop/workload/output limits and independent contract review are required before any impulse or trial. No trials or source artifact exist."
+          "next_action": "Await acceptance of T02-L01-GUARD-CONTRACT-1 and T02-L01-GUARD-SCHEMA-1. The six original dependencies and acceptance outcomes remain, with the strict guard and exact real-browser artifact path now specified; no matrix source/trial is authorized.",
+          "blocker": "The accepted browser-direct guard is scoped to one D01 direct shot and cannot cover L01. The restart packet does not freeze all candidate setup/application semantics or matrix-wide workload/output limits. Conditional math is not accepted policy or runtime proof. A separate strict hash identity, justified enforceable substep schedule, support/drop/workload/output limits and independent contract review are required before any impulse or trial. No trials or source artifact exist.",
+          "ready": false,
+          "title": "Run bounded coarse restart-loft diagnostic",
+          "outputs": [
+            "Real 24-tuple restart-loft matrix using the actual browser Babylon Engine and pinned Havok WASM, accepted canonical world and pose helper, and the hashed restartLoftDiagnosticGuard.",
+            "Pure tuple, preflight, deterministic encoding and bounded artifact metadata tests; no Node or mock physics.",
+            "A distinct development-only page action with compact summary and complete successful browser-download artifact; no full matrix DOM or single page.evaluate/IPC result.",
+            "A Playwright-host temporary file under test-results/ that is streaming-validated and hashed, atomically finalized, and attached with the required attachment name/options only after every assertion passes."
+          ],
+          "steps": [
+            "Extract this exact record with node scripts/check-completion-plan.mjs --packet T02-L01 after the amendment and schema card are accepted. Read the accepted guard/schema contract and the exact five source paths; the Vitest file remains pure and must not run physics.",
+            "Use the actual page Babylon Engine, pinned Havok WASM, accepted createCounterballWorld/world factory, canonical fixture and deriveRestartButtonPose helper. Do not use a mock, NullEngine, a new impulse route, or production calibration.",
+            "Generate the exact 24 tuples in nested order gap [0.75,1.0], tilt [45,60], impulse [6,8], azimuth [-15,0,15]. For each tuple use the exact 15-body state, selected home-0, obstacle home-1, derived button pose, canonical filler ordering, identity rotations and zero velocities in the accepted contract.",
+            "Before impulse, verify all fixture/config/WASM identities, native dynamic and static body/material/filter reads, strict exact material readbacks, mass projection, energy preflight and initial-state hash. Apply exactly one planar impulse at home-0 actual native world COM. Any unknown/missing/non-finite/mismatched property fails before impulse with no success artifact.",
+            "At every actual public Havok executeStep call apply the strict shifted-energy, per-body drop, full-collider support/apron and conservative point/rotation sweep checks from restartLoftDiagnosticGuard. Enforce all call/tick/case/matrix/batch/time caps and actual-call extrema. Do not describe public executeStep calls as low-level WASM substeps.",
+            "Record all 15 body states at tick zero and each nominal endpoint, every contact, one exact-extrema sweep summary per nominal interval, complete provenance/native property/material/static scene metadata, final transforms, settling evidence, all exact encoded byte counts and 24-tuple envelope. The runner aborts the whole matrix on any guard, provenance, integrity or cap failure. Zero eligible candidates are valid only after every case and output assertion passes.",
+            "A candidate is eligible only with whole-button before/after crossing, positive conservative swept clearance through full horizontal overlap, no button-obstacle contact, all 15 bodies finite and settled for the canonical window, and every actual call passing the hashed guard. Preserve honest discrete-step limitations.",
+            "Keep the page result compact and expose the complete JSON as a browser download only on full success. In Playwright, wait for the download, save it to a temporary path under test-results/, validate byte caps/digest and matrix structure/totals incrementally, atomically rename within that directory only after all assertions, then call await testInfo.attach(\"counterball-l01-matrix.json\", { path: finalPath, contentType: \"application/json\" }). Remove temp/final output and do not attach on any failure. Never render or return the full matrix through DOM or one page.evaluate/IPC value.",
+            "Set the matrix test timeout above the 720-second cap plus serialization/download/stream-validation/attachment overhead. The current job timeout is 20 minutes; if an exact hosted run cannot meet it, stop for a separately reviewed workflow amendment. Require the expanded CI diagnostic spec list to include tests/e2e/counterball-direct-probe.spec.ts, test collection/completion with zero skips/retries, the test-results attachment and complete logs.",
+            "Run only git diff --check locally. pnpm verify is supplementary pure/schema/unit/build coverage; only exact-head GitHub Chromium diagnostic execution with real pinned Havok and a retained complete artifact can prove this matrix card.",
+            "Write the unique implementation report with exact source SHA, hashes, exact browser/test results and artifact; release the five source paths for independent source review and then exact-run/artifact review."
+          ],
+          "acceptance": [
+            "All 24 unique fixed tuples run in actual Chromium using pinned WASM and actual browser Babylon Engine; no mock/Node/NullEngine result is accepted.",
+            "The strict hashed restart-loft guard passes at every actual public executeStep call with native preflight, shifted energy, per-body drop, complete collider sweep/support, and every workload/serialization cap; no low-level-substep or continuous-motion claim.",
+            "Complete JSON contains exact matrix metadata, all body/contact/sweep rows and assertions; encoded byte counts pass inclusive caps. Host validates download bytes/digest and matrix structure/totals before atomic rename and named attachment; no full DOM/page IPC payload or failure artifact.",
+            "Eligibility requires all six accepted conditions: full-button before/after crossing, positive swept clearance for full overlap, zero actual button-obstacle contact, 15 finite bodies, full settling window, and every actual call guarded. Zero candidates may be valid diagnostic output.",
+            "The exact Chromium diagnostic test is collected/completed with zero skips/retries on the exact SHA; independent source and run/artifact review pass.",
+            "Acceptance is diagnostic L01 only; it does not by itself accept T02, deployed Cloudflare Havok, calibrated playable physics, T05, a playable match or human feel."
+          ],
+          "negative_cases": [
+            "No mock/Node/NullEngine/synthetic contacts, positive apex, unrecorded impulse, omitted tuple, truncation, row deduplication or silent partial matrix.",
+            "No automatic restart lift/second shot, hidden force, production coefficient, gameplay config mutation, or reading diagnostic guard as fallback.",
+            "No full JSON in DOM text or one evaluate/IPC response; no final artifact/attachment after failure.",
+            "No trimming tests, reducing tuples/caps, increasing deadlines without reviewed workflow amendment, or fabricating test/run/artifact results."
+          ],
+          "review_questions": [
+            "Are all 24 tuples, provenance identities and exact setup values complete and ordered?",
+            "Does source enforce every native/energy/sweep/workload/material guard before and after each public call?",
+            "Does browser route use actual Babylon Engine/pinned Havok and return only compact status?",
+            "Does the host download path validate the complete artifact within bounded memory, time and encoded-byte limits before named attachment?",
+            "Do exact-head zero-skip CI logs and raw artifact prove only bounded L01 diagnostics?"
+          ],
+          "stop_conditions": [
+            "If any preflight/property/material/provenance guard fails, stop before impulse and produce no success artifact.",
+            "If any work/time/output/physics assertion fails, preserve the failure artifact/logs, abort the matrix, and use the bounded repair procedure; never omit a case.",
+            "If browser download, streaming validation, storage, attachment or 20-minute hosted job cannot satisfy the accepted caps, stop and obtain a separately reviewed workflow amendment before another matrix run.",
+            "If source needs a sixth write path, or the accepted contract/schema is inconsistent with source, stop and split/re-review before proceeding."
+          ]
         },
         {
           "id": "T02-P01",
@@ -3567,6 +3624,13 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-BR02-runtime-diagnosis-1-review.md",
               "detail": "The runtime error occurs before the direct impulse; retry request succeeds after interception removal; no numeric native/expected mass is exposed."
+            },
+            {
+              "command": "Coordinator dependency/evidence integration acceptance",
+              "result": "PASS",
+              "environment": "coordinator-record",
+              "report": "execution_state/reports/T02-BR02-coordinator-acceptance-38145098173.md",
+              "detail": "All original dependencies are ACCEPTED; exact hosted run 38145098173 and both independent dependency/evidence reviews pass. Scope remains diagnostic direct shot/retry only."
             }
           ],
           "acceptance": [
@@ -3588,7 +3652,7 @@
             "If C01-H does not collect the exact spec or dist-dev is unavailable, keep BR02 blocked pending coordinator wiring; do not substitute a broad E2E run.",
             "If browser WebGL/WASM is unavailable, report the exact capability/error and leave this proof blocked."
           ],
-          "status": "CHANGES_REQUIRED",
+          "status": "ACCEPTED",
           "owner": "coordinator; runtime source edits unauthorized pending separate bounded escalation/repair card",
           "author_identity": "/root",
           "reviewer_identity": "/root/br02_review — exact-head run evidence CHANGES_REQUIRED; /root/foundation_review — runtime diagnosis PASS",
@@ -3596,8 +3660,11 @@
           "attempt_count": 4,
           "implementation_report": "execution_state/reports/T02-BR02-implementation-3.md",
           "review_report": "execution_state/reports/T02-BR02-run-38127641051-review.md",
-          "next_action": "Do not accept BR02. Materialize and independently review a new bounded coordinator escalation card for the native mass preflight failure. Confirm exact pinned getter/setter semantics and observed values before changing guard math. Then repair the smallest owned source surface, retain retry teardown assertions, and run a fresh exact-head GitHub browser suite.",
-          "started_at": "2026-10-11"
+          "next_action": "Accepted for the bounded diagnostic browser direct-shot/retry scope only. All original dependencies remain unchanged. Exact hosted run 38145098173 and independent integration review pass; this does not accept parent T02 or gameplay.",
+          "started_at": "2026-10-11",
+          "reports": {
+            "acceptance_report": "execution_state/reports/T02-BR02-coordinator-acceptance-38145098173.md"
+          }
         },
         {
           "id": "T02-BR02-CI-ESCALATION-1",
@@ -3780,6 +3847,22 @@
               "run_id": 38139294487,
               "source_sha": "de455a083c3ba718e439fa47146dc50e1948f512",
               "report": "execution_state/reports/T02-BR02-run-38139294487.md"
+            },
+            {
+              "command": "GitHub Actions full verification and Chromium diagnostic on final integrated formatter source SHA 88c8302c8ce4b0d0217de33419efcb8145c11188",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "github",
+              "run_id": 38145098173,
+              "report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38145098173.md",
+              "detail": "The exact two-file formatter patch remains unchanged in all eight postimages. Full verify, integration, preview and focused diagnostic Chromium 2/2 passed with zero application skips/retries/flakes; initial formatter-only run 38139294487 remains recorded as failed at the pre-existing mass preflight."
+            },
+            {
+              "command": "Independent integrated-patch provenance and run review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-BR02-dependency-resolution-review-38145098173.md",
+              "detail": "Independent review confirmed all eight exact patch postimages at the accepted SHA, the accepted exact-run gates and reviews, and an acyclic dependency edge; this does not accept BR02."
             }
           ],
           "acceptance": [
@@ -3811,12 +3894,14 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-BR02-FORMAT-REPAIR-1-implementation.md",
           "review_report": "execution_state/reports/T02-BR02-FORMAT-REPAIR-1-review.md",
-          "status": "SUPERSEDED",
-          "owner": "coordinator — superseded by the evidence-led BR02 native-mass repair; its exact formatting-only diff remains in source, but its hosted BR02 gate failed at the mass preflight",
+          "status": "ACCEPTED",
+          "owner": "coordinator — accepted for exact formatter artifact and final integrated source after required hosted checks and independent review",
           "author_identity": "/root",
           "reviewer_identity": "/root/run_evidence_review — source diff PASS; /root/br02_review — exact-head runtime review CHANGES_REQUIRED",
-          "next_action": "Closed as SUPERSEDED by T02-BR02-OBSERVED-MASS-PROJECTION-1 to serialize the shared E2E source path. The exact reviewed formatting patch remains in the source base; the successor must re-run the full focused browser gate. This status is not ACCEPTED evidence for BR02/T02.",
-          "started_at": "2026-10-11"
+          "next_action": "Accepted for the exact formatting repair on its final integrated source. Keep original BR02 dependency ID unchanged; coordinator parent evidence integration remains separate.",
+          "started_at": "2026-10-11",
+          "acceptance_report": "execution_state/reports/T02-BR02-FORMAT-REPAIR-1-acceptance.md",
+          "evidence": "The pinned 4,674-byte/two-file formatting patch (SHA-256 442bf7fbfd79a61e1b9982e55cd20a5701801379354ffcc80fb94a171ccfa0d5) was applied verbatim and independently source-reviewed PASS. Its first browser run failed at the pre-existing native mass guard and remains recorded as CHANGES_REQUIRED. The later accepted successor retained all eight patch postimages unchanged on SHA 88c8302c8ce4b0d0217de33419efcb8145c11188; GitHub run 38145098173 then passed required verify/integration/preview/diagnostic Chromium/retry/cleanup/production-exclusion gates with zero application skips/retries/flakes, and independent source/run/postimage reviews passed. Acceptance report: execution_state/reports/T02-BR02-FORMAT-REPAIR-1-acceptance.md. This accepts the formatter card only."
         },
         {
           "id": "T02-BR02-MASS-READBACK-1",
@@ -3978,7 +4063,8 @@
           "title": "Use the observed native mass representation without weakening the guard",
           "role": "worker",
           "depends_on": [
-            "T02-BR02-MASS-READBACK-1"
+            "T02-BR02-MASS-READBACK-1",
+            "T02-BR02-FORMAT-REPAIR-1"
           ],
           "required_parent_acceptance": [
             "T01",
@@ -3986,10 +4072,10 @@
           ],
           "catalogue": "LOCAL_PACKETS.json",
           "ready": true,
-          "status": "RUNNING",
-          "owner": "/root/toolchain_audit — bounded formatting repair attempt 1, exact generated patch only; /root/br02_review — rotated independent patch review",
+          "status": "ACCEPTED",
+          "owner": "coordinator — accepted for diagnostic browser flick/retry scope after exact-head hosted checks and independent review",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/foundation_review — independent source review; /root/br02_review — independent exact-run evidence review",
+          "reviewer_identity": "/root/foundation_review — independent source and exact-run evidence reviews; /root/br02_review — independent hosted-format-patch review",
           "write_paths": [
             "games/counterball/src/simulation/browserDirectProbe.ts",
             "games/counterball/src/simulation/browserDirectProbe.test.ts",
@@ -4000,11 +4086,9 @@
           "implementation_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-implementation.md",
           "source_review_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-source-review.md",
           "review_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-review.md",
-          "evidence": "Source review PASS was completed before run 38144297447. The exact reviewed SHA bb03c75f4d49ad27013d630ee36e3dd76ce1b732 failed hosted Verify only at Prettier on tests/e2e/counterball-direct-probe.spec.ts. Typechecks and ESLint passed; unit tests/build/integration/preview/diagnostic-browser were skipped. The CI-generated 741-byte, one-file formatting patch was retrieved and its SHA/base/one-file scope checked; git apply --stat and --check passed. Exact evidence: execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38144297447.md. Attempt 1 applied that patch verbatim; scoped diff hygiene passed, then /root/br02_review independently confirmed byte-for-byte identity and unchanged timeout/error assertions. No physics run occurred.",
-          "next_action": "Commit and push the reviewed one-file format patch with its attempt/review and exact prior-run evidence records; rerun the full hosted verification and focused one-worker Chromium diagnostic on the resulting exact SHA. Capture actual test counts and all browser/WASM artifacts. Do not run local application checks. If the browser reaches a real error instead of a shot, preserve the exact error/cleanup evidence and keep the card unaccepted.",
-          "supersedes": [
-            "T02-BR02-FORMAT-REPAIR-1"
-          ],
+          "acceptance_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-acceptance.md",
+          "evidence": "Accepted for diagnostic browser flick and retry scope after independent source-review PASS and exact-run evidence-review PASS. GitHub run 38145098173 on exact SHA 88c8302c8ce4b0d0217de33419efcb8145c11188 passed full verify (29 files/163 tests), protocol (12/12), Worker smoke (1/1), disposable PostgreSQL migration/recheck, integration (1/1), ordinary browser preview (4/4), and focused real Chromium diagnostic (2/2, zero skips/retries/flakes). Both browser traces record the pointer flick and post-block retry with button contact, cap/button motion, all 15 bodies settled, changed WebGL pixels, and lifecycle teardown to baseline. Production diagnostic exclusion, browser packaging and dry-run Worker packaging passed. Run artifact inventories and WASM hash were independently verified. Retry artifacts do not separately record successful HTTP status/HAR; no HTTP 200 is claimed. Acceptance report: execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-acceptance.md. This does not accept BR02, T02, deployed Havok, a playable match, AI, online, or social flows.",
+          "next_action": "Accepted for diagnostic browser flick/retry scope after the accepted formatter dependency, exact-head hosted checks and independent review. BR02 coordinator evidence integration is a separate gate; T02 and gameplay remain open.",
           "started_at": "2026-10-11",
           "checks": [
             {
@@ -4054,13 +4138,364 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-format-repair-1-review.md",
               "detail": "Working diff byte-for-byte matches hosted artifact; callback, 30-second timeout, result assertion and subsequent error handling remain unchanged. Runtime NOT RUN."
+            },
+            {
+              "command": "GitHub Actions ci full verification and browser suites on exact SHA 88c8302c8ce4b0d0217de33419efcb8145c11188",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "github",
+              "run_id": 38145098173,
+              "report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38145098173.md",
+              "detail": "35 successful workflow steps, zero failed/cancelled; pnpm verify 29 files/163 tests, protocol 12/12, Worker smoke 1/1, migration/recheck, integration 1/1, production preview 4/4 and focused diagnostic browser 2/2. Application tests had zero skips/retries/flakes; failure-only formatter checks skipped after success. Packaging and production diagnostic exclusion passed."
+            },
+            {
+              "command": "Independent exact-head run/artifact evidence review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-review.md",
+              "detail": "Exact run/SHA, file manifests and hashes, WASM identity, zero-skip Chromium metadata, real contact/movement/pixels/settling, retry and teardown independently checked. A separate successful WASM HTTP status is not present in the retry artifacts and is not claimed."
             }
           ],
-          "latest_run_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38144297447.md",
+          "latest_run_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38145098173.md",
           "repair_source_review_report": "execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-format-repair-1-review.md"
+        },
+        {
+          "id": "T02-L01-GUARD-CONTRACT-1",
+          "status": "ACCEPTED",
+          "ready": false,
+          "role": "coordinator",
+          "title": "Freeze the strict diagnostic restart-loft guard and matrix contract",
+          "owner": "coordinator — exclusive writer for the two canonical contract documents",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/br02_review — reserved for independent exact-source review after implementation",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-CONTRACT-1",
+          "depends_on": [
+            "parent:T01",
+            "C00",
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "T02-D01",
+            "T02-GC01",
+            "T02-GC02",
+            "T02-BR02-OBSERVED-MASS-PROJECTION-1"
+          ],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-review-4.md",
+            "execution_state/reports/T02-runner-design-audit-1.md",
+            "execution_state/reports/T02-calibration-observations-review-1.md",
+            "games/counterball/src/simulation/worldFactory.ts",
+            "games/counterball/src/simulation/placementPose.ts",
+            "games/counterball/src/simulation/sampling.ts",
+            "games/counterball/src/simulation/intendedShotProbe.test.ts",
+            "packages/game-protocol/src/config.ts",
+            "packages/game-protocol/src/types.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "tests/fixtures/counterball-v1.json",
+            ".github/workflows/ci.yml",
+            "playwright.config.ts",
+            "tests/e2e/counterball-direct-probe.spec.ts"
+          ],
+          "write_paths": [
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md"
+          ],
+          "implementation_report": "execution_state/reports/T02-L01-guard-contract-implementation-1.md",
+          "review_report": "execution_state/reports/T02-L01-guard-contract-repair-1-review.md",
+          "acceptance_report": "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+          "attempt_count": 2,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --write-index",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "88 packets and 21 remaining parents; this packet is the only initially ready item. Plan consistency only."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-GUARD-CONTRACT-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact record extracted while READY; all original prerequisites and parent T01 were ACCEPTED. Plan consistency only."
+            },
+            {
+              "command": "git diff --check -- knowledge_base/execution/CONTRACTS.md knowledge_base/execution/completion/CONTRACT_WORK.md",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Scoped document whitespace check passed."
+            },
+            {
+              "command": "Independent exact-source review of the two contract documents",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-contract-implementation-review-1.md",
+              "detail": "All guard semantics passed; canonical CONTRACT_WORK.md example omitted the required Playwright attachment name argument. Runtime, physics, browser, build, unit and app checks NOT RUN."
+            },
+            {
+              "command": "git diff --check -- knowledge_base/execution/CONTRACTS.md knowledge_base/execution/completion/CONTRACT_WORK.md",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Scoped document whitespace check passed after the bounded Playwright attachment-signature repair."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "88 packets and 21 remaining parents; empty initialReady is expected while this packet is in repair/re-review. Plan consistency only."
+            },
+            {
+              "command": "Independent exact-source review after bounded repair 1",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-contract-repair-1-review.md",
+              "detail": "Rotated reviewer verified the complete guard contract and valid pinned Playwright 1.64.0 attachment name/options signature. App/runtime/physics checks NOT RUN."
+            }
+          ],
+          "next_action": "Contract docs accepted. Coordinator may materialize T02-L01-GUARD-PACKET-1 to add the strict schema card and append the new dependencies to T02-L01 while preserving all original dependencies.",
+          "prior_review_reports": [
+            "execution_state/reports/T02-L01-guard-contract-implementation-review-1.md"
+          ],
+          "repair_implementation_report": "execution_state/reports/T02-L01-guard-contract-repair-1-implementation.md",
+          "evidence": "Accepted for strict restart-loft diagnostic contract documentation only after plan consistency, scoped diff hygiene and two independent review passes (the first finding was repaired and re-reviewed). Direct-shot guard/protocol v1/schema-v2 source behavior and physicsCalibration:null are preserved. No source, runtime, browser or physics validation is claimed."
+        },
+        {
+          "id": "T02-L01-GUARD-PACKET-1",
+          "status": "ACCEPTED",
+          "ready": false,
+          "role": "coordinator",
+          "title": "Add the strict L01 schema card and append its prerequisites without changing original dependencies",
+          "owner": "coordinator — exclusive writer for the four assigned catalogue/task/index paths",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/foundation_review — reserved for independent graph/state review after implementation",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-PACKET-1",
+          "depends_on": [
+            "T02-L01-GUARD-CONTRACT-1"
+          ],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+            "knowledge_base/execution/completion/PACKETS.md",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-review-4.md"
+          ],
+          "write_paths": [
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+            "knowledge_base/execution/completion/PACKETS.md",
+            "execution_state/tasks.json"
+          ],
+          "implementation_report": "execution_state/reports/T02-L01-guard-packet-implementation-1.md",
+          "review_report": "execution_state/reports/T02-L01-guard-packet-review-1.md",
+          "acceptance_report": "execution_state/reports/T02-L01-guard-packet-acceptance-1.md",
+          "attempt_count": 0,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-GUARD-PACKET-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact amendment extracted after accepted contract dependency; initialReady contains only this card. Plan consistency only."
+            },
+            {
+              "command": "git diff --check -- knowledge_base/execution/completion/COORDINATOR_PACKETS.json knowledge_base/execution/completion/LOCAL_PACKETS.json knowledge_base/execution/completion/PACKETS.md execution_state/tasks.json",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Scoped control-plane whitespace check passed; Git reported only configured LF-to-CRLF working-copy notices."
+            },
+            {
+              "command": "Independent source review of packet graph and task-state records",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-packet-review-1.md",
+              "detail": "Independent graph/task-state review passed: exact schema/write set, dependency append order, task mirror, status gates, original L01 outcomes, and bounded host artifact route match the accepted amendment. No app/runtime/physics checks."
+            }
+          ],
+          "next_action": "Amendment accepted for control-plane scope. Re-extract T02-L01-GUARD-SCHEMA-1; then implement the exact five protocol/config/fixture paths. T02-L01 remains blocked.",
+          "outputs": [
+            "Coordinator schema card T02-L01-GUARD-SCHEMA-1 with the exact five protocol/config/test/fixture paths and accepted dependency chain.",
+            "T02-L01 catalogue and task state retain the exact original dependency order, with only T02-L01-GUARD-CONTRACT-1 and T02-L01-GUARD-SCHEMA-1 appended.",
+            "Generated PACKETS.md and task catalogue remain graph-consistent; T02-L01 stays BLOCKED until both new prerequisites are ACCEPTED.",
+            "Existing T02-L01 is expanded to the reviewed five-path browser-matrix packet; its original six dependencies remain in exact order, with the two new IDs appended, and all original crossing/contact/settling outcomes are preserved under the strict guard."
+          ],
+          "steps": [
+            "Extract this exact packet with node scripts/check-completion-plan.mjs --packet T02-L01-GUARD-PACKET-1; verify its accepted contract dependency and parent requirements.",
+            "Add exact schema card T02-L01-GUARD-SCHEMA-1 under T02 to COORDINATOR_PACKETS.json. Keep it coordinator-owned with only packages/game-protocol/src/config.ts, types.ts, schemas.ts, protocol.test.ts, and tests/fixtures/counterball-v1.json as its source write paths. Use the exact dependencies in the schema card.",
+            "Update the blocked T02-L01 record in LOCAL_PACKETS.json and its tasks.json mirror: preserve its exact six original dependencies, append contract then schema IDs, add the exact five source paths from proposal 4, and update its read paths/steps/checks/output for real Chromium/Havok plus bounded Playwright-host artifact download. Preserve every original acceptance outcome (full extent crossing, swept clearance, no contact, all-body settling, all cases/integrity) and replace only stale guard/substep wording with the accepted L01 public-call guard. Keep it BLOCKED until both new cards are ACCEPTED.",
+            "Add this packet and schema card to tasks.json under existing parent T02; leave the schema card PLANNED until this amendment is accepted, so its dependency gate alone determines readiness.",
+            "Regenerate PACKETS.md with node scripts/check-completion-plan.mjs --write-index; extract the amendment, schema and amended T02-L01 records and verify exact readiness plus append-only dependency order.",
+            "Run git diff --check only on the four assigned control-plane files. No application source/test/build/browser/physics/deployment command is in this card.",
+            "Write a unique implementation report with before/after dependency arrays and exact output; release all four paths for independent graph/state review."
+          ],
+          "acceptance": [
+            "The amendment packet has only T02-L01-GUARD-CONTRACT-1 as explicit dependency and is parented under T02.",
+            "Schema card T02-L01-GUARD-SCHEMA-1 is coordinator-owned with exactly the five listed source paths, exact schema dependencies, and hosted-only pnpm verify checks.",
+            "T02-L01 keeps the original six dependencies, identity, all original strict crossing/contact/settling/matrix-integrity outcomes and stop conditions; it adds the two dependencies, the exact five paths, the browser matrix route and the bounded file artifact procedure.",
+            "T02-L01 remains BLOCKED pending both new cards. The checker reports only the amendment ready now and the schema card ready only after the amendment is accepted; no matrix starts early.",
+            "The exact plan checker, scoped diff hygiene and independent graph/task-state review pass; no app/runtime/physics check is claimed."
+          ],
+          "review_questions": [
+            "Is the exact schema ID and all five source paths consistent everywhere?",
+            "Are all required accepted dependencies present with parent T01?",
+            "Are the original six L01 dependencies preserved in their exact order, with only the two additions appended?",
+            "Do task status and checker readiness keep schema and matrix appropriately gated?",
+            "Does the amended T02-L01 source packet now own exactly proposal 4's five paths and route the real browser matrix through the bounded host artifact flow while preserving original acceptance outcomes?"
+          ],
+          "stop_conditions": [
+            "If any original T02-L01 field changes beyond the two appended dependency IDs, revert only that accidental edit and investigate before continuing.",
+            "If the five-path schema implementation needs another shared file, split and independently review before source implementation.",
+            "If the plan checker detects a cycle, overlap or premature-ready card, leave all cards unaccepted and repair the control plane.",
+            "If the current L01 source packet cannot be updated without changing an original acceptance outcome or cannot own the five reviewed paths, stop and obtain a separately reviewed packet amendment before source dispatch."
+          ],
+          "evidence": "Accepted only as a control-plane amendment after the exact packet check, scoped diff hygiene, and independent PASS review. No application/runtime/physics evidence is claimed."
+        },
+        {
+          "id": "T02-L01-GUARD-SCHEMA-1",
+          "status": "IMPLEMENTED",
+          "ready": false,
+          "role": "coordinator",
+          "title": "Implement the strict hashed L01 diagnostic guard in the protocol config",
+          "owner": "coordinator — shared protocol/config/fixture source owner after packet amendment acceptance",
+          "author_identity": "coordinator",
+          "reviewer_identity": "/root/br02_review — reserved for independent schema source review after implementation",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-SCHEMA-1",
+          "depends_on": [
+            "parent:T01",
+            "C00",
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "T02-D01",
+            "T02-GC01",
+            "T02-GC02",
+            "T02-BR02-OBSERVED-MASS-PROJECTION-1",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-PACKET-1"
+          ],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-SCHEMA-1",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+            "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
+            "packages/game-protocol/src/config.ts",
+            "packages/game-protocol/src/types.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "packages/game-protocol/src/protocol.test.ts",
+            "tests/fixtures/counterball-v1.json"
+          ],
+          "write_paths": [
+            "packages/game-protocol/src/config.ts",
+            "packages/game-protocol/src/types.ts",
+            "packages/game-protocol/src/schemas.ts",
+            "packages/game-protocol/src/protocol.test.ts",
+            "tests/fixtures/counterball-v1.json"
+          ],
+          "implementation_report": "execution_state/reports/T02-L01-guard-schema-implementation-1.md",
+          "review_report": "execution_state/reports/T02-L01-guard-schema-repair-2-review.md",
+          "acceptance_report": "execution_state/reports/T02-L01-guard-schema-acceptance-1.md",
+          "attempt_count": 2,
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-GUARD-SCHEMA-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact schema card extracted with accepted dependencies; it was the sole initially ready packet. Plan consistency only."
+            },
+            {
+              "command": "git diff --check -- packages/game-protocol/src/config.ts packages/game-protocol/src/types.ts packages/game-protocol/src/schemas.ts packages/game-protocol/src/protocol.test.ts tests/fixtures/counterball-v1.json",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "All five exact source/fixture paths pass whitespace hygiene; no application checks were run locally."
+            },
+            {
+              "command": "Canonical config SHA-256 and updated fixture byte SHA-256 calculations",
+              "result": "PASS",
+              "environment": "local-hash-calculation",
+              "detail": "Config hash bdf08f51dab22c90ba796bccaf6afb849f9c46695d07b2b62330bc52246af808; fixture payload SHA 6ce26e4203017e446687dfd8ad95106ba582f09420f8c623129c7d1bbe6b625d; updated fixture bytes 20276; fixture file SHA e4ede68e3ab82e801fbcd42b03196ded4f0ad81683290e40af7634d914364c35; exactly eight configHash leaves changed."
+            },
+            {
+              "command": "Independent source review of exact five assigned paths",
+              "result": "PENDING",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-schema-review-1.md",
+              "detail": "Read-only check of contract parity, literal type/schema/config, versions, exact fixture changes/hash, exhaustive tests, exports and absence of consumers."
+            },
+            {
+              "command": "Independent source review of exact five assigned paths",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-schema-review-1.md",
+              "detail": "Found that the claimed exhaustive primitive-leaf test omitted the two boolean guard fields; no app/runtime checks ran."
+            },
+            {
+              "command": "git diff --check -- packages/game-protocol/src/protocol.test.ts",
+              "result": "PASS",
+              "environment": "local-document",
+              "repair": 1,
+              "detail": "No whitespace errors in the focused boolean-leaf test-coverage repair."
+            },
+            {
+              "command": "Independent rotated source review of repair 1",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-schema-repair-1-review.md",
+              "detail": "Rotated review confirmed boolean mutation but found the two array path assertions used identity-based toContain; no tests were run."
+            },
+            {
+              "command": "git diff --check -- packages/game-protocol/src/protocol.test.ts",
+              "result": "PASS",
+              "environment": "local-document",
+              "repair": 2,
+              "detail": "No whitespace errors in the focused deep-equality matcher repair."
+            },
+            {
+              "command": "Independent rotated source review of repair 2",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-guard-schema-repair-2-review.md",
+              "detail": "Rotated independent review passed: both booleans are enumerated/toggled and exact array-valued paths use deep equality; per-leaf schema rejection and canonical hash checks remain. No app tests ran."
+            }
+          ],
+          "next_action": "The bounded repair and independent source review pass. Commit only the exact reviewed implementation/control evidence, push the existing branch, then run the focused protocol test and pnpm verify on GitHub; no local application checks.",
+          "evidence": "Schema/config implementation is present on the exact five paths, with config hash bdf08f51dab22c90ba796bccaf6afb849f9c46695d07b2b62330bc52246af808 and post-update fixture byte SHA e4ede68e3ab82e801fbcd42b03196ded4f0ad81683290e40af7634d914364c35. Only document/hash/diff checks ran; source review and hosted tests remain pending. Review 1 finding was corrected by repair 1; rotated repair review 1 found an identity matcher and bounded repair 2 changed only two assertions. The rotated final source review passed. Hosted tests remain pending.",
+          "repair_implementation_report": "execution_state/reports/T02-L01-guard-schema-repair-1-implementation.md",
+          "repair_review_report": "execution_state/reports/T02-L01-guard-schema-repair-2-review.md",
+          "prior_review_reports": [
+            "execution_state/reports/T02-L01-guard-schema-review-1.md"
+          ],
+          "repair_implementation_report_2": "execution_state/reports/T02-L01-guard-schema-repair-2-implementation.md",
+          "repair_review_report_1": "execution_state/reports/T02-L01-guard-schema-repair-1-review.md"
         }
       ],
-      "next_action": "The exact hosted formatting patch is applied and independently reviewed. Coordinator publishes this reviewed source and reruns hosted verify plus the focused real Chromium/WASM suite; retain actual failure/evidence and keep T02/BR02 open until the shot gate passes."
+      "next_action": "T02-L01-GUARD-SCHEMA-1 passes rotated source review after two bounded repairs. Publish the exact reviewed source and run hosted focused protocol tests plus pnpm verify; then independently review exact-head evidence."
     },
     {
       "id": "T03",
@@ -4651,5 +5086,6 @@
       }
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
-  }
+  },
+  "next": "Await rotated independent review of the corrected L01 proposal 2. If it passes, materialize and execute the coordinator-owned hashed guard/schema/packet amendment card under T02, then update the L01 dependency. Do not start a source trial before that card is ACCEPTED."
 }
