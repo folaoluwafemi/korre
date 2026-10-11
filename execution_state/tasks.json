@@ -2727,7 +2727,7 @@
           "title": "Provide stable scene pose update and entity picking API",
           "owner": "/root/foundation_review",
           "author_identity": "/root/foundation_review",
-          "reviewer_identity": "/root/toolchain_audit — independent T02-P01 source reviewer; PASS",
+          "reviewer_identity": "/root/toolchain_audit — initial source PASS; /root/run_evidence_review — repair 1 source PASS",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-P01",
           "depends_on": [
             "parent:T03",
@@ -2750,9 +2750,9 @@
           "outputs": [
             "Stable EntityId-to-PieceAssembly map with coordinator-frozen pose-update and picking signatures."
           ],
-          "implementation_report": "execution_state/reports/T02-P01-implementation.md",
+          "implementation_report": "execution_state/reports/T02-P01-repair-1-implementation.md",
           "review_report": "execution_state/reports/T02-P01-review.md",
-          "attempt_count": 1,
+          "attempt_count": 2,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-P01",
@@ -2766,6 +2766,30 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-P01-review.md",
               "detail": "Frozen API signatures, complete 15-ID validation, atomic pose updates, exact body identity picking, visible-hole ray miss, scene ownership isolation, and focused tests reviewed. Runtime and gameplay not verified."
+            },
+            {
+              "command": "GitHub Actions run 38103925943: pnpm verify",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions",
+              "exit_code": 2,
+              "run_id": 38103925943,
+              "source_sha": "6e3720a3fdf00a2b0b016b48febe758f81a90756",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38103925943",
+              "detail": "Counterball typecheck failed at presentation.test.ts:217 because the intentional unknown-ID case cast away-7 directly to PlaybackTransform; TypeScript TS2352. Lint, unit tests, build, integration and browser checks did not run."
+            },
+            {
+              "command": "T02-P01 repair 1: change invalid-ID fixture to an explicit unknown boundary; preserve assertions",
+              "result": "PASS",
+              "environment": "source-change",
+              "report": "execution_state/reports/T02-P01-repair-1-implementation.md",
+              "detail": "Only presentation.test.ts changed. No local application check ran. Full failed-run logs preserved under execution_state/reports/T02-P01-run-38103925943-hosted-checks/."
+            },
+            {
+              "command": "Independent T02-P01 repair 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-P01-repair-1-review.md",
+              "detail": "Confirmed the explicit unknown boundary is limited to the malformed-ID test fixture, preserves its TypeError and atomicity assertions, and introduces no other source diff. Runtime pending."
             }
           ],
           "implementation_note": "Implement only the frozen exports in CONTRACTS.md: createCounterballPresentation(scene, bodies, config?) returns ReadonlyMap<EntityId, PieceAssembly>; updateCounterballPresentation(registry, readonly PlaybackTransform[]) returns void; pickCounterballEntity(registry, PickingInfo) returns EntityId|null. Use createPieces and PieceAssembly.id/root/bodyMesh. Updates are presentation-only and require exactly one finite transform for all 15 IDs. Resolve picks by registered body-mesh identity; only the body meshes are pickable. Keep button holes visible and do not edit App.tsx, rules, config, contracts, CI, tasks, status, or any other path. Test all 15 IDs, malformed snapshots, quaternion updates, button/cap picking, details/hole misses and scene disposal.",
@@ -2773,10 +2797,10 @@
             "A scene consumer can update every piece from a canonical authoritative snapshot and pick its stable EntityId.",
             "Picking and camera movement do not mutate protocol state or rules."
           ],
-          "next_action": "Independent source review passed. Coordinator is staging only the reviewed implementation/report and shared status changes; run packet checks on the resulting exact GitHub commit, then obtain independent runtime/artifact review."
+          "next_action": "Repair 1 source review passed. Coordinator is sending the exact repaired source to GitHub for package/workspace tests, build, integration and browser checks; obtain an independent exact-head runtime review."
         }
       ],
-      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 source review passed and its exact-head GitHub checks are pending. After runtime review, extract T02-BR01 then coordinator-owned T02-BR02 for the first pointer-triggered browser direct shot. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from the current evidence."
+      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 repair 1 source review passed; exact-head GitHub runtime checks are pending. After acceptance, extract T02-BR01 then coordinator-owned T02-BR02 for the first pointer-triggered browser direct shot. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from the current evidence."
     },
     {
       "id": "T03",

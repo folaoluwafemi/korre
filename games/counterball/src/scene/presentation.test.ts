@@ -214,7 +214,7 @@ describe("Counterball presentation registry", () => {
       const extra = [...transforms, first];
       const unknown = [
         ...transforms.slice(0, -1),
-        { ...first, id: "away-7" } as PlaybackTransform,
+        { ...first, id: "away-7" } as unknown as PlaybackTransform,
       ];
       const nonFinite = transforms.map((transform) =>
         transform.id === first.id
