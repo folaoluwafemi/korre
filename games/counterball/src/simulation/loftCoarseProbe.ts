@@ -477,9 +477,10 @@ function assertSha256(value: unknown, label: string): asserts value is string {
 
 function assertVector(value: unknown, label: string): asserts value is LoftCoarseVec3 {
   assertExactKeys(value, ["x", "y", "z"], label);
-  assertFiniteNumber(value.x, `${label}.x`);
-  assertFiniteNumber(value.y, `${label}.y`);
-  assertFiniteNumber(value.z, `${label}.z`);
+  const vector = value as unknown as LoftCoarseVec3;
+  assertFiniteNumber(vector.x, `${label}.x`);
+  assertFiniteNumber(vector.y, `${label}.y`);
+  assertFiniteNumber(vector.z, `${label}.z`);
 }
 
 function assertQuaternion(
@@ -487,10 +488,11 @@ function assertQuaternion(
   label: string,
 ): asserts value is LoftCoarseQuaternion {
   assertExactKeys(value, ["x", "y", "z", "w"], label);
-  assertFiniteNumber(value.x, `${label}.x`);
-  assertFiniteNumber(value.y, `${label}.y`);
-  assertFiniteNumber(value.z, `${label}.z`);
-  assertFiniteNumber(value.w, `${label}.w`);
+  const quaternion = value as unknown as LoftCoarseQuaternion;
+  assertFiniteNumber(quaternion.x, `${label}.x`);
+  assertFiniteNumber(quaternion.y, `${label}.y`);
+  assertFiniteNumber(quaternion.z, `${label}.z`);
+  assertFiniteNumber(quaternion.w, `${label}.w`);
 }
 
 function assertCanonicalEntityId(
@@ -526,52 +528,54 @@ function assertMaterial(value: unknown, label: string): void {
     ["friction", "staticFriction", "restitution", "frictionCombine", "restitutionCombine"],
     label,
   );
-  assertFiniteNumber(value.friction, `${label}.friction`);
-  assertFiniteNumber(value.staticFriction, `${label}.staticFriction`);
-  assertFiniteNumber(value.restitution, `${label}.restitution`);
-  assertNonemptyString(value.frictionCombine, `${label}.frictionCombine`);
-  assertNonemptyString(value.restitutionCombine, `${label}.restitutionCombine`);
+  const material = value as unknown as LoftCoarseMaterialValues;
+  assertFiniteNumber(material.friction, `${label}.friction`);
+  assertFiniteNumber(material.staticFriction, `${label}.staticFriction`);
+  assertFiniteNumber(material.restitution, `${label}.restitution`);
+  assertNonemptyString(material.frictionCombine, `${label}.frictionCombine`);
+  assertNonemptyString(material.restitutionCombine, `${label}.restitutionCombine`);
   if (
-    value.friction !== guard.materials.friction ||
-    value.staticFriction !== guard.materials.staticFriction ||
-    value.restitution !== guard.materials.restitution ||
-    value.frictionCombine !== guard.materials.frictionCombine ||
-    value.restitutionCombine !== guard.materials.restitutionCombine
+    material.friction !== guard.materials.friction ||
+    material.staticFriction !== guard.materials.staticFriction ||
+    material.restitution !== guard.materials.restitution ||
+    material.frictionCombine !== guard.materials.frictionCombine ||
+    material.restitutionCombine !== guard.materials.restitutionCombine
   ) invalid(`${label} differs from the frozen material policy.`);
 }
 
 function validateMatrixMetadata(value: unknown): asserts value is LoftCoarseMatrixMetadata {
   assertExactKeys(value, matrixIdentityKeys, "Matrix metadata");
-  assertBoundedInteger(value.guardSchemaVersion, 1, 1, "Matrix guardSchemaVersion");
-  assertNonemptyString(value.scope, "Matrix scope");
-  assertNonemptyString(value.matrixId, "Matrix matrixId");
-  assertNonemptyString(value.algorithmVersion, "Matrix algorithmVersion");
-  assertBoundedInteger(value.protocolVersion, 1, 1, "Matrix protocolVersion");
-  assertBoundedInteger(value.configSchemaVersion, 1, 1_000, "Matrix configSchemaVersion");
-  assertNonemptyString(value.configVersion, "Matrix configVersion");
-  assertSha256(value.configHash, "Matrix configHash");
-  assertNonemptyString(value.fixtureId, "Matrix fixtureId");
-  assertSha256(value.fixturePayloadSha256, "Matrix fixturePayloadSha256");
-  assertSha256(value.fixtureFileSha256, "Matrix fixtureFileSha256");
-  assertNonemptyString(value.physicsVersion, "Matrix physicsVersion");
-  assertNonemptyString(value.adapterVersion, "Matrix adapterVersion");
-  assertSha256(value.wasmSha256, "Matrix wasmSha256");
-  assertNonemptyString(value.matchId, "Matrix matchId");
-  assertNonemptyString(value.runtimeIdentity, "Matrix runtimeIdentity");
+  const metadata = value as unknown as LoftCoarseMatrixIdentity;
+  assertBoundedInteger(metadata.guardSchemaVersion, 1, 1, "Matrix guardSchemaVersion");
+  assertNonemptyString(metadata.scope, "Matrix scope");
+  assertNonemptyString(metadata.matrixId, "Matrix matrixId");
+  assertNonemptyString(metadata.algorithmVersion, "Matrix algorithmVersion");
+  assertBoundedInteger(metadata.protocolVersion, 1, 1, "Matrix protocolVersion");
+  assertBoundedInteger(metadata.configSchemaVersion, 1, 1_000, "Matrix configSchemaVersion");
+  assertNonemptyString(metadata.configVersion, "Matrix configVersion");
+  assertSha256(metadata.configHash, "Matrix configHash");
+  assertNonemptyString(metadata.fixtureId, "Matrix fixtureId");
+  assertSha256(metadata.fixturePayloadSha256, "Matrix fixturePayloadSha256");
+  assertSha256(metadata.fixtureFileSha256, "Matrix fixtureFileSha256");
+  assertNonemptyString(metadata.physicsVersion, "Matrix physicsVersion");
+  assertNonemptyString(metadata.adapterVersion, "Matrix adapterVersion");
+  assertSha256(metadata.wasmSha256, "Matrix wasmSha256");
+  assertNonemptyString(metadata.matchId, "Matrix matchId");
+  assertNonemptyString(metadata.runtimeIdentity, "Matrix runtimeIdentity");
   if (
-    value.guardSchemaVersion !== guard.schemaVersion ||
-    value.scope !== guard.scope ||
-    value.matrixId !== guard.matrixId ||
-    value.algorithmVersion !== guard.algorithmVersion ||
-    value.protocolVersion !== guard.protocolVersion ||
-    value.configSchemaVersion !== guard.configSchemaVersion ||
-    value.configVersion !== COUNTERBALL_CONFIG_V1.configVersion ||
-    value.fixtureId !== guard.fixture.id ||
-    value.fixturePayloadSha256 !== guard.fixture.payloadSha256 ||
-    value.physicsVersion !== guard.physicsVersion ||
-    value.adapterVersion !== guard.physicsVersion.slice(guard.physicsVersion.lastIndexOf("/") + 1) ||
-    value.wasmSha256 !== guard.wasmSha256 ||
-    value.matchId !== guard.matchId
+    metadata.guardSchemaVersion !== guard.schemaVersion ||
+    metadata.scope !== guard.scope ||
+    metadata.matrixId !== guard.matrixId ||
+    metadata.algorithmVersion !== guard.algorithmVersion ||
+    metadata.protocolVersion !== guard.protocolVersion ||
+    metadata.configSchemaVersion !== guard.configSchemaVersion ||
+    metadata.configVersion !== COUNTERBALL_CONFIG_V1.configVersion ||
+    metadata.fixtureId !== guard.fixture.id ||
+    metadata.fixturePayloadSha256 !== guard.fixture.payloadSha256 ||
+    metadata.physicsVersion !== guard.physicsVersion ||
+    metadata.adapterVersion !== guard.physicsVersion.slice(guard.physicsVersion.lastIndexOf("/") + 1) ||
+    metadata.wasmSha256 !== guard.wasmSha256 ||
+    metadata.matchId !== guard.matchId
   ) {
     invalid("Matrix metadata does not match the frozen diagnostic guard identity.");
   }
@@ -688,7 +692,7 @@ function validateCaseMetadata(
     const label = `Case ${expectedIndex} staticBodies[${bodyIndex}]`;
     assertExactKeys(body, ["id", "colliderDimensions", "collisionFilter", "material"], label);
     assertNonemptyString(body.id, `${label}.id`);
-    if (body.id !== canonicalStaticBodyIds[bodyIndex]) {
+    if (body.id !== requiredAt(canonicalStaticBodyIds, bodyIndex, `canonical static body ${bodyIndex}`)) {
       invalid(`${label}.id is not the expected goal-frame/support body in canonical order.`);
     }
     if (canonicalEntityIds.includes(body.id as LoftCoarseEntityId) || staticIds.has(body.id)) {
@@ -729,7 +733,11 @@ function validateCaseMetadata(
   metadata.finalBodies.forEach((body, bodyIndex) => {
     const label = `Case ${expectedIndex} finalBodies[${bodyIndex}]`;
     assertExactKeys(body, bodyStateKeys, label);
-    assertBodyState(body, label, canonicalEntityIds[bodyIndex]);
+    assertBodyState(
+      body,
+      label,
+      requiredAt(canonicalEntityIds, bodyIndex, `canonical entity ${bodyIndex}`),
+    );
   });
   validateSettlingWindow(metadata.settlingWindow, expectedIndex);
   assertExactKeys(metadata.eligibility, ["eligible", "reasons"], `Case ${expectedIndex} eligibility`);
@@ -769,52 +777,55 @@ function assertBodyState(
   expectedId: LoftCoarseEntityId,
 ): asserts value is LoftCoarseBodyState {
   assertExactKeys(value, bodyStateKeys, label);
-  assertCanonicalEntityId(value.id, `${label}.id`);
-  if (value.id !== expectedId) invalid(`${label}.id is out of canonical order.`);
-  assertVector(value.position, `${label}.position`);
-  assertQuaternion(value.rotation, `${label}.rotation`);
-  assertVector(value.linearVelocity, `${label}.linearVelocity`);
-  assertVector(value.angularVelocity, `${label}.angularVelocity`);
+  const body = value as unknown as LoftCoarseBodyState;
+  assertCanonicalEntityId(body.id, `${label}.id`);
+  if (body.id !== expectedId) invalid(`${label}.id is out of canonical order.`);
+  assertVector(body.position, `${label}.position`);
+  assertQuaternion(body.rotation, `${label}.rotation`);
+  assertVector(body.linearVelocity, `${label}.linearVelocity`);
+  assertVector(body.angularVelocity, `${label}.angularVelocity`);
 }
 
 function validateSettlingWindow(value: unknown, caseIndex: number): void {
   const label = `Case ${caseIndex} settlingWindow`;
   assertExactKeys(value, ["startTick", "endTick", "linearSpeedThreshold", "angularSpeedThreshold", "ticks"], label);
-  assertBoundedInteger(value.startTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.startTick`);
-  assertBoundedInteger(value.endTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.endTick`);
-  if (value.endTick < value.startTick || value.endTick - value.startTick + 1 !== 60) {
+  const window = value as unknown as LoftCoarseSettlingWindow;
+  assertBoundedInteger(window.startTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.startTick`);
+  assertBoundedInteger(window.endTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.endTick`);
+  if (window.endTick < window.startTick || window.endTick - window.startTick + 1 !== 60) {
     invalid(`${label} must describe the configured 60-tick settling window.`);
   }
-  assertFiniteNumber(value.linearSpeedThreshold, `${label}.linearSpeedThreshold`);
-  assertFiniteNumber(value.angularSpeedThreshold, `${label}.angularSpeedThreshold`);
-  if (value.linearSpeedThreshold <= 0 || value.angularSpeedThreshold <= 0) {
+  assertFiniteNumber(window.linearSpeedThreshold, `${label}.linearSpeedThreshold`);
+  assertFiniteNumber(window.angularSpeedThreshold, `${label}.angularSpeedThreshold`);
+  if (window.linearSpeedThreshold <= 0 || window.angularSpeedThreshold <= 0) {
     invalid(`${label} speed thresholds must be positive.`);
   }
   if (
-    value.linearSpeedThreshold !== COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold ||
-    value.angularSpeedThreshold !== COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold
+    window.linearSpeedThreshold !== COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold ||
+    window.angularSpeedThreshold !== COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold
   ) invalid(`${label} thresholds do not match canonical configuration.`);
-  assertArray(value.ticks, `${label}.ticks`);
-  if (value.ticks.length !== 60) invalid(`${label} must contain all 60 per-tick settling results.`);
-  value.ticks.forEach((tick, tickIndex) => {
+  assertArray(window.ticks, `${label}.ticks`);
+  if (window.ticks.length !== 60) invalid(`${label} must contain all 60 per-tick settling results.`);
+  window.ticks.forEach((tick, tickIndex) => {
     const tickLabel = `${label}.ticks[${tickIndex}]`;
     assertExactKeys(tick, ["tick", "linearSpeeds", "angularSpeeds", "settledMask"], tickLabel);
-    assertBoundedInteger(tick.tick, value.startTick, value.endTick, `${tickLabel}.tick`);
-    if (tick.tick !== value.startTick + tickIndex) invalid(`${tickLabel} is out of tick order.`);
-    assertArray(tick.linearSpeeds, `${tickLabel}.linearSpeeds`);
-    assertArray(tick.angularSpeeds, `${tickLabel}.angularSpeeds`);
+    const settleTick = tick as unknown as LoftCoarseSettleTick;
+    assertBoundedInteger(settleTick.tick, window.startTick, window.endTick, `${tickLabel}.tick`);
+    if (settleTick.tick !== window.startTick + tickIndex) invalid(`${tickLabel} is out of tick order.`);
+    assertArray(settleTick.linearSpeeds, `${tickLabel}.linearSpeeds`);
+    assertArray(settleTick.angularSpeeds, `${tickLabel}.angularSpeeds`);
     if (
-      tick.linearSpeeds.length !== canonicalEntityIds.length ||
-      tick.angularSpeeds.length !== canonicalEntityIds.length
+      settleTick.linearSpeeds.length !== canonicalEntityIds.length ||
+      settleTick.angularSpeeds.length !== canonicalEntityIds.length
     ) invalid(`${tickLabel} must record speeds for all 15 bodies in canonical entity order.`);
-    assertBoundedInteger(tick.settledMask, 0, 0x7fff, `${tickLabel}.settledMask`);
+    assertBoundedInteger(settleTick.settledMask, 0, 0x7fff, `${tickLabel}.settledMask`);
     canonicalEntityIds.forEach((id, bodyIndex) => {
-      const linear = tick.linearSpeeds[bodyIndex];
-      const angular = tick.angularSpeeds[bodyIndex];
+      const linear = settleTick.linearSpeeds[bodyIndex];
+      const angular = settleTick.angularSpeeds[bodyIndex];
       assertNonnegativeFinite(linear, `${tickLabel}.linearSpeeds[${bodyIndex}] (${id})`);
       assertNonnegativeFinite(angular, `${tickLabel}.angularSpeeds[${bodyIndex}] (${id})`);
-      const bitIsSet = (tick.settledMask & (1 << bodyIndex)) !== 0;
-      const expectedSettled = linear <= value.linearSpeedThreshold && angular <= value.angularSpeedThreshold;
+      const bitIsSet = (settleTick.settledMask & (1 << bodyIndex)) !== 0;
+      const expectedSettled = linear <= window.linearSpeedThreshold && angular <= window.angularSpeedThreshold;
       if (bitIsSet !== expectedSettled) invalid(`${tickLabel} settledMask does not match measured speeds.`);
     });
   });
@@ -823,13 +834,14 @@ function validateSettlingWindow(value: unknown, caseIndex: number): void {
 function validateBodyRow(value: unknown, tuple: LoftCoarseTuple, tickIndex: number, bodyIndex: number): void {
   const label = `Body row ${tickIndex * 15 + bodyIndex}`;
   assertExactKeys(value, bodyRowKeys, label);
-  if (!isExactTuple(value.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
-  assertBoundedInteger(value.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
-  if (value.nominalTick !== tickIndex) invalid(`${label} is not in contiguous tick/body order.`);
+  const row = value as unknown as LoftCoarseBodyRow;
+  if (!isExactTuple(row.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
+  assertBoundedInteger(row.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
+  if (row.nominalTick !== tickIndex) invalid(`${label} is not in contiguous tick/body order.`);
   assertBodyState(
-    { id: value.id, position: value.position, rotation: value.rotation, linearVelocity: value.linearVelocity, angularVelocity: value.angularVelocity },
+    { id: row.id, position: row.position, rotation: row.rotation, linearVelocity: row.linearVelocity, angularVelocity: row.angularVelocity },
     label,
-    canonicalEntityIds[bodyIndex],
+    requiredAt(canonicalEntityIds, bodyIndex, `canonical entity ${bodyIndex}`),
   );
 }
 
@@ -842,43 +854,46 @@ function validateContactRow(
 ): void {
   const label = `Contact row ${rowIndex}`;
   assertExactKeys(value, contactRowKeys, label);
-  if (!isExactTuple(value.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
-  assertBoundedInteger(value.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
-  if (value.nominalTick > maximumTick) invalid(`${label} is beyond the recorded body samples.`);
-  assertBoundedInteger(value.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
-  if (!Array.isArray(value.pair) || value.pair.length !== 2) invalid(`${label}.pair must be a canonical entity pair.`);
-  assertCanonicalEntityId(value.pair[0], `${label}.pair[0]`);
-  assertCanonicalEntityId(value.pair[1], `${label}.pair[1]`);
-  const left = canonicalEntityIds.indexOf(value.pair[0]);
-  const right = canonicalEntityIds.indexOf(value.pair[1]);
+  const row = value as unknown as LoftCoarseContactRow;
+  if (!isExactTuple(row.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
+  assertBoundedInteger(row.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
+  if (row.nominalTick > maximumTick) invalid(`${label} is beyond the recorded body samples.`);
+  assertBoundedInteger(row.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
+  if (!Array.isArray(row.pair) || row.pair.length !== 2) invalid(`${label}.pair must be a canonical entity pair.`);
+  assertCanonicalEntityId(row.pair[0], `${label}.pair[0]`);
+  assertCanonicalEntityId(row.pair[1], `${label}.pair[1]`);
+  const left = canonicalEntityIds.indexOf(row.pair[0]);
+  const right = canonicalEntityIds.indexOf(row.pair[1]);
   if (left >= right) invalid(`${label}.pair must be unique and in canonical order.`);
-  assertNonemptyString(value.eventType, `${label}.eventType`);
-  if (encoder.encode(value.eventType).byteLength > artifactCaps.maximumEventTypeBytes) {
+  assertNonemptyString(row.eventType, `${label}.eventType`);
+  if (encoder.encode(row.eventType).byteLength > artifactCaps.maximumEventTypeBytes) {
     invalid(`${label}.eventType exceeds ${artifactCaps.maximumEventTypeBytes} UTF-8 bytes.`);
   }
-  if (value.point !== null) assertVector(value.point, `${label}.point`);
+  if (row.point !== null) assertVector(row.point, `${label}.point`);
 }
 
 function validateExtremum(value: unknown, label: string, calls: number, withBody: boolean): void {
   assertExactKeys(value, withBody ? ["value", "callIndex", "bodyId"] : ["value", "callIndex"], label);
-  assertFiniteNumber(value.value, `${label}.value`);
-  assertBoundedInteger(value.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
-  if (withBody) assertCanonicalEntityId(value.bodyId, `${label}.bodyId`);
+  const extremum = value as unknown as LoftCoarseExtremum & { bodyId?: LoftCoarseEntityId };
+  assertFiniteNumber(extremum.value, `${label}.value`);
+  assertBoundedInteger(extremum.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
+  if (withBody) assertCanonicalEntityId(extremum.bodyId, `${label}.bodyId`);
 }
 
 function validateObstacleClearance(value: unknown, label: string, calls: number): void {
   assertExactKeys(value, ["value", "callIndex", "obstaclePair"], label);
-  assertFiniteNumber(value.value, `${label}.value`);
-  assertBoundedInteger(value.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
-  if (!Array.isArray(value.obstaclePair) || value.obstaclePair.length !== 2) {
+  const clearance = value as unknown as LoftCoarseObstacleClearanceExtremum;
+  assertFiniteNumber(clearance.value, `${label}.value`);
+  assertBoundedInteger(clearance.callIndex, 0, Math.max(0, calls - 1), `${label}.callIndex`);
+  if (!Array.isArray(clearance.obstaclePair) || clearance.obstaclePair.length !== 2) {
     invalid(`${label}.obstaclePair must identify the compared obstacle.`);
   }
-  assertCanonicalEntityId(value.obstaclePair[0], `${label}.obstaclePair[0]`);
-  assertCanonicalEntityId(value.obstaclePair[1], `${label}.obstaclePair[1]`);
-  if (canonicalEntityIds.indexOf(value.obstaclePair[0]) >= canonicalEntityIds.indexOf(value.obstaclePair[1])) {
+  assertCanonicalEntityId(clearance.obstaclePair[0], `${label}.obstaclePair[0]`);
+  assertCanonicalEntityId(clearance.obstaclePair[1], `${label}.obstaclePair[1]`);
+  if (canonicalEntityIds.indexOf(clearance.obstaclePair[0]) >= canonicalEntityIds.indexOf(clearance.obstaclePair[1])) {
     invalid(`${label}.obstaclePair must be in canonical entity order.`);
   }
-  if (value.obstaclePair[0] !== "button" || value.obstaclePair[1] !== "home-1") {
+  if (clearance.obstaclePair[0] !== "button" || clearance.obstaclePair[1] !== "home-1") {
     invalid(`${label}.obstaclePair must identify the button and configured obstacle cap.`);
   }
 }
@@ -886,11 +901,11 @@ function validateObstacleClearance(value: unknown, label: string, calls: number)
 function validateSweepRow(value: unknown, tuple: LoftCoarseTuple, rowIndex: number): number {
   const label = `Sweep row ${rowIndex}`;
   assertExactKeys(value, sweepRowKeys, label);
-  if (!isExactTuple(value.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
-  assertBoundedInteger(value.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
-  if (value.nominalTick !== rowIndex) invalid(`${label} is not in nominal-tick order.`);
-  assertBoundedInteger(value.actualCheckedCallCount, 1, guard.sweep.maximumCallsPerNominalTick, `${label}.actualCheckedCallCount`);
   const row = value as unknown as LoftCoarseSweepRow;
+  if (!isExactTuple(row.tuple, tuple)) invalid(`${label} tuple does not match its case.`);
+  assertBoundedInteger(row.nominalTick, 0, workloadCaps.maximumNominalTicksPerCase, `${label}.nominalTick`);
+  if (row.nominalTick !== rowIndex) invalid(`${label} is not in nominal-tick order.`);
+  assertBoundedInteger(row.actualCheckedCallCount, 1, guard.sweep.maximumCallsPerNominalTick, `${label}.actualCheckedCallCount`);
   validateExtremum(row.maximumShiftedEnergy, `${label}.maximumShiftedEnergy`, row.actualCheckedCallCount, false);
   validateExtremum(row.maximumCandidateRelativeComDrop, `${label}.maximumCandidateRelativeComDrop`, row.actualCheckedCallCount, true);
   validateExtremum(row.minimumApronMargin, `${label}.minimumApronMargin`, row.actualCheckedCallCount, true);
@@ -918,9 +933,9 @@ function validateSweepRow(value: unknown, tuple: LoftCoarseTuple, rowIndex: numb
     rotationSweep < 0 ||
     rotationSweep > guard.sweep.maximumRotationPerCall
   ) invalid(`${label} violates the frozen per-call safety guard.`);
-  assertNonemptyString(value.intervalClassification, `${label}.intervalClassification`);
-  if (encoder.encode(value.intervalClassification).byteLength > 64) invalid(`${label}.intervalClassification exceeds 64 UTF-8 bytes.`);
-  if (value.allFinite !== true || typeof value.all15Settled !== "boolean") {
+  assertNonemptyString(row.intervalClassification, `${label}.intervalClassification`);
+  if (encoder.encode(row.intervalClassification).byteLength > 64) invalid(`${label}.intervalClassification exceeds 64 UTF-8 bytes.`);
+  if (row.allFinite !== true || typeof row.all15Settled !== "boolean") {
     invalid(`${label} must record finite and all-body settling facts.`);
   }
   return row.actualCheckedCallCount;
@@ -1019,8 +1034,8 @@ function* jsonParts(
     invalid("JSON objects cannot contain hidden or symbol keys.");
   }
   yield "{";
-  for (let index = 0; index < keys.length; index += 1) {
-    const key = keys[index];
+  let firstKey = true;
+  for (const key of keys) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
     if (descriptor === undefined || !("value" in descriptor)) {
       invalid("JSON objects cannot contain accessors.");
@@ -1028,7 +1043,8 @@ function* jsonParts(
     if (descriptor.value === undefined) {
       invalid("JSON objects cannot contain undefined values.");
     }
-    if (index > 0) yield ",";
+    if (!firstKey) yield ",";
+    firstKey = false;
     yield* jsonStringParts(key);
     yield ":";
     yield* jsonParts(descriptor.value, ancestors);
@@ -1064,6 +1080,12 @@ function isExactTuple(value: unknown, expected: LoftCoarseTuple): boolean {
 
 function assertArray(value: unknown, label: string): asserts value is unknown[] {
   if (!Array.isArray(value)) invalid(`${label} must be an array.`);
+}
+
+function requiredAt<T>(values: readonly T[], index: number, label: string): T {
+  const value = values[index];
+  if (value === undefined) invalid(`${label} is missing.`);
+  return value;
 }
 
 function assertNonnegativeFinite(
@@ -1155,10 +1177,11 @@ class JsonChunkWriter {
 
 function assertCaseShape(value: unknown): asserts value is LoftCoarseCase {
   assertExactKeys(value, ["metadata", "bodyRows", "contactRows", "sweepRows"], "Case");
-  assertPlainObject(value.metadata, "Case metadata");
-  assertArray(value.bodyRows, "Case bodyRows");
-  assertArray(value.contactRows, "Case contactRows");
-  assertArray(value.sweepRows, "Case sweepRows");
+  const currentCase = value as unknown as LoftCoarseCase;
+  assertPlainObject(currentCase.metadata, "Case metadata");
+  assertArray(currentCase.bodyRows, "Case bodyRows");
+  assertArray(currentCase.contactRows, "Case contactRows");
+  assertArray(currentCase.sweepRows, "Case sweepRows");
 }
 
 async function writeCase(
@@ -1356,12 +1379,13 @@ export async function writeLoftCoarseMatrix({
       if (iterator >= LOFT_COARSE_TUPLES.length) {
         invalid("The matrix contains more than 24 cases.");
       }
+      const expectedTuple = requiredAt(LOFT_COARSE_TUPLES, iterator, "canonical matrix tuple");
       if (iterator > 0) await output.writeText(",");
       const counts = await writeCase(
         output,
         currentCase,
         metadata,
-        LOFT_COARSE_TUPLES[iterator],
+        expectedTuple,
         iterator,
       );
       aggregate.caseCount += 1;

@@ -43,6 +43,12 @@ beforeAll(async () => {
   canonicalConfigHash = await hashCounterballConfig();
 });
 
+function requiredItem<T>(values: readonly T[], index: number, label: string): T {
+  const value = values[index];
+  if (value === undefined) throw new Error(`${label} is missing from the test fixture.`);
+  return value;
+}
+
 function matrixMetadata(
   overrides: Partial<LoftCoarseMatrixMetadata> = {},
 ): LoftCoarseMatrixMetadata {
@@ -162,7 +168,7 @@ function caseMetadata(
   };
   return {
     ...identity,
-    tuple: LOFT_COARSE_TUPLES[index],
+    tuple: requiredItem(LOFT_COARSE_TUPLES, index, `tuple ${index}`),
     matrixIndex: index,
     initialStateHashAlgorithm: guard.setup.initialStateHashAlgorithm,
     initialStateHash: "c".repeat(64),
@@ -286,8 +292,8 @@ function collectingSink(): {
   const aborted: unknown[] = [];
   return {
     sink: {
-      write: (chunk) => chunks.push(new Uint8Array(chunk)),
-      abort: (reason) => aborted.push(reason),
+      write: (chunk) => { chunks.push(new Uint8Array(chunk)); },
+      abort: (reason) => { aborted.push(reason); },
     },
     chunks,
     aborted,
@@ -319,7 +325,7 @@ function countingSink(): {
         bytes += chunk.byteLength;
         largestChunk = Math.max(largestChunk, chunk.byteLength);
       },
-      abort: (reason) => aborted.push(reason),
+      abort: (reason) => { aborted.push(reason); },
     },
     getBytes: () => bytes,
     getLargestChunk: () => largestChunk,
@@ -389,7 +395,7 @@ describe("writeLoftCoarseMatrix", () => {
       },
     });
     expect(first.collected.text()).toContain('"configHash":"');
-    expect(first.result.matrixBytes).toBe(textEncoder.encode(first.collected.text()).byteLength);
+    expect(first.result.matrixBytes).toBe(new TextEncoder().encode(first.collected.text()).byteLength);
     expect(first.result.envelopeBytes).toBeGreaterThan(0);
     expect(first.collected.chunks.every((chunk) => chunk.byteLength <= 256 * 1_024)).toBe(true);
   });
@@ -425,14 +431,16 @@ describe("writeLoftCoarseMatrix", () => {
     const parsed = JSON.parse(first.collected.text()) as {
       cases: Array<{ bodyRows: Array<{ position: { x: number }; angularVelocity: { x: number } }> }>;
     };
-    expect(Object.is(parsed.cases[0].bodyRows[0].position.x, -0.12345678901234568)).toBe(true);
-    expect(Object.is(parsed.cases[0].bodyRows[0].angularVelocity.x, -0)).toBe(true);
+    const firstCase = requiredItem(parsed.cases, 0, "serialized first case");
+    const firstRow = requiredItem(firstCase.bodyRows, 0, "serialized first body row");
+    expect(Object.is(firstRow.position.x, -0.12345678901234568)).toBe(true);
+    expect(Object.is(firstRow.angularVelocity.x, -0)).toBe(true);
   });
 
   it("rejects missing metadata fields, unknown metadata and invalid row shapes", async () => {
     const identity = matrixMetadata();
     const missingMatrixField = { ...identity } as Record<string, unknown>;
-    delete missingMatrixField.fixtureId;
+    delete missingMatrixField["fixtureId"];
     await expect(run({ metadata: missingMatrixField as never })).rejects.toMatchObject({ code: "invalid" });
 
     await expect(run({
@@ -440,7 +448,7 @@ describe("writeLoftCoarseMatrix", () => {
       change: (index, current) => {
         if (index !== 0) return current;
         const metadata = { ...current.metadata } as Record<string, unknown>;
-        delete metadata.initialStateHash;
+        delete metadata["initialStateHash"];
         return { ...current, metadata: metadata as never };
       },
     })).rejects.toMatchObject({ code: "invalid" });
@@ -449,16 +457,19 @@ describe("writeLoftCoarseMatrix", () => {
       metadata: identity,
       change: (index, current) => {
         if (index !== 0) return current;
-        const dynamicBodies = [...current.metadata.dynamicBodies];
-        dynamicBodies[0] = {
-          ...dynamicBodies[0],
-          configuredMassProjection: {
-            configuredMass: dynamicBodies[0].configuredMassProjection.configuredMass,
-            projectedMass: dynamicBodies[0].configuredMassProjection.projectedMass,
-            tolerance: dynamicBodies[0].configuredMassProjection.tolerance,
-            withinTolerance: true,
-          } as never,
-        };
+        const dynamicBodies = current.metadata.dynamicBodies.map((body, bodyIndex) =>
+          bodyIndex === 0
+            ? {
+                ...body,
+                configuredMassProjection: {
+                  configuredMass: body.configuredMassProjection.configuredMass,
+                  projectedMass: body.configuredMassProjection.projectedMass,
+                  tolerance: body.configuredMassProjection.tolerance,
+                  withinTolerance: true,
+                } as never,
+              }
+            : body,
+        );
         return { ...current, metadata: { ...current.metadata, dynamicBodies } };
       },
     })).rejects.toMatchObject({ code: "invalid" });
@@ -484,7 +495,7 @@ describe("writeLoftCoarseMatrix", () => {
     await expect(run({
       metadata: identity,
       change: (index, current) => index === 0
-        ? { ...current, bodyRows: [{ ...current.bodyRows[0], rotation: undefined } as never] }
+        ? { ...current, bodyRows: [{ ...requiredItem(current.bodyRows, 0, "body row"), rotation: undefined } as never] }
         : current,
     })).rejects.toMatchObject({ code: "invalid" });
 
@@ -511,7 +522,7 @@ describe("writeLoftCoarseMatrix", () => {
         ? {
             ...current,
             sweepRows: [{
-              ...current.sweepRows[0],
+              ...requiredItem(current.sweepRows, 0, "sweep row"),
               maximumPointSweep: { value: 0.001, bodyId: "home-0" },
             } as never],
           }
@@ -571,9 +582,13 @@ describe("writeLoftCoarseMatrix", () => {
     await expect(run({ metadata: identity })).rejects.toMatchObject({ code: "resourceLimit" });
     await expect(run({
       metadata: matrixMetadata(),
-      change: (index, current) => index === 0
-        ? { ...current, bodyRows: [{ ...current.bodyRows[0], position: vec3(Number.NaN) }] }
-        : current,
+      change: (index, current) => {
+        if (index !== 0) return current;
+        const bodyRows = current.bodyRows.map((row, rowIndex) =>
+          rowIndex === 0 ? { ...row, position: vec3(Number.NaN) } : row,
+        );
+        return { ...current, bodyRows };
+      },
     })).rejects.toMatchObject({ code: "invalid" });
 
     await expect(run({
@@ -612,10 +627,12 @@ describe("writeLoftCoarseMatrix", () => {
   it("rejects body/contact/sweep count and workload values at limit plus one", async () => {
     const identity = matrixMetadata();
     const maxCase = exactCaseLimits(0, identity);
+    const firstBodyRow = requiredItem(maxCase.bodyRows, 0, "maximum-case body row");
+    const firstSweepRow = requiredItem(maxCase.sweepRows, 0, "maximum-case sweep row");
     await expect(run({
       metadata: identity,
       change: (index, current) => index === 0
-        ? { ...current, bodyRows: [...maxCase.bodyRows, maxCase.bodyRows[0]] }
+        ? { ...current, bodyRows: [...maxCase.bodyRows, firstBodyRow] }
         : current,
     })).rejects.toMatchObject({ code: "resourceLimit" });
     await expect(run({
@@ -627,13 +644,13 @@ describe("writeLoftCoarseMatrix", () => {
     await expect(run({
       metadata: identity,
       change: (index, current) => index === 0
-        ? { ...current, sweepRows: [...maxCase.sweepRows, maxCase.sweepRows[0]] }
+        ? { ...current, sweepRows: [...maxCase.sweepRows, firstSweepRow] }
         : current,
     })).rejects.toMatchObject({ code: "invalid" });
     await expect(run({
       metadata: identity,
       change: (index, current) => index === 0
-        ? { ...current, sweepRows: [...maxCase.sweepRows, maxCase.sweepRows[0], maxCase.sweepRows[0]] }
+        ? { ...current, sweepRows: [...maxCase.sweepRows, firstSweepRow, firstSweepRow] }
         : current,
     })).rejects.toMatchObject({ code: "resourceLimit" });
 
@@ -705,7 +722,7 @@ describe("writeLoftCoarseMatrix", () => {
     controller.abort(new Error("cancel probe"));
     await expect(pending).rejects.toMatchObject({ code: "cancelled" });
     expect(aborted).toHaveLength(1);
-    expect(aborted[0]).toMatchObject({ code: "cancelled" });
+    expect(requiredItem(aborted, 0, "abort reason")).toMatchObject({ code: "cancelled" });
     releaseWrite();
   });
 
