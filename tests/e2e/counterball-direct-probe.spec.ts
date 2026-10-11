@@ -109,10 +109,9 @@ async function flickAndReadTrace(
   const result = page.getByTestId("probe-result");
   const error = page.getByTestId("probe-error");
   await expect
-    .poll(
-      async () => (await result.isVisible()) || (await error.isVisible()),
-      { timeout: 30_000 },
-    )
+    .poll(async () => (await result.isVisible()) || (await error.isVisible()), {
+      timeout: 30_000,
+    })
     .toBe(true);
   if (await error.isVisible()) {
     const errorText = await error.textContent();
