@@ -1,4 +1,3 @@
-import { StandardMaterial } from "@babylonjs/core";
 import { useEffect, useRef, useState } from "react";
 import {
   Engine,
@@ -131,6 +130,27 @@ function countChangedPixels(
   return changed;
 }
 
+function readDiffuseTextureName(material: unknown): string | null {
+  if (
+    typeof material !== "object" ||
+    material === null ||
+    !("diffuseTexture" in material)
+  ) {
+    return null;
+  }
+  const texture = (material as { readonly diffuseTexture?: unknown })
+    .diffuseTexture;
+  if (
+    typeof texture !== "object" ||
+    texture === null ||
+    !("name" in texture)
+  ) {
+    return null;
+  }
+  const name = (texture as { readonly name?: unknown }).name;
+  return typeof name === "string" ? name : null;
+}
+
 function createSceneFacts(
   scene: ReturnType<typeof createCounterballScene>,
   registry: CounterballPieceRegistry,
@@ -141,8 +161,8 @@ function createSceneFacts(
   const ground = scene.getMeshByName("counterball-open-concrete-apron");
   const concreteMaterial = ground?.material;
   const greenConcreteTexture =
-    concreteMaterial instanceof StandardMaterial
-      ? (concreteMaterial.diffuseTexture?.name ?? null)
+    concreteMaterial?.name === "counterball-concrete"
+      ? readDiffuseTextureName(concreteMaterial)
       : null;
   const enclosingWallCount = scene.meshes.filter((mesh) =>
     /(?:^|[- ])wall(?:$|[- ])/i.test(mesh.name),
