@@ -3131,16 +3131,45 @@
               "detail": "Source review verified strict type/schema/config literals, outer/nested version split, wildcard barrel, null calibration, no runtime consumer and all eight exact config hashes; see T02-GC02-review.md."
             },
             {
-              "command": "Exact-head GitHub CI workflow and independent runtime evidence review",
+              "command": "GitHub Actions run 38107741535 exact-head workflow",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "exit_code": 1,
+              "report": "execution_state/reports/T02-GC02-run-38107741535.md",
+              "detail": "Run 38107741535 on exact SHA d6cd2a88a1de8bff25101e9405650f8a0a920b75 passed focused protocol 12/12, Workers smoke 1/1, typechecks, ESLint and migrations twice; pnpm verify stopped at Prettier for packages/game-protocol/src/protocol.test.ts. Unit tests/build, integration, production packaging and Chromium gates were skipped."
+            },
+            {
+              "command": "Apply exact hosted formatting repair 1 and git diff --check",
+              "result": "PASS",
+              "environment": "local-source-only",
+              "report": "execution_state/reports/T02-GC02-repair-1-implementation.md",
+              "detail": "Applied the exact GitHub-provided patch, limited to assigned protocol.test.ts. git apply --check before application and git diff --check after application passed. No app command ran."
+            },
+            {
+              "command": "Independent review of exact hosted formatting repair 1",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-GC02-run-38107741535-format-review.md",
+              "detail": "Reviewer compared the unapplied exact hosted patch with the base file, confirmed all test cases/assertions were preserved, and passed git apply --check. The applied diff came from that exact patch."
+            },
+            {
+              "command": "Independent exact-run evidence review for GitHub run 38107741535",
+              "result": "PASS",
+              "environment": "evidence-review",
+              "report": "execution_state/reports/T02-GC02-run-38107741535-review.md",
+              "detail": "Reviewer verified exact SHA/run provenance, focused protocol 12/12, Workers smoke 1/1, migrations, Prettier failure, 13 skipped workflow steps, and the patch's limited formatting-only scope."
+            },
+            {
+              "command": "Exact-head GitHub CI workflow after formatting repair 1 and independent run review",
               "result": "PENDING",
               "environment": "github"
             }
           ],
           "implementation_note": "Coordinator owns all five coupled protocol/config/hash paths. Do not add runtime consumers. No local application checks are allowed; source review precedes exact-head GitHub verification.",
-          "next_action": "Independent source review PASS. Coordinator owns exact reviewed-tree commit/push and full GitHub CI. Wait for exact-SHA hosted run and independent runtime evidence review before acceptance."
+          "next_action": "Commit/push the reviewed formatting-only source repair, then run full exact-head GitHub verification and independent exact-run review. Do not accept GC02 unless all required suites complete without skips."
         }
       ],
-      "next_action": "T02-GC02 source review PASS; coordinator is publishing this exact source tree for full hosted protocol, verify, integration, production and Chromium checks. No runtime consumer or swept-step support is implemented. BR01/L01 remain blocked."
+      "next_action": "T02-GC02 formatting repair 1 is applied and independently reviewed. Commit/push it and rerun full hosted verification. Runtime guard enforcement and swept-step support remain absent; BR01/L01 remain blocked."
     },
     {
       "id": "T03",

@@ -361,82 +361,79 @@ describe("Counterball v1 protocol", () => {
     expect(configHash).toBe(fixture.versions.configHash);
   });
 
-  it(
-    "accepts only the fixed diagnostic guard and hashes it separately from calibration",
-    async () => {
-      const guard = COUNTERBALL_CONFIG_V1.diagnosticGuard;
-      expect(
-        CounterballConfigSchema.parse(COUNTERBALL_CONFIG_V1).diagnosticGuard,
-      ).toEqual(guard);
+  it("accepts only the fixed diagnostic guard and hashes it separately from calibration", async () => {
+    const guard = COUNTERBALL_CONFIG_V1.diagnosticGuard;
+    expect(
+      CounterballConfigSchema.parse(COUNTERBALL_CONFIG_V1).diagnosticGuard,
+    ).toEqual(guard);
 
-      const invalidGuards: unknown[] = [
-        { ...guard, scope: "generic-impulse" },
-        { ...guard, fixtureId: "other-fixture" },
-        { ...guard, matchId: "00000000-0000-4000-8000-000000000002" },
-        { ...guard, capId: "away-6" },
-        { ...guard, impulse: { ...guard.impulse, z: 9 } },
-        {
-          ...guard,
-          applicationPoint: { ...guard.applicationPoint, y: 0.061 },
+    const invalidGuards: unknown[] = [
+      { ...guard, scope: "generic-impulse" },
+      { ...guard, fixtureId: "other-fixture" },
+      { ...guard, matchId: "00000000-0000-4000-8000-000000000002" },
+      { ...guard, capId: "away-6" },
+      { ...guard, impulse: { ...guard.impulse, z: 9 } },
+      {
+        ...guard,
+        applicationPoint: { ...guard.applicationPoint, y: 0.061 },
+      },
+      { ...guard, maxMechanicalEnergy: 35 },
+      { ...guard, maxRestHeightDrop: 0.012 },
+      { ...guard, supportApronMargin: 324 },
+      {
+        ...guard,
+        tunnelling: { ...guard.tunnelling, maxPointSweepPerSubstep: 0.012 },
+      },
+      {
+        ...guard,
+        tunnelling: {
+          ...guard.tunnelling,
+          maxRotationPerSubstep: Math.PI / 4,
         },
-        { ...guard, maxMechanicalEnergy: 35 },
-        { ...guard, maxRestHeightDrop: 0.012 },
-        { ...guard, supportApronMargin: 324 },
-        {
-          ...guard,
-          tunnelling: { ...guard.tunnelling, maxPointSweepPerSubstep: 0.012 },
-        },
-        {
-          ...guard,
-          tunnelling: {
-            ...guard.tunnelling,
-            maxRotationPerSubstep: Math.PI / 4,
-          },
-        },
-        {
-          ...guard,
-          tunnelling: { ...guard.tunnelling, maxSubstepsPerTick: 47 },
-        },
-        {
-          ...guard,
-          workload: { ...guard.workload, maxTotalSubsteps: 86_399 },
-        },
-        {
-          ...guard,
-          workload: { ...guard.workload, maxBatchSubsteps: 119 },
-        },
-        {
-          ...guard,
-          workload: { ...guard.workload, maxWallTimeMs: 29_999 },
-        },
-        { ...guard, unexpected: true },
-        { ...guard, tunnelling: { ...guard.tunnelling, unexpected: true } },
-      ];
+      },
+      {
+        ...guard,
+        tunnelling: { ...guard.tunnelling, maxSubstepsPerTick: 47 },
+      },
+      {
+        ...guard,
+        workload: { ...guard.workload, maxTotalSubsteps: 86_399 },
+      },
+      {
+        ...guard,
+        workload: { ...guard.workload, maxBatchSubsteps: 119 },
+      },
+      {
+        ...guard,
+        workload: { ...guard.workload, maxWallTimeMs: 29_999 },
+      },
+      { ...guard, unexpected: true },
+      { ...guard, tunnelling: { ...guard.tunnelling, unexpected: true } },
+    ];
 
-      for (const diagnosticGuard of invalidGuards) {
-        expect(
-          CounterballConfigSchema.safeParse({
-            ...COUNTERBALL_CONFIG_V1,
-            diagnosticGuard,
-          }).success,
-        ).toBe(false);
-      }
-
+    for (const diagnosticGuard of invalidGuards) {
       expect(
         CounterballConfigSchema.safeParse({
           ...COUNTERBALL_CONFIG_V1,
-          diagnosticGuard: null,
+          diagnosticGuard,
         }).success,
       ).toBe(false);
-      expect(COUNTERBALL_CONFIG_V1.physicsCalibration).toBeNull();
-      expect(
-        await hashCanonicalJson({
-          ...COUNTERBALL_CONFIG_V1,
-          diagnosticGuard: { ...guard, maxMechanicalEnergy: 35 },
-        }),
-      ).not.toBe(await hashCanonicalJson(COUNTERBALL_CONFIG_V1));
-    },
-  );
+    }
+
+    expect(
+      CounterballConfigSchema.safeParse({
+        ...COUNTERBALL_CONFIG_V1,
+        diagnosticGuard: null,
+      }).success,
+    ).toBe(false);
+    expect(COUNTERBALL_CONFIG_V1.physicsCalibration).toBeNull();
+    expect(
+      await hashCanonicalJson({
+        ...COUNTERBALL_CONFIG_V1,
+        diagnosticGuard: { ...guard, maxMechanicalEnergy: 35 },
+      }),
+    ).not.toBe(await hashCanonicalJson(COUNTERBALL_CONFIG_V1));
+  });
 
   it("validates the nullable versioned calibration without changing null fixtures", async () => {
     const calibration = createPhysicsCalibration();
