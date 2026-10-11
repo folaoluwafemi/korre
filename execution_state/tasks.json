@@ -2908,9 +2908,9 @@
           "status": "RUNNING",
           "role": "worker",
           "title": "Expose a bounded browser-WASM direct-shot diagnostic",
-          "owner": "/root/foundation_review — attempt 6 bounded ESLint repair; hosted run 38124420406 passed typecheck and failed lint",
-          "author_identity": "/root/foundation_review — attempt 6 bounded lint repair",
-          "reviewer_identity": "/root/swarm_review — rotated attempt-6 independent source review pending",
+          "owner": "/root/foundation_review — attempt 7 exact hosted-formatting patch repair; hosted run 38124854990 failed Prettier only",
+          "author_identity": "/root/foundation_review — attempt 7 exact formatting patch",
+          "reviewer_identity": "/root/run_evidence_review — rotated attempt-7 independent source review PASS",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-BR01",
           "depends_on": [
             "T02-D01",
@@ -2940,15 +2940,15 @@
             "games/counterball/src/simulation/browserDirectProbe.ts",
             "games/counterball/src/simulation/browserDirectProbe.test.ts",
             "games/counterball/src/browser.ts",
-            "execution_state/reports/T02-BR01-implementation-6.md"
+            "execution_state/reports/T02-BR01-implementation-7.md"
           ],
           "outputs": [
             "A browser-only diagnostic entry that creates the existing canonical fixture through worldFactory and pinned Havok/WASM, applies exactly one accepted D01 measured direct-impulse candidate, advances a bounded real simulation, and returns serializable transforms, contacts and typed termination.",
             "No production default power mapping or playable route; this diagnostic can only be invoked by the explicit diagnostic build."
           ],
-          "implementation_report": "execution_state/reports/T02-BR01-implementation-6.md",
-          "review_report": "execution_state/reports/T02-BR01-source-review-6.md",
-          "attempt_count": 6,
+          "implementation_report": "execution_state/reports/T02-BR01-implementation-7.md",
+          "review_report": "execution_state/reports/T02-BR01-source-review-7.md",
+          "attempt_count": 7,
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-BR01",
@@ -3073,6 +3073,34 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-BR01-source-review-6.md",
               "detail": "Rotated reviewer passed the four exact lint repairs and confirmed guards, observer behavior, APIs and cleanup remain unchanged. RUNTIME NOT RUN; all new exact-head application checks remain pending."
+            },
+            {
+              "command": "GitHub CI exact-head run 38124854990",
+              "result": "FAIL",
+              "environment": "github",
+              "report": "execution_state/reports/T02-BR01-run-38124854990.md",
+              "detail": "Exact SHA 30c0c3e94c417948766dd306d293de7c959b00c3 passed typechecks and ESLint; Prettier failed on only browserDirectProbe.ts. Worker smoke 1/1 and protocol 12/12 passed with no test skips; 23 workflow steps succeeded, 1 failed, 13 skipped. Counterball/workspace tests, builds, integration, preview and diagnostic browser did not run."
+            },
+            {
+              "command": "Independent evidence review for GitHub run 38124854990",
+              "result": "PASS",
+              "environment": "evidence-review",
+              "report": "execution_state/reports/T02-BR01-run-38124854990-review.md",
+              "detail": "Reviewer confirmed exact run/SHA, typecheck and ESLint pass, Prettier-only failure, workflow/test counts, artifact hashes and the exact one-file formatting patch. No runtime/flick evidence."
+            },
+            {
+              "command": "T02-BR01 attempt 7 exact formatting-patch implementation and hygiene",
+              "result": "PASS",
+              "environment": "local-source-only",
+              "report": "execution_state/reports/T02-BR01-implementation-7.md",
+              "detail": "Applied the uploaded one-file formatting patch unchanged after `git apply --check`; exact packet extraction and scoped git diff --check passed. No local application checks ran."
+            },
+            {
+              "command": "T02-BR01 attempt 7 rotated independent source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-BR01-source-review-7.md",
+              "detail": "Reviewer confirmed the source diff matches the hosted formatting patch exactly and changes no behavior. RUNTIME NOT RUN; hosted formatting and full checks remain pending."
             }
           ],
           "implementation_note": "Expose runBrowserDirectProbe(engine: AbstractEngine, options?: SimulationRunOptions): Promise<BrowserDirectProbeResult> only from @korre/counterball/browser; keep its result local to this diagnostic, not a wire/event type or production ShotSimulation. Use only accepted D01 key impulse=8|aim=straight-at-button: home-6, raw impulse {x:0,y:0,z:8}, at {x:0,y:0.06,z:-4}; never alter it or map player power. Use accepted COUNTERBALL_CONFIG_V1.diagnosticGuard only for diagnostic enforcement; physicsCalibration stays null and is never a fallback. Derive actual Havok substeps, bounds, batch count, host yield, cancellation, output limits and wall-time from that hashed guard and C00, and report each actual call. Read back active pinned-Havok mass/inertia and use only canonical worldFactory geometry. Enforce full-collider support/apron and finite/energy/sweep bounds each actual substep. Fixed-orientation shape casts are not a rotational sweep proof: use a reviewer-verifiable conservative envelope or stop before writing/running if the full interval cannot be bounded. Keep playback sampling at the accepted 30-Hz sampler, capture serializable transforms/actual contacts and typed termination; fail closed on any missing fact, rejected premise, guard violation, timeout, cancellation, non-finite body or workload/output limit. Remove observers and dispose the owned world in all outcomes; never dispose the caller Engine. Do not add private limits, coefficients, fixture/config/contract edits, Node adapter/mock, UI/E2E change, hidden lift, gameplay route or calibration claim. If any accepted bound cannot be enforced, write the stop report and do not apply the impulse.",
@@ -3081,7 +3109,7 @@
             "Returned observations include actual transforms, contacts and typed termination; any missing fact, timeout, wall limit or C00 guard violation fails the diagnostic.",
             "The card does not claim a browser movement pass or accept T02/T05; BR02 performs actual Chromium interaction/render proof."
           ],
-          "next_action": "Run 38124420406 passed typecheck but failed four lint rules. Attempt 6 bounded repair, exact packet extraction, source hygiene and rotated independent source review passed; RUNTIME NOT RUN. Keep status RUNNING. Coordinator should commit and push the reviewed source with exact run/report/status evidence, then run a new exact-head package test, typecheck and full verification. No BR01 runtime, browser flick, or gameplay acceptance yet; preserve original dependencies and accept only after actual hosted checks and review."
+          "next_action": "Run 38124854990 passed typecheck and ESLint but failed Prettier on browserDirectProbe.ts. Attempt 7 applied the exact uploaded formatting patch; packet extraction, scoped source hygiene and rotated independent source review passed. Runtime remains NOT RUN. Keep status RUNNING; coordinator should commit/push the reviewed source with exact run/report/status evidence, then run a new exact-head package test, typecheck and full verification. No BR01 runtime, browser flick, or gameplay acceptance yet; preserve original dependencies and accept only after actual hosted checks and review."
         },
         {
           "id": "T02-GA01",
@@ -3297,7 +3325,7 @@
           "next_action": "Accepted for strict protocol/config/schema/hash-fixture scope only. Runtime guard enforcement, full-collider swept support, calibrated physics, the first browser flick, playable local match, and deployed Havok remain open. Proceed only to the next exact catalogue card whose recorded dependencies are ACCEPTED; preserve the stop condition when the configured guard cannot be enforced."
         }
       ],
-      "next_action": "T02-BR01 attempt 5 resolved typecheck but exact-head run 38124420406 failed four lint rules. Attempt 6 bounded source repair, packet extraction, source hygiene and rotated source review passed; runtime remains NOT RUN. Keep the card RUNNING. Commit and push the reviewed source, then run a new exact-head hosted package test, typecheck and full verification. The first Chromium flick and deployed Havok proof remain unproven; local match, username-gated AI, online and social flows remain incomplete. Preserve all accepted predecessors and unblock only on explicit ACCEPTED dependencies."
+      "next_action": "T02-BR01 attempt 6 passed lint but exact-head run 38124854990 failed Prettier on only browserDirectProbe.ts. Attempt 7 applied the exact uploaded formatting patch; packet extraction, source hygiene and rotated source review passed. Runtime remains NOT RUN. Keep the card RUNNING. Commit and push the reviewed patch, then run a new exact-head hosted package test, typecheck and full verification. The first Chromium flick and deployed Havok proof remain unproven; local match, username-gated AI, online and social flows remain incomplete. Preserve all accepted predecessors and unblock only on explicit ACCEPTED dependencies."
     },
     {
       "id": "T03",

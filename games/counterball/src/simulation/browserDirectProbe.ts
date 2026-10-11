@@ -589,10 +589,7 @@ function diagnosticError(
 function hasSimulationErrorCode(error: unknown): error is SimulationError {
   if (!(error instanceof Error)) return false;
   const code = (error as Partial<SimulationError>).code;
-  return (
-    typeof code === "string" &&
-    simulationErrorCodes.has(code)
-  );
+  return typeof code === "string" && simulationErrorCodes.has(code);
 }
 
 /** Converts untyped failures at a known boundary while preserving typed failures. */
