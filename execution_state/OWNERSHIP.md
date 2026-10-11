@@ -284,3 +284,9 @@ Hosted formatting repair 1 is assigned to `/root/toolchain_audit`, with `/root/b
 Hosted formatting implementation report is saved at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-implementation.md`; `/root/toolchain_audit` released both source paths. `/root/br02_review` owns only `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-review.md`; coordinator retains status and hosted-run integration.
 
 Hosted formatting repair 1 source review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-format-repair-1-review.md`. `/root/toolchain_audit` and `/root/br02_review` have released their paths. `/root` owns exact-head GitHub verification and shared status.
+
+Hosted timeout repair 1 is assigned to `/root/toolchain_audit`, with `/root/foundation_review` as rotated independent reviewer. Author may write only `games/counterball/src/simulation/loftCoarseProbe.test.ts` and its implementation report; reviewer may write only the specified review report. Preserve the exact 24-case caps and every assertion; change only the narrow timeout or use an evidence-backed semantics-preserving optimization. No local application checks.
+
+The timeout repair implementation report is `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-implementation.md`; `/root/toolchain_audit` released the test path. `/root/foundation_review` owns only `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-review.md`. Coordinator retains task state and exact-head verification.
+
+Timeout repair 1 source review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-review.md`; `/root/toolchain_audit` and `/root/foundation_review` released their paths. `/root` owns exact-head verification and shared status.

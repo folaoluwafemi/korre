@@ -796,7 +796,7 @@ describe("writeLoftCoarseMatrix", () => {
       guard.artifact.maximumMatrixBytes,
     );
     expect(counted.getLargestChunk()).toBeLessThanOrEqual(256 * 1_024);
-  });
+  }, 180_000);
 
   it("rejects body/contact/sweep count and workload values at limit plus one", async () => {
     const identity = matrixMetadata();
