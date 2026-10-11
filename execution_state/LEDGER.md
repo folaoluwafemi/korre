@@ -344,3 +344,14 @@ The run 38154941084 full verify failure is recorded in `execution_state/reports/
 
 
 The bounded lint repair passed rotated source review at `execution_state/reports/T02-L01-guard-schema-lint-repair-1-review.md`. The repair only narrows array callback entries to `readonly unknown[]`; no application checks ran during review. Coordinator may publish the exact reviewed source and collect the next GitHub run.
+
+
+## Coordinator checkpoint — schema hosted run 38155542248 failed at formatting
+
+Run [38155542248](https://github.com/folaoluwafemi/korre/actions/runs/38155542248) on `db8436e02f98a7007a9be0f4708dc552f651ef4d` completed hosted typechecks, ESLint, migration checks, and the focused game-protocol step, then failed Prettier only in `packages/game-protocol/src/schemas.ts`. Unit/build/integration/browser stages were not reached; this is not schema acceptance. Run record: `execution_state/reports/T02-L01-guard-schema-run-38155542248.md`. Coordinator applied only the GitHub formatting suggestion to that one path; local patch-apply and diff-hygiene checks passed. Formatting attempt 1 of 2 is under rotated source review at `execution_state/reports/T02-L01-guard-schema-format-repair-1-review.md`; `/root/foundation_review` independently owns run evidence review.
+
+
+The rotated source review of the bounded formatting repair passed at `execution_state/reports/T02-L01-guard-schema-format-repair-1-review.md`. The exact two hosted Prettier tuple-layout changes are limited to `packages/game-protocol/src/schemas.ts`; no schema values or order changed and review ran no tests. Exact-run evidence review remains pending before publication.
+
+
+Independent exact-run review of [38155542248](https://github.com/folaoluwafemi/korre/actions/runs/38155542248) is saved at `execution_state/reports/T02-L01-guard-schema-run-38155542248-independent-review.md`: exact SHA, attempt and four artifacts match; focused protocol passed 13/13 and Worker smoke 1/1, both zero-skip, but verify failed at Prettier. Unit tests, builds, integration, built-preview and diagnostic browser checks were not reached. No L01/Havok/playability evidence resulted. The source-only formatting repair independently passed; coordinator may publish and rerun but cannot accept the card from this failed run.

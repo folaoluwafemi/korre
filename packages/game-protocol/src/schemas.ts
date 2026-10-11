@@ -120,11 +120,7 @@ const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
       gapOffsets: z.tuple([z.literal(0.75), z.literal(1)]),
       tiltDegrees: z.tuple([z.literal(45), z.literal(60)]),
       impulseMagnitudes: z.tuple([z.literal(6), z.literal(8)]),
-      azimuthDegrees: z.tuple([
-        z.literal(-15),
-        z.literal(0),
-        z.literal(15),
-      ]),
+      azimuthDegrees: z.tuple([z.literal(-15), z.literal(0), z.literal(15)]),
       nestedAxisOrder: z.tuple([
         z.literal("gap"),
         z.literal("tilt"),
@@ -153,11 +149,7 @@ const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
       initialStateHashAlgorithm: z.literal("hashCanonicalJson-v1"),
       capsIdentityRotation: z.literal(true),
       allDynamicVelocitiesZero: z.literal(true),
-      impulseDirection: z.tuple([
-        z.literal(0),
-        z.literal(0),
-        z.literal(1),
-      ]),
+      impulseDirection: z.tuple([z.literal(0), z.literal(0), z.literal(1)]),
       impulseApplicationPoint: z.literal("actual-native-world-COM"),
       supportApronMargin: z.literal(325),
     }),
