@@ -3,12 +3,20 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./browser": "./src/browser.ts",
-    "./headless": "./src/headless.ts"
+    "./browser": {
+      "types": "./src/browser.ts",
+      "import": "./src/browser.ts",
+      "default": "./src/browser.ts"
+    },
+    "./headless": {
+      "types": "./src/headless.ts",
+      "import": "./src/headless.ts",
+      "default": "./src/headless.ts"
+    }
   },
   "scripts": {
     "test": "vitest run --root ../.. --config vitest.config.ts games/counterball/src",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "node --input-type=module -e \"for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }\" && tsc --noEmit -p tsconfig.json",
     "build": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
