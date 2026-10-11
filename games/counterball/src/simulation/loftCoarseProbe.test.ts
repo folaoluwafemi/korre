@@ -761,18 +761,17 @@ describe("writeLoftCoarseMatrix", () => {
 
     expect(
       canonicalizeLoftCoarseContactPair("button", "support-apron"),
-    ).toEqual(
-      canonicalizeLoftCoarseContactPair("support-apron", "button"),
-    );
+    ).toEqual(canonicalizeLoftCoarseContactPair("support-apron", "button"));
 
     expect(
       canonicalizeLoftCoarseContactPair("support-apron", "goal-frame-5"),
     ).toEqual(["goal-frame-5", "support-apron"]);
 
     for (const staticId of staticIds) {
-      expect(
-        canonicalizeLoftCoarseContactPair("home-6", staticId),
-      ).toEqual(["home-6", staticId]);
+      expect(canonicalizeLoftCoarseContactPair("home-6", staticId)).toEqual([
+        "home-6",
+        staticId,
+      ]);
     }
   });
 
@@ -832,9 +831,11 @@ describe("writeLoftCoarseMatrix", () => {
       ["button", "support-apron"],
       ["goal-frame-5", "support-apron"],
     ]);
-    expect(firstCase.contactRows.slice(7).map((row) => row.eventType)).toEqual(
-      ["first-orientation", "second-orientation", "static-static"],
-    );
+    expect(firstCase.contactRows.slice(7).map((row) => row.eventType)).toEqual([
+      "first-orientation",
+      "second-orientation",
+      "static-static",
+    ]);
     expect(result.result.contactRows).toBe(10);
   });
 
@@ -851,9 +852,9 @@ describe("writeLoftCoarseMatrix", () => {
         "button",
       ),
     ).toThrow(/canonical contact body id/);
-    expect(() =>
-      canonicalizeLoftCoarseContactPair("button", "button"),
-    ).toThrow(/endpoints must be distinct/);
+    expect(() => canonicalizeLoftCoarseContactPair("button", "button")).toThrow(
+      /endpoints must be distinct/,
+    );
 
     const identity = matrixMetadata();
     const invalidPairs = [

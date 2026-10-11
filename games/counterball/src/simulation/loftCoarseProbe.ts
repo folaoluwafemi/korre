@@ -54,8 +54,7 @@ export type LoftCoarseStaticBodyId =
   | "support-apron";
 
 export type LoftCoarseContactBodyId =
-  | LoftCoarseEntityId
-  | LoftCoarseStaticBodyId;
+  LoftCoarseEntityId | LoftCoarseStaticBodyId;
 
 export type LoftCoarseVec3 = Readonly<{ x: number; y: number; z: number }>;
 export type LoftCoarseQuaternion = Readonly<{
@@ -289,8 +288,8 @@ const canonicalEntityIds: readonly LoftCoarseEntityId[] = Object.freeze([
   "away-5",
   "away-6",
 ]);
-const canonicalStaticBodyIds: readonly LoftCoarseStaticBodyId[] =
-  Object.freeze([
+const canonicalStaticBodyIds: readonly LoftCoarseStaticBodyId[] = Object.freeze(
+  [
     "goal-frame-0",
     "goal-frame-1",
     "goal-frame-2",
@@ -298,7 +297,8 @@ const canonicalStaticBodyIds: readonly LoftCoarseStaticBodyId[] =
     "goal-frame-4",
     "goal-frame-5",
     "support-apron",
-  ]);
+  ],
+);
 const canonicalContactBodyIds: readonly LoftCoarseContactBodyId[] =
   Object.freeze([...canonicalEntityIds, ...canonicalStaticBodyIds]);
 
