@@ -3186,6 +3186,99 @@
     ]
   },
   {
+    "id": "T02-L01-CONTACT-SCHEMA-1",
+    "parent": "T02",
+    "title": "Represent dynamic and static L01 contact participants",
+    "role": "worker",
+    "depends_on": [
+      "T02-L01-CONTACT-CONTRACT-1",
+      "T02-L01-CONTACT-STATUS-1",
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1",
+      "T02-L01-PACKET-SPLIT-1",
+      "T02-L01-ARTIFACT-1"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/README.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-CONTACT-SCHEMA-1",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-EXECUTOR-1-implementation.md",
+      "execution_state/reports/T02-L01-EXECUTOR-1-blocker-review.md",
+      "execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review.md",
+      "execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review-2.md",
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "games/counterball/src/simulation/worldFactory.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+    ],
+    "outputs": [
+      "A distinct `LoftCoarseStaticBodyId` and `LoftCoarseContactBodyId` represent the seven stable artifact-only static IDs without changing `LoftCoarseEntityId` or protocol `EntityId`.",
+      "A canonical contact-pair helper orders all 15 existing dynamic IDs first, then `goal-frame-0` through `goal-frame-5` and `support-apron`; it rejects unknown or identical endpoints and normalizes either callback orientation to one pair.",
+      "The serializer validates and preserves dynamic-dynamic, dynamic-static and static-static callback rows in original occurrence order, including repeated/symmetric notifications, under the existing exact row/count/byte caps."
+    ],
+    "steps": [
+      "Keep existing dynamic IDs and their exact canonical order; define the static participant union from the seven existing metadata IDs in the exact order `goal-frame-0` … `goal-frame-5`, `support-apron`.",
+      "Add an exported typed canonicalization helper for two contact participants. It returns a tuple sorted by the total dynamic-then-static order; reject unknown, malformed or identical participants.",
+      "Update contact row types and validation to allow any two distinct known participants in canonical order. Preserve all rows and duplicates; do not change envelope fields, caps, config, hashes, gameplay IDs or protocol version.",
+      "Add focused tests for unchanged dynamic pairs, all seven static IDs, dynamic-static in both input orientations normalizing to the same tuple, static-static ordering, duplicate row retention, and unknown/self/reversed encoded-pair rejection.",
+      "Run only exact-path diff hygiene locally. Do not run an application build, test, browser or physics check on the laptop; report for independent source review and exact-head GitHub `pnpm verify`."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-CONTACT-SCHEMA-1",
+        "environment": "local-document",
+        "expected": "Exact packet is extracted and ready only after its accepted prerequisites and T01 parent gate."
+      },
+      {
+        "command": "git diff --check -- games/counterball/src/simulation/loftCoarseProbe.ts games/counterball/src/simulation/loftCoarseProbe.test.ts",
+        "environment": "local-document",
+        "expected": "Both assigned source paths pass whitespace validation; no app checks run locally."
+      },
+      {
+        "command": "pnpm verify on the exact reviewed SHA",
+        "environment": "github",
+        "expected": "Hosted typecheck, lint, format, tests and build pass with no skipped or empty focused contact-schema tests."
+      },
+      {
+        "command": "Independent exact-source review",
+        "environment": "source-review",
+        "expected": "PASS confirms all participant IDs, pair ordering, both callback orientations, duplicate preservation and unchanged protocol/gameplay identity."
+      }
+    ],
+    "acceptance": [
+      "The encoder represents every required dynamic/static pair using the same seven stable IDs already used by static metadata.",
+      "Callback endpoint orientation is canonicalized without dropping or deduplicating any callback occurrence; every encoded pair is valid, distinct and totally ordered.",
+      "Focused tests cover dynamic compatibility, all static IDs, dynamic-static/static-static order, symmetric duplicate retention and malformed pair rejection.",
+      "Independent source review and exact-head hosted `pnpm verify` pass; this accepts only the diagnostic contact serializer and makes no physics or gameplay claim."
+    ],
+    "negative_cases": [
+      "Do not add static IDs to protocol `EntityId`, rename gameplay IDs, change world geometry/physics/config/hash/version, filter callbacks, deduplicate repeated notifications, or weaken row caps."
+    ],
+    "review_questions": [
+      "Do both participant directions map to the same canonical ordered pair while each callback remains a distinct row?",
+      "Can every one of the seven fixed bodies be represented without using a scene name as a gameplay entity ID?",
+      "Are duplicates retained and unknown, identical or reverse-ordered serialized endpoints rejected?"
+    ],
+    "stop_conditions": [
+      "If the pinned callback identity cannot map unambiguously to the seven frozen static IDs, stop and report the exact missing mapping; do not omit or relabel a callback."
+    ]
+  },
+  {
     "id": "T02-L01-EXECUTOR-1",
     "parent": "T02",
     "title": "Run L01 cases with the real page Havok engine",
@@ -3200,7 +3293,8 @@
       "T02-L01-GUARD-CONTRACT-1",
       "T02-L01-GUARD-SCHEMA-1",
       "T02-L01-PACKET-SPLIT-1",
-      "T02-L01-ARTIFACT-1"
+      "T02-L01-ARTIFACT-1",
+      "T02-L01-CONTACT-SCHEMA-1"
     ],
     "read_paths": [
       "AGENTS.md",
@@ -3226,7 +3320,14 @@
       "packages/game-protocol/src/types.ts",
       "tests/fixtures/counterball-v1.json",
       "knowledge_base/execution/completion/OPERATIONS.md",
-      "knowledge_base/execution/completion/LOCAL_NOTES.md"
+      "knowledge_base/execution/completion/LOCAL_NOTES.md",
+      "execution_state/reports/T02-L01-EXECUTOR-1-implementation.md",
+      "execution_state/reports/T02-L01-EXECUTOR-1-blocker-review.md",
+      "execution_state/reports/T02-L01-CONTACT-CONTRACT-1-implementation.md",
+      "execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review.md",
+      "execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review-2.md",
+      "execution_state/reports/T02-L01-CONTACT-SCHEMA-1-implementation.md",
+      "execution_state/reports/T02-L01-CONTACT-SCHEMA-1-review.md"
     ],
     "write_paths": [
       "games/counterball/src/simulation/loftCoarseRunner.ts"

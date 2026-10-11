@@ -1,5 +1,7 @@
 # Runtime ownership
 
+> Historical entries above describe earlier packets; current assignments and blockers are authoritative in the latest dated checkpoint below and `execution_state/tasks.json`. Do not infer that an old “active” or “assigned” line still grants ownership.
+
 - Coordinator: root manifests, pnpm lockfile, workspace and TypeScript/lint/test configuration, CI, Wrangler configuration, canonical shared contracts, runtime task status, ledger, and reports.
 - Coordinator T01: `execution_state/packets/T01.md`; `knowledge_base/execution/CONTRACTS.md` for protocol-v1 bounds; `packages/game-protocol/src/types.ts`, `schemas.ts`, `config.ts`, `index.ts`, `protocol.test.ts`, `tsconfig.json` only for standard WebCrypto types without DOM/Node globals; `packages/game-sdk/src/manifest.ts`, `lifecycle.ts`, `transport.ts`, `index.ts`, `sdk.test.ts`, and `tsconfig.json` only if DOM mount typing is required; `tests/fixtures/counterball-v1.json`; plus coordinator-owned T01 runtime status, ledger, decisions, integration record, and implementation report.
 - Coordinator T01 package-script repair: `packages/game-protocol/package.json` and `packages/game-sdk/package.json` only to fix package test config path; no dependency or lockfile changes.
@@ -290,3 +292,17 @@ Hosted timeout repair 1 is assigned to `/root/toolchain_audit`, with `/root/foun
 The timeout repair implementation report is `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-implementation.md`; `/root/toolchain_audit` released the test path. `/root/foundation_review` owns only `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-review.md`. Coordinator retains task state and exact-head verification.
 
 Timeout repair 1 source review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-review.md`; `/root/toolchain_audit` and `/root/foundation_review` released their paths. `/root` owns exact-head verification and shared status.
+
+## Current T02-L01 execution checkpoint — 2026-10-11
+
+`T02-L01-ARTIFACT-1` is ACCEPTED for pure bounded serialization after exact-source review, GitHub run 38169119032 on `0983916d61fc42195558db6d144e540055c94c99`, and independent evidence review. This does not accept the full physics matrix, deployed Havok, or playable match.
+
+The first `T02-L01-EXECUTOR-1` attempt stopped before creating a world or applying an impulse. Its implementation report and independent blocker review confirm that real dynamic-to-static Havok callbacks cannot be encoded by the accepted dynamic-only contact-pair schema. The executor is now PLANNED and unassigned; its original dependencies remain, with `T02-L01-CONTACT-SCHEMA-1` appended as an unaccepted prerequisite. The runner source path is released.
+
+`T02-L01-CONTACT-CONTRACT-1` is ACCEPTED for the five contract/catalogue files only. Independent review PASS is recorded at `execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review-2.md`; its initial CHANGES_REQUIRED report remains historical.
+
+`T02-L01-CONTACT-STATUS-1` is ACCEPTED after rotated independent PASS at `execution_state/reports/T02-L01-CONTACT-STATUS-1-review-2.md`; the initial CHANGES_REQUIRED report is retained. `/root` remains the sole writer of `execution_state/tasks.json`, `execution_state/LEDGER.md`, and `execution_state/OWNERSHIP.md`.
+
+`T02-L01-CONTACT-SCHEMA-1` implementation and report are complete; `/root/toolchain_audit` released both source paths after exact extraction and scoped diff hygiene passed. Independent source review PASS is recorded at `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-review.md`. `/root` owns only exact-head GitHub verification now; no app checks run locally.
+
+No local application build/test/browser/physics ran for this contract correction. Cloudflare/Wrangler access is not needed for these local contract/schema tasks; ask the user before the later deployed-Havok gate.

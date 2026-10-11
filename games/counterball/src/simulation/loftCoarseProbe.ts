@@ -44,6 +44,19 @@ export type LoftCoarseEntityId =
   | "away-5"
   | "away-6";
 
+export type LoftCoarseStaticBodyId =
+  | "goal-frame-0"
+  | "goal-frame-1"
+  | "goal-frame-2"
+  | "goal-frame-3"
+  | "goal-frame-4"
+  | "goal-frame-5"
+  | "support-apron";
+
+export type LoftCoarseContactBodyId =
+  | LoftCoarseEntityId
+  | LoftCoarseStaticBodyId;
+
 export type LoftCoarseVec3 = Readonly<{ x: number; y: number; z: number }>;
 export type LoftCoarseQuaternion = Readonly<{
   x: number;
@@ -176,7 +189,10 @@ type LoftCoarseContactRow = {
   tuple: LoftCoarseTuple;
   nominalTick: number;
   callIndex: number;
-  pair: readonly [first: LoftCoarseEntityId, second: LoftCoarseEntityId];
+  pair: readonly [
+    first: LoftCoarseContactBodyId,
+    second: LoftCoarseContactBodyId,
+  ];
   eventType: string;
   point: LoftCoarseVec3 | null;
 };
@@ -273,15 +289,18 @@ const canonicalEntityIds: readonly LoftCoarseEntityId[] = Object.freeze([
   "away-5",
   "away-6",
 ]);
-const canonicalStaticBodyIds = Object.freeze([
-  "goal-frame-0",
-  "goal-frame-1",
-  "goal-frame-2",
-  "goal-frame-3",
-  "goal-frame-4",
-  "goal-frame-5",
-  "support-apron",
-] as const);
+const canonicalStaticBodyIds: readonly LoftCoarseStaticBodyId[] =
+  Object.freeze([
+    "goal-frame-0",
+    "goal-frame-1",
+    "goal-frame-2",
+    "goal-frame-3",
+    "goal-frame-4",
+    "goal-frame-5",
+    "support-apron",
+  ]);
+const canonicalContactBodyIds: readonly LoftCoarseContactBodyId[] =
+  Object.freeze([...canonicalEntityIds, ...canonicalStaticBodyIds]);
 
 const matrixIdentityKeys = [
   "guardSchemaVersion",
@@ -515,6 +534,31 @@ function assertCanonicalEntityId(
   ) {
     invalid(`${label} must be a canonical entity id.`);
   }
+}
+
+function assertCanonicalContactBodyId(
+  value: unknown,
+  label: string,
+): asserts value is LoftCoarseContactBodyId {
+  if (
+    typeof value !== "string" ||
+    !canonicalContactBodyIds.includes(value as LoftCoarseContactBodyId)
+  ) {
+    invalid(`${label} must be a canonical contact body id.`);
+  }
+}
+
+export function canonicalizeLoftCoarseContactPair(
+  first: LoftCoarseContactBodyId,
+  second: LoftCoarseContactBodyId,
+): readonly [LoftCoarseContactBodyId, LoftCoarseContactBodyId] {
+  assertCanonicalContactBodyId(first, "Contact pair first endpoint");
+  assertCanonicalContactBodyId(second, "Contact pair second endpoint");
+  if (first === second) invalid("Contact pair endpoints must be distinct.");
+
+  const firstIndex = canonicalContactBodyIds.indexOf(first);
+  const secondIndex = canonicalContactBodyIds.indexOf(second);
+  return firstIndex < secondIndex ? [first, second] : [second, first];
 }
 
 function assertFilterPair(value: unknown, label: string): void {
@@ -1140,11 +1184,11 @@ function validateContactRow(
     `${label}.callIndex`,
   );
   if (!Array.isArray(row.pair) || row.pair.length !== 2)
-    invalid(`${label}.pair must be a canonical entity pair.`);
-  assertCanonicalEntityId(row.pair[0], `${label}.pair[0]`);
-  assertCanonicalEntityId(row.pair[1], `${label}.pair[1]`);
-  const left = canonicalEntityIds.indexOf(row.pair[0]);
-  const right = canonicalEntityIds.indexOf(row.pair[1]);
+    invalid(`${label}.pair must be a canonical contact-body pair.`);
+  assertCanonicalContactBodyId(row.pair[0], `${label}.pair[0]`);
+  assertCanonicalContactBodyId(row.pair[1], `${label}.pair[1]`);
+  const left = canonicalContactBodyIds.indexOf(row.pair[0]);
+  const right = canonicalContactBodyIds.indexOf(row.pair[1]);
   if (left >= right)
     invalid(`${label}.pair must be unique and in canonical order.`);
   assertNonemptyString(row.eventType, `${label}.eventType`);

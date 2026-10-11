@@ -1,6 +1,6 @@
 # Local continuation packet notes
 
-This is a planning artifact only. No source, build, test, deployment, or status change was made while revising it. The detailed plan contains 32 bounded packets in [LOCAL_PACKETS.json](LOCAL_PACKETS.json); coordinator-owned contract, CI and calibration cards remain in [COORDINATOR_PACKETS.json](COORDINATOR_PACKETS.json).
+This is a planning artifact; its original planning pass changed no source, build, test, deployment or runtime status. The local catalogue now contains 50 bounded packets in [LOCAL_PACKETS.json](LOCAL_PACKETS.json), including the contact-schema correction discovered while implementing T02-L01. Coordinator-owned contract, CI and calibration cards remain in [COORDINATOR_PACKETS.json](COORDINATOR_PACKETS.json).
 
 Each implementation packet has exact paths and no more than five implementation/test write paths. Its implementation and independent review reports are implicit at `execution_state/reports/<id>-implementation.md` and `execution_state/reports/<id>-review.md`. T21-D01's human-device evidence belongs in the exact report `execution_state/reports/T21-D01-implementation.md`, with one device table for model, OS, browser, build hash, orientation, measured frame times/FPS, thermal notes, test outcomes and status. Do not repeat the manual device check in another packet; the coordinator consumes that report when evaluating T21.
 

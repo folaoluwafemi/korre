@@ -5,10 +5,13 @@ import {
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   LOFT_COARSE_TUPLES,
+  canonicalizeLoftCoarseContactPair,
   type LoftCoarseByteSink,
   type LoftCoarseCase,
+  type LoftCoarseContactBodyId,
   type LoftCoarseEntityId,
   type LoftCoarseMatrixMetadata,
+  type LoftCoarseStaticBodyId,
   type LoftCoarseTuple,
   writeLoftCoarseMatrix,
 } from "./loftCoarseProbe.js";
@@ -31,7 +34,7 @@ const entityIds: readonly LoftCoarseEntityId[] = [
   "away-5",
   "away-6",
 ];
-const staticIds = [
+const staticIds: readonly LoftCoarseStaticBodyId[] = [
   "goal-frame-0",
   "goal-frame-1",
   "goal-frame-2",
@@ -251,13 +254,21 @@ function sweepRowsFor(
   return callsPerInterval.map((calls, tick) => sweepRow(tuple, tick, calls));
 }
 
-function contactRow(tuple: LoftCoarseTuple, nominalTick = 0) {
+function contactRow(
+  tuple: LoftCoarseTuple,
+  nominalTick = 0,
+  pair: readonly [LoftCoarseContactBodyId, LoftCoarseContactBodyId] = [
+    "button",
+    "home-0",
+  ],
+  eventType = "started",
+) {
   return {
     tuple,
     nominalTick,
     callIndex: 0,
-    pair: ["button", "home-0"] as const,
-    eventType: "started",
+    pair,
+    eventType,
     point: vec3(),
   };
 }
@@ -740,6 +751,134 @@ describe("writeLoftCoarseMatrix", () => {
             : current,
       }),
     ).rejects.toMatchObject({ code: "invalid" });
+  });
+
+  it("canonicalizes dynamic and static contact participants in total order", () => {
+    expect(canonicalizeLoftCoarseContactPair("home-6", "button")).toEqual([
+      "button",
+      "home-6",
+    ]);
+
+    expect(
+      canonicalizeLoftCoarseContactPair("button", "support-apron"),
+    ).toEqual(
+      canonicalizeLoftCoarseContactPair("support-apron", "button"),
+    );
+
+    expect(
+      canonicalizeLoftCoarseContactPair("support-apron", "goal-frame-5"),
+    ).toEqual(["goal-frame-5", "support-apron"]);
+
+    for (const staticId of staticIds) {
+      expect(
+        canonicalizeLoftCoarseContactPair("home-6", staticId),
+      ).toEqual(["home-6", staticId]);
+    }
+  });
+
+  it("serializes all static IDs and retains symmetric callbacks in occurrence order", async () => {
+    const identity = matrixMetadata();
+    const tuple = requiredItem(LOFT_COARSE_TUPLES, 0, "tuple 0");
+    const staticRows = staticIds.map((staticId, index) =>
+      contactRow(
+        tuple,
+        0,
+        canonicalizeLoftCoarseContactPair("home-6", staticId),
+        `static-${index}`,
+      ),
+    );
+    const callbacks = [
+      contactRow(
+        tuple,
+        0,
+        canonicalizeLoftCoarseContactPair("support-apron", "button"),
+        "first-orientation",
+      ),
+      contactRow(
+        tuple,
+        0,
+        canonicalizeLoftCoarseContactPair("button", "support-apron"),
+        "second-orientation",
+      ),
+      contactRow(
+        tuple,
+        0,
+        canonicalizeLoftCoarseContactPair("support-apron", "goal-frame-5"),
+        "static-static",
+      ),
+    ];
+    const result = await run({
+      metadata: identity,
+      change: (index, current) =>
+        index === 0
+          ? { ...current, contactRows: [...staticRows, ...callbacks] }
+          : current,
+    });
+    const parsed = JSON.parse(result.collected.text()) as {
+      cases: Array<{
+        contactRows: Array<{
+          pair: readonly string[];
+          eventType: string;
+        }>;
+      }>;
+    };
+    const firstCase = requiredItem(parsed.cases, 0, "serialized case 0");
+    expect(firstCase.contactRows).toHaveLength(10);
+    expect(firstCase.contactRows.slice(0, 7).map((row) => row.pair)).toEqual(
+      staticIds.map((staticId) => ["home-6", staticId]),
+    );
+    expect(firstCase.contactRows.slice(7).map((row) => row.pair)).toEqual([
+      ["button", "support-apron"],
+      ["button", "support-apron"],
+      ["goal-frame-5", "support-apron"],
+    ]);
+    expect(firstCase.contactRows.slice(7).map((row) => row.eventType)).toEqual(
+      ["first-orientation", "second-orientation", "static-static"],
+    );
+    expect(result.result.contactRows).toBe(10);
+  });
+
+  it("rejects unknown, identical, malformed and reverse-ordered contact pairs", async () => {
+    expect(() =>
+      canonicalizeLoftCoarseContactPair(
+        "unknown-body" as unknown as LoftCoarseContactBodyId,
+        "button",
+      ),
+    ).toThrow(/canonical contact body id/);
+    expect(() =>
+      canonicalizeLoftCoarseContactPair(
+        7 as unknown as LoftCoarseContactBodyId,
+        "button",
+      ),
+    ).toThrow(/canonical contact body id/);
+    expect(() =>
+      canonicalizeLoftCoarseContactPair("button", "button"),
+    ).toThrow(/endpoints must be distinct/);
+
+    const identity = matrixMetadata();
+    const invalidPairs = [
+      ["unknown-body", "button"],
+      ["button", "button"],
+      ["support-apron", "button"],
+      ["button"],
+      null,
+    ];
+    for (const pair of invalidPairs) {
+      await expect(
+        run({
+          metadata: identity,
+          change: (index, current) =>
+            index === 0
+              ? {
+                  ...current,
+                  contactRows: [
+                    { ...contactRow(current.metadata.tuple), pair } as never,
+                  ],
+                }
+              : current,
+        }),
+      ).rejects.toMatchObject({ code: "invalid" });
+    }
   });
 
   it("rejects non-finite and over-limit metadata before returning success", async () => {
