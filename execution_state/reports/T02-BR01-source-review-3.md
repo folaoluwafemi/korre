@@ -1,0 +1,30 @@
+# T02-BR01 attempt 3 independent source review
+
+Source verdict: **CHANGES_REQUIRED**.
+
+This review covers the extracted T02-BR01 record, `T02-BR01-implementation-3.md`, the three assigned source paths, and the accepted diagnostic guard in config/CONTRACTS. No source or shared record was changed. No application test, typecheck, lint, formatter, build, browser, physics, install or deployment command was run.
+
+## Findings
+
+1. **The runtime supplies an incomplete sweep guard.** `games/counterball/src/simulation/browserDirectProbe.ts:1178` passes `guard.tunnelling` to `deriveDiagnosticSweepPlan`. The required type at line 93 includes `maxMechanicalEnergy`, `maxRestHeightDrop` and `supportApronMargin`; the canonical tunnelling object contains only its three sweep/count fields (`packages/game-protocol/src/config.ts:73`). In particular, line 317 immediately checks `limits.maxMechanicalEnergy`, which would be undefined and throw `RangeError("Energy ceiling must be finite and positive.")`. Thus the canonical trial cannot reach its impulse even if world construction succeeds, and the argument is structurally incompatible with the declared helper type. The unit test instead constructs the complete guard at `browserDirectProbe.test.ts:75`, so it does not exercise this runtime wiring. Smallest repair: assemble the helper argument explicitly from the three outer guard fields plus the three tunnelling fields, using only the frozen config; share that assembly with a focused pure test. Do not invent a second energy ceiling or change config.
+
+2. **The swept-apron success test necessarily violates the drop guard.** `games/counterball/src/simulation/browserDirectProbe.test.ts:203` sets COM/rest height to 1, linear-speed bound to 0.5, delta to 1 and maximum drop to 0.01125, then line 226 expects a successful zero apron clearance. The actual helper at `browserDirectProbe.ts:451` computes rest-drop clearance as `1 - 0.5*1 - (1 - 0.01125) = -0.48875`; line 458 rejects it. This is a direct arithmetic/control-flow reproduction, not a test execution. Smallest repair: isolate the intended apron boundary with a drop-safe COM/rest reference or zero linear-speed bound while retaining the point-speed envelope and exact apron equality. Add a separate drop-boundary rejection assertion; do not relax the production drop guard.
+
+3. **Guard failures can escape without the required typed failure code.** `games/counterball/src/simulation/browserDirectProbe.ts:577` returns any original Error unchanged when cleanup has no errors. The energy, quaternion, subdivision and swept-envelope helpers throw plain RangeError (for example lines 256, 361 and 460), and their runtime calls are not converted into SimulationError before the outer catch. Concrete path: an unsupported swept interval throws at line 460, the outer catch saves it, cleanup succeeds, and line 1565 returns that RangeError without a `code`. The incomplete sweep argument in finding 1 follows the same path. CONTRACTS lines 127, 328 and 332 require typed non-settled failures, with unsupported envelope/native-property/resource violations using `resourceLimit`. Smallest repair: convert guard-helper exceptions at their runtime boundary into `resourceLimit`, preserve existing valid SimulationError codes, and normalize untyped initialization failures to `initialization` with their cause retained. Ensure both successful and failed cleanup preserve the selected code; do not normalize all guard failures to initialization. Add focused error-code regression coverage without mocking a physics pass.
+
+## Other source observations
+
+The source uses the existing browser Havok initializer, canonical fixture/world factory, and caller-owned Engine. The browser export is limited to this diagnostic API and result types. The only requested impulse is the frozen home-6 tuple; no player-power mapping, UI wiring, calibration assignment or production runner is introduced.
+
+The shifted-energy formula at lines 240–295 uses each body's lower permitted COM height and rejects any body already below it. This prevents the negative-potential cancellation defect in the previous rest-referenced expression. Subdivision derives full-precision mass/inertia/radius speed bounds; a count above the frozen maximum is rejected rather than clipped. Pre-call envelopes include the whole collider, COM drop and apron/slab bounds; post-call checks, cancellation, actual-call workload accounting, host yields, output bounds and no-success-on-timeout are present. These are source observations, conditional on the accepted native/passivity model; they do not prove continuous native motion or browser performance.
+
+The replacement apron preserves the surface settings and the cleanup helper restores the original before disposing the replacement on the normal path. If restoration fails, it attempts world teardown first and only then releases the replacement; if world teardown also fails, it keeps the potentially attached replacement alive and reports failure. Observer removals are attempted independently in reverse order. The caller's Engine is not disposed. These cleanup paths have pure ordering regressions; real native cleanup remains a hosted/runtime check.
+
+## Evidence and limits
+
+- `node scripts/check-completion-plan.mjs --packet T02-BR01` — exit **0**; plan consistency PASS, 83 packets. This is packet extraction/plan validation only.
+- Read-only source/report/config/contract inspection commands — exit **0**. The browser export diff adds only the diagnostic function and its result/contact type exports.
+- Required hosted package tests, package typecheck and `pnpm verify` — **NOT RUN** in this review, pending repairs and exact-head GitHub execution.
+- Real browser Havok/WASM movement, native observations, cleanup, rendering, deployment and phone checks — **NOT RUN**. BR02 supplies browser interaction/render proof; this review does not accept T02, T05 or runtime calibration.
+
+The three findings must be repaired within the assigned source/test paths and independently re-reviewed before a source PASS.

@@ -14,6 +14,11 @@ export type {
   CounterballConfig,
   TeamId,
 } from "@korre/game-protocol";
+export {
+  runBrowserDirectProbe,
+  type BrowserDirectProbeContact,
+  type BrowserDirectProbeResult,
+} from "./simulation/browserDirectProbe.js";
 export type {
   ButtonAssembly,
   ButtonHole,
