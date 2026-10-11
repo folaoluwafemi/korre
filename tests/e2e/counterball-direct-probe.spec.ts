@@ -129,11 +129,12 @@ async function flickAndReadTrace(
     path: testInfo.outputPath("direct-probe-after.png"),
   });
   const sceneFactsText = await page.getByTestId("scene-facts").textContent();
+  const sceneFacts: unknown = JSON.parse(sceneFactsText ?? "null");
   await testInfo.attach("counterball-direct-probe-trace.json", {
     body: JSON.stringify(
       {
         trace,
-        sceneFacts: JSON.parse(sceneFactsText ?? "null"),
+        sceneFacts,
         lifecycleBeforeFlick: initialLifecycle,
         lifecycleAfterFlick: await lifecycle(page),
       },
