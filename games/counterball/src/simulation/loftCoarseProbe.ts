@@ -809,7 +809,7 @@ function validateSettlingWindow(value: unknown, caseIndex: number): void {
   window.ticks.forEach((tick, tickIndex) => {
     const tickLabel = `${label}.ticks[${tickIndex}]`;
     assertExactKeys(tick, ["tick", "linearSpeeds", "angularSpeeds", "settledMask"], tickLabel);
-    const settleTick = tick as unknown as LoftCoarseSettleTick;
+    const settleTick = tick;
     assertBoundedInteger(settleTick.tick, window.startTick, window.endTick, `${tickLabel}.tick`);
     if (settleTick.tick !== window.startTick + tickIndex) invalid(`${tickLabel} is out of tick order.`);
     assertArray(settleTick.linearSpeeds, `${tickLabel}.linearSpeeds`);
@@ -1439,6 +1439,7 @@ export async function writeLoftCoarseMatrix({
       throw new AggregateError(
         [error, abortError],
         "Matrix artifact failed and the byte sink also failed to abort.",
+        { cause: error },
       );
     }
     throw error;

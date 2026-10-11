@@ -276,6 +276,7 @@ async function* orderedCases(
   identity: LoftCoarseMatrixMetadata,
   change?: (index: number, value: LoftCoarseCase) => LoftCoarseCase,
 ): AsyncGenerator<LoftCoarseCase> {
+  await Promise.resolve();
   for (let index = 0; index < LOFT_COARSE_TUPLES.length; index += 1) {
     const value = caseAt(index, identity);
     yield change === undefined ? value : change(index, value);
@@ -600,6 +601,7 @@ describe("writeLoftCoarseMatrix", () => {
     const identity = matrixMetadata();
     const counted = countingSink();
     async function* maximumCases() {
+      await Promise.resolve();
       for (let index = 0; index < 24; index += 1) {
         yield exactCaseLimits(index, identity);
       }
@@ -683,6 +685,7 @@ describe("writeLoftCoarseMatrix", () => {
       abort: () => undefined,
     };
     async function* slowCases() {
+      await Promise.resolve();
       yield exactCaseLimits(0, identity);
       advancedPastFirstCase = true;
       for (let index = 1; index < 24; index += 1) yield caseAt(index, identity);
@@ -709,6 +712,7 @@ describe("writeLoftCoarseMatrix", () => {
       abort: (reason) => { aborted.push(reason); },
     };
     async function* firstMaximumCase() {
+      await Promise.resolve();
       yield exactCaseLimits(0, identity);
       for (let index = 1; index < 24; index += 1) yield caseAt(index, identity);
     }
