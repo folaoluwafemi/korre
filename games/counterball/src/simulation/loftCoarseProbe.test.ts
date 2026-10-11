@@ -772,7 +772,14 @@ describe("writeLoftCoarseMatrix", () => {
       cases: cases(),
       sink: {
         write: () => { throw failure; },
-        abort: () => Promise.reject(undefined),
+        abort: () => {
+          const erroredStream = new ReadableStream<void>({
+            start(controller) {
+              controller.error(undefined);
+            },
+          });
+          return erroredStream.getReader().closed;
+        },
       },
       signal: new AbortController().signal,
     }).catch((error: unknown) => error);

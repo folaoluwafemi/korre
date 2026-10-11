@@ -380,3 +380,15 @@ Hosted verification failure — T02-L01-ARTIFACT-1: GitHub run [38166723002](htt
 
 
 Source review — T02-L01-ARTIFACT-1 lint repair 2: independent review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-lint-repair-2-review.md`; scoped `git diff --check` PASS. Exact-head hosted verification remains pending.
+
+
+Hosted verification failure — T02-L01-ARTIFACT-1: GitHub run [38167503608](https://github.com/folaoluwafemi/korre/actions/runs/38167503608) on exact SHA `fa86a7dde9c2c6a86e8e1e451bf81004a8db7d93` passed typechecks and stopped in lint on test-only `Promise.reject(undefined)` at `loftCoarseProbe.test.ts:775`. Worker smoke 1/1, protocol 13/13, migrations twice and formatting passed; unit/build/integration/preview/browser were skipped. Full log, 10 downloaded files, inventory and report are saved under `execution_state/reports/T02-L01-ARTIFACT-1-run-38167503608*`. First bounded repair for this distinct failure is assigned to `/root/toolchain_audit`; rotated reviewer `/root/foundation_review`.
+
+
+Implementation update — T02-L01-ARTIFACT-1 hosted test repair 1: the undefined-rejection test now uses an errored `ReadableStream` promise; production code is unchanged. Implementation report and scoped source diff check PASS. `/root/foundation_review` owns the independent source review; hosted verification remains pending.
+
+
+Source review — T02-L01-ARTIFACT-1 hosted test repair 1: independent review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-test-repair-1-review.md`. The stream-based test still asserts both aggregate entries, including `undefined`, and original cause; production writer unchanged. Fresh exact-head hosted verification remains pending.
+
+
+Commit preparation — T02-L01-ARTIFACT-1 hosted test repair 1: implementation, scoped hygiene, independent review and prior run evidence are recorded in the prepared commit. The exact pushed SHA's full hosted verification is the next gate.
