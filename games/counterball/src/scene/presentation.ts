@@ -65,9 +65,9 @@ function isFiniteQuaternion(
 function isPlaybackTransform(value: unknown): value is PlaybackTransform {
   return (
     isRecord(value) &&
-    isEntityId(value.id) &&
-    isFiniteVector3(value.position) &&
-    isFiniteQuaternion(value.rotation)
+    isEntityId(value["id"]) &&
+    isFiniteVector3(value["position"]) &&
+    isFiniteQuaternion(value["rotation"])
   );
 }
 

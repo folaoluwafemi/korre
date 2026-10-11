@@ -2727,7 +2727,7 @@
           "title": "Provide stable scene pose update and entity picking API",
           "owner": "/root/foundation_review",
           "author_identity": "/root/foundation_review",
-          "reviewer_identity": "/root/toolchain_audit — initial source PASS; /root/run_evidence_review — repair 1 and repair 2 source PASS",
+          "reviewer_identity": "/root/toolchain_audit — initial source PASS and coordinator-fix independent PASS; /root/run_evidence_review — repair 1 and repair 2 source PASS plus escalation diagnosis",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-P01",
           "depends_on": [
             "parent:T03",
@@ -2750,7 +2750,7 @@
           "outputs": [
             "Stable EntityId-to-PieceAssembly map with coordinator-frozen pose-update and picking signatures."
           ],
-          "implementation_report": "execution_state/reports/T02-P01-repair-2-implementation.md",
+          "implementation_report": "execution_state/reports/T02-P01-escalation-repair-implementation.md",
           "review_report": "execution_state/reports/T02-P01-review.md",
           "attempt_count": 3,
           "checks": [
@@ -2814,6 +2814,37 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-P01-repair-2-review.md",
               "detail": "Confirmed the unknown-array/type guards remove unsafe-any access while preserving canonical ID, finite-value, duplicate/missing, and atomicity validation. Runtime pending."
+            },
+            {
+              "command": "GitHub Actions run 38104471030: pnpm verify",
+              "result": "CHANGES_REQUIRED",
+              "environment": "GitHub Actions",
+              "exit_code": 2,
+              "run_id": 38104471030,
+              "source_sha": "5d84c64ac3181ae959ccdf91cfb21e3c78fcc35f",
+              "run_url": "https://github.com/folaoluwafemi/korre/actions/runs/38104471030",
+              "detail": "Workspace/package typechecks passed through the presentation guards, then TS4111 required bracket access for id, position and rotation on Record<string, unknown> at presentation.ts:68-70. Lint, unit tests, builds, integration and browser checks did not run. Full logs are preserved under execution_state/reports/T02-P01-run-38104471030-hosted-checks/."
+            },
+            {
+              "command": "Independent bounded repair diagnosis after worker repair limit",
+              "result": "PASS",
+              "environment": "source-diagnosis",
+              "report": "execution_state/reports/T02-P01-escalation-diagnosis.md",
+              "detail": "Reviewer recommends bracket access for only the three Record<string, unknown> reads; no guard, finite check, canonical ID rule, or atomicity change is needed."
+            },
+            {
+              "command": "Coordinator-owned TS4111 correction",
+              "result": "PASS",
+              "environment": "source-change",
+              "report": "execution_state/reports/T02-P01-escalation-repair-implementation.md",
+              "detail": "Only the three indexed-field accesses in presentation.ts changed, following the independent diagnosis. No local application checks ran."
+            },
+            {
+              "command": "Independent T02-P01 escalation repair source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-P01-escalation-repair-review.md",
+              "detail": "Confirmed the correction is exactly the three diagnosed bracket accesses and preserves unknown guards, short-circuit checks, duplicate/missing validation, atomicity and frozen signatures. Runtime pending."
             }
           ],
           "implementation_note": "Implement only the frozen exports in CONTRACTS.md: createCounterballPresentation(scene, bodies, config?) returns ReadonlyMap<EntityId, PieceAssembly>; updateCounterballPresentation(registry, readonly PlaybackTransform[]) returns void; pickCounterballEntity(registry, PickingInfo) returns EntityId|null. Use createPieces and PieceAssembly.id/root/bodyMesh. Updates are presentation-only and require exactly one finite transform for all 15 IDs. Resolve picks by registered body-mesh identity; only the body meshes are pickable. Keep button holes visible and do not edit App.tsx, rules, config, contracts, CI, tasks, status, or any other path. Test all 15 IDs, malformed snapshots, quaternion updates, button/cap picking, details/hole misses and scene disposal.",
@@ -2821,10 +2852,10 @@
             "A scene consumer can update every piece from a canonical authoritative snapshot and pick its stable EntityId.",
             "Picking and camera movement do not mutate protocol state or rules."
           ],
-          "next_action": "Repair 2 source review passed. Coordinator is running the unchanged GitHub checks on the exact reviewed commit and preserving all run artifacts. If another concrete check fails, stop the author and have the reviewer/coordinator perform the bounded diagnosis and escalation."
+          "next_action": "Independent diagnosis and source review for the coordinator correction passed. Run the exact reviewed source on GitHub with full artifacts; if checks pass, obtain independent exact-head runtime/artifact review before VERIFIED."
         }
       ],
-      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 final worker repair source review passed; exact-head GitHub verification is pending. If another concrete check fails, stop the author and escalate through reviewer/coordinator diagnosis. On acceptance, extract T02-BR01 then coordinator-owned T02-BR02 for the first pointer-triggered browser direct shot. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from the current evidence."
+      "next_action": "C01-H is ACCEPTED on exact-head run 38102448918. T02-P01 independent source review is complete; exact-head runtime/artifact verification remains. Keep BR01 blocked until T02-P01 is ACCEPTED. T02-L01 remains BLOCKED on the missing frozen hashed guard/substep schedule. Do not accept T02, claim a playable match, or claim deployed Havok from the current evidence."
     },
     {
       "id": "T03",
