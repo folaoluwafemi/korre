@@ -264,3 +264,11 @@ No worker may spawn agents, build, run tests, or start services locally. Report 
 
 
 - T02-L01-GUARD-SCHEMA-1 is ACCEPTED for protocol/config/schema/hash-fixture scope on exact SHA `970ea3d430fa751aa19ad8a037a359d7b23417c4`; acceptance is `execution_state/reports/T02-L01-guard-schema-acceptance-1.md`. Exact final five-path source review PASS: `execution_state/reports/T02-L01-guard-schema-final-source-review-970ea3d.md`. Independent exact-run/artifact review PASS: `execution_state/reports/T02-L01-guard-schema-run-38156205255-independent-review.md`. The original T02-L01 dependencies are unchanged and its status is READY. Coordinator owns only T02-L01 bounded packet materialization/shared status; source implementation packets must have disjoint paths and be independently reviewed. No L01/physics/deployment/playability acceptance follows from schema acceptance.
+
+## T02-L01 serial packet ownership (split accepted; ARTIFACT-1 ready)
+
+The T02-L01 packet split is ACCEPTED for control-plane scope after the document checks and independent review. Its catalogue/task/index amendment paths are released. `/root` retains coordinator ownership of task state, ledger, ownership, shared config, hosted-run integration, and the final T02-L01 gate. T02 remains RUNNING; no matrix, calibrated gameplay runner, deployed Havok, or playable match is accepted.
+
+T02-L01-ARTIFACT-1 repair 1 passed rotated independent source review at execution_state/reports/T02-L01-ARTIFACT-1-repair-1-review.md and staged exact-path diff hygiene (cached check exit 0). Source files remain staged and frozen. Coordinator owns exact reviewed-SHA commit and GitHub pnpm verify; no next consumer packet is released until ACCEPTED. Initial plain diff-check attempt on untracked files remains ineffective and is not counted.
+
+Remaining serial assignments are in the exact packet/task records: EXECUTOR follows ARTIFACT; BROWSER follows EXECUTOR; TRANSPORT then MATRIX share `tests/e2e/counterball-direct-probe.spec.ts` serially. `/root` remains the sole writer for shared contracts/config/status and final L01 integration.

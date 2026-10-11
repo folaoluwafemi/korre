@@ -900,7 +900,7 @@
       "knowledge_base/execution/CONTRACTS.md",
       "knowledge_base/execution/DECISIONS.md",
       "knowledge_base/execution/completion/CONTRACT_WORK.md",
-      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01",
       "execution_state/tasks.json",
       "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
       "execution_state/reports/T02-L01-guard-contract-proposal-review-4.md",
@@ -993,7 +993,7 @@
       "knowledge_base/execution/DECISIONS.md",
       "knowledge_base/execution/completion/CONTRACT_WORK.md",
       "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
-      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01",
       "knowledge_base/execution/completion/PACKETS.md",
       "execution_state/tasks.json",
       "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
@@ -1091,7 +1091,7 @@
       "knowledge_base/execution/DECISIONS.md",
       "knowledge_base/execution/completion/CONTRACT_WORK.md",
       "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-SCHEMA-1",
-      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01",
       "execution_state/tasks.json",
       "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
       "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
@@ -1170,6 +1170,234 @@
       "If exact proposal hash/digest disagrees with the post-update fixture or canonical hash, stop and resolve without changing identity values.",
       "If a sixth implementation path is needed, split and review it before edits.",
       "If a consumer requires a wire-version change or physicsCalibration migration, stop and obtain a separate accepted contract."
+    ]
+  },
+  {
+    "id": "T02-L01-PACKET-SPLIT-1",
+    "parent": "T02",
+    "title": "Split L01 into disjoint core, browser, transport, and matrix packets",
+    "role": "coordinator",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/README.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+      "execution_state/reports/T02-L01-guard-schema-acceptance-1.md",
+      "execution_state/reports/T02-L01-packet-split-architecture-review.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+      "knowledge_base/execution/completion/PACKETS.md",
+      "execution_state/LEDGER.md",
+      "execution_state/OWNERSHIP.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md"
+    ],
+    "write_paths": [
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json",
+      "knowledge_base/execution/completion/PACKETS.md",
+      "execution_state/tasks.json",
+      "execution_state/OWNERSHIP.md"
+    ],
+    "outputs": [
+      "Five serial, bounded source/test packets divide L01 into pure artifact encoding, actual browser execution, the page/download, maximum-size transport proof, and the real matrix test.",
+      "T02-L01 remains the coordinator acceptance gate; all eight existing direct dependency IDs and their order are preserved, and the five new packets retain those prerequisites.",
+      "The generated index and runtime task records contain exact write paths, exports, commands, reviewers and acceptance gates; only this amendment is initially ready."
+    ],
+    "steps": [
+      "Extract this record with node scripts/check-completion-plan.mjs --packet T02-L01-PACKET-SPLIT-1 and verify it alone is READY.",
+      "Use only the accepted CONTRACT_WORK.md limits and matrix outcomes. Preserve original L01 direct dependencies and parent T01; do not copy provisional feasibility limits.",
+      "Move T02-L01 from LOCAL_PACKETS to COORDINATOR_PACKETS as a zero-source-path integration gate. Keep the exact original eight dependency IDs first and append this amendment and all five child IDs.",
+      "Append five local packets: ARTIFACT owns loftCoarseProbe.ts and pure tests; EXECUTOR owns a new loftCoarseRunner.ts; BROWSER owns browser.ts and CounterballDirectProbe.tsx; TRANSPORT owns the existing routed E2E spec and proves exact-cap transfer; MATRIX serially owns that spec and runs all 24 real cases.",
+      "Specify awaited sink/backpressure, one-case buffering, OPFS file-backed download, exact 504365056-byte Chromium transfer test, streaming host parser/hash/cleanup, and an exact full-job timing gate. Keep the matrix caps and 20-minute job unchanged for the first exact run.",
+      "Materialize all new records under T02.packet_progress with exact paths and named reviewers. Set only this amendment READY and future cards PLANNED; regenerate PACKETS.md and run packet extraction, full graph and scoped diff checks.",
+      "Write the unique implementation report with dependency arrays, ownership map and readiness results; release all five control-plane paths for independent review."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-PACKET-SPLIT-1",
+        "environment": "local-document",
+        "expected": "Exact amendment is READY after all original L01 prerequisites and inherited T01 acceptance."
+      },
+      {
+        "command": "node scripts/check-completion-plan.mjs --write-index",
+        "environment": "local-document",
+        "expected": "Generated index has the expected cards and only this amendment is ready before review."
+      },
+      {
+        "command": "node scripts/check-completion-plan.mjs",
+        "environment": "local-document",
+        "expected": "Full graph passes: no cycle, missing parent coverage, unordered worker overlap or status/catalogue mismatch."
+      },
+      {
+        "command": "git diff --check -- knowledge_base/execution/completion/COORDINATOR_PACKETS.json knowledge_base/execution/completion/LOCAL_PACKETS.json knowledge_base/execution/completion/PACKETS.md execution_state/tasks.json execution_state/OWNERSHIP.md",
+        "environment": "local-document",
+        "expected": "All five exact control-plane paths pass whitespace hygiene."
+      },
+      {
+        "command": "Independent graph and runtime-state review",
+        "environment": "source-review",
+        "expected": "PASS confirms original dependencies and acceptance are preserved, path ownership is serial/disjoint and transport/timing gates are explicit."
+      }
+    ],
+    "acceptance": [
+      "All eight original L01 dependencies remain first and unchanged; inherited parent T01 remains required.",
+      "The five implementation/test cards have exact outputs and disjoint writes; the E2E spec is locked serially by TRANSPORT then MATRIX.",
+      "Only ARTIFACT is ready after this amendment is accepted; later cards depend on their accepted producers.",
+      "T02-L01 preserves every original tuple, setup, provenance, guard, row, eligibility and artifact acceptance condition as the coordinator integration gate.",
+      "Maximum-cap transport is proven in actual Chromium before matrix trials; the first full exact hosted run records whether all work fits the existing 20-minute job. A timeout requires a separately reviewed workflow amendment before another matrix run.",
+      "Exact packet extraction, generated index, full graph, scoped diff and independent review pass. No source/runtime/physics result is claimed."
+    ],
+    "negative_cases": [
+      "No dropping or reordering original dependencies or relaxing any accepted matrix condition/cap.",
+      "No worker writes shared status, contracts, config, workflow, manifests or another packet's files; no worker spawns or self-reviews.",
+      "No assumed OPFS memory behavior, whole-matrix DOM/IPC path, mock physics or fabricated timing/runtime evidence."
+    ],
+    "review_questions": [
+      "Are original dependency IDs/order and parent T01 intact?",
+      "Are source writes disjoint and the reused E2E path strictly serialized?",
+      "Does the API between pure encoder, browser executor, UI, transport test and matrix test have accepted inputs/outputs?",
+      "Does the maximum-size transfer test exercise the real file-backed download path without full IPC or buffer?",
+      "Are the existing 20-minute job and all strict caps preserved until exact hosted evidence requires a reviewed workflow amendment?"
+    ],
+    "stop_conditions": [
+      "If the checker rejects a zero-source-path coordinator integration record, stop and add a separately reviewed coordinator gate without altering original dependency IDs.",
+      "If transport needs a new workflow/config/path, stop and materialize a coordinator-owned packet before source dispatch.",
+      "If any original L01 assertion cannot be assigned to a child plus integration review, do not dispatch source work."
+    ]
+  },
+  {
+    "id": "T02-L01",
+    "parent": "T02",
+    "title": "Integrate and accept the bounded restart-loft diagnostic",
+    "role": "coordinator",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1",
+      "T02-L01-PACKET-SPLIT-1",
+      "T02-L01-ARTIFACT-1",
+      "T02-L01-EXECUTOR-1",
+      "T02-L01-BROWSER-1",
+      "T02-L01-TRANSPORT-1",
+      "T02-L01-MATRIX-1"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-GUARD-SCHEMA-1",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-runner-design-audit-1.md",
+      "execution_state/reports/T02-calibration-observations-review-1.md",
+      "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
+      "execution_state/reports/T02-L01-guard-contract-proposal-4.md",
+      "execution_state/reports/T02-L01-guard-contract-proposal-review-4.md",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "games/counterball/src/features/restarts/domain/placementPose.ts",
+      "games/counterball/src/simulation/sampling.ts",
+      "games/counterball/src/simulation/intendedShotProbe.test.ts",
+      "games/counterball/src/simulation/browserDirectProbe.ts",
+      "games/counterball/src/browser.ts",
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "packages/game-protocol/src/config.ts",
+      "packages/game-protocol/src/types.ts",
+      "packages/game-protocol/src/schemas.ts",
+      "tests/fixtures/counterball-v1.json",
+      "tests/e2e/counterball-direct-probe.spec.ts",
+      ".github/workflows/ci.yml",
+      "playwright.config.ts",
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/README.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "execution_state/reports/T02-L01-guard-schema-acceptance-1.md",
+      "execution_state/reports/T02-L01-packet-split-architecture-review.md",
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts"
+    ],
+    "write_paths": [
+      "execution_state/tasks.json",
+      "execution_state/LEDGER.md",
+      "execution_state/OWNERSHIP.md"
+    ],
+    "outputs": [
+      "Real 24-tuple restart-loft matrix using the actual browser Babylon Engine and pinned Havok WASM, accepted canonical world and pose helper, and the hashed restartLoftDiagnosticGuard.",
+      "Pure tuple, preflight, deterministic encoding and bounded artifact metadata tests; no Node or mock physics.",
+      "A distinct development-only page action with compact summary and complete successful browser-download artifact; no full matrix DOM or single page.evaluate/IPC result.",
+      "A Playwright-host temporary file under test-results/ that is streaming-validated and hashed, atomically finalized, and attached with the required attachment name/options only after every assertion passes.",
+      "Coordinator integration accepts only after every split child, exact 24-case run/artifact review, and all eight original L01 dependencies are ACCEPTED."
+    ],
+    "steps": [
+      "Extract this exact coordinator gate with node scripts/check-completion-plan.mjs --packet T02-L01 after every child is accepted.",
+      "Review all implementation/source reports, exact hosted run, complete artifact digest/content and the original acceptance matrix. Recheck every original dependency before recording acceptance.",
+      "Record exact commit/run/attempt, total job time, full suite counts, attached artifact path/hash, source/run reviewer verdicts and any finite-step limitations in the unique integration report.",
+      "Update T02-L01 and parent T02 status/ledger/ownership only after every check and independent review actually passes. Preserve the distinction from deployed Havok and playable-game acceptance."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01",
+        "environment": "local-document",
+        "expected": "Original eight dependencies plus the accepted split children are ready and accepted."
+      },
+      {
+        "command": "Independent parent-dependency and matrix artifact integration review",
+        "environment": "source-review",
+        "expected": "PASS verifies every original acceptance criterion, actual hosted artifact and no broader T02/gameplay claim."
+      }
+    ],
+    "acceptance": [
+      "All 24 unique fixed tuples run in actual Chromium using pinned WASM and actual browser Babylon Engine; no mock/Node/NullEngine result is accepted.",
+      "The strict hashed restart-loft guard passes at every actual public executeStep call with native preflight, shifted energy, per-body drop, complete collider sweep/support, and every workload/serialization cap; no low-level-substep or continuous-motion claim.",
+      "Complete JSON contains exact matrix metadata, all body/contact/sweep rows and assertions; encoded byte counts pass inclusive caps. Host validates download bytes/digest and matrix structure/totals before atomic rename and named attachment; no full DOM/page IPC payload or failure artifact.",
+      "Eligibility requires all six accepted conditions: full-button before/after crossing, positive swept clearance for full overlap, zero actual button-obstacle contact, 15 finite bodies, full settling window, and every actual call guarded. Zero candidates may be valid diagnostic output.",
+      "The exact Chromium diagnostic test is collected/completed with zero skips/retries on the exact SHA; independent source and run/artifact review pass.",
+      "Acceptance is diagnostic L01 only; it does not by itself accept T02, deployed Cloudflare Havok, calibrated playable physics, T05, a playable match or human feel.",
+      "The coordinator independently verifies the complete set of child reports, exact reviewed commit, full hosted run time, complete attached matrix and every original dependency before accepting L01."
+    ],
+    "negative_cases": [
+      "No mock/Node/NullEngine/synthetic contacts, positive apex, unrecorded impulse, omitted tuple, truncation, row deduplication or silent partial matrix.",
+      "No automatic restart lift/second shot, hidden force, production coefficient, gameplay config mutation, or reading diagnostic guard as fallback.",
+      "No full JSON in DOM text or one evaluate/IPC response; no final artifact/attachment after failure.",
+      "No trimming tests, reducing tuples/caps, increasing deadlines without reviewed workflow amendment, or fabricating test/run/artifact results."
+    ],
+    "review_questions": [
+      "Are all 24 tuples, provenance identities and exact setup values complete and ordered?",
+      "Does source enforce every native/energy/sweep/workload/material guard before and after each public call?",
+      "Does browser route use actual Babylon Engine/pinned Havok and return only compact status?",
+      "Does the host download path validate the complete artifact within bounded memory, time and encoded-byte limits before named attachment?",
+      "Do exact-head zero-skip CI logs and raw artifact prove only bounded L01 diagnostics?"
+    ],
+    "stop_conditions": [
+      "If any preflight/property/material/provenance guard fails, stop before impulse and produce no success artifact.",
+      "If any work/time/output/physics assertion fails, preserve the failure artifact/logs, abort the matrix, and use the bounded repair procedure; never omit a case.",
+      "If browser download, streaming validation, storage, attachment or 20-minute hosted job cannot satisfy the accepted caps, stop and obtain a separately reviewed workflow amendment before another matrix run.",
+      "If source needs a sixth write path, or the accepted contract/schema is inconsistent with source, stop and split/re-review before proceeding.",
+      "Any missing child acceptance, incomplete artifact, nonzero skip/retry, unreviewed source edit or unaccepted original dependency keeps L01 unaccepted."
     ]
   }
 ]
