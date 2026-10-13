@@ -397,3 +397,9 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root/toolchain_audit` owns only `games/counterball/src/browser.ts`, `apps/web/src/CounterballDirectProbe.tsx`, and `execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md` for the two TS2307s in run 38415702575. If another path is needed, it must stop and request a coordinator packet amendment.
 - `/root/run_evidence_review` independently audited run 38415702575 and released its run-evidence report; it is the rotated reviewer for repair attempt 2 source after implementation paths are released.
 - `/root` owns task/ledger/ownership files, publication and next exact-SHA hosted run. No local app command ran; Cloudflare remains untouched until the user signals.
+
+## Current ownership — 2026-10-13 (repair-2 scope amendment approved)
+
+- Repair attempt 2 is authorized to edit the original two Browser1 source paths plus existing `games/counterball/src/viteAssetModules.d.ts`, as recorded in the accepted scope amendment and `LOCAL_PACKETS.json`.
+- `/root/toolchain_audit` owns only those three source paths and `execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md`; it may run only scoped `git diff --check` and must not attempt another repair after this one.
+- `/root/run_evidence_review` is the independent source/run reviewer after implementation paths are released. `/root` owns shared status, exact-SHA GitHub checks, artifact review, and packet acceptance. Cloudflare remains untouched pending the user signal.
