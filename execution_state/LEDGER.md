@@ -601,3 +601,15 @@ The implementation worker completed the diagnostic-only change and scoped source
 ## Coordinator checkpoint — 2026-10-13 (support-readback source review passed)
 
 The diagnostics-only implementation passed independent source review after correcting the report's distinction between the pre-dispatch ready packet and its post-dispatch RUNNING state. The reviewer confirmed the original support predicates, expected values, comparisons, quaternion tolerance, geometry and physics path remain unchanged; actual/expected values and each clause are serialized safely. Exact packet and scoped diff checks pass. The source has not yet run through hosted Verify or browser diagnostics. T02-L01-SUPPORT-PREFLIGHT-1 is IMPLEMENTED, not accepted; the exact SHA and GitHub evidence remain pending. MATRIX-1 remains unaccepted and Cloudflare remains unused.
+
+## Coordinator checkpoint — 2026-10-13 (support-readback Verify stopped at Prettier)
+
+Exact SHA `837fa4a37746f596bc563df3ff05ab7621d28d23`, run [38464838129](https://github.com/folaoluwafemi/korre/actions/runs/38464838129), passed typecheck and ESLint then failed Prettier solely in `games/counterball/src/simulation/loftCoarseRunner.ts`. Verify therefore did not reach unit tests or builds; integration, preview, diagnostic E2E and the 24-case matrix did not run. The hosted formatting suggestion and complete log/artifact inventory are retained under `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38464838129/`. This is focused repair attempt 1 for that formatting signature. `/root/toolchain_audit` is applying only the exact hosted formatting patch; `/root/run_evidence_review` independently reviews the run; `/root/executor_type_review` will independently review source. MATRIX-1 remains unaccepted, and Cloudflare remains untouched.
+
+## Coordinator correction — 2026-10-13 (run 38464838129 focused tests)
+
+The separate focused game protocol contract test step ran before `Verify` and passed 13/13. The earlier ledger wording that the workflow had run no app tests was too broad. The general `pnpm test` and build stages, integration, production preview, diagnostic browser suite, and Havok matrix did not run because Verify stopped at Prettier. The run report and task detail now distinguish the protocol tests from browser/physics evidence.
+
+## Coordinator checkpoint — 2026-10-13 (support-readback format repair 1 reviewed)
+
+The exact hosted Prettier patch for run 38464838129 was applied with no semantic changes. Its three hunks match the hosted suggestion; the scoped source diff check passed and independent source review passed. The patch file SHA-256 was corrected in the implementation/run reports and independently verified. Independent run review passed: the separate protocol contract step passed 13/13; Verify passed typecheck and ESLint, then failed only Prettier. General tests/build and later integration, preview, diagnostic E2E, and Havok matrix did not run. The implementation card is IMPLEMENTED, not accepted. One exact reviewed-source GitHub run is next; MATRIX-1 remains unaccepted and Cloudflare remains unused.

@@ -1350,8 +1350,7 @@ async function runCase(
                 z: diagnosticNumber(surfaceRotation.z),
                 w: diagnosticNumber(surfaceRotation.w),
               },
-        parent:
-          surfaceBody.transformNode.parent === null ? null : "present",
+        parent: surfaceBody.transformNode.parent === null ? null : "present",
         scale: {
           x: diagnosticNumber(surfaceBody.transformNode.scaling.x),
           y: diagnosticNumber(surfaceBody.transformNode.scaling.y),
@@ -1366,8 +1365,7 @@ async function runCase(
       };
       const supportPreflightMatches = {
         positionX: surfaceBody.transformNode.position.x === 0,
-        positionY:
-          surfaceBody.transformNode.position.y === expectedSurfaceY,
+        positionY: surfaceBody.transformNode.position.y === expectedSurfaceY,
         positionZ: surfaceBody.transformNode.position.z === 0,
         rotationIsIdentity: surfaceIsIdentityRotation,
         parentIsNull: surfaceBody.transformNode.parent === null,
@@ -1382,11 +1380,13 @@ async function runCase(
           originalSurfaceDimensions.z === config.geometry.pitchLength,
       };
       throw resourceFailure(
-        `Canonical support transform differs from the open slab contract. ${JSON.stringify({
-          expected: expectedSupportReadback,
-          observed: observedSupportReadback,
-          clauseMatches: supportPreflightMatches,
-        })}`,
+        `Canonical support transform differs from the open slab contract. ${JSON.stringify(
+          {
+            expected: expectedSupportReadback,
+            observed: observedSupportReadback,
+            clauseMatches: supportPreflightMatches,
+          },
+        )}`,
       );
     }
     const originalMembership = originalShape.filterMembershipMask;

@@ -1,0 +1,13 @@
+# T02-L01-SUPPORT-PREFLIGHT-1 exact-SHA run 38464838129
+
+**Outcome: CHANGES_REQUIRED. This run did not reach the routed diagnostic browser suite. MATRIX-1 remains unaccepted.**
+
+- Exact source: `837fa4a37746f596bc563df3ff05ab7621d28d23` on `codex/remote-ci-bootstrap`.
+- GitHub Actions run: [38464838129](https://github.com/folaoluwafemi/korre/actions/runs/38464838129), final conclusion `failure`.
+- `Verify` passed workspace and application typechecks, including the Counterball runner, and ESLint. Prettier then failed only for `games/counterball/src/simulation/loftCoarseRunner.ts`. The workflow's published formatting suggestion contains three formatting-only hunks in the new readback block; see `artifacts/formatting-repair/formatting-repair.patch` (SHA-256 `46b2b6cfa4ae6d306f7aabacffc0b93df926a9901c678e4825005e199fb88971`). No predicate or runtime result can be inferred from a formatter patch.
+- Because `pnpm verify` stopped at lint/format, unit tests and builds did not run. Integration, production preview, diagnostic browser suite and Havok matrix were skipped/not run. There are no matrix cases, impulses, `executeStep` calls, or no-skip browser counts to report for this run.
+- Thirteen setup/contract steps succeeded before `Verify`; `Verify` failed; its three automatic TypeScript-resolution diagnostics ran after failure. The separate focused game protocol contract test step passed 13/13; none of these steps provides browser or physics evidence.
+- Full captured run log: `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38464838129/github.log`, SHA-256 `c6e2ff95d7849c3a64aaaff364365fc80a85da2b704e095bb80453c612b06d7cb` (156,841 bytes). Failed-step log: `failed.log`, SHA-256 `a29bf08ebe8213f9c90b51dec36ebd191449fc99e1b8c52f6277c31a325ee028` (7,819 bytes). The exact run snapshot, artifact API response, extracted-file hash inventory and hosted artifacts are retained in this directory.
+- Hosted artifacts: formatting suggestion ID 11847758490, compressed 793 bytes, digest `sha256:cbdf7f2ecf55740973b70a9f9096bec31ae0d588be50d921b290628b9848834b`; verification log ID 11847363732, 1,771 bytes, digest `sha256:731454eadb562268a90412ada9c4354b9d945fbff8a06c12c6f57d6bd54c2382`; full hosted-check bundle ID 11847598686, 1,326,212 bytes, digest `sha256:60cf16965998e5d3c2aaea92234f38fe06a74e4a09809eb0ad56c0d65b447daa`; browser-evidence bundle ID 11847703657, 437,511 bytes, digest `sha256:bc871188184f1ce33d4a9744ca332e0c8b0c7fef089d2e17434f3fe2e361a66d`.
+
+A single bounded formatting repair is assigned from the exact hosted suggestion. The readback predicates, expected values, tolerance, diagnostics, and physics path must remain unchanged. The next exact-SHA GitHub run must complete Verify before any browser evidence is claimed.

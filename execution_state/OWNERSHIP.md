@@ -556,3 +556,13 @@ No local application build/test/browser/physics ran for this contract correction
 ## Current ownership — 2026-10-13 (support-readback source review passed)
 
 - `/root/executor_type_review` independently passed the unchanged support predicate and diagnostic-only source diff at `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-review.md`; the report-readiness wording was corrected and re-reviewed. `/root` now owns the exact-reviewed-SHA GitHub verification, retained run artifacts, exact-run review, and shared status. No hosted/runtime check has run yet. The source diff remains limited to `games/counterball/src/simulation/loftCoarseRunner.ts`; Cloudflare is untouched.
+
+## Current ownership — 2026-10-13 (support-readback formatting repair 1)
+
+- Exact run 38464838129 on `837fa4a37746f596bc563df3ff05ab7621d28d23` stopped in Verify at Prettier on `loftCoarseRunner.ts`; typecheck and ESLint passed, no app tests/build/browser ran. Full logs and artifact inventory are saved under `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38464838129/`. `/root/toolchain_audit` owns only the runner file and `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-repair-1-implementation.md`, applying the exact hosted patch. `/root/run_evidence_review` owns only `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38464838129-independent-review.md`. `/root/executor_type_review` will independently review the formatted source repair. `/root` owns shared status and GitHub runs.
+
+- Evidence clarification: run 38464838129 did execute the separate focused game-protocol contract step (13/13 passed) before Verify; the general unit-test/build, integration, preview, browser, and matrix stages did not run. The worker has released the source path after applying the hosted formatting patch; independent source and exact-run reviews are pending.
+
+## Current ownership — 2026-10-13 (support-readback format repair 1 reviewed)
+
+- `/root/toolchain_audit` applied the exact three-hunk hosted Prettier patch to the runner file and released it. `/root/executor_type_review` independently passed the formatting-only source diff and corrected patch-file hash at `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-repair-1-review.md`. `/root/run_evidence_review` independently passed run 38464838129 at `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38464838129-independent-review.md`, including the separate protocol test result of 13/13. `/root` owns the next exact-SHA GitHub run and status. No browser/physics checks have run for this card.
