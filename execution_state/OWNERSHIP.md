@@ -293,7 +293,7 @@ The timeout repair implementation report is `execution_state/reports/T02-L01-ART
 
 Timeout repair 1 source review PASS at `execution_state/reports/T02-L01-ARTIFACT-1-hosted-timeout-repair-1-review.md`; `/root/toolchain_audit` and `/root/foundation_review` released their paths. `/root` owns exact-head verification and shared status.
 
-## Current T02-L01 execution checkpoint — 2026-10-11
+## Historical T02-L01 execution checkpoint (superseded) — 2026-10-11
 
 `T02-L01-ARTIFACT-1` is ACCEPTED for pure bounded serialization after exact-source review, GitHub run 38169119032 on `0983916d61fc42195558db6d144e540055c94c99`, and independent evidence review. This does not accept the full physics matrix, deployed Havok, or playable match.
 
@@ -306,3 +306,19 @@ The first `T02-L01-EXECUTOR-1` attempt stopped before creating a world or applyi
 `T02-L01-CONTACT-SCHEMA-1` implementation and report are complete; `/root/toolchain_audit` released both source paths after exact extraction and scoped diff hygiene passed. Independent source review PASS is recorded at `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-review.md`. `/root` owns only exact-head GitHub verification now; no app checks run locally.
 
 No local application build/test/browser/physics ran for this contract correction. Cloudflare/Wrangler access is not needed for these local contract/schema tasks; ask the user before the later deployed-Havok gate.
+
+## Current ownership — 2026-10-11 (CONTACT-SCHEMA accepted; executor ready)
+
+- `T02-L01-CONTACT-SCHEMA-1` is ACCEPTED for the diagnostic serializer only, on source SHA `e1344960e8e1f5c346861a3fd8eda9b4efa337d1` and GitHub run `38180511032`. Source, formatter-repair and hosted-evidence reviews all PASS. Reports and full run evidence are under `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-*`.
+- `/root/toolchain_audit` is READY for `T02-L01-EXECUTOR-1` and may write only `games/counterball/src/simulation/loftCoarseRunner.ts` and `execution_state/reports/T02-L01-EXECUTOR-1-implementation-2.md`. It must not edit contracts, schemas, config, task status, workflow, browser/page/host transport, or other source paths. No local application check or physics execution; the only local source command is the exact scoped `git diff --check` in the packet.
+- `/root/contact_state_review2` is the rotated independent reviewer and may write only `execution_state/reports/T02-L01-EXECUTOR-1-review-2.md`; it must not repair source or run app checks.
+- `/root` retains shared status, ledger, ownership, branch publication and exact-head GitHub verification. Parent T02 remains RUNNING. The full 24-case Chromium matrix is a later `T02-L01-MATRIX-1` gate; this runner packet and its hosted `pnpm verify` cannot accept that matrix.
+- Cloudflare access is not needed for this packet. Because the user is logging out and asked to be notified, `/root` will contact them when T04 staging Havok becomes the next gate and wait for their signal before using Wrangler. No production publish or plan changes are authorized.
+
+
+## Current ownership — 2026-10-13 (executor source review passed; hosted verify pending)
+
+- `T02-L01-EXECUTOR-1` source paths are released after repair; the full source review chain passes at `execution_state/reports/T02-L01-EXECUTOR-1-review-5.md`. Coordinator repair preserves the primary error code when sink abort also fails.
+- `/root` owns exact-head commit/push, GitHub `pnpm verify`, evidence capture, and the next shared status update. `/root/foundation_review` has released its review report.
+- `T02-L01-EXECUTOR-1` remains VERIFIED, not ACCEPTED, until the exact reviewed SHA passes hosted checks. The full Chromium/Havok matrix remains a later gate.
+- No Cloudflare access or local app build/test is needed at this point. Notify the user before T04 staging Havok and wait for their signal before using Wrangler.

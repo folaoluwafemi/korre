@@ -423,6 +423,17 @@ Historical readiness snapshot (superseded): At the time, the packet checker mark
 Historical dispatch — T02-L01-EXECUTOR-1 (superseded): `/root/toolchain_audit` received the one-file executor assignment after ARTIFACT-1 acceptance, then released it without creating a world or applying an impulse when the schema blocker was confirmed. The current assignment is unowned and PLANNED until CONTACT-SCHEMA-1 is accepted.
 
 
-## Current contact-schema checkpoint — 2026-10-11
+## Historical contact-schema checkpoint (superseded) — 2026-10-11
 
 `T02-L01-CONTACT-CONTRACT-1` is ACCEPTED after independent PASS at `execution_state/reports/T02-L01-CONTACT-CONTRACT-1-review-2.md`. `T02-L01-CONTACT-STATUS-1` is ACCEPTED after rotated independent PASS at `execution_state/reports/T02-L01-CONTACT-STATUS-1-review-2.md`; the first CHANGES_REQUIRED review is retained. CONTACT-SCHEMA-1 implementation is complete at `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-implementation.md`; source review PASS is recorded at `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-review.md`; exact-head hosted verification has not run. EXECUTOR-1 remains PLANNED and unassigned. No runner source, physics matrix, deployed Havok or playable match is accepted.
+
+## Current T02-L01 execution checkpoint — 2026-10-11 (contact schema accepted; executor ready)
+
+`T02-L01-CONTACT-SCHEMA-1` is ACCEPTED for the diagnostic contact serializer only. Exact source SHA `e1344960e8e1f5c346861a3fd8eda9b4efa337d1` passed GitHub run [38180511032](https://github.com/folaoluwafemi/korre/actions/runs/38180511032) and independent source, repair and hosted-artifact reviews. Hosted results were 30 files/179 unit tests, protocol 13/13, integration 1/1, preview Chromium 4/4 and diagnostic Chromium 2/2, all with zero test skips/flakes. The initial Prettier-only failure, pinned formatting repair, full logs and 1,152-file hash inventory remain recorded under `execution_state/reports/T02-L01-CONTACT-SCHEMA-1-*`. The run did not deploy the Worker, exercise Cloudflare Havok, or prove a playable match.
+
+The exact `T02-L01-EXECUTOR-1` packet now extracts as the sole `initialReady` card. Its original dependency list and required T01 parent gate are preserved. `/root/toolchain_audit` is assigned only `games/counterball/src/simulation/loftCoarseRunner.ts` and `execution_state/reports/T02-L01-EXECUTOR-1-implementation-2.md`; rotated reviewer `/root/contact_state_review2` may write only `execution_state/reports/T02-L01-EXECUTOR-1-review-2.md`. `/root` owns shared status, exact-SHA publication, and hosted verification. No local application checks or Cloudflare access are needed for this runner packet. T02 remains RUNNING; the 24-case browser matrix and every downstream gameplay gate remain open.
+
+
+## Coordinator checkpoint — 2026-10-13 (executor source review passed; hosted verify pending)
+
+`T02-L01-EXECUTOR-1` is VERIFIED for source review only, not ACCEPTED. The independent review chain is preserved at `execution_state/reports/T02-L01-EXECUTOR-1-review-2.md` through `review-5.md`; the final scoped repair review passes. The timing field interval was clarified in `knowledge_base/execution/completion/CONTRACT_WORK.md` after independent PASS review. The document checker passes (99 packets, 21 remaining parents). Next: publish the exact reviewed source/reports and obtain `pnpm verify` on that exact GitHub SHA. No local app tests, browser/physics trial, deployed Havok, or playability proof has run for this executor. Cloudflare access is not needed yet.
