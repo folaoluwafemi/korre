@@ -8504,7 +8504,7 @@
           "review_report": "execution_state/reports/T02-L01-SUPPORT-F32-source-review.md",
           "acceptance_report": "execution_state/reports/T02-L01-SUPPORT-F32-acceptance.md",
           "attempt_count": 1,
-          "next_action": "Implementation worker released all three exact source paths. Independent source review PASS at execution_state/reports/T02-L01-SUPPORT-F32-source-review.md; source hashes match. The coordinator owns committing/pushing this exact reviewed source and running GitHub Verify plus the routed real-Havok Chromium diagnostic. No local application commands. F32, MATRIX-1 and parent T02 remain unaccepted until the hosted evidence and independent exact-run review are complete.",
+          "next_action": "Exact run 38469673506 failure and artifacts have independent review PASS; it confirms only Prettier failed and the full suite/build/browser/Havok gates did not run. Repair 1 exact patch and independent source review PASS. /root publishes source SHA f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30 and launches hosted Verify plus the unchanged real-Havok matrix; /root/run_evidence_review will review that exact run. F32/MATRIX-1/T02 remain unaccepted.",
           "packet_review_report": "execution_state/reports/T02-L01-SUPPORT-F32-packet-review.md",
           "checks": [
             {
@@ -8546,6 +8546,95 @@
               "environment": "source-review",
               "result": "PENDING",
               "report": "execution_state/reports/T02-L01-SUPPORT-F32-run-review.md"
+            },
+            {
+              "command": "pnpm verify on exact source-reviewed SHA d7477075de44ade129067e177acc07f8f5cb0655",
+              "environment": "github",
+              "result": "CHANGES_REQUIRED",
+              "run_id": 38469673506,
+              "source_sha": "d7477075de44ade129067e177acc07f8f5cb0655",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38469673506",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506.md",
+              "detail": "One verify job failed after workspace/root typecheck and ESLint passed; Prettier flagged only loftCoarseRunner.ts. Worker smoke 1/1, two migration verifications, and protocol 13/13 passed. Main unit suite, build, integration, browser and Havok matrix did not run."
+            },
+            {
+              "command": "Capture exact log, API snapshots, hosted artifacts and extracted file hashes for run 38469673506",
+              "environment": "github-evidence",
+              "result": "PASS",
+              "run_id": 38469673506,
+              "source_sha": "d7477075de44ade129067e177acc07f8f5cb0655",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506.md",
+              "detail": "Full log, jobs/artifact snapshots, four artifact payloads, exact hosted formatting patch and SHA-256 inventory retained; current-run browser/physics evidence absent."
+            },
+            {
+              "command": "Independent exact-run review for run 38469673506",
+              "environment": "source-review",
+              "result": "PASS",
+              "run_id": 38469673506,
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506-independent-review.md",
+              "detail": "Independent reviewer confirmed exact run/SHA, gate progression, no main unit/build/browser/physics result, all 22 extracted-file hashes and four API artifacts. The browser-evidence artifact contained only the pre-existing T03 screenshots."
+            },
+            {
+              "command": "Apply exact hosted Prettier patch and scoped whitespace check — repair attempt 1",
+              "environment": "local-diff-only",
+              "result": "PENDING",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-implementation.md",
+              "detail": "The exact one-file patch and exact allowed commands are documented in execution_state/reports/T02-L01-SUPPORT-F32-repair-1-coordinator-setup.md."
+            },
+            {
+              "command": "Apply exact hosted formatting repair patch attempt 1",
+              "environment": "local-diff-only",
+              "result": "PASS",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-implementation.md",
+              "detail": "GitHub patch hash verified; only loftCoarseRunner.ts changed and its full diff exactly matches the single hosted formatting hunk. Resulting runner SHA-256 f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30."
+            },
+            {
+              "command": "git diff --check -- games/counterball/src/simulation/loftCoarseRunner.ts after formatting repair 1",
+              "environment": "local-document",
+              "result": "PASS",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-implementation.md",
+              "detail": "Worker and coordinator verified scoped whitespace check; no local app/runtime command."
+            },
+            {
+              "command": "Independent exact-source review of F32 formatting repair 1",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-review.md",
+              "detail": "Reviewer independently confirmed the exact GitHub patch hash and single hunk against base commit d7477075de44ade129067e177acc07f8f5cb0655; runner SHA-256 matches worker report and no behavior changed."
+            },
+            {
+              "command": "Independent exact-source review of F32 formatting repair 1",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-review.md",
+              "detail": "Exact one-file diff matches the captured hosted formatting patch; source hash f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30 matches worker evidence. No application/runtime command was run."
+            },
+            {
+              "command": "Independent exact-run evidence review for run 38469673506",
+              "environment": "source-review",
+              "result": "PASS",
+              "run_id": 38469673506,
+              "source_sha": "d7477075de44ade129067e177acc07f8f5cb0655",
+              "report": "execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506-independent-review.md",
+              "detail": "Exact-source run, failure stage, actual preceding passes, gates not reached, artifact IDs/digests and all extracted hashes independently checked."
+            }
+          ],
+          "repair_attempts": [
+            {
+              "attempt": 1,
+              "failure_signature": "Hosted Prettier reports only games/counterball/src/simulation/loftCoarseRunner.ts",
+              "status": "SOURCE_REVIEWED_HOSTED_PENDING",
+              "owner": "/root/toolchain_audit",
+              "write_paths": [
+                "games/counterball/src/simulation/loftCoarseRunner.ts"
+              ],
+              "setup_report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-coordinator-setup.md",
+              "implementation_report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-SUPPORT-F32-repair-1-review.md",
+              "reviewer_identity": "/root/executor_type_review — independent source review PASS",
+              "run_failure_review": "execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506-independent-review.md"
             }
           ]
         }
@@ -9142,5 +9231,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02-L01-SUPPORT-F32-1 has an independent source review PASS and is pending exact-SHA GitHub Verify plus real-Havok Chromium evidence. /root owns publication and hosted checks; /root/executor_type_review reviews the exact hosted run. F32, MATRIX-1 and T02 remain unaccepted. Do not run local application commands or use Cloudflare/Wrangler without the user signal."
+  "next": "F32 repair attempt 1 has exact-source PASS; run 38469673506 has independent evidence PASS and is recorded as Prettier-only failure before main tests/build/browser/physics. Publish runner SHA f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30 and rerun hosted Verify plus unchanged real-Havok browser matrix. F32/MATRIX-1/T02 remain unaccepted; no local app commands or Cloudflare/Wrangler."
 }

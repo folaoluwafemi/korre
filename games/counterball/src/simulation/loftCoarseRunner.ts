@@ -1385,11 +1385,10 @@ async function runCase(
         scaleZ: surfaceBody.transformNode.scaling.z === 1,
         nativeShapeDimensionX:
           originalSurfaceDimensions.x === config.geometry.pitchWidth,
-        nativeShapeDimensionY:
-          matchesExactFloat32Projection(
-            config.geometry.surfaceThickness,
-            originalSurfaceDimensions.y,
-          ),
+        nativeShapeDimensionY: matchesExactFloat32Projection(
+          config.geometry.surfaceThickness,
+          originalSurfaceDimensions.y,
+        ),
         nativeShapeDimensionZ:
           originalSurfaceDimensions.z === config.geometry.pitchLength,
       };

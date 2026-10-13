@@ -584,3 +584,21 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root/toolchain_audit` released the exact three implementation paths. `/root/run_evidence_review` independently passed source review at `execution_state/reports/T02-L01-SUPPORT-F32-source-review.md`; the exact comparison is restricted to support AABB Y, no tolerance is used, and source hashes match. The tests are authored but not run.
 - `/root` owns exact-reviewed-source commit/push, hosted Verify and browser/real-Havok evidence capture plus shared status. `/root/executor_type_review` is rotated to independently review the exact hosted run. Do not run local application builds/tests/browser checks. Keep Cloudflare/Wrangler unused until the user signals access.
 - F32 remains RUNNING; MATRIX-1 remains CHANGES_REQUIRED; T02 remains RUNNING. Do not accept a packet or parent until the corresponding actual hosted checks and independent review pass.
+
+## Current ownership — 2026-10-13 (F32 formatting repair attempt 1)
+
+- Exact run 38469673506 on `d7477075de44ade129067e177acc07f8f5cb0655` failed only hosted Prettier in `loftCoarseRunner.ts`; typecheck, ESLint, worker smoke 1/1, migrations twice and protocol tests 13/13 passed. Full run log, four actual artifacts and hash inventory are retained under `execution_state/reports/T02-L01-SUPPORT-F32-run-38469673506/`.
+- `/root/toolchain_audit` owns only `games/counterball/src/simulation/loftCoarseRunner.ts` for exact GitHub formatting patch `formatting-repair.patch`, and its unique implementation report. `/root/executor_type_review` owns exact source review after the repair. `/root/run_evidence_review` independently audits run 38469673506. `/root` owns shared state, publication and next hosted run.
+- Run 38469673506 did not reach main unit tests, build, integration, browser tests or Havok; there is no matrix artifact or zero-skip claim. Apply no semantic edits. Keep Cloudflare/Wrangler and local app commands unused.
+
+## Current ownership — 2026-10-13 (F32 formatter repair independently reviewed)
+
+- Repair attempt 1 is complete: `/root/toolchain_audit` applied the exact hosted one-hunk formatter patch to only the assigned runner file; `/root/executor_type_review` passed the exact diff and hash check. Runner SHA-256 is `f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30`.
+- `/root/run_evidence_review` is completing the independent evidence review for failed run 38469673506. `/root` owns exact reviewed-source publication and hosted verification plus real-Havok browser evidence. Local app commands and Cloudflare/Wrangler remain unused.
+- F32 is still RUNNING; MATRIX-1 remains CHANGES_REQUIRED; T02 remains RUNNING.
+
+## Current ownership — 2026-10-13 (F32 repair ready for exact hosted rerun)
+
+- Independent source and failed-run evidence reviews passed for formatting repair attempt 1. The run review confirms no full unit/build/browser/physics run occurred on SHA d7477075de44ade129067e177acc07f8f5cb0655; exact failure and artifact hashes are saved in the run folder and summary report.
+- `/root` owns commit/push of the reviewed single-hunk formatter patch and shared state; the exact next hosted run is expected on runner SHA `f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30`. `/root/run_evidence_review` will independently review the next exact run. No local app commands or Cloudflare/Wrangler.
+- F32 remains RUNNING pending hosted Verify and real-Havok browser evidence; MATRIX-1 remains CHANGES_REQUIRED; T02 remains RUNNING.
