@@ -1,0 +1,1929 @@
+diff --git a/games/counterball/src/simulation/loftCoarseRunner.ts b/games/counterball/src/simulation/loftCoarseRunner.ts
+index bf06f7f..5cc3aaf 100644
+--- a/games/counterball/src/simulation/loftCoarseRunner.ts
++++ b/games/counterball/src/simulation/loftCoarseRunner.ts
+@@ -169,7 +169,8 @@ function resourceGuard<T>(operation: () => T): T {
+ }
+ 
+ function cancellationError(reason: unknown, message: string): Error {
+-  if (reason instanceof Error) return normalizeDiagnosticError(reason, "cancelled");
++  if (reason instanceof Error)
++    return normalizeDiagnosticError(reason, "cancelled");
+   return Object.assign(new Error(message), {
+     name: "AbortError",
+     code: "cancelled",
+@@ -332,7 +333,9 @@ function materialValues(material: PhysicsMaterial): DiagnosticMaterialValues {
+     frictionCombine === undefined ||
+     restitutionCombine === undefined
+   ) {
+-    throw resourceFailure("A native material coefficient or combine mode is missing.");
++    throw resourceFailure(
++      "A native material coefficient or combine mode is missing.",
++    );
+   }
+   const nativeValues = {
+     friction,
+@@ -352,7 +355,9 @@ function materialValues(material: PhysicsMaterial): DiagnosticMaterialValues {
+     nativeValues.frictionCombine !== guard.materials.frictionCombine ||
+     nativeValues.restitutionCombine !== guard.materials.restitutionCombine
+   ) {
+-    throw resourceFailure("A native material value is missing or out of range.");
++    throw resourceFailure(
++      "A native material value is missing or out of range.",
++    );
+   }
+   return {
+     friction: nativeValues.friction,
+@@ -376,7 +381,10 @@ function materialFact(): DiagnosticMaterialValues {
+ function setAndReadMaterial(
+   world: CounterballWorld,
+   shape: PhysicsShape,
+-): { setter: ReturnType<typeof materialFact>; readback: ReturnType<typeof materialFact> } {
++): {
++  setter: ReturnType<typeof materialFact>;
++  readback: ReturnType<typeof materialFact>;
++} {
+   const setter = materialFact();
+   shape.material = {
+     friction: setter.friction,
+@@ -394,7 +402,9 @@ function setAndReadMaterial(
+     "restitutionCombine",
+   ] as const) {
+     if (readback[key] !== setter[key]) {
+-      throw resourceFailure(`Native ${key} material readback differs from its setter.`);
++      throw resourceFailure(
++        `Native ${key} material readback differs from its setter.`,
++      );
+     }
+   }
+   return { setter, readback };
+@@ -563,7 +573,8 @@ function regeneratedState(
+       rotation = pose.rotation;
+     } else {
+       const slot = slots[fillerIndex];
+-      if (slot === undefined) throw failure("A canonical filler slot is missing.");
++      if (slot === undefined)
++        throw failure("A canonical filler slot is missing.");
+       position = slot;
+       fillerIndex += 1;
+     }
+@@ -578,11 +589,14 @@ function regeneratedState(
+   return parseMatchState({ ...fixture, bodies });
+ }
+ 
+-function getWorldSamples(metrics: readonly NativeBodyMetrics[]): NativeBodySample[] {
++function getWorldSamples(
++  metrics: readonly NativeBodyMetrics[],
++): NativeBodySample[] {
+   return metrics.map((metric) => {
+     const node = metric.body.transformNode;
+     const rotationValue = node.rotationQuaternion;
+-    if (rotationValue === null) throw resourceFailure(`Body ${metric.id} has no quaternion.`);
++    if (rotationValue === null)
++      throw resourceFailure(`Body ${metric.id} has no quaternion.`);
+     const rotation = normalizedQuaternion(
+       {
+         x: rotationValue.x,
+@@ -592,7 +606,11 @@ function getWorldSamples(metrics: readonly NativeBodyMetrics[]): NativeBodySampl
+       },
+       `Body ${metric.id} rotation`,
+     );
+-    const position = { x: node.position.x, y: node.position.y, z: node.position.z };
++    const position = {
++      x: node.position.x,
++      y: node.position.y,
++      z: node.position.z,
++    };
+     const linear = metric.body.getLinearVelocity();
+     const angular = metric.body.getAngularVelocity();
+     const linearVelocity = { x: linear.x, y: linear.y, z: linear.z };
+@@ -600,11 +618,26 @@ function getWorldSamples(metrics: readonly NativeBodyMetrics[]): NativeBodySampl
+     assertFiniteVector(position, `Body ${metric.id} position`);
+     assertFiniteVector(linearVelocity, `Body ${metric.id} linear velocity`);
+     assertFiniteVector(angularVelocity, `Body ${metric.id} angular velocity`);
+-    const centerOfMass = add(position, rotate(rotation, metric.centerOfMassLocal));
+-    const principalWorld = multiplyQuaternion(rotation, metric.inertiaOrientation);
+-    const angularVelocityPrincipal = rotate(conjugate(principalWorld), angularVelocity);
++    const centerOfMass = add(
++      position,
++      rotate(rotation, metric.centerOfMassLocal),
++    );
++    const principalWorld = multiplyQuaternion(
++      rotation,
++      metric.inertiaOrientation,
++    );
++    const angularVelocityPrincipal = rotate(
++      conjugate(principalWorld),
++      angularVelocity,
++    );
+     return {
+-      state: { id: metric.id, position, rotation, linearVelocity, angularVelocity },
++      state: {
++        id: metric.id,
++        position,
++        rotation,
++        linearVelocity,
++        angularVelocity,
++      },
+       centerOfMass,
+       angularVelocityPrincipal,
+     };
+@@ -616,11 +649,14 @@ function energyBodies(
+   samples: readonly NativeBodySample[],
+ ): DiagnosticEnergyBody[] {
+   if (metrics.length !== 15 || samples.length !== 15) {
+-    throw resourceFailure("Energy sample does not contain all fifteen dynamic bodies.");
++    throw resourceFailure(
++      "Energy sample does not contain all fifteen dynamic bodies.",
++    );
+   }
+   return metrics.map((metric, index) => {
+     const sample = samples[index];
+-    if (sample === undefined) throw resourceFailure(`Missing body sample ${metric.id}.`);
++    if (sample === undefined)
++      throw resourceFailure(`Missing body sample ${metric.id}.`);
+     return {
+       mass: metric.mass,
+       inertiaUnitMass: metric.inertiaUnitMass,
+@@ -645,7 +681,10 @@ function allZero(samples: readonly NativeBodySample[]): boolean {
+   );
+ }
+ 
+-function isCollisionCompatible(left: readonly [number, number], right: readonly [number, number]): boolean {
++function isCollisionCompatible(
++  left: readonly [number, number],
++  right: readonly [number, number],
++): boolean {
+   return (left[0] & right[1]) !== 0 && (right[0] & left[1]) !== 0;
+ }
+ 
+@@ -675,7 +714,12 @@ function materialRow(
+   bodyId: string,
+   value: ReturnType<typeof setAndReadMaterial>,
+ ): LoftCoarseCase["metadata"]["materials"][number] {
+-  return { bodyId, shapeIndex: 0, setter: value.setter, readback: value.readback };
++  return {
++    bodyId,
++    shapeIndex: 0,
++    setter: value.setter,
++    readback: value.readback,
++  };
+ }
+ 
+ function supportClearances(
+@@ -687,21 +731,35 @@ function supportClearances(
+   const apronX = geometry.pitchWidth / 2 + guard.setup.supportApronMargin;
+   const apronZ = geometry.pitchLength / 2 + guard.setup.supportApronMargin;
+   const apron = Math.min(
+-    apronX - (Math.abs(sample.state.position.x) + metric.farthestOriginRadius + pointSweep),
+-    apronZ - (Math.abs(sample.state.position.z) + metric.farthestOriginRadius + pointSweep),
++    apronX -
++      (Math.abs(sample.state.position.x) +
++        metric.farthestOriginRadius +
++        pointSweep),
++    apronZ -
++      (Math.abs(sample.state.position.z) +
++        metric.farthestOriginRadius +
++        pointSweep),
+   );
+   const axis = rotate(sample.state.rotation, { x: 0, y: 1, z: 0 });
+-  const radialSupport = metric.radius * Math.sqrt(Math.max(0, 1 - axis.y * axis.y));
+-  const verticalSupport = (metric.height / 2) * Math.abs(axis.y) + radialSupport;
++  const radialSupport =
++    metric.radius * Math.sqrt(Math.max(0, 1 - axis.y * axis.y));
++  const verticalSupport =
++    (metric.height / 2) * Math.abs(axis.y) + radialSupport;
+   const underside = geometry.surfaceY - geometry.surfaceThickness;
+-  const slab = sample.state.position.y - verticalSupport - pointSweep - underside;
++  const slab =
++    sample.state.position.y - verticalSupport - pointSweep - underside;
+   const drop = metric.restY - sample.centerOfMass.y;
+   const result = { apron, slab, drop };
+   if (Object.values(result).some((value) => !Number.isFinite(value))) {
+-    throw resourceFailure(`Body ${metric.id} has non-finite support clearance.`);
++    throw resourceFailure(
++      `Body ${metric.id} has non-finite support clearance.`,
++    );
+   }
+   if (apron < 0 || slab < 0 || drop > guard.energy.maximumRestComDrop) {
+-    throw Object.assign(new Error(`Body ${metric.id} crossed a strict support/drop guard.`), { code: "resourceLimit" });
++    throw Object.assign(
++      new Error(`Body ${metric.id} crossed a strict support/drop guard.`),
++      { code: "resourceLimit" },
++    );
+   }
+   return result;
+ }
+@@ -719,33 +777,48 @@ function verticalObstacleClearance(
+   );
+   const horizontalOverlap =
+     horizontalDistance <=
+-    button.farthestOriginRadius + obstacle.farthestOriginRadius + combinedPointSweep;
++    button.farthestOriginRadius +
++      obstacle.farthestOriginRadius +
++      combinedPointSweep;
+   const buttonAxis = rotate(buttonSample.state.rotation, { x: 0, y: 1, z: 0 });
+-  const obstacleAxis = rotate(obstacleSample.state.rotation, { x: 0, y: 1, z: 0 });
++  const obstacleAxis = rotate(obstacleSample.state.rotation, {
++    x: 0,
++    y: 1,
++    z: 0,
++  });
+   const buttonVerticalSupport =
+     (button.height / 2) * Math.abs(buttonAxis.y) +
+     button.radius * Math.sqrt(Math.max(0, 1 - buttonAxis.y * buttonAxis.y));
+   const obstacleVerticalSupport =
+     (obstacle.height / 2) * Math.abs(obstacleAxis.y) +
+-    obstacle.radius * Math.sqrt(Math.max(0, 1 - obstacleAxis.y * obstacleAxis.y));
++    obstacle.radius *
++      Math.sqrt(Math.max(0, 1 - obstacleAxis.y * obstacleAxis.y));
+   const clearance =
+     Math.abs(buttonSample.state.position.y - obstacleSample.state.position.y) -
+     buttonVerticalSupport -
+     obstacleVerticalSupport -
+     combinedPointSweep;
+-  if (!Number.isFinite(clearance)) throw resourceFailure("Obstacle clearance is non-finite.");
++  if (!Number.isFinite(clearance))
++    throw resourceFailure("Obstacle clearance is non-finite.");
+   return { horizontalOverlap, clearance };
+ }
+ 
+ function staticBodyName(body: PhysicsBody): LoftCoarseStaticBodyId {
+   const id = staticNames.get(body.transformNode.name);
+-  if (id === undefined) throw resourceFailure(`Unknown static collider ${body.transformNode.name}.`);
++  if (id === undefined)
++    throw resourceFailure(
++      `Unknown static collider ${body.transformNode.name}.`,
++    );
+   return id;
+ }
+ 
+ function eventPoint(point: IPhysicsCollisionEvent["point"]): Vec3 | null {
+   if (point === null || point === undefined) return null;
+-  if (!Number.isFinite(point.x) || !Number.isFinite(point.y) || !Number.isFinite(point.z)) {
++  if (
++    !Number.isFinite(point.x) ||
++    !Number.isFinite(point.y) ||
++    !Number.isFinite(point.z)
++  ) {
+     throw resourceFailure("A native contact point is present but non-finite.");
+   }
+   return { x: point.x, y: point.y, z: point.z };
+@@ -780,7 +853,9 @@ function makeMatrixMetadata(
+     fixturePayloadSha256,
+     fixtureFileSha256,
+     physicsVersion: guard.physicsVersion,
+-    adapterVersion: guard.physicsVersion.slice(guard.physicsVersion.lastIndexOf("/") + 1),
++    adapterVersion: guard.physicsVersion.slice(
++      guard.physicsVersion.lastIndexOf("/") + 1,
++    ),
+     wasmSha256,
+     matchId: guard.matchId,
+     runtimeIdentity,
+@@ -791,15 +866,21 @@ function exactMatrixTuples(): void {
+   const expected = guard.matrix.gapOffsets.flatMap((gap) =>
+     guard.matrix.tiltDegrees.flatMap((tilt) =>
+       guard.matrix.impulseMagnitudes.flatMap((impulse) =>
+-        guard.matrix.azimuthDegrees.map((azimuth) => [gap, tilt, impulse, azimuth] as const),
++        guard.matrix.azimuthDegrees.map(
++          (azimuth) => [gap, tilt, impulse, azimuth] as const,
++        ),
+       ),
+     ),
+   );
+   if (
+     expected.length !== LOFT_COARSE_TUPLES.length ||
+-    expected.some((tuple, index) => tuple.some((value, axis) => value !== LOFT_COARSE_TUPLES[index]?.[axis]))
++    expected.some((tuple, index) =>
++      tuple.some((value, axis) => value !== LOFT_COARSE_TUPLES[index]?.[axis]),
++    )
+   ) {
+-    throw resourceFailure("The exported L01 tuples do not match the hashed matrix order.");
++    throw resourceFailure(
++      "The exported L01 tuples do not match the hashed matrix order.",
++    );
+   }
+ }
+ 
+@@ -811,63 +892,131 @@ function readNativeBodies(world: CounterballWorld): {
+   staticFacts: LoftCoarseCase["metadata"]["staticBodies"][number][];
+ } {
+   const { geometry } = config;
+-  const dynamicFacts: LoftCoarseCase["metadata"]["dynamicBodies"][number][] = [];
++  const dynamicFacts: LoftCoarseCase["metadata"]["dynamicBodies"][number][] =
++    [];
+   const materials: LoftCoarseCase["metadata"]["materials"][number][] = [];
+   const metrics: NativeBodyMetrics[] = [];
+   for (const entityId of ENTITY_IDS) {
+     const id = entityId;
+     const body = world.bodies.get(entityId);
+-    if (body === undefined) throw resourceFailure(`Canonical dynamic body ${id} is missing.`);
++    if (body === undefined)
++      throw resourceFailure(`Canonical dynamic body ${id} is missing.`);
+     const shape = body.shape;
+-    if (shape === null || shape.type !== PhysicsShapeType.CYLINDER || shape.isTrigger) {
++    if (
++      shape === null ||
++      shape.type !== PhysicsShapeType.CYLINDER ||
++      shape.isTrigger
++    ) {
+       throw resourceFailure(`Dynamic body ${id} has an unsupported collider.`);
+     }
+     const transform = body.transformNode;
+-    if (transform.parent !== null || transform.scaling.x !== 1 || transform.scaling.y !== 1 || transform.scaling.z !== 1) {
+-      throw resourceFailure(`Dynamic body ${id} has unsupported parent/scale geometry.`);
++    if (
++      transform.parent !== null ||
++      transform.scaling.x !== 1 ||
++      transform.scaling.y !== 1 ||
++      transform.scaling.z !== 1
++    ) {
++      throw resourceFailure(
++        `Dynamic body ${id} has unsupported parent/scale geometry.`,
++      );
+     }
+     const nativeMaterial = setAndReadMaterial(world, shape);
+     materials.push(materialRow(id, nativeMaterial));
+     const membership = shape.filterMembershipMask;
+     const collide = shape.filterCollideMask;
+     if (!maskIsValid(membership) || !maskIsValid(collide)) {
+-      throw resourceFailure(`Dynamic body ${id} has invalid native collision filters.`);
++      throw resourceFailure(
++        `Dynamic body ${id} has invalid native collision filters.`,
++      );
+     }
+     const dimensions = shapeDimensions(shape);
+     const isButton = id === "button";
+-    const configuredRadius = isButton ? geometry.buttonRadius : geometry.capRadius;
+-    const configuredHeight = isButton ? geometry.buttonThickness : geometry.capHeight;
++    const configuredRadius = isButton
++      ? geometry.buttonRadius
++      : geometry.capRadius;
++    const configuredHeight = isButton
++      ? geometry.buttonThickness
++      : geometry.capHeight;
+     const radius = Math.max(dimensions.x, dimensions.z) / 2;
+     const height = dimensions.y;
+-    if (dimensions.x !== configuredRadius * 2 || dimensions.z !== configuredRadius * 2 || height !== configuredHeight) {
+-      throw resourceFailure(`Dynamic body ${id} native dimensions differ from canonical cylinder geometry.`);
++    if (
++      dimensions.x !== configuredRadius * 2 ||
++      dimensions.z !== configuredRadius * 2 ||
++      height !== configuredHeight
++    ) {
++      throw resourceFailure(
++        `Dynamic body ${id} native dimensions differ from canonical cylinder geometry.`,
++      );
+     }
+     const properties = body.getMassProperties();
+-    if (properties.mass === undefined || properties.centerOfMass === undefined || properties.inertia === undefined || properties.inertiaOrientation === undefined) {
+-      throw resourceFailure(`Dynamic body ${id} has incomplete native mass properties.`);
++    if (
++      properties.mass === undefined ||
++      properties.centerOfMass === undefined ||
++      properties.inertia === undefined ||
++      properties.inertiaOrientation === undefined
++    ) {
++      throw resourceFailure(
++        `Dynamic body ${id} has incomplete native mass properties.`,
++      );
+     }
+     const mass = properties.mass;
+-    const centerOfMassLocal = { x: properties.centerOfMass.x, y: properties.centerOfMass.y, z: properties.centerOfMass.z };
+-    const inertiaUnitMass = { x: properties.inertia.x, y: properties.inertia.y, z: properties.inertia.z };
+-    const inertiaOrientation = normalizedQuaternion({ x: properties.inertiaOrientation.x, y: properties.inertiaOrientation.y, z: properties.inertiaOrientation.z, w: properties.inertiaOrientation.w }, `Body ${id} inertia orientation`);
+-    const configuredMass = isButton ? config.bodies.buttonMass : config.bodies.capMass;
++    const centerOfMassLocal = {
++      x: properties.centerOfMass.x,
++      y: properties.centerOfMass.y,
++      z: properties.centerOfMass.z,
++    };
++    const inertiaUnitMass = {
++      x: properties.inertia.x,
++      y: properties.inertia.y,
++      z: properties.inertia.z,
++    };
++    const inertiaOrientation = normalizedQuaternion(
++      {
++        x: properties.inertiaOrientation.x,
++        y: properties.inertiaOrientation.y,
++        z: properties.inertiaOrientation.z,
++        w: properties.inertiaOrientation.w,
++      },
++      `Body ${id} inertia orientation`,
++    );
++    const configuredMass = isButton
++      ? config.bodies.buttonMass
++      : config.bodies.capMass;
+     const projectedMass = Math.fround(configuredMass);
+-    const tolerance = guard.energy.nativeMassToleranceMultiplier * Number.EPSILON * Math.max(1, configuredMass);
++    const tolerance =
++      guard.energy.nativeMassToleranceMultiplier *
++      Number.EPSILON *
++      Math.max(1, configuredMass);
+     if (
+-      !Number.isFinite(mass) || mass <= 0 ||
++      !Number.isFinite(mass) ||
++      mass <= 0 ||
+       !finiteVector(centerOfMassLocal) ||
+-      !finiteVector(inertiaUnitMass) || inertiaUnitMass.x <= 0 || inertiaUnitMass.y <= 0 || inertiaUnitMass.z <= 0 ||
++      !finiteVector(inertiaUnitMass) ||
++      inertiaUnitMass.x <= 0 ||
++      inertiaUnitMass.y <= 0 ||
++      inertiaUnitMass.z <= 0 ||
+       Math.abs(mass - projectedMass) > tolerance
+     ) {
+-      throw resourceFailure(`Dynamic body ${id} failed its actual native mass/inertia projection checks.`);
++      throw resourceFailure(
++        `Dynamic body ${id} failed its actual native mass/inertia projection checks.`,
++      );
+     }
+     const radii = radiiFromBounds(shape, centerOfMassLocal);
+     const metric: NativeBodyMetrics = {
+-      id, body, shape, radius, height, dimensions,
++      id,
++      body,
++      shape,
++      radius,
++      height,
++      dimensions,
+       farthestPointRadius: radii.farthestPointRadius,
+       farthestOriginRadius: radii.farthestOriginRadius,
+-      mass, inertiaUnitMass, inertiaOrientation, centerOfMassLocal,
+-      filter: [membership, collide], restY: Number.NaN,
++      mass,
++      inertiaUnitMass,
++      inertiaOrientation,
++      centerOfMassLocal,
++      filter: [membership, collide],
++      restY: Number.NaN,
+     };
+     metrics.push(metric);
+     dynamicFacts.push({
+@@ -881,61 +1030,122 @@ function readNativeBodies(world: CounterballWorld): {
+       initialLinearVelocity: { x: 0, y: 0, z: 0 },
+       initialAngularVelocity: { x: 0, y: 0, z: 0 },
+       configuredMassProjection: {
+-        configuredMass, projectedMass, observedNativeMass: mass, tolerance, withinTolerance: true,
++        configuredMass,
++        projectedMass,
++        observedNativeMass: mass,
++        tolerance,
++        withinTolerance: true,
+       },
+     });
+   }
+   if (metrics.length !== ENTITY_IDS.length || world.staticBodies.length !== 7) {
+-    throw resourceFailure("The Havok world does not contain the canonical 15+7 body set.");
++    throw resourceFailure(
++      "The Havok world does not contain the canonical 15+7 body set.",
++    );
+   }
+   const statics: NamedStaticBody[] = [];
+   const staticFacts: LoftCoarseCase["metadata"]["staticBodies"][number][] = [];
+   for (const body of world.staticBodies) {
+     const id = staticBodyName(body);
+     const shape = body.shape;
+-    if (shape === null || shape.isTrigger) throw resourceFailure(`Static body ${id} has no solid shape.`);
++    if (shape === null || shape.isTrigger)
++      throw resourceFailure(`Static body ${id} has no solid shape.`);
+     const material = setAndReadMaterial(world, shape);
+     materials.push(materialRow(id, material));
+     const membership = shape.filterMembershipMask;
+     const collide = shape.filterCollideMask;
+     const density = shape.density;
+-    if (!maskIsValid(membership) || !maskIsValid(collide) || !Number.isFinite(density) || density < 0) {
+-      throw resourceFailure(`Static body ${id} has invalid native filter/density properties.`);
++    if (
++      !maskIsValid(membership) ||
++      !maskIsValid(collide) ||
++      !Number.isFinite(density) ||
++      density < 0
++    ) {
++      throw resourceFailure(
++        `Static body ${id} has invalid native filter/density properties.`,
++      );
+     }
+     const dimensions = shapeDimensions(shape);
+     if (id === "support-apron") {
+-      if (shape.type !== PhysicsShapeType.BOX || dimensions.x !== 662 || dimensions.y !== 0.2 || dimensions.z !== 670) {
+-        throw resourceFailure("The diagnostic support apron does not match the exact hashed slab geometry.");
++      if (
++        shape.type !== PhysicsShapeType.BOX ||
++        dimensions.x !== 662 ||
++        dimensions.y !== 0.2 ||
++        dimensions.z !== 670
++      ) {
++        throw resourceFailure(
++          "The diagnostic support apron does not match the exact hashed slab geometry.",
++        );
+       }
+     } else if (shape.type !== PhysicsShapeType.CYLINDER) {
+-      throw resourceFailure(`Goal frame body ${id} has an unsupported collider type.`);
++      throw resourceFailure(
++        `Goal frame body ${id} has an unsupported collider type.`,
++      );
+     } else {
+       const isCrossbar = id === "goal-frame-2" || id === "goal-frame-5";
+       const expected = isCrossbar
+-        ? { x: geometry.goalWidth, y: geometry.goalFrameRadius * 2, z: geometry.goalFrameRadius * 2 }
+-        : { x: geometry.goalFrameRadius * 2, y: geometry.goalHeight, z: geometry.goalFrameRadius * 2 };
+-      if (dimensions.x !== expected.x || dimensions.y !== expected.y || dimensions.z !== expected.z) {
+-        throw resourceFailure(`Goal frame collider ${id} dimensions differ from canonical geometry.`);
++        ? {
++            x: geometry.goalWidth,
++            y: geometry.goalFrameRadius * 2,
++            z: geometry.goalFrameRadius * 2,
++          }
++        : {
++            x: geometry.goalFrameRadius * 2,
++            y: geometry.goalHeight,
++            z: geometry.goalFrameRadius * 2,
++          };
++      if (
++        dimensions.x !== expected.x ||
++        dimensions.y !== expected.y ||
++        dimensions.z !== expected.z
++      ) {
++        throw resourceFailure(
++          `Goal frame collider ${id} dimensions differ from canonical geometry.`,
++        );
+       }
+     }
+-    const named: NamedStaticBody = { id, body, shape, dimensions, filter: [membership, collide], material: material.readback };
++    const named: NamedStaticBody = {
++      id,
++      body,
++      shape,
++      dimensions,
++      filter: [membership, collide],
++      material: material.readback,
++    };
+     statics.push(named);
+-    staticFacts.push({ id, colliderDimensions: dimensions, collisionFilter: named.filter, material: named.material });
++    staticFacts.push({
++      id,
++      colliderDimensions: dimensions,
++      collisionFilter: named.filter,
++      material: named.material,
++    });
+   }
+   statics.sort((a, b) => staticIds.indexOf(a.id) - staticIds.indexOf(b.id));
+-  staticFacts.sort((a, b) => staticIds.indexOf((a as { id: LoftCoarseStaticBodyId }).id) - staticIds.indexOf((b as { id: LoftCoarseStaticBodyId }).id));
+-  if (materials.length !== guard.materials.shapeCount || statics.length !== staticIds.length) {
++  staticFacts.sort(
++    (a, b) =>
++      staticIds.indexOf((a as { id: LoftCoarseStaticBodyId }).id) -
++      staticIds.indexOf((b as { id: LoftCoarseStaticBodyId }).id),
++  );
++  if (
++    materials.length !== guard.materials.shapeCount ||
++    statics.length !== staticIds.length
++  ) {
+     throw resourceFailure("Native material/static facts are incomplete.");
+   }
+   const support = statics.find((item) => item.id === "support-apron");
+-  if (support === undefined) throw resourceFailure("Diagnostic support body is missing.");
++  if (support === undefined)
++    throw resourceFailure("Diagnostic support body is missing.");
+   for (const metric of metrics) {
+     if (!isCollisionCompatible(metric.filter, support.filter)) {
+-      throw resourceFailure(`Dynamic body ${metric.id} cannot collide with the support slab.`);
++      throw resourceFailure(
++        `Dynamic body ${metric.id} cannot collide with the support slab.`,
++      );
+     }
+     for (const staticBody of statics) {
+       if (!isCollisionCompatible(metric.filter, staticBody.filter)) {
+-        throw resourceFailure(`Dynamic body ${metric.id} cannot collide with ${staticBody.id}.`);
++        throw resourceFailure(
++          `Dynamic body ${metric.id} cannot collide with ${staticBody.id}.`,
++        );
+       }
+     }
+   }
+@@ -943,8 +1153,14 @@ function readNativeBodies(world: CounterballWorld): {
+     for (let right = left + 1; right < metrics.length; right += 1) {
+       const first = metrics[left];
+       const second = metrics[right];
+-      if (first === undefined || second === undefined || !isCollisionCompatible(first.filter, second.filter)) {
+-        throw resourceFailure("Dynamic collision filters are unsupported or incompatible.");
++      if (
++        first === undefined ||
++        second === undefined ||
++        !isCollisionCompatible(first.filter, second.filter)
++      ) {
++        throw resourceFailure(
++          "Dynamic collision filters are unsupported or incompatible.",
++        );
+       }
+     }
+   }
+@@ -958,7 +1174,10 @@ async function makeCaseInitialBodyState(state: MatchState): Promise<string> {
+ function measureMatrixWallTime(startedAt: number): number {
+   const elapsed = nowMs() - startedAt;
+   if (elapsed > guard.workload.maximumWallTimeMatrixMs) {
+-    throw Object.assign(new Error("The matrix exceeded its wall-time ceiling."), { code: "resourceLimit" });
++    throw Object.assign(
++      new Error("The matrix exceeded its wall-time ceiling."),
++      { code: "resourceLimit" },
++    );
+   }
+   return elapsed;
+ }
+@@ -978,7 +1197,12 @@ async function runCase(
+   identity: LoftCoarseMatrixMetadata,
+   signal: AbortSignal,
+   runStartedAt: number,
+-  counts: { calls: number; batches: number; contacts: number; eligible: number },
++  counts: {
++    calls: number;
++    batches: number;
++    contacts: number;
++    eligible: number;
++  },
+   progress: (progress: LoftCoarseProgress) => void,
+   completedCases: number,
+ ): Promise<LoftCoarseCase> {
+@@ -993,38 +1217,68 @@ async function runCase(
+   let result: LoftCoarseCase | undefined;
+   let primaryError: unknown;
+   try {
+-    ensureWithin(signal, runStartedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
+-    ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
++    ensureWithin(
++      signal,
++      runStartedAt,
++      guard.workload.maximumWallTimeMatrixMs,
++      "L01 matrix",
++    );
++    ensureWithin(
++      signal,
++      caseStartedAt,
++      guard.workload.maximumWallTimePerCaseMs,
++      "L01 case",
++    );
+     const caseState = regeneratedState(fixture, tuple);
+     const initialStateHash = await makeCaseInitialBodyState(caseState);
+     const activeWorld = createCounterballWorld({
+       engine,
+       havok,
+       state: caseState,
+-      gravity: new Vector3(config.simulation.gravity.x, config.simulation.gravity.y, config.simulation.gravity.z),
++      gravity: new Vector3(
++        config.simulation.gravity.x,
++        config.simulation.gravity.y,
++        config.simulation.gravity.z,
++      ),
+     });
+     world = activeWorld;
+-    if (activeWorld.plugin.isSupported() !== true) throw failure("Pinned browser Havok plugin is not supported.");
++    if (activeWorld.plugin.isSupported() !== true)
++      throw failure("Pinned browser Havok plugin is not supported.");
+     const physicsEngine = activeWorld.scene.getPhysicsEngine();
+-    if (!(physicsEngine instanceof PhysicsEngineV2)) throw failure("The trial did not create PhysicsEngineV2.");
++    if (!(physicsEngine instanceof PhysicsEngineV2))
++      throw failure("The trial did not create PhysicsEngineV2.");
+     const physicsBodies = physicsEngine.getBodies();
+     if (
+       activeWorld.staticBodies.length !== 7 ||
+       activeWorld.bodies.size !== 15 ||
+       physicsBodies.length !== 22 ||
+-      [...activeWorld.bodies.values(), ...activeWorld.staticBodies].some((body) => !physicsBodies.includes(body))
++      [...activeWorld.bodies.values(), ...activeWorld.staticBodies].some(
++        (body) => !physicsBodies.includes(body),
++      )
+     ) {
+-      throw resourceFailure("The trial does not have exactly the canonical 15 dynamic and 7 static bodies.");
++      throw resourceFailure(
++        "The trial does not have exactly the canonical 15 dynamic and 7 static bodies.",
++      );
+     }
+-    surfaceBody = activeWorld.staticBodies.find((body) => body.transformNode.name === "counterball-surface");
+-    if (surfaceBody === undefined) throw resourceFailure("Canonical support surface is missing.");
++    surfaceBody = activeWorld.staticBodies.find(
++      (body) => body.transformNode.name === "counterball-surface",
++    );
++    if (surfaceBody === undefined)
++      throw resourceFailure("Canonical support surface is missing.");
+     originalSurfaceShape = surfaceBody.shape ?? undefined;
+     const originalShape = originalSurfaceShape;
+-    if (originalShape === undefined || originalShape.type !== PhysicsShapeType.BOX || originalShape.isTrigger) {
++    if (
++      originalShape === undefined ||
++      originalShape.type !== PhysicsShapeType.BOX ||
++      originalShape.isTrigger
++    ) {
+       throw resourceFailure("Canonical surface is not a solid box.");
+     }
+-    const expectedSurfaceY = config.geometry.surfaceY - config.geometry.surfaceThickness / 2;
+-    const originalSurfaceDimensions = resourceGuard(() => shapeDimensions(originalShape));
++    const expectedSurfaceY =
++      config.geometry.surfaceY - config.geometry.surfaceThickness / 2;
++    const originalSurfaceDimensions = resourceGuard(() =>
++      shapeDimensions(originalShape),
++    );
+     const surfaceRotation = surfaceBody.transformNode.rotationQuaternion;
+     const surfaceIsIdentityRotation =
+       surfaceRotation === null
+@@ -1048,21 +1302,38 @@ async function runCase(
+       originalSurfaceDimensions.y !== config.geometry.surfaceThickness ||
+       originalSurfaceDimensions.z !== config.geometry.pitchLength
+     ) {
+-      throw resourceFailure("Canonical support transform differs from the open slab contract.");
++      throw resourceFailure(
++        "Canonical support transform differs from the open slab contract.",
++      );
+     }
+     const originalMembership = originalShape.filterMembershipMask;
+     const originalCollide = originalShape.filterCollideMask;
+     const originalDensity = originalShape.density;
+-    if (!maskIsValid(originalMembership) || !maskIsValid(originalCollide) || !Number.isFinite(originalDensity) || originalDensity < 0) {
+-      throw resourceFailure("Canonical surface filter or density readback is invalid.");
++    if (
++      !maskIsValid(originalMembership) ||
++      !maskIsValid(originalCollide) ||
++      !Number.isFinite(originalDensity) ||
++      originalDensity < 0
++    ) {
++      throw resourceFailure(
++        "Canonical surface filter or density readback is invalid.",
++      );
+     }
+     // The detached original is restored only during disposal. Set the accepted
+     // diagnostic material before cloning it so the replacement preserves it.
+     resourceGuard(() => setAndReadMaterial(activeWorld, originalShape));
+-    const dimensionsX = config.geometry.pitchWidth + 2 * guard.setup.supportApronMargin;
+-    const dimensionsZ = config.geometry.pitchLength + 2 * guard.setup.supportApronMargin;
+-    if (dimensionsX !== 662 || dimensionsZ !== 670 || config.geometry.surfaceThickness !== 0.2) {
+-      throw resourceFailure("Hashed diagnostic apron dimensions differ from the accepted 662 x 0.2 x 670 slab.");
++    const dimensionsX =
++      config.geometry.pitchWidth + 2 * guard.setup.supportApronMargin;
++    const dimensionsZ =
++      config.geometry.pitchLength + 2 * guard.setup.supportApronMargin;
++    if (
++      dimensionsX !== 662 ||
++      dimensionsZ !== 670 ||
++      config.geometry.surfaceThickness !== 0.2
++    ) {
++      throw resourceFailure(
++        "Hashed diagnostic apron dimensions differ from the accepted 662 x 0.2 x 670 slab.",
++      );
+     }
+     replacementShape = new PhysicsShapeBox(
+       Vector3.Zero(),
+@@ -1076,35 +1347,53 @@ async function runCase(
+     replacementShape.isTrigger = originalShape.isTrigger;
+     replacementAttached = true;
+     surfaceBody.shape = replacementShape;
+-    if (surfaceBody.shape !== replacementShape) throw resourceFailure("Diagnostic apron attachment was not confirmed.");
++    if (surfaceBody.shape !== replacementShape)
++      throw resourceFailure("Diagnostic apron attachment was not confirmed.");
+ 
+     const bodyFacts = resourceGuard(() => readNativeBodies(activeWorld));
+     const samples = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
+-    if (!allZero(samples)) throw resourceFailure("Initial dynamic velocities are not exactly zero.");
+-    const expectedStates = new Map(caseState.bodies.map((body) => [body.id, body]));
++    if (!allZero(samples))
++      throw resourceFailure("Initial dynamic velocities are not exactly zero.");
++    const expectedStates = new Map(
++      caseState.bodies.map((body) => [body.id, body]),
++    );
+     for (let index = 0; index < bodyFacts.metrics.length; index += 1) {
+       const metric = bodyFacts.metrics[index];
+       const sample = samples[index];
+-      const expected = metric === undefined ? undefined : expectedStates.get(metric.id);
+-      if (metric === undefined || sample === undefined || expected === undefined) {
+-        throw resourceFailure("Initial transform validation omitted a canonical body.");
++      const expected =
++        metric === undefined ? undefined : expectedStates.get(metric.id);
++      if (
++        metric === undefined ||
++        sample === undefined ||
++        expected === undefined
++      ) {
++        throw resourceFailure(
++          "Initial transform validation omitted a canonical body.",
++        );
+       }
+       if (
+         sample.state.position.x !== expected.position.x ||
+         sample.state.position.y !== expected.position.y ||
+         sample.state.position.z !== expected.position.z ||
+-        Math.abs(sample.state.rotation.x - expected.rotation.x) > QUATERNION_NORM_TOLERANCE ||
+-        Math.abs(sample.state.rotation.y - expected.rotation.y) > QUATERNION_NORM_TOLERANCE ||
+-        Math.abs(sample.state.rotation.z - expected.rotation.z) > QUATERNION_NORM_TOLERANCE ||
+-        Math.abs(sample.state.rotation.w - expected.rotation.w) > QUATERNION_NORM_TOLERANCE
++        Math.abs(sample.state.rotation.x - expected.rotation.x) >
++          QUATERNION_NORM_TOLERANCE ||
++        Math.abs(sample.state.rotation.y - expected.rotation.y) >
++          QUATERNION_NORM_TOLERANCE ||
++        Math.abs(sample.state.rotation.z - expected.rotation.z) >
++          QUATERNION_NORM_TOLERANCE ||
++        Math.abs(sample.state.rotation.w - expected.rotation.w) >
++          QUATERNION_NORM_TOLERANCE
+       ) {
+-        throw resourceFailure(`World transform for ${metric.id} differs from its hashed initial state.`);
++        throw resourceFailure(
++          `World transform for ${metric.id} differs from its hashed initial state.`,
++        );
+       }
+     }
+     for (let index = 0; index < bodyFacts.metrics.length; index += 1) {
+       const metric = bodyFacts.metrics[index];
+       const sample = samples[index];
+-      if (metric === undefined || sample === undefined) throw resourceFailure("Initial native body facts are incomplete.");
++      if (metric === undefined || sample === undefined)
++        throw resourceFailure("Initial native body facts are incomplete.");
+       metric.restY = sample.centerOfMass.y;
+     }
+     let plan: ReturnType<typeof deriveDiagnosticSweepPlan>;
+@@ -1112,52 +1401,95 @@ async function runCase(
+       plan = deriveDiagnosticSweepPlan(
+         bodyFacts.metrics.map((metric) => ({
+           mass: metric.mass,
+-          minimumUnitInertia: Math.min(metric.inertiaUnitMass.x, metric.inertiaUnitMass.y, metric.inertiaUnitMass.z),
+-          maximumUnitInertia: Math.max(metric.inertiaUnitMass.x, metric.inertiaUnitMass.y, metric.inertiaUnitMass.z),
++          minimumUnitInertia: Math.min(
++            metric.inertiaUnitMass.x,
++            metric.inertiaUnitMass.y,
++            metric.inertiaUnitMass.z,
++          ),
++          maximumUnitInertia: Math.max(
++            metric.inertiaUnitMass.x,
++            metric.inertiaUnitMass.y,
++            metric.inertiaUnitMass.z,
++          ),
+           farthestPointRadius: metric.farthestPointRadius,
+         })),
+         config.simulation.fixedStepSeconds,
+         makeSweepGuard(),
+       );
+     } catch (error) {
+-      throw resourceFailure("Native sweep subdivision cannot satisfy the hashed resource guard.", error);
++      throw resourceFailure(
++        "Native sweep subdivision cannot satisfy the hashed resource guard.",
++        error,
++      );
+     }
+-    const preEnergy = resourceGuard(() =>
+-      computeDiagnosticShiftedEnergy(
+-        energyBodies(bodyFacts.metrics, samples),
+-        guard.energy.gravityMagnitude,
+-        guard.energy.maximumRestComDrop,
+-      ).shiftedMechanicalEnergy,
++    const preEnergy = resourceGuard(
++      () =>
++        computeDiagnosticShiftedEnergy(
++          energyBodies(bodyFacts.metrics, samples),
++          guard.energy.gravityMagnitude,
++          guard.energy.maximumRestComDrop,
++        ).shiftedMechanicalEnergy,
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(preEnergy, guard.energy.maximum)) {
+-      throw resourceFailure("Tuple initial state exceeds the shifted-energy ceiling.");
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(preEnergy, guard.energy.maximum)
++    ) {
++      throw resourceFailure(
++        "Tuple initial state exceeds the shifted-energy ceiling.",
++      );
+     }
+-    const selectedIndex = bodyFacts.metrics.findIndex((metric) => metric.id === "home-0");
++    const selectedIndex = bodyFacts.metrics.findIndex(
++      (metric) => metric.id === "home-0",
++    );
+     const selected = bodyFacts.metrics[selectedIndex];
+     const selectedSample = samples[selectedIndex];
+-    if (selected === undefined || selectedSample === undefined) throw resourceFailure("Selected candidate cap is missing.");
++    if (selected === undefined || selectedSample === undefined)
++      throw resourceFailure("Selected candidate cap is missing.");
+     const impulseMagnitude = tuple[2];
+     const inputImpulse = { x: 0, y: 0, z: impulseMagnitude };
+-    const applicationPoint = add(selectedSample.state.position, rotate(selectedSample.state.rotation, selected.centerOfMassLocal));
+-    const predictedBodies = energyBodies(bodyFacts.metrics, samples).map((item, index) =>
+-      index === selectedIndex
+-        ? { ...item, linearVelocity: { x: item.linearVelocity.x, y: item.linearVelocity.y, z: item.linearVelocity.z + impulseMagnitude / selected.mass } }
+-        : item,
++    const applicationPoint = add(
++      selectedSample.state.position,
++      rotate(selectedSample.state.rotation, selected.centerOfMassLocal),
++    );
++    const predictedBodies = energyBodies(bodyFacts.metrics, samples).map(
++      (item, index) =>
++        index === selectedIndex
++          ? {
++              ...item,
++              linearVelocity: {
++                x: item.linearVelocity.x,
++                y: item.linearVelocity.y,
++                z: item.linearVelocity.z + impulseMagnitude / selected.mass,
++              },
++            }
++          : item,
+     );
+-    const predictedEnergy = resourceGuard(() =>
+-      computeDiagnosticShiftedEnergy(
+-        predictedBodies,
+-        guard.energy.gravityMagnitude,
+-        guard.energy.maximumRestComDrop,
+-      ).shiftedMechanicalEnergy,
++    const predictedEnergy = resourceGuard(
++      () =>
++        computeDiagnosticShiftedEnergy(
++          predictedBodies,
++          guard.energy.gravityMagnitude,
++          guard.energy.maximumRestComDrop,
++        ).shiftedMechanicalEnergy,
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(predictedEnergy, guard.energy.maximum)) {
+-      throw resourceFailure("The single planar COM impulse exceeds the shifted-energy ceiling.");
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(
++        predictedEnergy,
++        guard.energy.maximum,
++      )
++    ) {
++      throw resourceFailure(
++        "The single planar COM impulse exceeds the shifted-energy ceiling.",
++      );
+     }
+ 
+-    const names = new Map<string, LoftCoarseEntityId | LoftCoarseStaticBodyId>();
+-    for (const metric of bodyFacts.metrics) names.set(metric.body.transformNode.name, metric.id);
+-    for (const body of bodyFacts.statics) names.set(body.body.transformNode.name, body.id);
++    const names = new Map<
++      string,
++      LoftCoarseEntityId | LoftCoarseStaticBodyId
++    >();
++    for (const metric of bodyFacts.metrics)
++      names.set(metric.body.transformNode.name, metric.id);
++    for (const body of bodyFacts.statics)
++      names.set(body.body.transformNode.name, body.id);
+     const contactRows: LoftCoarseCase["contactRows"][number][] = [];
+     let callbackFailure: unknown;
+     let nominalTick = 0;
+@@ -1167,15 +1499,29 @@ async function runCase(
+         const first = names.get(event.collider.transformNode.name);
+         const second = names.get(event.collidedAgainst.transformNode.name);
+         if (first === undefined || second === undefined || first === second) {
+-          throw resourceFailure("A collision callback reported an unknown/self participant.");
++          throw resourceFailure(
++            "A collision callback reported an unknown/self participant.",
++          );
+         }
+         const pair = canonicalizeLoftCoarseContactPair(first, second);
+         const eventType = String(event.type);
+-        if (encoder.encode(eventType).byteLength > guard.artifact.maximumEventTypeBytes) {
+-          throw resourceFailure("A native contact event name exceeds the byte cap.");
++        if (
++          encoder.encode(eventType).byteLength >
++          guard.artifact.maximumEventTypeBytes
++        ) {
++          throw resourceFailure(
++            "A native contact event name exceeds the byte cap.",
++          );
+         }
+-        if (contactRows.length >= guard.artifact.maximumContactsPerCase || counts.contacts + contactRows.length >= guard.artifact.maximumContactsMatrix) {
+-          throw Object.assign(new Error("Contact rows exceed the hashed case/matrix ceiling."), { code: "resourceLimit" });
++        if (
++          contactRows.length >= guard.artifact.maximumContactsPerCase ||
++          counts.contacts + contactRows.length >=
++            guard.artifact.maximumContactsMatrix
++        ) {
++          throw Object.assign(
++            new Error("Contact rows exceed the hashed case/matrix ceiling."),
++            { code: "resourceLimit" },
++          );
+         }
+         contactRows.push({
+           tuple,
+@@ -1189,7 +1535,10 @@ async function runCase(
+         callbackFailure ??= error;
+       }
+     };
+-    for (const body of [...bodyFacts.metrics.map((metric) => metric.body), ...bodyFacts.statics.map((item) => item.body)]) {
++    for (const body of [
++      ...bodyFacts.metrics.map((metric) => metric.body),
++      ...bodyFacts.statics.map((item) => item.body),
++    ]) {
+       body.setCollisionCallbackEnabled(true);
+       const observable = body.getCollisionObservable();
+       const observer = observable.add(onContact);
+@@ -1199,24 +1548,41 @@ async function runCase(
+     const bodyRows: LoftCoarseCase["bodyRows"][number][] = [];
+     const sweepRows: LoftCoarseCase["sweepRows"][number][] = [];
+     const quietWindow = Math.ceil(
+-      config.simulation.settleWindowSeconds / config.simulation.fixedStepSeconds,
++      config.simulation.settleWindowSeconds /
++        config.simulation.fixedStepSeconds,
+     );
+-    if (quietWindow !== 60) throw failure("Canonical settle window is not exactly sixty ticks.");
+-    const quietTicks: Array<{ tick: number; linearSpeeds: number[]; angularSpeeds: number[]; settledMask: number }> = [];
++    if (quietWindow !== 60)
++      throw failure("Canonical settle window is not exactly sixty ticks.");
++    const quietTicks: Array<{
++      tick: number;
++      linearSpeeds: number[];
++      angularSpeeds: number[];
++      settledMask: number;
++    }> = [];
+     selected.body.applyImpulse(
+       new Vector3(inputImpulse.x, inputImpulse.y, inputImpulse.z),
+       new Vector3(applicationPoint.x, applicationPoint.y, applicationPoint.z),
+     );
+-    const afterImpulse = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
+-    const measuredPostImpulseEnergy = resourceGuard(() =>
+-      computeDiagnosticShiftedEnergy(
+-        energyBodies(bodyFacts.metrics, afterImpulse),
+-        guard.energy.gravityMagnitude,
+-        guard.energy.maximumRestComDrop,
+-      ).shiftedMechanicalEnergy,
++    const afterImpulse = resourceGuard(() =>
++      getWorldSamples(bodyFacts.metrics),
+     );
+-    if (!isDiagnosticShiftedEnergyWithinLimit(measuredPostImpulseEnergy, guard.energy.maximum)) {
+-      throw resourceFailure("Observed post-impulse energy exceeds the hashed ceiling.");
++    const measuredPostImpulseEnergy = resourceGuard(
++      () =>
++        computeDiagnosticShiftedEnergy(
++          energyBodies(bodyFacts.metrics, afterImpulse),
++          guard.energy.gravityMagnitude,
++          guard.energy.maximumRestComDrop,
++        ).shiftedMechanicalEnergy,
++    );
++    if (
++      !isDiagnosticShiftedEnergyWithinLimit(
++        measuredPostImpulseEnergy,
++        guard.energy.maximum,
++      )
++    ) {
++      throw resourceFailure(
++        "Observed post-impulse energy exceeds the hashed ceiling.",
++      );
+     }
+     recordBodyRows(bodyRows, tuple, 0, afterImpulse);
+     let totalCalls = 0;
+@@ -1232,50 +1598,112 @@ async function runCase(
+       pitchWidth: config.geometry.pitchWidth,
+       pitchLength: config.geometry.pitchLength,
+       supportApronMargin: guard.setup.supportApronMargin,
+-      surfaceUnderside: config.geometry.surfaceY - config.geometry.surfaceThickness,
++      surfaceUnderside:
++        config.geometry.surfaceY - config.geometry.surfaceThickness,
+       maxRestHeightDrop: guard.energy.maximumRestComDrop,
+     };
+     for (let tick = 1; tick <= maxTicks; tick += 1) {
+-      ensureWithin(signal, runStartedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
+-      ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
++      ensureWithin(
++        signal,
++        runStartedAt,
++        guard.workload.maximumWallTimeMatrixMs,
++        "L01 matrix",
++      );
++      ensureWithin(
++        signal,
++        caseStartedAt,
++        guard.workload.maximumWallTimePerCaseMs,
++        "L01 case",
++      );
+       nominalTick = tick - 1;
+       let maximumEnergy = { value: -Infinity, callIndex: 0 };
+-      let maximumDrop = { value: -Infinity, callIndex: 0, bodyId: "home-0" as LoftCoarseEntityId };
+-      let minimumApron = { value: Infinity, callIndex: 0, bodyId: "button" as LoftCoarseEntityId };
+-      let minimumSlab = { value: Infinity, callIndex: 0, bodyId: "button" as LoftCoarseEntityId };
+-      let maximumSweep = { value: -Infinity, callIndex: 0, bodyId: "button" as LoftCoarseEntityId };
+-      let maximumRotation = { value: -Infinity, callIndex: 0, bodyId: "button" as LoftCoarseEntityId };
+-      let minimumClearance = { value: Infinity, callIndex: 0, obstaclePair: ["button", "home-1"] as const };
++      let maximumDrop = {
++        value: -Infinity,
++        callIndex: 0,
++        bodyId: "home-0" as LoftCoarseEntityId,
++      };
++      let minimumApron = {
++        value: Infinity,
++        callIndex: 0,
++        bodyId: "button" as LoftCoarseEntityId,
++      };
++      let minimumSlab = {
++        value: Infinity,
++        callIndex: 0,
++        bodyId: "button" as LoftCoarseEntityId,
++      };
++      let maximumSweep = {
++        value: -Infinity,
++        callIndex: 0,
++        bodyId: "button" as LoftCoarseEntityId,
++      };
++      let maximumRotation = {
++        value: -Infinity,
++        callIndex: 0,
++        bodyId: "button" as LoftCoarseEntityId,
++      };
++      let minimumClearance = {
++        value: Infinity,
++        callIndex: 0,
++        obstaclePair: ["button", "home-1"] as const,
++      };
+       let sawHorizontalOverlap = false;
+       let checkedCalls = 0;
+       for (let substep = 0; substep < plan.substepsPerTick; substep += 1) {
+-        ensureWithin(signal, runStartedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
+-        ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
++        ensureWithin(
++          signal,
++          runStartedAt,
++          guard.workload.maximumWallTimeMatrixMs,
++          "L01 matrix",
++        );
++        ensureWithin(
++          signal,
++          caseStartedAt,
++          guard.workload.maximumWallTimePerCaseMs,
++          "L01 case",
++        );
+         if (
+           totalCalls >= guard.workload.maximumExecuteStepCallsPerCase ||
+           counts.calls >= guard.workload.maximumExecuteStepCallsMatrix
+         ) {
+-          throw Object.assign(new Error("The L01 executeStep ceiling was reached."), { code: "resourceLimit" });
++          throw Object.assign(
++            new Error("The L01 executeStep ceiling was reached."),
++            { code: "resourceLimit" },
++          );
+         }
+         const before = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
+-        const beforeEnergy = resourceGuard(() =>
+-          computeDiagnosticShiftedEnergy(
+-            energyBodies(bodyFacts.metrics, before),
+-            guard.energy.gravityMagnitude,
+-            guard.energy.maximumRestComDrop,
+-          ).shiftedMechanicalEnergy,
++        const beforeEnergy = resourceGuard(
++          () =>
++            computeDiagnosticShiftedEnergy(
++              energyBodies(bodyFacts.metrics, before),
++              guard.energy.gravityMagnitude,
++              guard.energy.maximumRestComDrop,
++            ).shiftedMechanicalEnergy,
+         );
+-        if (!isDiagnosticShiftedEnergyWithinLimit(beforeEnergy, guard.energy.maximum)) {
+-          throw resourceFailure("Pre-step shifted energy exceeds the hashed maximum.");
++        if (
++          !isDiagnosticShiftedEnergyWithinLimit(
++            beforeEnergy,
++            guard.energy.maximum,
++          )
++        ) {
++          throw resourceFailure(
++            "Pre-step shifted energy exceeds the hashed maximum.",
++          );
+         }
+-        if (beforeEnergy > maximumEnergy.value) maximumEnergy = { value: beforeEnergy, callIndex: substep };
++        if (beforeEnergy > maximumEnergy.value)
++          maximumEnergy = { value: beforeEnergy, callIndex: substep };
+         let candidateMetric: NativeBodyMetrics | undefined;
+         let candidateSample: NativeBodySample | undefined;
+         for (let index = 0; index < bodyFacts.metrics.length; index += 1) {
+           const metric = bodyFacts.metrics[index];
+           const sample = before[index];
+           const bound = plan.bodies[index];
+-          if (metric === undefined || sample === undefined || bound === undefined) throw resourceFailure("Pre-step sweep omitted a dynamic body.");
++          if (
++            metric === undefined ||
++            sample === undefined ||
++            bound === undefined
++          )
++            throw resourceFailure("Pre-step sweep omitted a dynamic body.");
+           const margins = resourceGuard(() =>
+             checkDiagnosticSweptEnvelope(
+               {
+@@ -1292,40 +1720,100 @@ async function runCase(
+               sweepLimits,
+             ),
+           );
+-          const sweptDrop = metric.restY - sample.centerOfMass.y + bound.linearSpeedBound * plan.substepSeconds;
++          const sweptDrop =
++            metric.restY -
++            sample.centerOfMass.y +
++            bound.linearSpeedBound * plan.substepSeconds;
+           if (metric.id === "home-0") {
+             candidateMetric = metric;
+             candidateSample = sample;
+-            if (sweptDrop > maximumDrop.value) maximumDrop = { value: sweptDrop, callIndex: substep, bodyId: metric.id };
++            if (sweptDrop > maximumDrop.value)
++              maximumDrop = {
++                value: sweptDrop,
++                callIndex: substep,
++                bodyId: metric.id,
++              };
+           }
+-          if (margins.apronClearance < minimumApron.value) minimumApron = { value: margins.apronClearance, callIndex: substep, bodyId: metric.id };
+-          if (margins.surfaceClearance < minimumSlab.value) minimumSlab = { value: margins.surfaceClearance, callIndex: substep, bodyId: metric.id };
++          if (margins.apronClearance < minimumApron.value)
++            minimumApron = {
++              value: margins.apronClearance,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
++          if (margins.surfaceClearance < minimumSlab.value)
++            minimumSlab = {
++              value: margins.surfaceClearance,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
+           const bodyPointSweep = bound.pointSpeedBound * plan.substepSeconds;
+-          const bodyRotationSweep = bound.angularSpeedBound * plan.substepSeconds;
+-          if (bodyPointSweep > maxPointSweep) throw resourceFailure("Pre-step point sweep exceeds the hashed cap.");
+-          if (bodyRotationSweep > guard.sweep.maximumRotationPerCall) throw resourceFailure("Pre-step rotation sweep exceeds the hashed cap.");
+-          if (bodyPointSweep > maximumSweep.value) maximumSweep = { value: bodyPointSweep, callIndex: substep, bodyId: metric.id };
+-          if (bodyRotationSweep > maximumRotation.value) maximumRotation = { value: bodyRotationSweep, callIndex: substep, bodyId: metric.id };
++          const bodyRotationSweep =
++            bound.angularSpeedBound * plan.substepSeconds;
++          if (bodyPointSweep > maxPointSweep)
++            throw resourceFailure(
++              "Pre-step point sweep exceeds the hashed cap.",
++            );
++          if (bodyRotationSweep > guard.sweep.maximumRotationPerCall)
++            throw resourceFailure(
++              "Pre-step rotation sweep exceeds the hashed cap.",
++            );
++          if (bodyPointSweep > maximumSweep.value)
++            maximumSweep = {
++              value: bodyPointSweep,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
++          if (bodyRotationSweep > maximumRotation.value)
++            maximumRotation = {
++              value: bodyRotationSweep,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
+           // A static support witness is checked at every call, before physics advances.
+           supportClearances(metric, sample, bodyPointSweep);
+         }
+-        const buttonIndex = bodyFacts.metrics.findIndex((metric) => metric.id === "button");
+-        const obstacleIndex = bodyFacts.metrics.findIndex((metric) => metric.id === "home-1");
++        const buttonIndex = bodyFacts.metrics.findIndex(
++          (metric) => metric.id === "button",
++        );
++        const obstacleIndex = bodyFacts.metrics.findIndex(
++          (metric) => metric.id === "home-1",
++        );
+         const buttonMetric = bodyFacts.metrics[buttonIndex];
+         const obstacleMetric = bodyFacts.metrics[obstacleIndex];
+         const buttonSample = before[buttonIndex];
+         const obstacleSample = before[obstacleIndex];
+         const buttonBound = plan.bodies[buttonIndex];
+         const obstacleBound = plan.bodies[obstacleIndex];
+-        if (buttonMetric === undefined || obstacleMetric === undefined || buttonSample === undefined || obstacleSample === undefined || buttonBound === undefined || obstacleBound === undefined || candidateMetric === undefined || candidateSample === undefined) {
++        if (
++          buttonMetric === undefined ||
++          obstacleMetric === undefined ||
++          buttonSample === undefined ||
++          obstacleSample === undefined ||
++          buttonBound === undefined ||
++          obstacleBound === undefined ||
++          candidateMetric === undefined ||
++          candidateSample === undefined
++        ) {
+           throw resourceFailure("Button/obstacle sweep inputs are incomplete.");
+         }
+-        const combinedPointSweep = (buttonBound.pointSpeedBound + obstacleBound.pointSpeedBound) * plan.substepSeconds;
+-        const obstacleClearance = verticalObstacleClearance(buttonMetric, buttonSample, obstacleMetric, obstacleSample, combinedPointSweep);
++        const combinedPointSweep =
++          (buttonBound.pointSpeedBound + obstacleBound.pointSpeedBound) *
++          plan.substepSeconds;
++        const obstacleClearance = verticalObstacleClearance(
++          buttonMetric,
++          buttonSample,
++          obstacleMetric,
++          obstacleSample,
++          combinedPointSweep,
++        );
+         if (obstacleClearance.horizontalOverlap) {
+           sawHorizontalOverlap = true;
+           if (obstacleClearance.clearance < minimumClearance.value) {
+-            minimumClearance = { value: obstacleClearance.clearance, callIndex: substep, obstaclePair: ["button", "home-1"] };
++            minimumClearance = {
++              value: obstacleClearance.clearance,
++              callIndex: substep,
++              obstaclePair: ["button", "home-1"],
++            };
+           }
+         }
+         currentCallIndex = totalCalls;
+@@ -1338,55 +1826,120 @@ async function runCase(
+           throw normalizeDiagnosticError(callbackFailure, "resourceLimit");
+         }
+         if (callsInBatch === guard.workload.maximumCallsPerBatch) {
+-          if (totalBatches >= guard.workload.maximumBatchesPerCase || counts.batches >= guard.workload.maximumBatchesMatrix) {
+-            throw Object.assign(new Error("The L01 host-yield batch ceiling was reached."), { code: "resourceLimit" });
++          if (
++            totalBatches >= guard.workload.maximumBatchesPerCase ||
++            counts.batches >= guard.workload.maximumBatchesMatrix
++          ) {
++            throw Object.assign(
++              new Error("The L01 host-yield batch ceiling was reached."),
++              { code: "resourceLimit" },
++            );
+           }
+           callsInBatch = 0;
+           totalBatches += 1;
+           counts.batches += 1;
+           await yieldToBrowser(signal);
+-          ensureWithin(signal, runStartedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
+-          ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
+-          progress({ completedCases, totalCases: LOFT_COARSE_TUPLES.length, currentMatrixIndex: matrixIndex, nominalTick: tick - 1, nominalTickLimit: maxTicks, executeStepCalls: counts.calls, batches: counts.batches, elapsedMs: nowMs() - runStartedAt });
++          ensureWithin(
++            signal,
++            runStartedAt,
++            guard.workload.maximumWallTimeMatrixMs,
++            "L01 matrix",
++          );
++          ensureWithin(
++            signal,
++            caseStartedAt,
++            guard.workload.maximumWallTimePerCaseMs,
++            "L01 case",
++          );
++          progress({
++            completedCases,
++            totalCases: LOFT_COARSE_TUPLES.length,
++            currentMatrixIndex: matrixIndex,
++            nominalTick: tick - 1,
++            nominalTickLimit: maxTicks,
++            executeStepCalls: counts.calls,
++            batches: counts.batches,
++            elapsedMs: nowMs() - runStartedAt,
++          });
+         }
+         if (callbackFailure !== undefined) {
+           throw normalizeDiagnosticError(callbackFailure, "resourceLimit");
+         }
+         const after = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
+-        const afterEnergy = resourceGuard(() =>
+-          computeDiagnosticShiftedEnergy(
+-            energyBodies(bodyFacts.metrics, after),
+-            guard.energy.gravityMagnitude,
+-            guard.energy.maximumRestComDrop,
+-          ).shiftedMechanicalEnergy,
++        const afterEnergy = resourceGuard(
++          () =>
++            computeDiagnosticShiftedEnergy(
++              energyBodies(bodyFacts.metrics, after),
++              guard.energy.gravityMagnitude,
++              guard.energy.maximumRestComDrop,
++            ).shiftedMechanicalEnergy,
+         );
+-        if (!isDiagnosticShiftedEnergyWithinLimit(afterEnergy, guard.energy.maximum)) {
+-          throw resourceFailure("Post-step shifted energy exceeds the hashed maximum.");
++        if (
++          !isDiagnosticShiftedEnergyWithinLimit(
++            afterEnergy,
++            guard.energy.maximum,
++          )
++        ) {
++          throw resourceFailure(
++            "Post-step shifted energy exceeds the hashed maximum.",
++          );
+         }
+-        if (afterEnergy > maximumEnergy.value) maximumEnergy = { value: afterEnergy, callIndex: substep };
++        if (afterEnergy > maximumEnergy.value)
++          maximumEnergy = { value: afterEnergy, callIndex: substep };
+         for (let index = 0; index < bodyFacts.metrics.length; index += 1) {
+           const metric = bodyFacts.metrics[index];
+           const sample = after[index];
+           const bound = plan.bodies[index];
+-          if (metric === undefined || sample === undefined || bound === undefined) throw resourceFailure("Post-step state omitted a dynamic body.");
++          if (
++            metric === undefined ||
++            sample === undefined ||
++            bound === undefined
++          )
++            throw resourceFailure("Post-step state omitted a dynamic body.");
+           const margins = supportClearances(metric, sample, 0);
+-          if (margins.apron < minimumApron.value) minimumApron = { value: margins.apron, callIndex: substep, bodyId: metric.id };
+-          if (margins.slab < minimumSlab.value) minimumSlab = { value: margins.slab, callIndex: substep, bodyId: metric.id };
+-          if (metric.id === "home-0" && margins.drop > maximumDrop.value) maximumDrop = { value: margins.drop, callIndex: substep, bodyId: metric.id };
++          if (margins.apron < minimumApron.value)
++            minimumApron = {
++              value: margins.apron,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
++          if (margins.slab < minimumSlab.value)
++            minimumSlab = {
++              value: margins.slab,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
++          if (metric.id === "home-0" && margins.drop > maximumDrop.value)
++            maximumDrop = {
++              value: margins.drop,
++              callIndex: substep,
++              bodyId: metric.id,
++            };
+         }
+         finalSamples = after;
+       }
+       if (callsInBatch > 0 && tick === maxTicks) {
+-        if (totalBatches >= guard.workload.maximumBatchesPerCase || counts.batches >= guard.workload.maximumBatchesMatrix) {
+-          throw Object.assign(new Error("The L01 final host-yield batch ceiling was reached."), { code: "resourceLimit" });
++        if (
++          totalBatches >= guard.workload.maximumBatchesPerCase ||
++          counts.batches >= guard.workload.maximumBatchesMatrix
++        ) {
++          throw Object.assign(
++            new Error("The L01 final host-yield batch ceiling was reached."),
++            { code: "resourceLimit" },
++          );
+         }
+         callsInBatch = 0;
+         totalBatches += 1;
+         counts.batches += 1;
+         await yieldToBrowser(signal);
+       }
+-      if (checkedCalls < 1 || checkedCalls > guard.sweep.maximumCallsPerNominalTick) {
+-        throw resourceFailure("A nominal interval has an invalid checked-call count.");
++      if (
++        checkedCalls < 1 ||
++        checkedCalls > guard.sweep.maximumCallsPerNominalTick
++      ) {
++        throw resourceFailure(
++          "A nominal interval has an invalid checked-call count.",
++        );
+       }
+       nominalTick = tick;
+       finalSamples = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
+@@ -1395,23 +1948,55 @@ async function runCase(
+       let settledMask = 0;
+       for (let index = 0; index < finalSamples.length; index += 1) {
+         const sample = finalSamples[index];
+-        if (sample === undefined) throw resourceFailure("Settling sample is missing.");
+-        const linearSpeed = Math.hypot(sample.state.linearVelocity.x, sample.state.linearVelocity.y, sample.state.linearVelocity.z);
+-        const angularSpeed = Math.hypot(sample.state.angularVelocity.x, sample.state.angularVelocity.y, sample.state.angularVelocity.z);
++        if (sample === undefined)
++          throw resourceFailure("Settling sample is missing.");
++        const linearSpeed = Math.hypot(
++          sample.state.linearVelocity.x,
++          sample.state.linearVelocity.y,
++          sample.state.linearVelocity.z,
++        );
++        const angularSpeed = Math.hypot(
++          sample.state.angularVelocity.x,
++          sample.state.angularVelocity.y,
++          sample.state.angularVelocity.z,
++        );
+         linearSpeeds.push(linearSpeed);
+         angularSpeeds.push(angularSpeed);
+-        if (linearSpeed <= minLinear && angularSpeed <= minAngular) settledMask |= 1 << index;
++        if (linearSpeed <= minLinear && angularSpeed <= minAngular)
++          settledMask |= 1 << index;
+       }
+       quietTicks.push({ tick, linearSpeeds, angularSpeeds, settledMask });
+       if (quietTicks.length > quietWindow) quietTicks.shift();
+       const all15Quiet = settledMask === 0x7fff;
+       recordBodyRows(bodyRows, tuple, tick, finalSamples);
+-      if (maximumEnergy.value === -Infinity || maximumDrop.value === -Infinity || minimumApron.value === Infinity || minimumSlab.value === Infinity || maximumSweep.value === -Infinity || maximumRotation.value === -Infinity) {
+-        throw resourceFailure("A nominal interval is missing required extrema.");
++      if (
++        maximumEnergy.value === -Infinity ||
++        maximumDrop.value === -Infinity ||
++        minimumApron.value === Infinity ||
++        minimumSlab.value === Infinity ||
++        maximumSweep.value === -Infinity ||
++        maximumRotation.value === -Infinity
++      ) {
++        throw resourceFailure(
++          "A nominal interval is missing required extrema.",
++        );
+       }
+-      if (minimumClearance.value === Infinity) minimumClearance = { value: 0, callIndex: 0, obstaclePair: ["button", "home-1"] };
+-      const tickContacts = contactRows.some((row) => row.nominalTick === tick - 1 && isButtonObstaclePair(row.pair));
+-      const classification = !sawHorizontalOverlap ? "no-horizontal-overlap" : tickContacts ? "contact" : minimumClearance.value > guard.sweep.verticalClearanceMargin ? "clear-above-margin" : "clearance-at-or-below-margin";
++      if (minimumClearance.value === Infinity)
++        minimumClearance = {
++          value: 0,
++          callIndex: 0,
++          obstaclePair: ["button", "home-1"],
++        };
++      const tickContacts = contactRows.some(
++        (row) => row.nominalTick === tick - 1 && isButtonObstaclePair(row.pair),
++      );
++      const classification = !sawHorizontalOverlap
++        ? "no-horizontal-overlap"
++        : tickContacts
++          ? "contact"
++          : minimumClearance.value > guard.sweep.verticalClearanceMargin
++            ? "clear-above-margin"
++            : "clearance-at-or-below-margin";
+       sweepRows.push({
+         tuple,
+         nominalTick: tick - 1,
+@@ -1427,18 +2012,38 @@ async function runCase(
+         allFinite: true,
+         all15Settled: all15Quiet,
+       });
+-      const maxTicksForSettle = quietTicks.length === quietWindow && quietTicks.every((value) => value.settledMask === 0x7fff);
++      const maxTicksForSettle =
++        quietTicks.length === quietWindow &&
++        quietTicks.every((value) => value.settledMask === 0x7fff);
+       if (maxTicksForSettle) {
+         break;
+       }
+       if (tick % 120 === 0) {
+-        progress({ completedCases, totalCases: LOFT_COARSE_TUPLES.length, currentMatrixIndex: matrixIndex, nominalTick: tick, nominalTickLimit: maxTicks, executeStepCalls: counts.calls, batches: counts.batches, elapsedMs: nowMs() - runStartedAt });
++        progress({
++          completedCases,
++          totalCases: LOFT_COARSE_TUPLES.length,
++          currentMatrixIndex: matrixIndex,
++          nominalTick: tick,
++          nominalTickLimit: maxTicks,
++          executeStepCalls: counts.calls,
++          batches: counts.batches,
++          elapsedMs: nowMs() - runStartedAt,
++        });
+       }
+     }
+-    if (totalCalls < 1 || sweepRows.length === 0 || bodyRows.length < 30) throw resourceFailure("Trial did not produce the minimum complete evidence rows.");
++    if (totalCalls < 1 || sweepRows.length === 0 || bodyRows.length < 30)
++      throw resourceFailure(
++        "Trial did not produce the minimum complete evidence rows.",
++      );
+     if (callsInBatch > 0) {
+-      if (totalBatches >= guard.workload.maximumBatchesPerCase || counts.batches >= guard.workload.maximumBatchesMatrix) {
+-        throw Object.assign(new Error("The L01 final host-yield batch ceiling was reached."), { code: "resourceLimit" });
++      if (
++        totalBatches >= guard.workload.maximumBatchesPerCase ||
++        counts.batches >= guard.workload.maximumBatchesMatrix
++      ) {
++        throw Object.assign(
++          new Error("The L01 final host-yield batch ceiling was reached."),
++          { code: "resourceLimit" },
++        );
+       }
+       callsInBatch = 0;
+       totalBatches += 1;
+@@ -1446,35 +2051,74 @@ async function runCase(
+       await yieldToBrowser(signal);
+     }
+     counts.contacts += contactRows.length;
+-    const settlingTicks = quietTicks.length === quietWindow ? quietTicks : quietTicks.slice(-quietWindow);
+-    if (settlingTicks.length !== quietWindow) throw resourceFailure("The trial has fewer than 60 endpoint samples for its settling window.");
++    const settlingTicks =
++      quietTicks.length === quietWindow
++        ? quietTicks
++        : quietTicks.slice(-quietWindow);
++    if (settlingTicks.length !== quietWindow)
++      throw resourceFailure(
++        "The trial has fewer than 60 endpoint samples for its settling window.",
++      );
+     const startTick = settlingTicks[0]?.tick;
+     const finalTick = settlingTicks.at(-1)?.tick;
+-    if (startTick === undefined || finalTick === undefined) throw resourceFailure("Settling-window tick bounds are missing.");
++    if (startTick === undefined || finalTick === undefined)
++      throw resourceFailure("Settling-window tick bounds are missing.");
+     const settled = settlingTicks.every((tick) => tick.settledMask === 0x7fff);
+-    const buttonIndex = bodyFacts.metrics.findIndex((metric) => metric.id === "button");
+-    const obstacleIndex = bodyFacts.metrics.findIndex((metric) => metric.id === "home-1");
++    const buttonIndex = bodyFacts.metrics.findIndex(
++      (metric) => metric.id === "button",
++    );
++    const obstacleIndex = bodyFacts.metrics.findIndex(
++      (metric) => metric.id === "home-1",
++    );
+     const buttonMetric = bodyFacts.metrics[buttonIndex];
+     const obstacleMetric = bodyFacts.metrics[obstacleIndex];
+     const buttonFinal = finalSamples[buttonIndex];
+     const obstacleFinal = finalSamples[obstacleIndex];
+-    if (buttonMetric === undefined || obstacleMetric === undefined || buttonFinal === undefined || obstacleFinal === undefined) throw resourceFailure("Final button/obstacle states are missing.");
++    if (
++      buttonMetric === undefined ||
++      obstacleMetric === undefined ||
++      buttonFinal === undefined ||
++      obstacleFinal === undefined
++    )
++      throw resourceFailure("Final button/obstacle states are missing.");
+     const buttonStart = samples[buttonIndex];
+     const obstacleStart = samples[obstacleIndex];
+     const startsBefore =
+       buttonStart !== undefined &&
+       obstacleStart !== undefined &&
+-      buttonStart.state.position.z + buttonMetric.farthestOriginRadius < obstacleStart.state.position.z - obstacleMetric.farthestOriginRadius;
++      buttonStart.state.position.z + buttonMetric.farthestOriginRadius <
++        obstacleStart.state.position.z - obstacleMetric.farthestOriginRadius;
+     const finishesBeyond =
+-      buttonFinal.state.position.z - buttonMetric.farthestOriginRadius > obstacleFinal.state.position.z + obstacleMetric.farthestOriginRadius;
+-    const overlapSeen = sweepRows.some((row) => (row as { intervalClassification: string }).intervalClassification !== "no-horizontal-overlap");
+-    const clearancePass = sweepRows.filter((row) => (row as { intervalClassification: string }).intervalClassification !== "no-horizontal-overlap").every((row) => (row as { minimumWholeButtonObstacleClearance: { value: number } }).minimumWholeButtonObstacleClearance.value > guard.sweep.verticalClearanceMargin);
+-    const contactWithObstacle = contactRows.some((row) => isButtonObstaclePair(row.pair));
++      buttonFinal.state.position.z - buttonMetric.farthestOriginRadius >
++      obstacleFinal.state.position.z + obstacleMetric.farthestOriginRadius;
++    const overlapSeen = sweepRows.some(
++      (row) =>
++        (row as { intervalClassification: string }).intervalClassification !==
++        "no-horizontal-overlap",
++    );
++    const clearancePass = sweepRows
++      .filter(
++        (row) =>
++          (row as { intervalClassification: string }).intervalClassification !==
++          "no-horizontal-overlap",
++      )
++      .every(
++        (row) =>
++          (row as { minimumWholeButtonObstacleClearance: { value: number } })
++            .minimumWholeButtonObstacleClearance.value >
++          guard.sweep.verticalClearanceMargin,
++      );
++    const contactWithObstacle = contactRows.some((row) =>
++      isButtonObstaclePair(row.pair),
++    );
+     const reasons: string[] = [];
+-    if (!startsBefore) reasons.push("button-does-not-start-fully-before-obstacle");
+-    if (!finishesBeyond) reasons.push("button-does-not-finish-fully-beyond-obstacle");
++    if (!startsBefore)
++      reasons.push("button-does-not-start-fully-before-obstacle");
++    if (!finishesBeyond)
++      reasons.push("button-does-not-finish-fully-beyond-obstacle");
+     if (!overlapSeen) reasons.push("no-full-horizontal-overlap-sampled");
+-    if (!clearancePass) reasons.push("vertical-clearance-not-above-diagnostic-margin");
++    if (!clearancePass)
++      reasons.push("vertical-clearance-not-above-diagnostic-margin");
+     if (contactWithObstacle) reasons.push("button-obstacle-contact-observed");
+     if (!settled) reasons.push("all-body-settling-window-not-achieved");
+     const eligible = reasons.length === 0;
+@@ -1487,7 +2131,11 @@ async function runCase(
+       angularVelocity: { ...state.angularVelocity },
+     }));
+     const caseWallTimeMs = nowMs() - caseStartedAt;
+-    if (caseWallTimeMs > guard.workload.maximumWallTimePerCaseMs) throw Object.assign(new Error("The L01 case exceeded its wall-time ceiling."), { code: "resourceLimit" });
++    if (caseWallTimeMs > guard.workload.maximumWallTimePerCaseMs)
++      throw Object.assign(
++        new Error("The L01 case exceeded its wall-time ceiling."),
++        { code: "resourceLimit" },
++      );
+     result = {
+       metadata: {
+         ...identity,
+@@ -1524,22 +2172,38 @@ async function runCase(
+     removeObservers,
+     replacementAttached,
+     restoreSurface:
+-      replacementAttached && surfaceBody !== undefined && originalSurfaceShape !== undefined
++      replacementAttached &&
++      surfaceBody !== undefined &&
++      originalSurfaceShape !== undefined
+         ? () => {
+             surfaceBody.shape = originalSurfaceShape;
+-            if (surfaceBody.shape !== originalSurfaceShape) throw failure("Original support shape restoration was not confirmed.");
++            if (surfaceBody.shape !== originalSurfaceShape)
++              throw failure(
++                "Original support shape restoration was not confirmed.",
++              );
+           }
+         : undefined,
+-    disposeReplacement: replacementShape === undefined ? undefined : () => replacementShape?.dispose(),
++    disposeReplacement:
++      replacementShape === undefined
++        ? undefined
++        : () => replacementShape?.dispose(),
+     disposeWorld: () => world?.dispose(),
+   });
+-  if (primaryError !== undefined) throw errorWithCleanup(primaryError, cleanupErrors);
+-  if (cleanupErrors.length > 0) throw errorWithCleanup(failure("Trial cleanup failed."), cleanupErrors);
+-  if (result === undefined) throw failure("Trial ended without a serialized case.");
++  if (primaryError !== undefined)
++    throw errorWithCleanup(primaryError, cleanupErrors);
++  if (cleanupErrors.length > 0)
++    throw errorWithCleanup(failure("Trial cleanup failed."), cleanupErrors);
++  if (result === undefined)
++    throw failure("Trial ended without a serialized case.");
+   const caseWallTimeMs = nowMs() - caseStartedAt;
+-  if (caseWallTimeMs > guard.workload.maximumWallTimePerCaseMs) throw Object.assign(new Error("The L01 case exceeded its wall-time ceiling."), { code: "resourceLimit" });
++  if (caseWallTimeMs > guard.workload.maximumWallTimePerCaseMs)
++    throw Object.assign(
++      new Error("The L01 case exceeded its wall-time ceiling."),
++      { code: "resourceLimit" },
++    );
+   result.metadata.wallTimeMs = caseWallTimeMs;
+-  if (counts.calls - caseBeginCalls !== result.metadata.executeStepCalls) throw failure("Case call count changed during output.");
++  if (counts.calls - caseBeginCalls !== result.metadata.executeStepCalls)
++    throw failure("Case call count changed during output.");
+   return result;
+ }
+ 
+@@ -1549,25 +2213,60 @@ async function* makeCases(
+   fixture: MatchState,
+   matrixMetadata: LoftCoarseMatrixMetadata,
+   runStartedAt: number,
+-  counts: { calls: number; batches: number; contacts: number; eligible: number },
++  counts: {
++    calls: number;
++    batches: number;
++    contacts: number;
++    eligible: number;
++  },
+   abortMatrix: (reason: unknown) => void,
+ ): AsyncGenerator<LoftCoarseCase, void, void> {
+-  for (let matrixIndex = 0; matrixIndex < LOFT_COARSE_TUPLES.length; matrixIndex += 1) {
++  for (
++    let matrixIndex = 0;
++    matrixIndex < LOFT_COARSE_TUPLES.length;
++    matrixIndex += 1
++  ) {
+     const tuple = LOFT_COARSE_TUPLES[matrixIndex];
+-    if (tuple === undefined) throw failure("A canonical matrix tuple is missing.");
++    if (tuple === undefined)
++      throw failure("A canonical matrix tuple is missing.");
+     const caseStartedAt = nowMs();
+     const caseTimer = globalThis.setTimeout(
+-      () => abortMatrix(Object.assign(new Error("The L01 case exceeded its wall-time ceiling."), { code: "resourceLimit" })),
++      () =>
++        abortMatrix(
++          Object.assign(
++            new Error("The L01 case exceeded its wall-time ceiling."),
++            { code: "resourceLimit" },
++          ),
++        ),
+       guard.workload.maximumWallTimePerCaseMs,
+     );
+     try {
+       const currentCase = await runCase(
+-        options.engine, havok, fixture, tuple, matrixIndex, matrixMetadata,
+-        options.signal, runStartedAt, counts, options.onProgress, matrixIndex,
++        options.engine,
++        havok,
++        fixture,
++        tuple,
++        matrixIndex,
++        matrixMetadata,
++        options.signal,
++        runStartedAt,
++        counts,
++        options.onProgress,
++        matrixIndex,
+       );
+       yield currentCase;
+-      ensureWithin(options.signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case including serialization");
+-      ensureWithin(options.signal, runStartedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix including serialization");
++      ensureWithin(
++        options.signal,
++        caseStartedAt,
++        guard.workload.maximumWallTimePerCaseMs,
++        "L01 case including serialization",
++      );
++      ensureWithin(
++        options.signal,
++        runStartedAt,
++        guard.workload.maximumWallTimeMatrixMs,
++        "L01 matrix including serialization",
++      );
+       options.onProgress({
+         completedCases: matrixIndex + 1,
+         totalCases: LOFT_COARSE_TUPLES.length,
+@@ -1600,18 +2299,42 @@ export async function runLoftCoarseMatrix({
+     deadlineController.abort(signal.reason);
+   };
+   try {
+-    if (!(engine instanceof Engine)) throw failure("L01 requires the real Babylon browser Engine.");
+-    if (signal === null || typeof signal?.addEventListener !== "function") throw failure("L01 requires an AbortSignal.");
+-    if (sink === null || typeof sink?.write !== "function" || typeof sink?.abort !== "function") throw failure("L01 requires the accepted bounded byte sink.");
+-    if (typeof onProgress !== "function") throw failure("L01 requires a compact progress callback.");
++    if (!(engine instanceof Engine))
++      throw failure("L01 requires the real Babylon browser Engine.");
++    if (signal === null || typeof signal?.addEventListener !== "function")
++      throw failure("L01 requires an AbortSignal.");
++    if (
++      sink === null ||
++      typeof sink?.write !== "function" ||
++      typeof sink?.abort !== "function"
++    )
++      throw failure("L01 requires the accepted bounded byte sink.");
++    if (typeof onProgress !== "function")
++      throw failure("L01 requires a compact progress callback.");
+     if (signal.aborted) abortFromCaller();
+     else signal.addEventListener("abort", abortFromCaller, { once: true });
+     matrixTimer = globalThis.setTimeout(
+-      () => deadlineController.abort(Object.assign(new Error("The L01 matrix exceeded its wall-time ceiling."), { code: "resourceLimit" })),
++      () =>
++        deadlineController.abort(
++          Object.assign(
++            new Error("The L01 matrix exceeded its wall-time ceiling."),
++            { code: "resourceLimit" },
++          ),
++        ),
+       guard.workload.maximumWallTimeMatrixMs,
+     );
+-    const runOptions: LoftCoarseRunOptions = { engine, signal: deadlineController.signal, sink, onProgress };
+-    ensureWithin(deadlineController.signal, startedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
++    const runOptions: LoftCoarseRunOptions = {
++      engine,
++      signal: deadlineController.signal,
++      sink,
++      onProgress,
++    };
++    ensureWithin(
++      deadlineController.signal,
++      startedAt,
++      guard.workload.maximumWallTimeMatrixMs,
++      "L01 matrix",
++    );
+     exactMatrixTuples();
+     const computedConfigHash = await hashCounterballConfig();
+     const payloadSha = await hashCanonicalJson(omitConfigHash(fixtureJson));
+@@ -1621,31 +2344,68 @@ export async function runLoftCoarseMatrix({
+       fixtureFileSha !== expectedFixtureFileSha256 ||
+       payloadSha !== guard.fixture.payloadSha256
+     ) {
+-      throw failure("Fixture bytes or configHash-independent payload differ from the pinned L01 identity.");
++      throw failure(
++        "Fixture bytes or configHash-independent payload differ from the pinned L01 identity.",
++      );
+     }
+     const fixture = fixtureState();
+-    const fixtureObject = fixtureJson as unknown as { versions: { configHash: string } };
+-    if (fixtureObject.versions.configHash !== computedConfigHash || fixture.state.versions.configHash !== computedConfigHash) {
+-      throw failure("Pinned fixture configHash does not match the exact canonical config.");
++    const fixtureObject = fixtureJson as unknown as {
++      versions: { configHash: string };
++    };
++    if (
++      fixtureObject.versions.configHash !== computedConfigHash ||
++      fixture.state.versions.configHash !== computedConfigHash
++    ) {
++      throw failure(
++        "Pinned fixture configHash does not match the exact canonical config.",
++      );
+     }
+-    const response = await fetch(havokWasmUrl, { signal: deadlineController.signal });
+-    if (!response.ok) throw failure(`Pinned Havok WASM fetch failed with HTTP ${response.status}.`);
++    const response = await fetch(havokWasmUrl, {
++      signal: deadlineController.signal,
++    });
++    if (!response.ok)
++      throw failure(
++        `Pinned Havok WASM fetch failed with HTTP ${response.status}.`,
++      );
+     const wasmBytes = await response.arrayBuffer();
+     const wasmHash = await sha256(wasmBytes);
+-    if (wasmHash !== guard.wasmSha256) throw failure("Fetched Havok WASM bytes do not match the hashed diagnostic guard.");
++    if (wasmHash !== guard.wasmSha256)
++      throw failure(
++        "Fetched Havok WASM bytes do not match the hashed diagnostic guard.",
++      );
+     const havok = await withAbort(
+       initializeHavokRuntime({ wasmBinary: wasmBytes }),
+       deadlineController.signal,
+     );
+-    ensureWithin(deadlineController.signal, startedAt, guard.workload.maximumWallTimeMatrixMs, "L01 matrix");
++    ensureWithin(
++      deadlineController.signal,
++      startedAt,
++      guard.workload.maximumWallTimeMatrixMs,
++      "L01 matrix",
++    );
+     const runtimeIdentity = `browser:${navigator.userAgent};engine:${engine.constructor.name};physics:${guard.physicsVersion}`;
+-    if (runtimeIdentity.length > 1_024) throw failure("Browser runtime identity exceeds its compact bound.");
+-    const matrixMetadata = makeMatrixMetadata(computedConfigHash, fixtureFileSha, payloadSha, wasmHash, runtimeIdentity);
++    if (runtimeIdentity.length > 1_024)
++      throw failure("Browser runtime identity exceeds its compact bound.");
++    const matrixMetadata = makeMatrixMetadata(
++      computedConfigHash,
++      fixtureFileSha,
++      payloadSha,
++      wasmHash,
++      runtimeIdentity,
++    );
+     const counts = { calls: 0, batches: 0, contacts: 0, eligible: 0 };
+     writerStarted = true;
+     const matrix = await writeLoftCoarseMatrix({
+       metadata: matrixMetadata,
+-      cases: makeCases(runOptions, havok, fixture.state, matrixMetadata, startedAt, counts, (reason) => deadlineController.abort(reason)),
++      cases: makeCases(
++        runOptions,
++        havok,
++        fixture.state,
++        matrixMetadata,
++        startedAt,
++        counts,
++        (reason) => deadlineController.abort(reason),
++      ),
+       sink,
+       signal: deadlineController.signal,
+     });
+@@ -1663,7 +2423,10 @@ export async function runLoftCoarseMatrix({
+       measuredMatrixWallTimeMs,
+     };
+   } catch (error) {
+-    if ((!writerStarted || writerSucceeded) && typeof sink?.abort === "function") {
++    if (
++      (!writerStarted || writerSucceeded) &&
++      typeof sink?.abort === "function"
++    ) {
+       try {
+         await sink.abort(error);
+       } catch (abortError) {

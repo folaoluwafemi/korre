@@ -362,3 +362,9 @@ No local application build/test/browser/physics ran for this contract correction
 - Independent source review 8 passed the eight-finding runner lint repair. The run-evidence review for 38404197531 also passed. Reports are under `execution_state/reports/T02-L01-EXECUTOR-1-review-8.md` and `execution_state/reports/T02-L01-EXECUTOR-1-run-38404197531-independent-review.md`.
 - `/root` owns commit/push of the exact reviewed runner, status and evidence, followed by hosted `pnpm verify` on that SHA. No local app checks were run.
 - T02-L01-EXECUTOR-1 remains unaccepted until hosted verification passes; the 24-case browser matrix, deployed Havok and playability are separate unmet gates.
+
+## Current ownership — 2026-10-13 (hosted format check failed; focused repair pending review)
+
+- GitHub run 38405747942 on `b7a97ce15039ac7885439c18a67bcfe3732f8dd1` passed typecheck and ESLint, then failed Prettier on `games/counterball/src/simulation/loftCoarseRunner.ts`. Unit/build/integration/browser work was skipped. Full logs, exact snapshot, downloaded artifacts and file hashes are saved under `execution_state/reports/T02-L01-EXECUTOR-1-run-38405747942*`.
+- The run's exact formatting-repair artifact was applied to the runner only and independently reviewed PASS by `/root/run_evidence_review` at `execution_state/reports/T02-L01-EXECUTOR-1-review-9.md`. `/root` owns publication, shared status, and exact-SHA GitHub verification; a rotated reviewer will inspect the next run's evidence.
+- The card is not accepted. No real matrix, deployed Havok or playable match is proved. No Cloudflare/Wrangler access is needed or used at this stage.
