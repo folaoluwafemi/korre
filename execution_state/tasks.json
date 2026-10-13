@@ -5708,13 +5708,13 @@
         },
         {
           "id": "T02-L01-BROWSER-1",
-          "status": "VERIFIED",
+          "status": "RUNNING",
           "ready": false,
           "role": "worker",
           "title": "Add the development-only L01 page action and file-backed download",
-          "owner": "/root/toolchain_audit (source ownership released)",
+          "owner": "/root — exact-head GitHub verification and evidence review",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/run_evidence_review",
+          "reviewer_identity": "/root/executor_type_review",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
           "depends_on": [
             "C00-B",
@@ -5790,7 +5790,10 @@
               "command": "pnpm verify and diagnostic/production packaging checks on exact reviewed SHA",
               "environment": "github",
               "expected": "Development action compiles; production contains none of the diagnostic action/hooks; zero skipped checks.",
-              "result": "PENDING"
+              "result": "FAIL",
+              "exit_code": 1,
+              "detail": "Exact commit eceb041f14035114e841361bf4d1fc26c8acf502 failed GitHub run 38414094519 during apps/web typecheck with 10 TypeScript diagnostics; tests/build/integration/browser/production checks were skipped.",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-run-38414094519.md"
             },
             {
               "command": "Independent exact-source and official API review",
@@ -5799,6 +5802,20 @@
               "result": "PASS",
               "report": "execution_state/reports/T02-L01-BROWSER-1-review.md",
               "detail": "Independent source review PASS; runtime and hosted production/transport checks remain NOT RUN."
+            },
+            {
+              "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx",
+              "result": "PASS",
+              "environment": "local-source",
+              "exit_code": 0,
+              "detail": "Repair attempt 1 scoped whitespace check passed; no application command ran."
+            },
+            {
+              "command": "Independent repair attempt 1 source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md",
+              "detail": "All ten hosted TypeScript errors are directly repaired without suppressions; required bounds and behavior remain intact. Hosted/runtime gates pending."
             }
           ],
           "acceptance": [
@@ -5820,10 +5837,30 @@
             "If browser storage/download cannot satisfy the accepted caps, stop for a separately reviewed transport amendment before physics trials.",
             "If a new route, workflow/config or source path is required, stop for a coordinator packet amendment."
           ],
-          "attempt_count": 0,
+          "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-review.md",
-          "next_action": "Coordinator publish exact source/report/status SHA and run GitHub verify plus production packaging checks; then independently inspect run artifacts before acceptance."
+          "next_action": "Repair attempt 1 passed independent source review. Publish the reviewed source and reports, then run full hosted verification and inspect exact production output; do not accept until all browser packet acceptance checks pass.",
+          "repair_implementation_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-implementation.md",
+          "repair_review_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md",
+          "run_evidence": {
+            "run_id": 38414094519,
+            "commit": "eceb041f14035114e841361bf4d1fc26c8acf502",
+            "report": "execution_state/reports/T02-L01-BROWSER-1-run-38414094519.md",
+            "log": "execution_state/reports/T02-L01-BROWSER-1-run-38414094519-github.log",
+            "job_snapshot": "execution_state/reports/T02-L01-BROWSER-1-run-38414094519-job-snapshot.json",
+            "artifact_inventory": "execution_state/reports/T02-L01-BROWSER-1-run-38414094519-artifact-inventory.json"
+          },
+          "repair_attempts": [
+            {
+              "attempt": 1,
+              "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md",
+              "source_review": "PASS",
+              "hosted_verification": "PENDING",
+              "detail": "Independent review confirms all ten TypeScript diagnostics are directly fixed and browser bounds, acknowledgement, cleanup and direct-shot behavior remain unchanged. Exact-head hosted checks have not run."
+            }
+          ]
         },
         {
           "id": "T02-L01-TRANSPORT-1",
@@ -6056,7 +6093,7 @@
           "next_action": "Wait for accepted transport proof; then run full real-Havok matrix."
         }
       ],
-      "next_action": "T02-L01-BROWSER-1 source review and scoped diff check PASS; exact-SHA hosted verification is next. The full matrix, playable match and deployed Havok remain unproved."
+      "next_action": "T02-L01-BROWSER-1 repair attempt 1 passed independent source review; exact-head GitHub verification and production-output inspection are now pending. No local app checks ran."
     },
     {
       "id": "T03",
@@ -6648,5 +6685,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. T02-L01-BROWSER-1 is VERIFIED for source review and scoped diff only; exact-SHA GitHub verification and production-output inspection remain. No browser runtime or matrix has run. Cloudflare remains untouched."
+  "next": "T02 remains RUNNING. T02-L01-BROWSER-1 repair attempt 1 passed independent source review; next publish and verify the exact reviewed SHA on GitHub, including browser/runtime and production-bundle gates. No L01 matrix, playable match, or deployed Havok is verified."
 }

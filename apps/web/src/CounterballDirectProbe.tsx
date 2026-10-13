@@ -107,10 +107,10 @@ function isLoftMatrixHostAttestation(
     keys[1] === "fileName" &&
     keys[2] === "runId" &&
     keys[3] === "sha256" &&
-    typeof record.runId === "string" &&
-    typeof record.fileName === "string" &&
-    typeof record.byteLength === "number" &&
-    typeof record.sha256 === "string"
+    typeof record["runId"] === "string" &&
+    typeof record["fileName"] === "string" &&
+    typeof record["byteLength"] === "number" &&
+    typeof record["sha256"] === "string"
   );
 }
 
@@ -142,10 +142,10 @@ type OpfsExportSession = {
   writerClosed: boolean;
   writerAbortAttempted: boolean;
   downloadStarted: boolean;
-  abortListener?: () => void;
-  objectUrl?: string;
-  cleanupPromise?: Promise<void>;
-  cleanupTimer?: number;
+  abortListener?: (() => void) | undefined;
+  objectUrl?: string | undefined;
+  cleanupPromise?: Promise<void> | undefined;
+  cleanupTimer?: number | undefined;
 };
 
 const MATRIX_MAXIMUM_BYTES =
@@ -200,7 +200,7 @@ async function cleanupOpfsExport(
       }
     }
     if (session.cleanupTimer !== undefined) {
-      globalThis.clearTimeout(session.cleanupTimer);
+      window.clearTimeout(session.cleanupTimer);
       session.cleanupTimer = undefined;
     }
     if (session.objectUrl) {
@@ -338,7 +338,9 @@ async function writeOpfsChunk(
   ) {
     throw new Error("The OPFS chunk exceeds its bounded export contract.");
   }
-  await session.writer.write(chunk);
+  const fileChunk = new Uint8Array(chunk.byteLength);
+  fileChunk.set(chunk);
+  await session.writer.write(fileChunk);
   session.writtenBytes += chunk.byteLength;
   throwIfAborted(session.signal);
 }
@@ -761,7 +763,7 @@ export default function CounterballDirectProbe({
         exportSession.objectUrl = URL.createObjectURL(file);
         pendingMatrixDownload = exportSession;
         activeMatrixSession = undefined;
-        exportSession.cleanupTimer = globalThis.setTimeout(() => {
+        exportSession.cleanupTimer = window.setTimeout(() => {
           void discardPendingMatrix(
             exportSession,
             new Error("The browser export acknowledgement expired."),

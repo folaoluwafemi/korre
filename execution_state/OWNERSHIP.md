@@ -380,3 +380,14 @@ No local application build/test/browser/physics ran for this contract correction
 - The implementation source paths are released. The exact scoped diff check passed and independent review returned PASS at execution_state/reports/T02-L01-BROWSER-1-review.md.
 - No worker owns this packet now. /root owns shared task state, ledger, publication, and exact-SHA GitHub checks. Hosted production output and runtime transport checks remain pending.
 - Cloudflare access is not part of this packet; the user asked to be notified before that gate.
+## Current ownership — 2026-10-13 (T02-L01-BROWSER-1 repair attempt 1)
+
+- /root/toolchain_audit completed the focused repair in `apps/web/src/CounterballDirectProbe.tsx` and saved `execution_state/reports/T02-L01-BROWSER-1-repair-1-implementation.md`; source ownership is released.
+- /root/executor_type_review completed the independent source review at `execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md` with SOURCE PASS and HOSTED/RUNTIME NOT VERIFIED; reviewer ownership is released.
+- /root owns shared status, evidence publication, exact-SHA GitHub verification, and production-output inspection. No local app checks ran. Cloudflare remains out of scope until the user signals.
+
+## Current ownership — 2026-10-13 (browser repair source review passed; hosted verification pending)
+
+- The browser repair attempt has independent source approval. `/root` owns the next exact-head hosted run and artifact review; the Browser packet remains RUNNING and unaccepted until its hosted and production-output gates pass.
+- The next card, `T02-L01-TRANSPORT-1`, remains blocked on acceptance of `T02-L01-BROWSER-1`; preserve its original dependencies.
+- No L01 matrix, playable match, deployed Havok, or Cloudflare access has been verified or used.
