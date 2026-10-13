@@ -584,3 +584,20 @@ Run [38460342025](https://github.com/folaoluwafemi/korre/actions/runs/3846034202
 ## Coordinator checkpoint — 2026-10-13 (MATRIX-1 formatting repair reviewed)
 
 The hosted formatter patch from run 38460342025 was applied verbatim to the single assigned E2E spec. The scoped diff check passed. /root/executor_type_review independently confirmed all 57 patch hunks match the hosted suggestion, no semantic changes were made, and the repair-4 error-handling helper remains intact at execution_state/reports/T02-L01-MATRIX-1-repair-5-review.md. The exact run had passed typecheck and ESLint but stopped at Prettier; application tests and the 24-case matrix did not run. This source review does not establish hosted verification or physics results. The exact fix/evidence are ready for another GitHub run. MATRIX-1 remains CHANGES_REQUIRED and T02 remains RUNNING.
+
+
+GitHub run [38461667746](https://github.com/folaoluwafemi/korre/actions/runs/38461667746) is queued on exact reviewed source SHA bf04338c114676795ca9394ae9e11ef9b42cd42f. The hosted Prettier patch and independent source review are included. This will be the first attempt that can reach the 24-case real-Havok matrix if Verify passes; runtime and result remain pending. No local app checks or Cloudflare access were used.
+
+## Coordinator checkpoint — 2026-10-13 (MATRIX-1 exact-head preflight stopped)
+
+Run [38461667746](https://github.com/folaoluwafemi/korre/actions/runs/38461667746) completed on `bf04338c114676795ca9394ae9e11ef9b42cd42f`. Verify passed 30 files/179 tests; integration and four production-preview tests passed. Diagnostic Chromium passed three cases and the matrix test failed its grouped canonical support-slab preflight during first-case setup, before impulse or `executeStep`. Zero cases completed and no matrix success artifact exists. The diagnostic suite recorded zero skips/retries/flaky cases. Exact logs/hashes are under `execution_state/reports/T02-L01-MATRIX-1-run-38461667746/`; independent review confirms MATRIX-1 acceptance NOT MET. A reviewed, ready `T02-L01-SUPPORT-PREFLIGHT-1` packet will report actual/expected values and every predicate outcome without changing checks; do not retry matrix physics before that mismatch is reviewed and repaired. No local app check or Cloudflare access was used.
+
+Packet `T02-L01-SUPPORT-PREFLIGHT-1` passed exact extraction, full-plan consistency and independent pre-dispatch review. `/root/toolchain_audit` acknowledged it and is RUNNING on the single assigned file `games/counterball/src/simulation/loftCoarseRunner.ts`, changing only failure readbacks. `/root/executor_type_review` is reserved for the independent source review. No matrix retry or local app check has run.
+
+## Coordinator checkpoint — 2026-10-13 (support-readback report correction)
+
+The implementation worker completed the diagnostic-only change and scoped source diff check. Independent review passed the code invariants but found the implementation report blurred pre-dispatch packet readiness (`ready:true`, all prerequisites accepted) with the current RUNNING-state extraction (`initialReady:[]`, selected packet `ready:false`). The report now states both snapshots and avoids calling the post-dispatch result initially ready. The independent source/report re-review is pending. No hosted/runtime checks have run.
+
+## Coordinator checkpoint — 2026-10-13 (support-readback source review passed)
+
+The diagnostics-only implementation passed independent source review after correcting the report's distinction between the pre-dispatch ready packet and its post-dispatch RUNNING state. The reviewer confirmed the original support predicates, expected values, comparisons, quaternion tolerance, geometry and physics path remain unchanged; actual/expected values and each clause are serialized safely. Exact packet and scoped diff checks pass. The source has not yet run through hosted Verify or browser diagnostics. T02-L01-SUPPORT-PREFLIGHT-1 is IMPLEMENTED, not accepted; the exact SHA and GitHub evidence remain pending. MATRIX-1 remains unaccepted and Cloudflare remains unused.

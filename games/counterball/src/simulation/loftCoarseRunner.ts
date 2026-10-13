@@ -1302,8 +1302,91 @@ async function runCase(
       originalSurfaceDimensions.y !== config.geometry.surfaceThickness ||
       originalSurfaceDimensions.z !== config.geometry.pitchLength
     ) {
+      const diagnosticNumber = (value: number): number | string =>
+        Number.isFinite(value) ? value : String(value);
+      const expectedSupportReadback = {
+        position: {
+          x: 0,
+          y: expectedSurfaceY,
+          z: 0,
+        },
+        rotation:
+          surfaceRotation === null
+            ? { representation: "euler", x: 0, y: 0, z: 0 }
+            : {
+                representation: "quaternion",
+                x: 0,
+                y: 0,
+                z: 0,
+                w: 1,
+                componentTolerance: 1e-12,
+              },
+        parent: null,
+        scale: { x: 1, y: 1, z: 1 },
+        nativeShapeDimensions: {
+          x: config.geometry.pitchWidth,
+          y: config.geometry.surfaceThickness,
+          z: config.geometry.pitchLength,
+        },
+      };
+      const observedSupportReadback = {
+        position: {
+          x: diagnosticNumber(surfaceBody.transformNode.position.x),
+          y: diagnosticNumber(surfaceBody.transformNode.position.y),
+          z: diagnosticNumber(surfaceBody.transformNode.position.z),
+        },
+        rotation:
+          surfaceRotation === null
+            ? {
+                representation: "euler",
+                x: diagnosticNumber(surfaceBody.transformNode.rotation.x),
+                y: diagnosticNumber(surfaceBody.transformNode.rotation.y),
+                z: diagnosticNumber(surfaceBody.transformNode.rotation.z),
+              }
+            : {
+                representation: "quaternion",
+                x: diagnosticNumber(surfaceRotation.x),
+                y: diagnosticNumber(surfaceRotation.y),
+                z: diagnosticNumber(surfaceRotation.z),
+                w: diagnosticNumber(surfaceRotation.w),
+              },
+        parent:
+          surfaceBody.transformNode.parent === null ? null : "present",
+        scale: {
+          x: diagnosticNumber(surfaceBody.transformNode.scaling.x),
+          y: diagnosticNumber(surfaceBody.transformNode.scaling.y),
+          z: diagnosticNumber(surfaceBody.transformNode.scaling.z),
+        },
+        nativeShapeDimensions: {
+          readFrom: "PhysicsShape.getBoundingBox()",
+          x: diagnosticNumber(originalSurfaceDimensions.x),
+          y: diagnosticNumber(originalSurfaceDimensions.y),
+          z: diagnosticNumber(originalSurfaceDimensions.z),
+        },
+      };
+      const supportPreflightMatches = {
+        positionX: surfaceBody.transformNode.position.x === 0,
+        positionY:
+          surfaceBody.transformNode.position.y === expectedSurfaceY,
+        positionZ: surfaceBody.transformNode.position.z === 0,
+        rotationIsIdentity: surfaceIsIdentityRotation,
+        parentIsNull: surfaceBody.transformNode.parent === null,
+        scaleX: surfaceBody.transformNode.scaling.x === 1,
+        scaleY: surfaceBody.transformNode.scaling.y === 1,
+        scaleZ: surfaceBody.transformNode.scaling.z === 1,
+        nativeShapeDimensionX:
+          originalSurfaceDimensions.x === config.geometry.pitchWidth,
+        nativeShapeDimensionY:
+          originalSurfaceDimensions.y === config.geometry.surfaceThickness,
+        nativeShapeDimensionZ:
+          originalSurfaceDimensions.z === config.geometry.pitchLength,
+      };
       throw resourceFailure(
-        "Canonical support transform differs from the open slab contract.",
+        `Canonical support transform differs from the open slab contract. ${JSON.stringify({
+          expected: expectedSupportReadback,
+          observed: observedSupportReadback,
+          clauseMatches: supportPreflightMatches,
+        })}`,
       );
     }
     const originalMembership = originalShape.filterMembershipMask;

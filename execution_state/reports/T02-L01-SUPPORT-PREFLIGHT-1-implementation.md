@@ -1,0 +1,11 @@
+# T02-L01-SUPPORT-PREFLIGHT-1 implementation
+
+**Source status: diagnostic details added; mismatch intentionally unchanged. Runtime: NOT RUN.**
+
+The worker changed only `games/counterball/src/simulation/loftCoarseRunner.ts`; this report records the implementation evidence.
+
+The grouped canonical support preflight condition, comparison operators, expected values, and rotation tolerance remain unchanged. Only its failing branch now adds JSON diagnostics containing expected and observed position, rotation (including the active Euler/quaternion representation), parent-null state, scale, and shape dimensions read through `PhysicsShape.getBoundingBox()`. Non-finite observed numbers are represented as strings so JSON serialization does not turn them into `null`; parent output is only `null` or `"present"`, never a scene object. A boolean `clauseMatches` map identifies all existing checks: position x/y/z, identity rotation, null parent, scale x/y/z, and shape-dimension x/y/z. The same `resourceFailure` still aborts at the same point, before apron replacement, impulse, or `executeStep`; no predicate or physics behavior was changed.
+
+The independent pre-dispatch packet-review report records that exact packet extraction returned `ready: true`, with all five explicit prerequisites and required parent T01 accepted. After the packet was dispatched and its runtime status became `RUNNING`, the coordinator reran `node scripts/check-completion-plan.mjs --packet T02-L01-SUPPORT-PREFLIGHT-1`: plan consistency returned `PASS` with 109 packets and no initially-ready cards; the selected packet correctly reported `ready: false` in its current RUNNING state. These are different lifecycle snapshots, not evidence that a RUNNING packet was initially ready during the worker's implementation check.
+
+The scoped `git diff --check -- games/counterball/src/simulation/loftCoarseRunner.ts` exited 0 with no output. No install, build, typecheck, lint, test, browser, or physics command ran for this implementation. The routed browser diagnostic command is expected to exit nonzero when the unchanged matrix preflight throws; that stop is for diagnosis only, and any captured readback does not accept MATRIX-1.

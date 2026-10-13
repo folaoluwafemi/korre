@@ -533,3 +533,26 @@ No local application build/test/browser/physics ran for this contract correction
 - Repair 5 applied the exact single-file formatter patch produced by GitHub run 38460342025. Worker scoped diff check and independent review by /root/executor_type_review passed. See execution_state/reports/T02-L01-MATRIX-1-repair-5-review.md.
 - /root owns exact reviewed commit/push, GitHub rerun, full hosted evidence, matrix artifact and independent runtime review. The 24-case test has still not run; all earlier runs stopped before it.
 - Keep local app commands and Cloudflare unused. Do not accept the matrix until the exact hosted browser/Havok artifact and all timing/skip/run-review gates pass.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 exact-head run 38461667746 queued)
+
+- Exact reviewed source is pushed as bf04338c114676795ca9394ae9e11ef9b42cd42f. GitHub run 38461667746 is queued. /root owns hosted status, full log/artifact/hash capture, elapsed time and independent exact-run review.
+- This is the first attempt to reach the matrix. Earlier runs on 60d1d3c, fdedf9e and 77fafeb stopped before any 24-case runtime. The matrix is not yet accepted.
+- Do not run local app checks or Cloudflare. Avoid a status-only push during/after this run because it would launch an unnecessary duplicate matrix.
+
+
+## Current ownership — 2026-10-13 (support-slab preflight diagnosis)
+
+- Run 38461667746 is complete and independently reviewed. The first tuple was rejected before impulse/executeStep; the grouped error omits the actual field. MATRIX-1 remains CHANGES_REQUIRED. Reports retain exact hashes and the full artifact inventory.
+- `/root/toolchain_audit` owns only `games/counterball/src/simulation/loftCoarseRunner.ts` for `T02-L01-SUPPORT-PREFLIGHT-1`; only failure diagnostics may change. No transform predicate, tolerance, config, geometry, material, impulse or stepping change is authorized in this packet.
+- `/root/run_evidence_review` reviewed the packet and exact run. `/root/executor_type_review` owns the independent source review after implementation. `/root` owns task/ledger/ownership, exact-SHA publication and hosted checks.
+- Keep all app installs/builds/tests/browser/physics checks on GitHub. Cloudflare/Wrangler remains unused until the user signals availability.
+
+## Current ownership — 2026-10-13 (support-readback report correction)
+
+- The implementation worker released `games/counterball/src/simulation/loftCoarseRunner.ts`. Its scoped whitespace check passes. `/root` corrected the implementation report's readiness wording to distinguish the pre-dispatch `ready:true` packet review from the later RUNNING-state extraction (`initialReady:[]`, selected packet `ready:false`). `/root/executor_type_review` owns only the independent source/report re-review at `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-review.md`. No hosted/runtime check has started; `/root` owns the later exact-SHA run and shared status.
+
+## Current ownership — 2026-10-13 (support-readback source review passed)
+
+- `/root/executor_type_review` independently passed the unchanged support predicate and diagnostic-only source diff at `execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-review.md`; the report-readiness wording was corrected and re-reviewed. `/root` now owns the exact-reviewed-SHA GitHub verification, retained run artifacts, exact-run review, and shared status. No hosted/runtime check has run yet. The source diff remains limited to `games/counterball/src/simulation/loftCoarseRunner.ts`; Cloudflare is untouched.

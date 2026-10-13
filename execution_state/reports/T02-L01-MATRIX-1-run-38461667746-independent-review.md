@@ -1,0 +1,11 @@
+# T02-L01-MATRIX-1 run 38461667746 independent evidence review
+
+**EVIDENCE REVIEW: PASS. MATRIX-1 ACCEPTANCE: NOT MET.**
+
+The retained run snapshot identifies GitHub run [38461667746](https://github.com/folaoluwafemi/korre/actions/runs/38461667746), exact head SHA `bf04338c114676795ca9394ae9e11ef9b42cd42f`, and overall conclusion `failure`. Its 40 workflow steps break down as 35 success, 1 failure, and 4 skipped. Step 31, “Run every produced local diagnostic browser suite,” failed. Steps 14–16 (TypeScript-resolution diagnostics) and post step 67 were skipped. Verify itself completed successfully; its retained log reports 30 test files and 179 tests passed. The production marker check, production browser build, Worker packaging, integration suite, and built-preview browser suite also completed.
+
+The diagnostic Playwright JSON and log agree: four Chromium tests ran with one worker; three passed, one failed, none were skipped or flaky, and every test result has retry 0. The successful tests cover the real pointer flick, blocked-WASM cleanup/retry, and synthetic transport. The matrix test failed with `Canonical support transform differs from the open slab contract.` The test surfaced this as a pre-download browser-matrix error. The built-preview JSON separately records four passed, zero skipped, zero unexpected, and zero flaky tests.
+
+The exact-SHA runner source places that support-transform preflight at line 1306, after first-case state/world setup but before the first impulse at line 1562 and any `executeStep` call at line 1820. Thus the runner began setup for the first tuple, but no tuple reached physics execution and no matrix case result was produced. The failed Playwright result contains only its error context and trace attachments. The retained artifact API inventory has no `counterball-l01-matrix.json` success artifact; it contains run logs/builds and other browser evidence only.
+
+This run meets no MATRIX-1 acceptance gate. It has no executed 24-case physics matrix, no complete host-validated matrix JSON, no matrix success attachment, and no zero-failure hosted diagnostic run. The real flick and other passing browser checks are separate results and cannot stand in for the matrix. No deployed-Havok, matrix calibration, or playability claim follows from this run.
