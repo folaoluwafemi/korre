@@ -463,3 +463,25 @@ No local application build/test/browser/physics ran for this contract correction
 - MATRIX-1 repair source is independently reviewed PASS at `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md`; worker/reviewer source ownership is released.
 - /root owns staging/committing only the reviewed project/test and exact evidence/status reports, push to the authorized feature branch, then full exact-SHA GitHub CI and artifact review. No local application build/test/browser command.
 - Any hosted failure or 20-minute timeout is recorded exactly; do not rerun the expensive matrix without a bounded repair and review. Cloudflare remains unused pending the user's signal.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 hosted verification)
+
+- Exact reviewed MATRIX-1 SHA `60d1d3c09d4e445fcfdd5084b00311dd1e76b012` is running as GitHub Actions 38457484401.
+- /root owns capture of complete run logs, job counts, actual matrix artifact and digest, hosted timing, independent runtime evidence review, and final task acceptance. Do not run app checks locally.
+- Stop after a first matrix timeout/failure until a bounded repair/amendment has source review; never launch a second expensive matrix trial speculatively.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 TS2345 repair attempt 2)
+
+- Run 38457484401 failed Verify at the one reported TS2345; no matrix/browser step ran. Full log, snapshots and available artifacts are captured.
+- /root/toolchain_audit owns only `tests/e2e/counterball-direct-probe.spec.ts` plus `execution_state/reports/T02-L01-MATRIX-1-repair-2-implementation.md` to replace the narrow-typed ID membership call with a type-safe check over the same exact ID set. Only scoped diff-check may run locally.
+- /root/run_evidence_review owns only `execution_state/reports/T02-L01-MATRIX-1-repair-2-review.md` after source release.
+- /root owns publication and the next exact-head GitHub run only after independent SOURCE PASS. Matrix has not run; stop before any repeated matrix trial if a runtime/timeout occurs.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 repair 2 source reviewed)
+
+- /root/toolchain_audit completed bounded repair attempt 2 and released the E2E source path; /root/run_evidence_review independently returned SOURCE PASS at execution_state/reports/T02-L01-MATRIX-1-repair-2-review.md.
+- /root owns staging the reviewed source and exact run-38457484401 failure/review evidence with current status/ledger, publishing the resulting exact SHA to the authorized feature branch, and capturing/reviewing its full GitHub run and matrix artifact.
+- The hosted typecheck and matrix runtime remain unverified. Do not accept MATRIX-1 or T02 until the acceptance conditions pass. If this next exact-host run reaches the 24-case matrix and fails or times out, stop before another matrix trial and follow the bounded repair/review rule. No local app build/test/browser run; Cloudflare remains untouched pending the user's signal.

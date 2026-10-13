@@ -97,6 +97,10 @@ const MATRIX_STATIC_IDS = [
   "goal-frame-5",
   "support-apron",
 ] as const;
+const MATRIX_KNOWN_BODY_IDS: ReadonlySet<string> = new Set([
+  ...MATRIX_ENTITY_IDS,
+  ...MATRIX_STATIC_IDS,
+]);
 const MATRIX_IDENTITY_KEYS = [
   "guardSchemaVersion",
   "scope",
@@ -905,7 +909,7 @@ function validateCaseMetadata(
     const label = `Case ${index} material ${materialIndex}`;
     const material = assertExactKeys(item, ["bodyId", "shapeIndex", "setter", "readback"], label);
     const bodyId = material["bodyId"];
-    if (typeof bodyId !== "string" || ![...MATRIX_ENTITY_IDS, ...MATRIX_STATIC_IDS].includes(bodyId)) {
+    if (typeof bodyId !== "string" || !MATRIX_KNOWN_BODY_IDS.has(bodyId)) {
       throw new Error(`${label} references an unknown body.`);
     }
     expect(boundedInteger(material["shapeIndex"], 0, 0, `${label}.shapeIndex`)).toBe(0);

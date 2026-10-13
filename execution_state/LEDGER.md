@@ -538,3 +538,18 @@ Repair attempt 1 is implemented and released in the single assigned E2E path. It
 ## Coordinator checkpoint — 2026-10-13 (matrix repair source review passed; hosted run next)
 
 Rotated independent source review of MATRIX-1 repair attempt 1 passed at `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md`. It confirms exactly one full 24-case test, complete non-short-circuit validation of both 60-row settling windows, preserved caps/assertions, and the exact three corrections. The source-only gate and scoped diff check are now verified; no app/runtime checks ran. The coordinator owns publication and exact-head GitHub acceptance. The hosted 24-case run and 20-minute fit remain NOT RUN; T02 remains RUNNING.
+
+
+## Coordinator checkpoint — 2026-10-13 (MATRIX-1 exact hosted run started)
+
+The source-reviewed MATRIX-1 commit `60d1d3c09d4e445fcfdd5084b00311dd1e76b012` was pushed to the authorized feature branch. Exact GitHub workflow run [38457484401](https://github.com/folaoluwafemi/korre/actions/runs/38457484401) is in progress. No hosted outcome, 24-case result, full artifact, or 20-minute fit is claimed until the run completes and receives independent review. No local build/test/browser command was run.
+
+
+## Coordinator checkpoint — 2026-10-13 (MATRIX-1 hosted attempt 1 blocked at TypeScript)
+
+The first exact hosted attempt, run [38457484401](https://github.com/folaoluwafemi/korre/actions/runs/38457484401) on `60d1d3c09d4e445fcfdd5084b00311dd1e76b012`, failed Verify with one TypeScript TS2345 at `tests/e2e/counterball-direct-probe.spec.ts:908:94`: a dynamic string ID was passed to `includes` typed as a canonical-ID literal union. Counts are 26 successful, 1 failed, 13 skipped of 40 workflow steps. The diagnostic matrix and downstream application checks did not run. Exact logs and four small artifacts are captured in the run-specific report and directory. One bounded source repair is assigned; matrix runtime and 20-minute fit remain unproven.
+
+
+## Coordinator checkpoint — 2026-10-13 (MATRIX-1 repair 2 source pass; hosted rerun pending)
+
+The first exact-head matrix attempt, GitHub run [38457484401](https://github.com/folaoluwafemi/korre/actions/runs/38457484401), failed its Verify typecheck on one TS2345 before any application tests or the 24-case matrix ran. The bounded repair replaces the literal-array membership call with a ReadonlySet built from the exact unchanged canonical dynamic and static ID arrays. Its scoped diff check passed; independent source review by /root/run_evidence_review passed at execution_state/reports/T02-L01-MATRIX-1-repair-2-review.md. This does not verify hosted typecheck or matrix runtime. The source and evidence are ready for publication to the authorized feature branch and a new exact-head GitHub run. MATRIX-1 remains CHANGES_REQUIRED until its actual 24-case pinned-Havok Chromium artifact, full hosted job, zero skips/retries and independent exact-run review pass. Parent T02 remains RUNNING. No Cloudflare session, local application build/test/browser command, matrix trial, or deployment was used.
