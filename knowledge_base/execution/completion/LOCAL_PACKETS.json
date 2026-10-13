@@ -3718,7 +3718,8 @@
       "T02-L01-GUARD-SCHEMA-1",
       "T02-L01-PACKET-SPLIT-1",
       "T02-L01-TRANSPORT-1",
-      "T02-L01-SUPPORT-PREFLIGHT-1"
+      "T02-L01-SUPPORT-PREFLIGHT-1",
+      "T02-L01-SUPPORT-F32-1"
     ],
     "read_paths": [
       "AGENTS.md",
@@ -3896,6 +3897,109 @@
       "If the new error omits a mismatching field or changes a predicate, do not run the diagnostic suite; repair this card within the bounded scope.",
       "If hosted evidence shows an impulse, executeStep, or success artifact on the failing path, stop for safety review.",
       "Do not begin another matrix physics attempt until the exact readback is independently reviewed and the identified discrepancy is handled by its own bounded, reviewed source/contract packet."
+    ]
+  },
+  {
+    "id": "T02-L01-SUPPORT-F32-1",
+    "parent": "T02",
+    "title": "Compare native support thickness by exact float32 projection",
+    "role": "worker",
+    "depends_on": [
+      "T02-L01-EXECUTOR-1",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1",
+      "T02-L01-PACKET-SPLIT-1",
+      "T02-L01-TRANSPORT-1",
+      "T02-L01-SUPPORT-PREFLIGHT-1"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/README.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-acceptance-38466161040.md",
+      "execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38466161040.md",
+      "execution_state/reports/T02-L01-SUPPORT-PREFLIGHT-1-run-38466161040-independent-review.md",
+      "execution_state/reports/T02-L01-SUPPORT-F32-contract-proposal.md",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-SUPPORT-F32-1",
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "games/counterball/src/simulation/worldFactory.ts",
+      "packages/game-protocol/src/config.ts",
+      "tests/e2e/counterball-direct-probe.spec.ts"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts"
+    ],
+    "outputs": [
+      "One pure helper expresses strict native-dimension comparison as observed === Math.fround(configured), rejecting non-finite inputs and non-finite projections; it adds no tolerance or rounding-to-string behavior.",
+      "The runner uses that helper only for the support AABB Y readback. Configured geometry remains 0.2; the x/z, pose, rotation, parent, scale, material, filter and all physics/step checks stay unchanged. Mismatch diagnostics show configured, projected and observed Y.",
+      "Focused unit tests accept only the exact projected binary32 readback and reject raw nonrepresentable 0.2, the immediately adjacent float32 value, NaN/infinite readbacks, and finite Number.MAX_VALUE when its float32 projection becomes Infinity."
+    ],
+    "steps": [
+      "Read the accepted support-preflight diagnostic source/report/run/review and this exact contract proposal. Preserve its exact configured geometry and all guard/physics assertions except the single support AABB Y representation comparison.",
+      "Add the pure exact-float32 projection predicate to loftCoarseProbe.ts and unit tests to loftCoarseProbe.test.ts. Use a DataView bit-step in the test to construct the immediately adjacent float32 number; prove it is rejected. Also prove finite Number.MAX_VALUE is rejected when Math.fround(configured) is Infinity, even if the observed input equals Number.MAX_VALUE.",
+      "Import and call the tested helper from the existing support preflight in loftCoarseRunner.ts only for nativeShapeDimensionY. Change the matching diagnostic boolean consistently and include configured Y, projected expected readback, and actual readback. Leave x/z exact equality unchanged.",
+      "Do not use the projection to replace actual native dimensions in any energy, sweep, setup, or artifact calculations. The projection exists only in this one pre-impulse comparison.",
+      "Run only git diff --check over the three assigned paths locally. Write an implementation report with exact source diff/hash and exit code; no local app commands.",
+      "After independent exact-source review, coordinator publishes that exact SHA and runs GitHub Verify plus the unchanged complete routed real-WASM 24-case Chromium matrix. Preserve all 24 tuples, existing caps, 20-minute job-fit, retry/skip rules and artifact validation.",
+      "If the matrix advances beyond support Y but stops on a distinct later condition, retain the exact error and keep MATRIX-1 CHANGES_REQUIRED; do not expand this packet to repair the later condition. Release all three paths after review."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-SUPPORT-F32-1",
+        "environment": "local-document",
+        "expected": "The exact packet is READY only after accepted support disclosure/transport/guard prerequisites and the T01 parent gate; this is a document check only."
+      },
+      {
+        "command": "git diff --check -- games/counterball/src/simulation/loftCoarseProbe.ts games/counterball/src/simulation/loftCoarseProbe.test.ts games/counterball/src/simulation/loftCoarseRunner.ts",
+        "environment": "local-document",
+        "expected": "Only the three assigned paths pass; no local install, build, typecheck, lint, test, browser or physics command."
+      },
+      {
+        "command": "pnpm verify on the exact source-reviewed SHA",
+        "environment": "github",
+        "expected": "All type, lint, format, unit-test, production-exclusion and build gates pass; focused unit tests prove exact projection and adjacent-value rejection."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "Real Chromium/pinned-WASM no longer rejects the exact support Y projection. Preserve exact full-matrix outcome, all counts, complete artifact or exact later failure; zero skips/retries for acceptance. This gate accepts no matrix result by itself."
+      },
+      {
+        "command": "Independent exact-source and exact-run review",
+        "environment": "source-review",
+        "expected": "PASS confirms only support Y comparison changes to exact Math.fround projection, x/z and physics behavior remain intact, adjacent value is rejected, actual browser advances past support preflight, and MATRIX-1 status reflects full 24-case evidence or remains unaccepted."
+      }
+    ],
+    "acceptance": [
+      "The existing native support AABB Y readback accepts exactly Math.fround(config.geometry.surfaceThickness) only when configured, projected and observed numbers are finite; it does not accept the raw nonrepresentable decimal or any adjacent value by tolerance.",
+      "The configured and constructed slab remains exactly 12 × 0.2 × 20; support transform, materials, filters, open bounds, all physics calculations, matrix tuples/caps and public step guard remain unchanged.",
+      "Exact source is independently reviewed and GitHub Verify passes with the focused unit tests; a real pinned-WASM Chromium run demonstrates the support-Y check no longer aborts before the matrix can proceed.",
+      "If that run completes all 24 cases and the full artifact, MATRIX-1 is separately eligible for its own acceptance review. If a later check fails, this packet accepts only the exact support representation repair; MATRIX-1 stays CHANGES_REQUIRED."
+    ],
+    "negative_cases": [
+      "No arbitrary epsilon/tolerance, decimal string rounding, alternative raw/projected acceptance, geometry/config/factory/material/filter change, local test/build/browser run, tuple/cap reduction, impulse/step change, CI route change, artifact weakening, or Cloudflare/Wrangler operation."
+    ],
+    "review_questions": [
+      "Do tests reject the immediate neighboring float32 value and all non-finite readbacks, and prove a finite configured Number.MAX_VALUE with an infinite Math.fround projection is rejected, while accepting only the finite exact projection?",
+      "Is the helper applied only to support native AABB Y, with canonical config geometry and exact x/z checks unchanged?",
+      "Do later calculations and artifacts continue to use raw observed native dimensions?",
+      "Does the exact hosted run demonstrate that the support guard is passed before any subsequent matrix action, and is every later failure kept separate from this packet?"
+    ],
+    "stop_conditions": [
+      "If pinned-browser output differs from Math.fround(configured), stop; do not add a tolerance or second accepted encoding.",
+      "If the source changes factory/config dimensions, x/z/transform/rotation/parent/scale/material/filter rules, tuple/cap/time limits, impulses, executeStep guards, CI route or artifact validation, stop and require a new coordinator packet.",
+      "If the matrix reaches a new guard failure or violates any existing limit, preserve the exact evidence, keep MATRIX-1 unaccepted, and request a separately reviewed card rather than editing under this packet."
     ]
   }
 ]

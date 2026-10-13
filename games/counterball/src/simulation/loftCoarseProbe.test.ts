@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import {
   LOFT_COARSE_TUPLES,
   canonicalizeLoftCoarseContactPair,
+  matchesExactFloat32Projection,
   type LoftCoarseByteSink,
   type LoftCoarseCase,
   type LoftCoarseContactBodyId,
@@ -416,6 +417,43 @@ function exactCaseLimits(
     batchCount: 720,
   });
 }
+
+describe("matchesExactFloat32Projection", () => {
+  it("accepts only the exact finite projection and rejects adjacent values", () => {
+    const configured = 0.2;
+    const projected = Math.fround(configured);
+    const view = new DataView(new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT));
+    view.setFloat32(0, projected);
+    view.setUint32(0, view.getUint32(0) + 1);
+    const adjacent = view.getFloat32(0);
+
+    expect(matchesExactFloat32Projection(configured, projected)).toBe(true);
+    expect(matchesExactFloat32Projection(configured, configured)).toBe(false);
+    expect(adjacent).not.toBe(projected);
+    expect(Math.fround(adjacent)).toBe(adjacent);
+    expect(matchesExactFloat32Projection(configured, adjacent)).toBe(false);
+  });
+
+  it("rejects non-finite values and finite values with infinite projection", () => {
+    const projected = Math.fround(0.2);
+    const nonFiniteValues = [
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+    ];
+    for (const observed of nonFiniteValues) {
+      expect(matchesExactFloat32Projection(0.2, observed)).toBe(false);
+    }
+    for (const configured of nonFiniteValues) {
+      expect(matchesExactFloat32Projection(configured, projected)).toBe(false);
+    }
+
+    expect(Math.fround(Number.MAX_VALUE)).toBe(Number.POSITIVE_INFINITY);
+    expect(
+      matchesExactFloat32Projection(Number.MAX_VALUE, Number.MAX_VALUE),
+    ).toBe(false);
+  });
+});
 
 describe("writeLoftCoarseMatrix", () => {
   it("exposes the exact unique tuple order from the frozen four axes", () => {

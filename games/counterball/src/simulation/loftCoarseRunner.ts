@@ -41,6 +41,7 @@ import {
 import {
   canonicalizeLoftCoarseContactPair,
   LOFT_COARSE_TUPLES,
+  matchesExactFloat32Projection,
   writeLoftCoarseMatrix,
   type LoftCoarseByteSink,
   type LoftCoarseCase,
@@ -1299,7 +1300,10 @@ async function runCase(
       surfaceBody.transformNode.scaling.y !== 1 ||
       surfaceBody.transformNode.scaling.z !== 1 ||
       originalSurfaceDimensions.x !== config.geometry.pitchWidth ||
-      originalSurfaceDimensions.y !== config.geometry.surfaceThickness ||
+      !matchesExactFloat32Projection(
+        config.geometry.surfaceThickness,
+        originalSurfaceDimensions.y,
+      ) ||
       originalSurfaceDimensions.z !== config.geometry.pitchLength
     ) {
       const diagnosticNumber = (value: number): number | string =>
@@ -1327,6 +1331,13 @@ async function runCase(
           x: config.geometry.pitchWidth,
           y: config.geometry.surfaceThickness,
           z: config.geometry.pitchLength,
+        },
+        nativeShapeDimensionYProjection: {
+          configured: config.geometry.surfaceThickness,
+          projected: diagnosticNumber(
+            Math.fround(config.geometry.surfaceThickness),
+          ),
+          observed: diagnosticNumber(originalSurfaceDimensions.y),
         },
       };
       const observedSupportReadback = {
@@ -1375,7 +1386,10 @@ async function runCase(
         nativeShapeDimensionX:
           originalSurfaceDimensions.x === config.geometry.pitchWidth,
         nativeShapeDimensionY:
-          originalSurfaceDimensions.y === config.geometry.surfaceThickness,
+          matchesExactFloat32Projection(
+            config.geometry.surfaceThickness,
+            originalSurfaceDimensions.y,
+          ),
         nativeShapeDimensionZ:
           originalSurfaceDimensions.z === config.geometry.pitchLength,
       };

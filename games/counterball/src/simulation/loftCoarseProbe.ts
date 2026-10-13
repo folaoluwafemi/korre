@@ -561,6 +561,15 @@ export function canonicalizeLoftCoarseContactPair(
   return firstIndex < secondIndex ? [first, second] : [second, first];
 }
 
+export function matchesExactFloat32Projection(
+  configured: number,
+  observed: number,
+): boolean {
+  if (!Number.isFinite(configured) || !Number.isFinite(observed)) return false;
+  const projected = Math.fround(configured);
+  return Number.isFinite(projected) && observed === projected;
+}
+
 function assertFilterPair(value: unknown, label: string): void {
   if (!Array.isArray(value) || value.length !== 2) {
     invalid(`${label} must contain membership and collide masks.`);
