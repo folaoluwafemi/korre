@@ -391,3 +391,9 @@ No local application build/test/browser/physics ran for this contract correction
 - The browser repair attempt has independent source approval. `/root` owns the next exact-head hosted run and artifact review; the Browser packet remains RUNNING and unaccepted until its hosted and production-output gates pass.
 - The next card, `T02-L01-TRANSPORT-1`, remains blocked on acceptance of `T02-L01-BROWSER-1`; preserve its original dependencies.
 - No L01 matrix, playable match, deployed Havok, or Cloudflare access has been verified or used.
+
+## Current ownership — 2026-10-13 (browser repair attempt 2)
+
+- `/root/toolchain_audit` owns only `games/counterball/src/browser.ts`, `apps/web/src/CounterballDirectProbe.tsx`, and `execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md` for the two TS2307s in run 38415702575. If another path is needed, it must stop and request a coordinator packet amendment.
+- `/root/run_evidence_review` independently audited run 38415702575 and released its run-evidence report; it is the rotated reviewer for repair attempt 2 source after implementation paths are released.
+- `/root` owns task/ledger/ownership files, publication and next exact-SHA hosted run. No local app command ran; Cloudflare remains untouched until the user signals.
