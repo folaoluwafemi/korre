@@ -3503,7 +3503,7 @@
       "T02-L01-GUARD-CONTRACT-1",
       "T02-L01-GUARD-SCHEMA-1",
       "T02-L01-PACKET-SPLIT-1",
-      "T02-L01-BROWSER-1"
+      "T02-L01-BROWSER-1-SUCCESSOR-3"
     ],
     "read_paths": [
       "AGENTS.md",
@@ -3518,6 +3518,9 @@
       "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
       "execution_state/reports/T02-L01-guard-schema-acceptance-1.md",
       "execution_state/reports/T02-L01-packet-split-architecture-review.md",
+      "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-acceptance.md",
+      "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment.md",
+      "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment-review.md",
       "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-1",
       "games/counterball/src/browser.ts",
       "apps/web/src/CounterballDirectProbe.tsx",
@@ -3532,12 +3535,12 @@
     ],
     "outputs": [
       "A real Chromium test streams exactly 504,365,056 deterministic bytes through the page's OPFS writer and completed-file download, then saves and hashes the download incrementally on the host.",
-      "The existing diagnostic page exposes the test-only accessible action `Run max-size download transport check`; Playwright starts a `download` wait before clicking it, and the hook uses the exact same OPFS writer/finalizer/anchor path as L01 without allocating or returning a full payload.",
+      "The existing diagnostic page exposes a two-step test-only flow: click the accessible `Write transport test file` button, then wait for the bounded OPFS file to become ready and click `Download transport file` after registering the Playwright download wait. The hook uses the same OPFS writer/finalizer/anchor path as L01 without allocating or returning a full payload.",
       "The test is transport-only, is collected by the existing diagnostic route, removes browser and host temporary files, and attaches no synthetic payload."
     ],
     "steps": [
       "Read the accepted browser transport API. Add one test to the existing routed spec; do not edit route/workflow/package files.",
-      "Write exactly 504,365,056 deterministic bytes in awaited 256-KiB-or-smaller chunks after checking browser storage quota. Trigger the accessible `Run max-size download transport check` action through Playwright after registering `page.waitForEvent('download')`; trigger the same file-backed download path as matrix completion.",
+      "Write exactly 504,365,056 deterministic bytes in awaited 256-KiB-or-smaller chunks after checking browser storage quota. Click the existing accessible `Write transport test file` button, wait for the status `The bounded OPFS file is complete and ready to download.`, then register `page.waitForEvent('download')` before clicking the existing accessible `Download transport file` button. This must exercise the accepted same file-backed path as matrix completion; do not add or alter UI controls.",
       "Use Playwright download.saveAs into testInfo.outputPath; host streams the file to verify exact length and SHA-256 with bounded memory. Delete both ends in finally.",
       "Run this E2E only on GitHub; capture exact SHA, counts, runtime and artifact/log evidence. Write report and release the spec for independent source/run review."
     ],
@@ -3573,7 +3576,7 @@
       "No mock/Node test is called a physics result; no reduced size, unbounded buffer or retained synthetic artifact."
     ],
     "review_questions": [
-      "Does this test prove the same file-backed transport at the complete inclusive matrix cap?",
+      "Does the test exercise the existing `Write transport test file` and `Download transport file` controls through the same path at the complete inclusive matrix cap?",
       "Are bytes/hash checked incrementally with cleanup and no attachment?",
       "Does the existing CI route collect and complete the test without skips/retries?"
     ],

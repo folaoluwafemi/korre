@@ -5975,13 +5975,13 @@
         },
         {
           "id": "T02-L01-TRANSPORT-1",
-          "status": "PLANNED",
+          "status": "REVIEWING",
           "ready": false,
           "role": "worker",
           "title": "Prove maximum-size browser-to-host transfer in Chromium",
-          "owner": "unassigned",
-          "author_identity": null,
-          "reviewer_identity": "/root/toolchain_audit",
+          "owner": "/root/toolchain_audit — implementation complete; /root/run_evidence_review — independent source review assigned",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/run_evidence_review",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-1",
           "depends_on": [
             "C00-B",
@@ -5993,10 +5993,7 @@
             "T02-L01-GUARD-CONTRACT-1",
             "T02-L01-GUARD-SCHEMA-1",
             "T02-L01-PACKET-SPLIT-1",
-            "T02-L01-BROWSER-1"
-          ],
-          "required_parent_acceptance": [
-            "T01"
+            "T02-L01-BROWSER-1-SUCCESSOR-3"
           ],
           "read_paths": [
             "AGENTS.md",
@@ -6011,6 +6008,9 @@
             "execution_state/reports/T02-L01-guard-contract-acceptance-1.md",
             "execution_state/reports/T02-L01-guard-schema-acceptance-1.md",
             "execution_state/reports/T02-L01-packet-split-architecture-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-acceptance.md",
+            "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment.md",
+            "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment-review.md",
             "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-1",
             "games/counterball/src/browser.ts",
             "apps/web/src/CounterballDirectProbe.tsx",
@@ -6025,12 +6025,12 @@
           ],
           "outputs": [
             "A real Chromium test streams exactly 504,365,056 deterministic bytes through the page's OPFS writer and completed-file download, then saves and hashes the download incrementally on the host.",
-            "The existing diagnostic page exposes the test-only accessible action `Run max-size download transport check`; Playwright starts a `download` wait before clicking it, and the hook uses the exact same OPFS writer/finalizer/anchor path as L01 without allocating or returning a full payload.",
+            "The existing diagnostic page exposes a two-step test-only flow: click the accessible `Write transport test file` button, then wait for the bounded OPFS file to become ready and click `Download transport file` after registering the Playwright download wait. The hook uses the same OPFS writer/finalizer/anchor path as L01 without allocating or returning a full payload.",
             "The test is transport-only, is collected by the existing diagnostic route, removes browser and host temporary files, and attaches no synthetic payload."
           ],
           "steps": [
             "Read the accepted browser transport API. Add one test to the existing routed spec; do not edit route/workflow/package files.",
-            "Write exactly 504,365,056 deterministic bytes in awaited 256-KiB-or-smaller chunks after checking browser storage quota. Trigger the accessible `Run max-size download transport check` action through Playwright after registering `page.waitForEvent('download')`; trigger the same file-backed download path as matrix completion.",
+            "Write exactly 504,365,056 deterministic bytes in awaited 256-KiB-or-smaller chunks after checking browser storage quota. Click the existing accessible `Write transport test file` button, wait for the status `The bounded OPFS file is complete and ready to download.`, then register `page.waitForEvent('download')` before clicking the existing accessible `Download transport file` button. This must exercise the accepted same file-backed path as matrix completion; do not add or alter UI controls.",
             "Use Playwright download.saveAs into testInfo.outputPath; host streams the file to verify exact length and SHA-256 with bounded memory. Delete both ends in finally.",
             "Run this E2E only on GitHub; capture exact SHA, counts, runtime and artifact/log evidence. Write report and release the spec for independent source/run review."
           ],
@@ -6038,26 +6038,79 @@
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-1",
               "environment": "local-document",
-              "expected": "Ready only after accepted browser sink and original prerequisites.",
-              "result": "PENDING"
+              "expected": "Ready only after accepted browser sink and original prerequisites."
             },
             {
               "command": "git diff --check -- tests/e2e/counterball-direct-probe.spec.ts",
               "environment": "local-document",
-              "expected": "Exact test path passes; no local browser run.",
-              "result": "PENDING"
+              "expected": "Exact test path passes; no local browser run."
             },
             {
               "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
               "environment": "github",
-              "expected": "Exact-cap transfer completes in real Chromium with zero skips/retries and all temp files removed.",
-              "result": "PENDING"
+              "expected": "Exact-cap transfer completes in real Chromium with zero skips/retries and all temp files removed."
             },
             {
               "command": "Independent exact-source/run review",
               "environment": "source-review",
-              "expected": "PASS verifies byte count, digest, route, bounded reader, cleanup and transport-only scope.",
-              "result": "PENDING"
+              "expected": "PASS verifies byte count, digest, route, bounded reader, cleanup and transport-only scope."
+            },
+            {
+              "command": "Independent coordinator dependency-amendment review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-dependency-amendment-review.md",
+              "detail": "Reviewer confirmed the accepted SUCCESSOR-3 dependency replacement, all preserved original prerequisites and T01 parent gate, packet read path, generated index, and checker ready:true. No implementation/runtime checks were implied."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-1 (pre-dispatch)",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-dependency-amendment-review.md",
+              "detail": "Exact record extraction reported ready:true and required_parent_acceptance [T01] after all dependencies were ACCEPTED; dependency amendment was independently reviewed."
+            },
+            {
+              "command": "Pre-dispatch source inspection found original accessible-control mismatch",
+              "result": "CHANGES_REQUIRED",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment.md",
+              "detail": "Worker stopped before source edits: accepted UI has a two-step Write transport test file then Download transport file flow, not the packet specified nonexistent button."
+            },
+            {
+              "command": "Independent exact packet-amendment review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment-review.md",
+              "detail": "Reviewer confirmed actual accessible names/status, exact two-step download ordering, preserved transport cap and boundedness, cleanup, and unchanged sole E2E write path."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-1 (after reviewed UI amendment, pre-dispatch)",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-ui-name-amendment-review.md",
+              "detail": "Exact record reports ready:true with all original prerequisites accepted and required_parent_acceptance [T01]."
+            },
+            {
+              "command": "Worker exact packet extraction before implementation",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
+              "detail": "Worker reports ready:true and required T01 acceptance after the independently reviewed UI amendment."
+            },
+            {
+              "command": "git diff --check -- tests/e2e/counterball-direct-probe.spec.ts",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
+              "detail": "Scoped one-file whitespace check exited 0. No local app build/test/browser was run."
+            },
+            {
+              "command": "Independent exact-source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
+              "detail": "Independent source reviewer confirmed the sole E2E path, exact size/chunk/quota, amended UI sequence, streamed host digest, post-verification ACK, cleanup and production/CI scope. Runtime remains pending."
             }
           ],
           "acceptance": [
@@ -6070,7 +6123,7 @@
             "No mock/Node test is called a physics result; no reduced size, unbounded buffer or retained synthetic artifact."
           ],
           "review_questions": [
-            "Does this test prove the same file-backed transport at the complete inclusive matrix cap?",
+            "Does the test exercise the existing `Write transport test file` and `Download transport file` controls through the same path at the complete inclusive matrix cap?",
             "Are bytes/hash checked incrementally with cleanup and no attachment?",
             "Does the existing CI route collect and complete the test without skips/retries?"
           ],
@@ -6081,7 +6134,11 @@
           "attempt_count": 0,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
-          "next_action": "Wait for accepted Browser packet; then prove full-cap Chromium file transfer."
+          "next_action": "Exact-source review PASS. Coordinator stages the reviewed E2E and evidence/catalogue changes, commits and pushes the exact SHA to GitHub; then independently review the hosted transfer results before acceptance.",
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "blocker": null
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7324,6 +7381,24 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-review.md",
               "detail": "Exact one-path diff matches the hosted formatting patch in both directions; the cause cleanupError fix and two-error iterable remain unchanged. Runtime remains NOT RUN."
+            },
+            {
+              "command": "GitHub Actions exact-SHA Verify, production, integration, preview, and diagnostic browser gates",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38430577910,
+              "commit": "af5f499a06df4a3cf472ecf0d3991ee330a70bd8",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38430577910",
+              "detail": "Run completed successfully. Independent exact-run evidence review PASS; see the acceptance and exact-run reports for gate totals, browser traces, artifact verification, and scope.",
+              "source_sha": "af5f499a06df4a3cf472ecf0d3991ee330a70bd8",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-run-38430577910.md"
+            },
+            {
+              "command": "Independent exact-run evidence review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-run-38430577910-independent-review.md",
+              "detail": "Exact run/SHA, all required executed gates, actual browser Havok flick, cleanup, skip/retry counts, and extracted artifact hashes independently verified."
             }
           ],
           "acceptance": [
@@ -7348,7 +7423,7 @@
             "If any required gate fails or skips, preserve the evidence and keep the first-flick milestone unaccepted.",
             "After two focused unsuccessful repairs of the same failure, stop edits and follow the SWARM escalation procedure."
           ],
-          "status": "REVIEWING",
+          "status": "ACCEPTED",
           "ready": false,
           "owner": "/root/toolchain_audit — sole component source edit",
           "author_identity": "/root/toolchain_audit",
@@ -7356,12 +7431,21 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-review.md",
-          "next_action": "Independent source review PASS. Commit and push the exact reviewed source plus coordinator evidence; then capture and independently review full GitHub Verify, production, integration, preview, and diagnostic browser results.",
+          "next_action": "Accepted for first browser flick only. T02-L01-TRANSPORT-1 dependency and accessible-flow amendments passed independent review; the max-size transfer card is ready for implementation.",
           "coordinator_setup_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-coordinator-setup.md",
-          "packet_review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-packet-review.md"
+          "packet_review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-packet-review.md",
+          "hosted_run": {
+            "run_id": 38430577910,
+            "commit": "af5f499a06df4a3cf472ecf0d3991ee330a70bd8",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38430577910",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          "acceptance_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-acceptance.md",
+          "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "T02 remains RUNNING. Successor 3 exact formatting patch and independent source review passed. Publish the reviewed SHA to GitHub; the first browser-flick milestone stays unaccepted until every hosted gate and independent exact-run review passes."
+      "next_action": "T02-L01-TRANSPORT-1 source is implemented and under independent review. After source PASS, coordinator submits the exact reviewed SHA to GitHub and retains run logs/artifacts before exact-run review."
     },
     {
       "id": "T03",
@@ -7953,5 +8037,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. Browser repair attempt 2 source review passed; next publish and verify the exact source on GitHub. No L01 matrix, playable match, or deployed Havok is verified."
+  "next": "T02 remains RUNNING. First diagnostic browser flick accepted. Full-cap OPFS browser-to-host proof is now in progress in one E2E file, using the accepted two-step UI. The 24-case physics matrix, complete playable match, AI, online/social, staging, Cloudflare deployment, and device playtest still remain."
 }
