@@ -60,12 +60,7 @@ async function hashDownloadedFile(path: string): Promise<DownloadDigest> {
   try {
     const buffer = new Uint8Array(64 * 1024);
     while (true) {
-      const { bytesRead } = await file.read(
-        buffer,
-        0,
-        buffer.byteLength,
-        null,
-      );
+      const { bytesRead } = await file.read(buffer, 0, buffer.byteLength, null);
       if (bytesRead === 0) break;
       byteLength += bytesRead;
       if (byteLength > TRANSPORT_BYTES) {
@@ -437,9 +432,7 @@ test("the maximum synthetic transport streams through the browser download", asy
     expect(output.phase).toBe("ready");
     expect(output.export.kind).toBe("synthetic");
     expect(output.export.byteLength).toBe(TRANSPORT_BYTES);
-    expect(output.export.fileName).toMatch(
-      /^counterball-l01-[0-9a-f-]+\.bin$/,
-    );
+    expect(output.export.fileName).toMatch(/^counterball-l01-[0-9a-f-]+\.bin$/);
     expect(output.export.runId).not.toBe("");
     expect(output.export.summary).toEqual({
       matrixBytes: TRANSPORT_BYTES,
@@ -451,9 +444,7 @@ test("the maximum synthetic transport streams through the browser download", asy
     const downloadPromise = page.waitForEvent("download", {
       timeout: 60_000,
     });
-    await page
-      .getByRole("button", { name: "Download transport file" })
-      .click();
+    await page.getByRole("button", { name: "Download transport file" }).click();
     browserDownload = await downloadPromise;
     expect(browserDownload.suggestedFilename()).toBe(output.export.fileName);
 

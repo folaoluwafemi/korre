@@ -6186,6 +6186,39 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-review.md",
               "detail": "Reviewer confirmed the aggregate throw is outside the nested close catch, preserves the read error as cause and both errors in AggregateError.errors, and leaves bounded reads/cap/transport unchanged. Hosted Verify remains pending."
+            },
+            {
+              "command": "GitHub exact-SHA full verify, production, integration, preview, diagnostic browser E2E, and full-cap transport after repair 2",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38437750598,
+              "source_sha": "296b1041db5384d167537102e7bcac1c28010f43",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38437750598",
+              "detail": "Typecheck and ESLint passed; Prettier flagged only tests/e2e/counterball-direct-probe.spec.ts. 26/40 steps succeeded, 1 failed, 13 skipped. Unit tests, build, integration, preview, browser and transport gates did not run.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38437750598.md"
+            },
+            {
+              "command": "Capture exact failed-run logs, artifacts, and formatter suggestion for run 38437750598",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38437750598,
+              "source_sha": "296b1041db5384d167537102e7bcac1c28010f43",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38437750598.md",
+              "detail": "Full log, job snapshot, artifacts API, formatter patch and artifact digests are preserved under the run evidence folder; exact patch passes git apply --check."
+            },
+            {
+              "command": "Apply exact formatter patch supplied by run 38437750598",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-format-repair-implementation.md",
+              "detail": "Exact hosted patch applied verbatim; only its three line-wrap changes are present, and scoped git diff --check passed. No app commands ran."
+            },
+            {
+              "command": "Independent review of exact formatter response",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-format-repair-review.md",
+              "detail": "Reviewer matched the current diff to the exact hosted patch SHA and confirmed only three formatting wraps changed. Transport semantics are untouched; scoped diff-check passed."
             }
           ],
           "acceptance": [
@@ -6209,19 +6242,19 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
-          "next_action": "Final repair attempt 2 passed independent source review and scoped diff-check. Commit and push the exact reviewed repair, then run the final permitted GitHub verification. If the repeated lint failure remains, stop and follow SWARM escalation; do not make a third source repair.",
+          "next_action": "The source repair passed typecheck and ESLint. The exact hosted Prettier patch was applied verbatim and independently reviewed; commit and push this formatting-only patch, then rerun GitHub verification. Full-cap Chromium transfer remains unproven.",
           "required_parent_acceptance": [
             "T01"
           ],
           "hosted_run": {
-            "run_id": 38436788486,
-            "commit": "681d47f71a08dc0104e2eca2fda7ee815398065f",
-            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38436788486",
+            "run_id": 38437750598,
+            "commit": "296b1041db5384d167537102e7bcac1c28010f43",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38437750598",
             "status": "completed",
             "conclusion": "failure",
-            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38436788486.md"
+            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38437750598.md"
           },
-          "blocker": "GitHub Verify failed preserve-caught-error after repair 1; no runtime gates ran. Repair attempt 2 is the final focused attempt before SWARM escalation.",
+          "blocker": "The latest GitHub run failed Prettier after typecheck and ESLint passed. The exact hosted formatting patch is applied and independently reviewed; hosted rerun is pending.",
           "repair_implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
           "repair_review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
           "repair_attempts": [
@@ -6236,12 +6269,18 @@
             },
             {
               "number": 2,
-              "status": "SOURCE_REVIEWED_HOSTED_PENDING",
+              "status": "SOURCE_REVIEWED_HOSTED_FORMATTING_REQUIRED",
               "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-implementation.md",
               "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-review.md",
-              "detail": "Final bounded repair attempt passed scoped diff check and independent source review. The exact repaired SHA must pass GitHub Verify before any runtime claim."
+              "detail": "Source repair passed independent review; hosted run cleared typecheck and ESLint but stopped at a distinct Prettier-only failure."
             }
-          ]
+          ],
+          "formatting_suggestion": {
+            "artifact_id": 11832644890,
+            "path": "execution_state/reports/T02-L01-TRANSPORT-1-run-38437750598-evidence/formatting-repair/formatting-repair.patch",
+            "status": "REVIEWED_HOSTED_RERUN_PENDING",
+            "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-format-repair-review.md"
+          }
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7548,7 +7587,7 @@
           "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "Transport repair attempt 2 is independently source-reviewed and ready for the final permitted GitHub verification. No full-cap transport runtime result or playable match is established."
+      "next_action": "Transport source repairs passed typecheck and ESLint on GitHub. The exact formatter patch is independently reviewed and ready for a hosted rerun; runtime remains unrun."
     },
     {
       "id": "T03",
@@ -8140,5 +8179,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. Transport verification failed twice at ESLint; the final bounded source repair passed independent review and is ready for GitHub. No full transfer or playable match is claimed."
+  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. Source typecheck and ESLint pass; the exact formatter patch is independently reviewed and ready for GitHub. Full-cap transfer and playable match remain unproven."
 }
