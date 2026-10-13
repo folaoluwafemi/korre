@@ -512,3 +512,24 @@ No local application build/test/browser/physics ran for this contract correction
 - /root/toolchain_audit released the bounded final repair path; /root/run_evidence_review independently passed its source review at execution_state/reports/T02-L01-MATRIX-1-repair-4-review.md.
 - /root owns exact reviewed-source commit/push, one exact-head GitHub run, complete run/artifact capture, independent runtime review and the acceptance decision.
 - Runs 38457484401 and 38458662778 failed before matrix runtime (typecheck then lint). No 24-case trial has run. This next GitHub run is the first runtime attempt; preserve the accepted 20-minute/zero-skip gates and do not claim matrix evidence until the actual browser/Havok artifact is reviewed. Cloudflare remains untouched pending the user's signal.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 exact-head run 38460342025 queued)
+
+- Exact reviewed source is pushed as 77fafeba85c0fe1bcc1d67f0b5e22a1437743cf1; GitHub run 38460342025 is queued. /root owns capture of full run/log/artifact/timing, independent exact-run review, and acceptance/status update.
+- This is the first attempt that may reach the actual 24-case matrix. Prior hosted attempts stopped during TypeScript or lint. No matrix outcome is claimed yet.
+- Do not run local app checks or touch Cloudflare. The source-triggered run must finish before any status-only commit; do not push a metadata-only change that would launch an unnecessary repeat matrix.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 same-file formatting repair)
+
+- Run 38460342025 passed typecheck and ESLint, then Prettier failed only on tests/e2e/counterball-direct-probe.spec.ts before application tests or matrix runtime. Exact logs/artifacts and formatter patch are retained under execution_state/reports/T02-L01-MATRIX-1-run-38460342025*.
+- /root/toolchain_audit owns only tests/e2e/counterball-direct-probe.spec.ts and execution_state/reports/T02-L01-MATRIX-1-repair-5-implementation.md. Apply the exact same-file CI formatter patch without semantic edits. Only scoped git diff --check locally; no app checks or CI.
+- /root/executor_type_review owns only execution_state/reports/T02-L01-MATRIX-1-repair-5-review.md. /root owns status and exact-run verification. New formatting signature has at most two focused repairs total; matrix runtime remains NOT RUN.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 formatting source reviewed)
+
+- Repair 5 applied the exact single-file formatter patch produced by GitHub run 38460342025. Worker scoped diff check and independent review by /root/executor_type_review passed. See execution_state/reports/T02-L01-MATRIX-1-repair-5-review.md.
+- /root owns exact reviewed commit/push, GitHub rerun, full hosted evidence, matrix artifact and independent runtime review. The 24-case test has still not run; all earlier runs stopped before it.
+- Keep local app commands and Cloudflare unused. Do not accept the matrix until the exact hosted browser/Havok artifact and all timing/skip/run-review gates pass.

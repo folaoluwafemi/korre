@@ -1,0 +1,1889 @@
+diff --git a/tests/e2e/counterball-direct-probe.spec.ts b/tests/e2e/counterball-direct-probe.spec.ts
+index 489f609..ec57c64 100644
+--- a/tests/e2e/counterball-direct-probe.spec.ts
++++ b/tests/e2e/counterball-direct-probe.spec.ts
+@@ -173,8 +173,7 @@ const MATRIX_SWEEP_ROW_KEYS = [
+   "all15Settled",
+ ] as const;
+ const MATRIX_GUARD = Object.freeze({
+-  schemaVersion:
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.schemaVersion,
++  schemaVersion: COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.schemaVersion,
+   scope: COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.scope,
+   matrixId: COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.matrixId,
+   algorithmVersion:
+@@ -187,7 +186,8 @@ const MATRIX_GUARD = Object.freeze({
+   fixtureId: COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.fixture.id,
+   fixturePayloadSha256:
+     COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.fixture.payloadSha256,
+-  physicsVersion: COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.physicsVersion,
++  physicsVersion:
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.physicsVersion,
+   adapterVersion:
+     COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.physicsVersion.slice(
+       COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.physicsVersion.lastIndexOf(
+@@ -243,9 +243,7 @@ class MatrixJsonFileReader {
+   private eof = false;
+   private byteLength = 0;
+ 
+-  constructor(
+-    private readonly file: Awaited<ReturnType<typeof open>>,
+-  ) {}
++  constructor(private readonly file: Awaited<ReturnType<typeof open>>) {}
+ 
+   get bytesRead(): number {
+     return this.byteLength;
+@@ -288,14 +286,17 @@ class MatrixJsonFileReader {
+     for (const character of text) {
+       const actual = await this.readByte();
+       if (actual !== character.charCodeAt(0)) {
+-        throw new Error(`The matrix is missing its exact ${JSON.stringify(text)} delimiter.`);
++        throw new Error(
++          `The matrix is missing its exact ${JSON.stringify(text)} delimiter.`,
++        );
+       }
+     }
+   }
+ 
+   async readObject(maximumBytes: number, label: string): Promise<string> {
+     const opening = await this.readByte();
+-    if (opening !== 0x7b) throw new Error(`${label} must begin with an object.`);
++    if (opening !== 0x7b)
++      throw new Error(`${label} must begin with an object.`);
+     const chunks: Buffer[] = [Buffer.from([opening])];
+     let capturedBytes = 1;
+     let depth = 1;
+@@ -308,7 +309,8 @@ class MatrixJsonFileReader {
+       let complete = false;
+       while (this.cursor < this.available) {
+         const byte = this.buffer[this.cursor];
+-        if (byte === undefined) throw new Error(`${label} contains a missing byte.`);
++        if (byte === undefined)
++          throw new Error(`${label} contains a missing byte.`);
+         this.cursor += 1;
+         capturedBytes += 1;
+         if (capturedBytes > maximumBytes) {
+@@ -325,7 +327,8 @@ class MatrixJsonFileReader {
+         else if (byte === 0x7b || byte === 0x5b) depth += 1;
+         else if (byte === 0x7d || byte === 0x5d) {
+           depth -= 1;
+-          if (depth < 0) throw new Error(`${label} has unbalanced JSON delimiters.`);
++          if (depth < 0)
++            throw new Error(`${label} has unbalanced JSON delimiters.`);
+           if (depth === 0) {
+             complete = true;
+             break;
+@@ -396,7 +399,11 @@ function rethrowCaughtError(error: unknown, message: string): never {
+   throw new Error(message, { cause: error });
+ }
+ 
+-function assertTuple(value: unknown, expected: MatrixTuple, label: string): void {
++function assertTuple(
++  value: unknown,
++  expected: MatrixTuple,
++  label: string,
++): void {
+   expect(Array.isArray(value), `${label} must be an array`).toBe(true);
+   expect(value, `${label} must equal its canonical tuple`).toEqual(expected);
+ }
+@@ -410,11 +417,19 @@ function assertVector(value: unknown, label: string): void {
+ 
+ function assertQuaternion(value: unknown, label: string): void {
+   const rotation = assertExactKeys(value, ["x", "y", "z", "w"], label);
+-  const components = [rotation["x"], rotation["y"], rotation["z"], rotation["w"]].map(
+-    (component, index) => finiteNumber(component, `${label}[${index}]`),
+-  );
++  const components = [
++    rotation["x"],
++    rotation["y"],
++    rotation["z"],
++    rotation["w"],
++  ].map((component, index) => finiteNumber(component, `${label}[${index}]`));
+   const [x, y, z, w] = components;
+-  if (x === undefined || y === undefined || z === undefined || w === undefined) {
++  if (
++    x === undefined ||
++    y === undefined ||
++    z === undefined ||
++    w === undefined
++  ) {
+     throw new Error(`${label} is missing a quaternion component.`);
+   }
+   expect(Math.abs(Math.hypot(x, y, z, w) - 1)).toBeLessThanOrEqual(
+@@ -437,7 +452,12 @@ function isCompactJson(text: string): boolean {
+       else if (character === "\\") escaped = true;
+       else if (character === '"') inString = false;
+     } else if (character === '"') inString = true;
+-    else if (character === " " || character === "\n" || character === "\r" || character === "\t") {
++    else if (
++      character === " " ||
++      character === "\n" ||
++      character === "\r" ||
++      character === "\t"
++    ) {
+       return false;
+     }
+   }
+@@ -460,7 +480,10 @@ function skipJsonValue(text: string, start: number): number {
+   }
+   if (first !== "{" && first !== "[") {
+     let index = start;
+-    while (index < text.length && ![",", "]", "}"].includes(text[index] ?? "")) {
++    while (
++      index < text.length &&
++      ![",", "]", "}"].includes(text[index] ?? "")
++    ) {
+       index += 1;
+     }
+     if (index === start) throw new Error("A JSON primitive is empty.");
+@@ -507,9 +530,11 @@ function objectValueSpans(text: string): Map<string, JsonSpan> {
+     if (spans.has(key)) throw new Error(`Duplicate JSON key ${key}.`);
+     spans.set(key, { start: valueStart, end: valueEnd });
+     if (valueEnd === text.length - 1) break;
+-    if (text[valueEnd] !== ",") throw new Error("A JSON object separator is missing.");
++    if (text[valueEnd] !== ",")
++      throw new Error("A JSON object separator is missing.");
+     cursor = valueEnd + 1;
+-    if (cursor >= text.length - 1) throw new Error("A JSON object has a trailing comma.");
++    if (cursor >= text.length - 1)
++      throw new Error("A JSON object has a trailing comma.");
+   }
+   return spans;
+ }
+@@ -525,12 +550,15 @@ function* arrayValueSpans(
+   let cursor = span.start + 1;
+   while (cursor < span.end - 1) {
+     const valueEnd = skipJsonValue(text, cursor);
+-    if (valueEnd > span.end - 1) throw new Error(`${label} has a truncated row.`);
++    if (valueEnd > span.end - 1)
++      throw new Error(`${label} has a truncated row.`);
+     yield { start: cursor, end: valueEnd };
+     if (valueEnd === span.end - 1) return;
+-    if (text[valueEnd] !== ",") throw new Error(`${label} has a missing separator.`);
++    if (text[valueEnd] !== ",")
++      throw new Error(`${label} has a missing separator.`);
+     cursor = valueEnd + 1;
+-    if (cursor >= span.end - 1) throw new Error(`${label} has a trailing comma.`);
++    if (cursor >= span.end - 1)
++      throw new Error(`${label} has a trailing comma.`);
+   }
+ }
+ 
+@@ -545,7 +573,10 @@ function omitConfigHashLeaves(value: unknown): unknown {
+   );
+ }
+ 
+-function collectConfigHashLeaves(value: unknown, output: string[] = []): string[] {
++function collectConfigHashLeaves(
++  value: unknown,
++  output: string[] = [],
++): string[] {
+   if (Array.isArray(value)) {
+     for (const child of value) collectConfigHashLeaves(child, output);
+   } else if (typeof value === "object" && value !== null) {
+@@ -624,12 +655,19 @@ async function readPinnedFixture(): Promise<{
+     );
+   }
+   if (primaryFailure !== null) {
+-    rethrowCaughtError(primaryFailure.value, "Fixture verification failed with a non-Error value.");
++    rethrowCaughtError(
++      primaryFailure.value,
++      "Fixture verification failed with a non-Error value.",
++    );
+   }
+   if (closeFailure !== null) {
+-    rethrowCaughtError(closeFailure.value, "Fixture handle close failed with a non-Error value.");
++    rethrowCaughtError(
++      closeFailure.value,
++      "Fixture handle close failed with a non-Error value.",
++    );
+   }
+-  if (result === undefined) throw new Error("Fixture verification ended without a result.");
++  if (result === undefined)
++    throw new Error("Fixture verification ended without a result.");
+   return result;
+ }
+ 
+@@ -666,7 +704,8 @@ function regeneratedInitialState(
+   let fillerIndex = 0;
+   const bodies = ENTITY_IDS.map((id) => {
+     const original = originals.get(id);
+-    if (original === undefined) throw new Error(`Fixture body ${id} is missing.`);
++    if (original === undefined)
++      throw new Error(`Fixture body ${id} is missing.`);
+     let position: typeof original.position;
+     let rotation = { x: 0, y: 0, z: 0, w: 1 };
+     if (id === "home-0") position = selectedPosition;
+@@ -676,7 +715,8 @@ function regeneratedInitialState(
+       rotation = pose.rotation;
+     } else {
+       const slot = slots[fillerIndex];
+-      if (slot === undefined) throw new Error("A canonical filler slot is missing.");
++      if (slot === undefined)
++        throw new Error("A canonical filler slot is missing.");
+       position = slot;
+       fillerIndex += 1;
+     }
+@@ -696,10 +736,17 @@ function validateMatrixIdentity(
+   configHash: string,
+   fixtureFileSha256: string,
+ ): MatrixRecord {
+-  const metadata = assertExactKeys(value, MATRIX_IDENTITY_KEYS, "Matrix metadata");
++  const metadata = assertExactKeys(
++    value,
++    MATRIX_IDENTITY_KEYS,
++    "Matrix metadata",
++  );
+   for (const [field, expected] of Object.entries(MATRIX_GUARD)) {
+-    const actualField = field === "schemaVersion" ? "guardSchemaVersion" : field;
+-    expect(metadata[actualField], `Matrix identity ${actualField}`).toBe(expected);
++    const actualField =
++      field === "schemaVersion" ? "guardSchemaVersion" : field;
++    expect(metadata[actualField], `Matrix identity ${actualField}`).toBe(
++      expected,
++    );
+   }
+   expect(metadata["configHash"]).toBe(configHash);
+   expect(metadata["fixtureFileSha256"]).toBe(fixtureFileSha256);
+@@ -712,8 +759,10 @@ function validateMatrixIdentity(
+   assertHash(metadata["wasmSha256"], "Matrix wasmSha256");
+   const identity = metadata["runtimeIdentity"];
+   if (
+-    typeof identity !== "string" || identity.length === 0 ||
+-    identity.length > 1_024 || !identity.startsWith("browser:") ||
++    typeof identity !== "string" ||
++    identity.length === 0 ||
++    identity.length > 1_024 ||
++    !identity.startsWith("browser:") ||
+     !identity.endsWith(`;physics:${MATRIX_GUARD.physicsVersion}`)
+   ) {
+     throw new Error("Matrix runtime identity is missing or outside its bound.");
+@@ -721,7 +770,10 @@ function validateMatrixIdentity(
+   return metadata;
+ }
+ 
+-function assertFilterPair(value: unknown, label: string): readonly [number, number] {
++function assertFilterPair(
++  value: unknown,
++  label: string,
++): readonly [number, number] {
+   if (!Array.isArray(value) || value.length !== 2) {
+     throw new Error(`${label} must contain two native collision masks.`);
+   }
+@@ -732,8 +784,10 @@ function assertFilterPair(value: unknown, label: string): readonly [number, numb
+     [collide, "collide"],
+   ] as const) {
+     if (
+-      typeof mask !== "number" || !Number.isSafeInteger(mask) ||
+-      mask < -0x80000000 || mask > 0xffffffff
++      typeof mask !== "number" ||
++      !Number.isSafeInteger(mask) ||
++      mask < -0x80000000 ||
++      mask > 0xffffffff
+     ) {
+       throw new Error(`${label} ${name} mask is invalid.`);
+     }
+@@ -754,13 +808,21 @@ function filtersCollide(
+ function assertMaterialValues(value: unknown, label: string): void {
+   const material = assertExactKeys(
+     value,
+-    ["friction", "staticFriction", "restitution", "frictionCombine", "restitutionCombine"],
++    [
++      "friction",
++      "staticFriction",
++      "restitution",
++      "frictionCombine",
++      "restitutionCombine",
++    ],
+     label,
+   );
+   expect(finiteNumber(material["friction"], `${label}.friction`)).toBe(
+     COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.materials.friction,
+   );
+-  expect(finiteNumber(material["staticFriction"], `${label}.staticFriction`)).toBe(
++  expect(
++    finiteNumber(material["staticFriction"], `${label}.staticFriction`),
++  ).toBe(
+     COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.materials.staticFriction,
+   );
+   expect(finiteNumber(material["restitution"], `${label}.restitution`)).toBe(
+@@ -770,11 +832,16 @@ function assertMaterialValues(value: unknown, label: string): void {
+     COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.materials.frictionCombine,
+   );
+   expect(material["restitutionCombine"]).toBe(
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.materials.restitutionCombine,
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.materials
++      .restitutionCombine,
+   );
+ }
+ 
+-function assertBodyState(value: unknown, expectedId: string, label: string): MatrixRecord {
++function assertBodyState(
++  value: unknown,
++  expectedId: string,
++  label: string,
++): MatrixRecord {
+   const body = assertExactKeys(value, MATRIX_BODY_STATE_KEYS, label);
+   expect(body["id"]).toBe(expectedId);
+   assertVector(body["position"], `${label}.position`);
+@@ -823,18 +890,28 @@ function validateCaseMetadata(
+     `Case ${index} metadata`,
+   );
+   for (const field of MATRIX_IDENTITY_KEYS) {
+-    expect(metadata[field], `Case ${index} identity ${field}`).toEqual(identity[field]);
++    expect(metadata[field], `Case ${index} identity ${field}`).toEqual(
++      identity[field],
++    );
+   }
+   assertTuple(metadata["tuple"], tuple, `Case ${index} tuple`);
+-  expect(boundedInteger(metadata["matrixIndex"], 0, 23, `Case ${index} index`)).toBe(index);
++  expect(
++    boundedInteger(metadata["matrixIndex"], 0, 23, `Case ${index} index`),
++  ).toBe(index);
+   expect(metadata["initialStateHashAlgorithm"]).toBe(
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.setup.initialStateHashAlgorithm,
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.setup
++      .initialStateHashAlgorithm,
+   );
+   assertHash(metadata["initialStateHash"], `Case ${index} initialStateHash`);
+ 
+-  const expectedBodies = new Map(expectedState.bodies.map((body) => [body.id, body]));
++  const expectedBodies = new Map(
++    expectedState.bodies.map((body) => [body.id, body]),
++  );
+   const dynamicValue = metadata["dynamicBodies"];
+-  if (!Array.isArray(dynamicValue) || dynamicValue.length !== MATRIX_ENTITY_IDS.length) {
++  if (
++    !Array.isArray(dynamicValue) ||
++    dynamicValue.length !== MATRIX_ENTITY_IDS.length
++  ) {
+     throw new Error(`Case ${index} must describe all 15 dynamic bodies.`);
+   }
+   const dynamicFilters = new Map<string, readonly [number, number]>();
+@@ -843,9 +920,16 @@ function validateCaseMetadata(
+     const body = assertExactKeys(
+       item,
+       [
+-        "id", "nativeMass", "centerOfMassOffset", "principalInertias",
+-        "inertiaOrientation", "colliderDimensions", "collisionFilter",
+-        "initialLinearVelocity", "initialAngularVelocity", "configuredMassProjection",
++        "id",
++        "nativeMass",
++        "centerOfMassOffset",
++        "principalInertias",
++        "inertiaOrientation",
++        "colliderDimensions",
++        "collisionFilter",
++        "initialLinearVelocity",
++        "initialAngularVelocity",
++        "configuredMassProjection",
+       ],
+       label,
+     );
+@@ -855,45 +939,87 @@ function validateCaseMetadata(
+     const nativeMass = finiteNumber(body["nativeMass"], `${label}.nativeMass`);
+     expect(nativeMass).toBeGreaterThan(0);
+     assertVector(body["centerOfMassOffset"], `${label}.centerOfMassOffset`);
+-    const inertias = asRecord(body["principalInertias"], `${label}.principalInertias`);
++    const inertias = asRecord(
++      body["principalInertias"],
++      `${label}.principalInertias`,
++    );
+     assertVector(inertias, `${label}.principalInertias`);
+     for (const axis of ["x", "y", "z"] as const) {
+-      expect(finiteNumber(inertias[axis], `${label}.inertia.${axis}`)).toBeGreaterThan(0);
++      expect(
++        finiteNumber(inertias[axis], `${label}.inertia.${axis}`),
++      ).toBeGreaterThan(0);
+     }
+     assertQuaternion(body["inertiaOrientation"], `${label}.inertiaOrientation`);
+-    const dimensions = asRecord(body["colliderDimensions"], `${label}.colliderDimensions`);
++    const dimensions = asRecord(
++      body["colliderDimensions"],
++      `${label}.colliderDimensions`,
++    );
+     assertVector(dimensions, `${label}.colliderDimensions`);
+     const geometry = COUNTERBALL_CONFIG_V1.geometry;
+     expect(dimensions).toEqual(
+       id === "button"
+-        ? { x: geometry.buttonRadius * 2, y: geometry.buttonThickness, z: geometry.buttonRadius * 2 }
+-        : { x: geometry.capRadius * 2, y: geometry.capHeight, z: geometry.capRadius * 2 },
++        ? {
++            x: geometry.buttonRadius * 2,
++            y: geometry.buttonThickness,
++            z: geometry.buttonRadius * 2,
++          }
++        : {
++            x: geometry.capRadius * 2,
++            y: geometry.capHeight,
++            z: geometry.capRadius * 2,
++          },
+     );
+     for (const axis of ["x", "y", "z"] as const) {
+-      expect(finiteNumber(dimensions[axis], `${label}.dimensions.${axis}`)).toBeGreaterThan(0);
++      expect(
++        finiteNumber(dimensions[axis], `${label}.dimensions.${axis}`),
++      ).toBeGreaterThan(0);
+     }
+-    const filter = assertFilterPair(body["collisionFilter"], `${label}.collisionFilter`);
++    const filter = assertFilterPair(
++      body["collisionFilter"],
++      `${label}.collisionFilter`,
++    );
+     dynamicFilters.set(id, filter);
+-    assertVector(body["initialLinearVelocity"], `${label}.initialLinearVelocity`);
+-    assertVector(body["initialAngularVelocity"], `${label}.initialAngularVelocity`);
+-    for (const velocityField of ["initialLinearVelocity", "initialAngularVelocity"] as const) {
+-      const velocity = asRecord(body[velocityField], `${label}.${velocityField}`);
++    assertVector(
++      body["initialLinearVelocity"],
++      `${label}.initialLinearVelocity`,
++    );
++    assertVector(
++      body["initialAngularVelocity"],
++      `${label}.initialAngularVelocity`,
++    );
++    for (const velocityField of [
++      "initialLinearVelocity",
++      "initialAngularVelocity",
++    ] as const) {
++      const velocity = asRecord(
++        body[velocityField],
++        `${label}.${velocityField}`,
++      );
+       for (const axis of ["x", "y", "z"] as const) {
+         expect(velocity[axis], `${label}.${velocityField}.${axis}`).toBe(0);
+       }
+     }
+-    const configuredMass = id === "button"
+-      ? COUNTERBALL_CONFIG_V1.bodies.buttonMass
+-      : COUNTERBALL_CONFIG_V1.bodies.capMass;
++    const configuredMass =
++      id === "button"
++        ? COUNTERBALL_CONFIG_V1.bodies.buttonMass
++        : COUNTERBALL_CONFIG_V1.bodies.capMass;
+     const projection = assertExactKeys(
+       body["configuredMassProjection"],
+-      ["configuredMass", "projectedMass", "observedNativeMass", "tolerance", "withinTolerance"],
++      [
++        "configuredMass",
++        "projectedMass",
++        "observedNativeMass",
++        "tolerance",
++        "withinTolerance",
++      ],
+       `${label}.configuredMassProjection`,
+     );
+     const projectedMass = Math.fround(configuredMass);
+     const tolerance =
+-      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.energy.nativeMassToleranceMultiplier *
+-      Number.EPSILON * Math.max(1, configuredMass);
++      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.energy
++        .nativeMassToleranceMultiplier *
++      Number.EPSILON *
++      Math.max(1, configuredMass);
+     expect(projection["configuredMass"]).toBe(configuredMass);
+     expect(projection["projectedMass"]).toBe(projectedMass);
+     expect(projection["observedNativeMass"]).toBe(nativeMass);
+@@ -902,7 +1028,8 @@ function validateCaseMetadata(
+     expect(Math.abs(nativeMass - projectedMass)).toBeLessThanOrEqual(tolerance);
+ 
+     const initialBody = expectedBodies.get(id);
+-    if (initialBody === undefined) throw new Error(`${label} is absent from fixture setup.`);
++    if (initialBody === undefined)
++      throw new Error(`${label} is absent from fixture setup.`);
+     if (bodyIndex === 0) {
+       // State-row setup checks below prove each configured transform and all-zero velocity.
+       expect(initialBody.id).toBe("button");
+@@ -911,49 +1038,86 @@ function validateCaseMetadata(
+ 
+   const materialsValue = metadata["materials"];
+   if (!Array.isArray(materialsValue) || materialsValue.length !== 22) {
+-    throw new Error(`Case ${index} must record all 22 shape material readbacks.`);
++    throw new Error(
++      `Case ${index} must record all 22 shape material readbacks.`,
++    );
+   }
+   const materialByShape = new Map<string, MatrixRecord>();
+   for (const [materialIndex, item] of materialsValue.entries()) {
+     const label = `Case ${index} material ${materialIndex}`;
+-    const material = assertExactKeys(item, ["bodyId", "shapeIndex", "setter", "readback"], label);
++    const material = assertExactKeys(
++      item,
++      ["bodyId", "shapeIndex", "setter", "readback"],
++      label,
++    );
+     const bodyId = material["bodyId"];
+     if (typeof bodyId !== "string" || !MATRIX_KNOWN_BODY_IDS.has(bodyId)) {
+       throw new Error(`${label} references an unknown body.`);
+     }
+-    expect(boundedInteger(material["shapeIndex"], 0, 0, `${label}.shapeIndex`)).toBe(0);
++    expect(
++      boundedInteger(material["shapeIndex"], 0, 0, `${label}.shapeIndex`),
++    ).toBe(0);
+     const key = `${bodyId}:0`;
+     expect(materialByShape.has(key)).toBe(false);
+     assertMaterialValues(material["setter"], `${label}.setter`);
+     assertMaterialValues(material["readback"], `${label}.readback`);
+     expect(material["setter"]).toEqual(material["readback"]);
+-    materialByShape.set(key, asRecord(material["readback"], `${label}.readback`));
++    materialByShape.set(
++      key,
++      asRecord(material["readback"], `${label}.readback`),
++    );
+   }
+   for (const id of [...MATRIX_ENTITY_IDS, ...MATRIX_STATIC_IDS]) {
+     expect(materialByShape.has(`${id}:0`), `Material for ${id}`).toBe(true);
+   }
+ 
+   const staticValue = metadata["staticBodies"];
+-  if (!Array.isArray(staticValue) || staticValue.length !== MATRIX_STATIC_IDS.length) {
++  if (
++    !Array.isArray(staticValue) ||
++    staticValue.length !== MATRIX_STATIC_IDS.length
++  ) {
+     throw new Error(`Case ${index} must record all seven static colliders.`);
+   }
+   const staticFilters = new Map<string, readonly [number, number]>();
+   staticValue.forEach((item: unknown, staticIndex: number) => {
+     const label = `Case ${index} static body ${staticIndex}`;
+-    const body = assertExactKeys(item, ["id", "colliderDimensions", "collisionFilter", "material"], label);
++    const body = assertExactKeys(
++      item,
++      ["id", "colliderDimensions", "collisionFilter", "material"],
++      label,
++    );
+     const id = MATRIX_STATIC_IDS[staticIndex];
+     if (id === undefined) throw new Error(`${label} has no canonical id.`);
+     expect(body["id"]).toBe(id);
+-    const dimensions = asRecord(body["colliderDimensions"], `${label}.dimensions`);
++    const dimensions = asRecord(
++      body["colliderDimensions"],
++      `${label}.dimensions`,
++    );
+     assertVector(dimensions, `${label}.dimensions`);
+     const geometry = COUNTERBALL_CONFIG_V1.geometry;
+-    const expected = id === "support-apron"
+-      ? { x: geometry.pitchWidth + 650, y: geometry.surfaceThickness, z: geometry.pitchLength + 650 }
+-      : id === "goal-frame-2" || id === "goal-frame-5"
+-        ? { x: geometry.goalWidth, y: geometry.goalFrameRadius * 2, z: geometry.goalFrameRadius * 2 }
+-        : { x: geometry.goalFrameRadius * 2, y: geometry.goalHeight, z: geometry.goalFrameRadius * 2 };
++    const expected =
++      id === "support-apron"
++        ? {
++            x: geometry.pitchWidth + 650,
++            y: geometry.surfaceThickness,
++            z: geometry.pitchLength + 650,
++          }
++        : id === "goal-frame-2" || id === "goal-frame-5"
++          ? {
++              x: geometry.goalWidth,
++              y: geometry.goalFrameRadius * 2,
++              z: geometry.goalFrameRadius * 2,
++            }
++          : {
++              x: geometry.goalFrameRadius * 2,
++              y: geometry.goalHeight,
++              z: geometry.goalFrameRadius * 2,
++            };
+     expect(dimensions).toEqual(expected);
+-    const filter = assertFilterPair(body["collisionFilter"], `${label}.collisionFilter`);
++    const filter = assertFilterPair(
++      body["collisionFilter"],
++      `${label}.collisionFilter`,
++    );
+     staticFilters.set(id, filter);
+     assertMaterialValues(body["material"], `${label}.material`);
+     expect(body["material"]).toEqual(materialByShape.get(`${id}:0`));
+@@ -961,75 +1125,162 @@ function validateCaseMetadata(
+ 
+   for (const dynamicId of MATRIX_ENTITY_IDS) {
+     const dynamicFilter = dynamicFilters.get(dynamicId);
+-    if (dynamicFilter === undefined) throw new Error(`Filter for ${dynamicId} is missing.`);
++    if (dynamicFilter === undefined)
++      throw new Error(`Filter for ${dynamicId} is missing.`);
+     for (const staticId of MATRIX_STATIC_IDS) {
+       const staticFilter = staticFilters.get(staticId);
+-      if (staticFilter === undefined || !filtersCollide(dynamicFilter, staticFilter)) {
++      if (
++        staticFilter === undefined ||
++        !filtersCollide(dynamicFilter, staticFilter)
++      ) {
+         throw new Error(`${dynamicId} cannot collide with ${staticId}.`);
+       }
+     }
+   }
+-  for (let leftIndex = 0; leftIndex < MATRIX_ENTITY_IDS.length; leftIndex += 1) {
+-    for (let rightIndex = leftIndex + 1; rightIndex < MATRIX_ENTITY_IDS.length; rightIndex += 1) {
++  for (
++    let leftIndex = 0;
++    leftIndex < MATRIX_ENTITY_IDS.length;
++    leftIndex += 1
++  ) {
++    for (
++      let rightIndex = leftIndex + 1;
++      rightIndex < MATRIX_ENTITY_IDS.length;
++      rightIndex += 1
++    ) {
+       const leftId = MATRIX_ENTITY_IDS[leftIndex];
+       const rightId = MATRIX_ENTITY_IDS[rightIndex];
+-      if (leftId === undefined || rightId === undefined) throw new Error("Dynamic filter order is incomplete.");
++      if (leftId === undefined || rightId === undefined)
++        throw new Error("Dynamic filter order is incomplete.");
+       const left = dynamicFilters.get(leftId);
+       const right = dynamicFilters.get(rightId);
+-      if (left === undefined || right === undefined || !filtersCollide(left, right)) {
++      if (
++        left === undefined ||
++        right === undefined ||
++        !filtersCollide(left, right)
++      ) {
+         throw new Error(`${leftId} cannot collide with ${rightId}.`);
+       }
+     }
+   }
+ 
+-  for (const field of ["preImpulseMeasuredShiftedEnergy", "preImpulsePredictedShiftedEnergy"] as const) {
++  for (const field of [
++    "preImpulseMeasuredShiftedEnergy",
++    "preImpulsePredictedShiftedEnergy",
++  ] as const) {
+     const energy = finiteNumber(metadata[field], `Case ${index} ${field}`);
+     expect(energy).toBeGreaterThanOrEqual(0);
+-    expect(energy).toBeLessThanOrEqual(COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.energy.maximum);
++    expect(energy).toBeLessThanOrEqual(
++      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.energy.maximum,
++    );
+   }
+ 
+   const finalBodies = metadata["finalBodies"];
+-  if (!Array.isArray(finalBodies) || finalBodies.length !== MATRIX_ENTITY_IDS.length) {
++  if (
++    !Array.isArray(finalBodies) ||
++    finalBodies.length !== MATRIX_ENTITY_IDS.length
++  ) {
+     throw new Error(`Case ${index} must contain all 15 final body states.`);
+   }
+   finalBodies.forEach((body, bodyIndex) => {
+     const id = MATRIX_ENTITY_IDS[bodyIndex];
+-    if (id === undefined) throw new Error(`Case ${index} final body id is missing.`);
++    if (id === undefined)
++      throw new Error(`Case ${index} final body id is missing.`);
+     assertBodyState(body, id, `Case ${index} final body ${bodyIndex}`);
+   });
+ 
+   const settling = assertExactKeys(
+     metadata["settlingWindow"],
+-    ["startTick", "endTick", "linearSpeedThreshold", "angularSpeedThreshold", "ticks"],
++    [
++      "startTick",
++      "endTick",
++      "linearSpeedThreshold",
++      "angularSpeedThreshold",
++      "ticks",
++    ],
+     `Case ${index} settlingWindow`,
+   );
+-  const startTick = boundedInteger(settling["startTick"], 0, 1_800, `Case ${index} settle start`);
+-  const endTick = boundedInteger(settling["endTick"], 0, 1_800, `Case ${index} settle end`);
++  const startTick = boundedInteger(
++    settling["startTick"],
++    0,
++    1_800,
++    `Case ${index} settle start`,
++  );
++  const endTick = boundedInteger(
++    settling["endTick"],
++    0,
++    1_800,
++    `Case ${index} settle end`,
++  );
+   expect(endTick - startTick + 1).toBe(60);
+-  const linearThreshold = finiteNumber(settling["linearSpeedThreshold"], `Case ${index} linear settle threshold`);
+-  const angularThreshold = finiteNumber(settling["angularSpeedThreshold"], `Case ${index} angular settle threshold`);
+-  expect(linearThreshold).toBe(COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold);
+-  expect(angularThreshold).toBe(COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold);
++  const linearThreshold = finiteNumber(
++    settling["linearSpeedThreshold"],
++    `Case ${index} linear settle threshold`,
++  );
++  const angularThreshold = finiteNumber(
++    settling["angularSpeedThreshold"],
++    `Case ${index} angular settle threshold`,
++  );
++  expect(linearThreshold).toBe(
++    COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
++  );
++  expect(angularThreshold).toBe(
++    COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
++  );
+   const settleTicks = settling["ticks"];
+   if (!Array.isArray(settleTicks) || settleTicks.length !== 60) {
+     throw new Error(`Case ${index} must preserve all 60 settling ticks.`);
+   }
+-  for (let settleIndex = 0; settleIndex < settleTicks.length; settleIndex += 1) {
++  for (
++    let settleIndex = 0;
++    settleIndex < settleTicks.length;
++    settleIndex += 1
++  ) {
+     const value: unknown = settleTicks[settleIndex];
+-    const tick = assertExactKeys(value, ["tick", "linearSpeeds", "angularSpeeds", "settledMask"], `Case ${index} settle tick ${settleIndex}`);
+-    expect(boundedInteger(tick["tick"], startTick, endTick, `Case ${index} settle tick id`)).toBe(startTick + settleIndex);
++    const tick = assertExactKeys(
++      value,
++      ["tick", "linearSpeeds", "angularSpeeds", "settledMask"],
++      `Case ${index} settle tick ${settleIndex}`,
++    );
++    expect(
++      boundedInteger(
++        tick["tick"],
++        startTick,
++        endTick,
++        `Case ${index} settle tick id`,
++      ),
++    ).toBe(startTick + settleIndex);
+     const linear = tick["linearSpeeds"];
+     const angular = tick["angularSpeeds"];
+-    if (!Array.isArray(linear) || !Array.isArray(angular) || linear.length !== 15 || angular.length !== 15) {
+-      throw new Error(`Case ${index} settle tick ${settleIndex} does not include all bodies.`);
++    if (
++      !Array.isArray(linear) ||
++      !Array.isArray(angular) ||
++      linear.length !== 15 ||
++      angular.length !== 15
++    ) {
++      throw new Error(
++        `Case ${index} settle tick ${settleIndex} does not include all bodies.`,
++      );
+     }
+-    const mask = boundedInteger(tick["settledMask"], 0, 0x7fff, `Case ${index} settle mask`);
++    const mask = boundedInteger(
++      tick["settledMask"],
++      0,
++      0x7fff,
++      `Case ${index} settle mask`,
++    );
+     let expectedMask = 0;
+     for (let bodyIndex = 0; bodyIndex < 15; bodyIndex += 1) {
+-      const linearSpeed = finiteNumber(linear[bodyIndex], `Case ${index} settle linear speed`);
+-      const angularSpeed = finiteNumber(angular[bodyIndex], `Case ${index} settle angular speed`);
+-      if (linearSpeed < 0 || angularSpeed < 0) throw new Error("Settling speeds cannot be negative.");
+-      if (linearSpeed <= linearThreshold && angularSpeed <= angularThreshold) expectedMask |= 1 << bodyIndex;
++      const linearSpeed = finiteNumber(
++        linear[bodyIndex],
++        `Case ${index} settle linear speed`,
++      );
++      const angularSpeed = finiteNumber(
++        angular[bodyIndex],
++        `Case ${index} settle angular speed`,
++      );
++      if (linearSpeed < 0 || angularSpeed < 0)
++        throw new Error("Settling speeds cannot be negative.");
++      if (linearSpeed <= linearThreshold && angularSpeed <= angularThreshold)
++        expectedMask |= 1 << bodyIndex;
+     }
+     expect(mask).toBe(expectedMask);
+   }
+@@ -1037,25 +1288,47 @@ function validateCaseMetadata(
+   const executeStepCalls = boundedInteger(
+     metadata["executeStepCalls"],
+     1,
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumExecuteStepCallsPerCase,
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++      .maximumExecuteStepCallsPerCase,
+     `Case ${index} executeStepCalls`,
+   );
+   const batches = boundedInteger(
+     metadata["batches"],
+     1,
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumBatchesPerCase,
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++      .maximumBatchesPerCase,
+     `Case ${index} batches`,
+   );
+   expect(batches).toBeLessThanOrEqual(executeStepCalls);
+-  expect(batches * COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumCallsPerBatch).toBeGreaterThanOrEqual(executeStepCalls);
+-  const wallTimeMs = finiteNumber(metadata["wallTimeMs"], `Case ${index} wallTimeMs`);
++  expect(
++    batches *
++      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++        .maximumCallsPerBatch,
++  ).toBeGreaterThanOrEqual(executeStepCalls);
++  const wallTimeMs = finiteNumber(
++    metadata["wallTimeMs"],
++    `Case ${index} wallTimeMs`,
++  );
+   expect(wallTimeMs).toBeGreaterThanOrEqual(0);
+-  expect(wallTimeMs).toBeLessThanOrEqual(COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumWallTimePerCaseMs);
+-  const eligibility = assertExactKeys(metadata["eligibility"], ["eligible", "reasons"], `Case ${index} eligibility`);
+-  if (typeof eligibility["eligible"] !== "boolean" || !Array.isArray(eligibility["reasons"])) {
++  expect(wallTimeMs).toBeLessThanOrEqual(
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++      .maximumWallTimePerCaseMs,
++  );
++  const eligibility = assertExactKeys(
++    metadata["eligibility"],
++    ["eligible", "reasons"],
++    `Case ${index} eligibility`,
++  );
++  if (
++    typeof eligibility["eligible"] !== "boolean" ||
++    !Array.isArray(eligibility["reasons"])
++  ) {
+     throw new Error(`Case ${index} eligibility is malformed.`);
+   }
+-  expect((eligibility["eligible"] === true) === (eligibility["reasons"].length === 0)).toBe(true);
++  expect(
++    (eligibility["eligible"] === true) ===
++      (eligibility["reasons"].length === 0),
++  ).toBe(true);
+ 
+   return metadata;
+ }
+@@ -1076,11 +1349,14 @@ function validateSweepRow(
+ ): number {
+   const row = assertExactKeys(value, MATRIX_SWEEP_ROW_KEYS, label);
+   assertTuple(row["tuple"], tuple, `${label}.tuple`);
+-  expect(boundedInteger(row["nominalTick"], 0, 1_800, `${label}.nominalTick`)).toBe(rowIndex);
++  expect(
++    boundedInteger(row["nominalTick"], 0, 1_800, `${label}.nominalTick`),
++  ).toBe(rowIndex);
+   const calls = boundedInteger(
+     row["actualCheckedCallCount"],
+     1,
+-    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.sweep.maximumCallsPerNominalTick,
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.sweep
++      .maximumCallsPerNominalTick,
+     `${label}.actualCheckedCallCount`,
+   );
+   const workload = COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard;
+@@ -1089,13 +1365,25 @@ function validateSweepRow(
+     ["value", "callIndex"],
+     `${label}.maximumShiftedEnergy`,
+   );
+-  const maximumEnergy = finiteNumber(energy["value"], `${label}.maximumShiftedEnergy.value`);
++  const maximumEnergy = finiteNumber(
++    energy["value"],
++    `${label}.maximumShiftedEnergy.value`,
++  );
+   expect(maximumEnergy).toBeGreaterThanOrEqual(0);
+   expect(maximumEnergy).toBeLessThanOrEqual(workload.energy.maximum);
+-  boundedInteger(energy["callIndex"], 0, calls - 1, `${label}.maximumShiftedEnergy.callIndex`);
++  boundedInteger(
++    energy["callIndex"],
++    0,
++    calls - 1,
++    `${label}.maximumShiftedEnergy.callIndex`,
++  );
+ 
+   const bodyExtrema = [
+-    ["maximumCandidateRelativeComDrop", workload.energy.maximumRestComDrop, "maximum"],
++    [
++      "maximumCandidateRelativeComDrop",
++      workload.energy.maximumRestComDrop,
++      "maximum",
++    ],
+     ["minimumApronMargin", 0, "minimum"],
+     ["minimumSlabUndersideMargin", 0, "minimum"],
+     ["maximumPointSweep", workload.sweep.maximumPointSweepPerCall, "maximum"],
+@@ -1108,7 +1396,12 @@ function validateSweepRow(
+       `${label}.${key}`,
+     );
+     const number = finiteNumber(extremum["value"], `${label}.${key}.value`);
+-    boundedInteger(extremum["callIndex"], 0, calls - 1, `${label}.${key}.callIndex`);
++    boundedInteger(
++      extremum["callIndex"],
++      0,
++      calls - 1,
++      `${label}.${key}.callIndex`,
++    );
+     expect(MATRIX_ENTITY_IDS).toContain(extremum["bodyId"]);
+     if (direction === "maximum") expect(number).toBeLessThanOrEqual(limit);
+     else expect(number).toBeGreaterThanOrEqual(limit);
+@@ -1122,8 +1415,16 @@ function validateSweepRow(
+     ["value", "callIndex", "obstaclePair"],
+     `${label}.minimumWholeButtonObstacleClearance`,
+   );
+-  finiteNumber(clearance["value"], `${label}.minimumWholeButtonObstacleClearance.value`);
+-  boundedInteger(clearance["callIndex"], 0, calls - 1, `${label}.minimumWholeButtonObstacleClearance.callIndex`);
++  finiteNumber(
++    clearance["value"],
++    `${label}.minimumWholeButtonObstacleClearance.value`,
++  );
++  boundedInteger(
++    clearance["callIndex"],
++    0,
++    calls - 1,
++    `${label}.minimumWholeButtonObstacleClearance.callIndex`,
++  );
+   expect(clearance["obstaclePair"]).toEqual(["button", "home-1"]);
+   const classification = row["intervalClassification"];
+   expect([
+@@ -1154,7 +1455,8 @@ async function validateMatrixCase(
+   identity: MatrixRecord,
+   fixtureState: ReturnType<typeof parseMatchState>,
+ ): Promise<MatrixCaseCounts> {
+-  if (!isCompactJson(raw)) throw new Error(`Case ${index} is not compact JSON.`);
++  if (!isCompactJson(raw))
++    throw new Error(`Case ${index} is not compact JSON.`);
+   const rawBytes = Buffer.byteLength(raw, "utf8");
+   expect(rawBytes).toBeLessThanOrEqual(MATRIX_CASE_MAXIMUM_BYTES);
+   const caseSpans = objectValueSpans(raw);
+@@ -1168,7 +1470,10 @@ async function validateMatrixCase(
+   if (!metadataSpan || !bodySpan || !contactSpan || !sweepSpan) {
+     throw new Error(`Case ${index} is missing a required field.`);
+   }
+-  const metadataBytes = Buffer.byteLength(raw.slice(metadataSpan.start, metadataSpan.end), "utf8");
++  const metadataBytes = Buffer.byteLength(
++    raw.slice(metadataSpan.start, metadataSpan.end),
++    "utf8",
++  );
+   expect(metadataBytes).toBeLessThanOrEqual(MATRIX_METADATA_MAXIMUM_BYTES);
+   const metadata = validateCaseMetadata(
+     parseObjectSpan(raw, metadataSpan, `Case ${index} metadata`),
+@@ -1178,7 +1483,9 @@ async function validateMatrixCase(
+     regeneratedInitialState(fixtureState, tuple),
+   );
+   const expectedState = regeneratedInitialState(fixtureState, tuple);
+-  expect(metadata["initialStateHash"]).toBe(await hashCanonicalJson(expectedState));
++  expect(metadata["initialStateHash"]).toBe(
++    await hashCanonicalJson(expectedState),
++  );
+ 
+   let bodyRows = 0;
+   let bodyTick = 0;
+@@ -1186,17 +1493,37 @@ async function validateMatrixCase(
+   let startStates: Map<string, MatrixRecord> | undefined;
+   let finalStates = new Map<string, MatrixRecord>();
+   let currentTickStates = new Map<string, MatrixRecord>();
+-  const endpointSettleFacts: Array<Readonly<{ settled: boolean; linear: readonly number[]; angular: readonly number[] }>> = [];
+-  const expectedBodies = new Map(expectedState.bodies.map((body) => [body.id, body]));
++  const endpointSettleFacts: Array<
++    Readonly<{
++      settled: boolean;
++      linear: readonly number[];
++      angular: readonly number[];
++    }>
++  > = [];
++  const expectedBodies = new Map(
++    expectedState.bodies.map((body) => [body.id, body]),
++  );
+   for (const span of arrayValueSpans(raw, bodySpan, `Case ${index} bodyRows`)) {
+     const rowText = raw.slice(span.start, span.end);
+-    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(MATRIX_ROW_MAXIMUM_BYTES);
+-    const row = assertExactKeys(JSON.parse(rowText) as unknown, MATRIX_BODY_ROW_KEYS, `Case ${index} body row ${bodyRows}`);
++    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(
++      MATRIX_ROW_MAXIMUM_BYTES,
++    );
++    const row = assertExactKeys(
++      JSON.parse(rowText) as unknown,
++      MATRIX_BODY_ROW_KEYS,
++      `Case ${index} body row ${bodyRows}`,
++    );
+     assertTuple(row["tuple"], tuple, `Case ${index} body tuple`);
+-    const tick = boundedInteger(row["nominalTick"], 0, 1_800, `Case ${index} body tick`);
++    const tick = boundedInteger(
++      row["nominalTick"],
++      0,
++      1_800,
++      `Case ${index} body tick`,
++    );
+     expect(tick).toBe(bodyTick);
+     const id = MATRIX_ENTITY_IDS[bodyIndex];
+-    if (id === undefined) throw new Error(`Case ${index} body ordering exceeded 15 ids.`);
++    if (id === undefined)
++      throw new Error(`Case ${index} body ordering exceeded 15 ids.`);
+     const state = assertBodyState(
+       {
+         id: row["id"],
+@@ -1212,20 +1539,47 @@ async function validateMatrixCase(
+     currentTickStates.set(id, state);
+     if (tick === 0) {
+       const expected = expectedBodies.get(id);
+-      if (!expected) throw new Error(`Case ${index} expected setup is missing ${id}.`);
+-      assertSameVector(state["position"], expected.position, `Case ${index} initial ${id} position`);
+-      assertSameQuaternion(state["rotation"], expected.rotation, `Case ${index} initial ${id} rotation`);
++      if (!expected)
++        throw new Error(`Case ${index} expected setup is missing ${id}.`);
++      assertSameVector(
++        state["position"],
++        expected.position,
++        `Case ${index} initial ${id} position`,
++      );
++      assertSameQuaternion(
++        state["rotation"],
++        expected.rotation,
++        `Case ${index} initial ${id} rotation`,
++      );
+       if (id === "home-0") {
+         const facts = metadata["dynamicBodies"] as unknown[];
+-        const selected = facts.find((value) => asRecord(value, "dynamic fact")["id"] === id);
+-        if (!selected) throw new Error(`Case ${index} selected cap facts are missing.`);
+-        const mass = finiteNumber(asRecord(selected, "selected cap fact")["nativeMass"], "selected cap mass");
++        const selected = facts.find(
++          (value) => asRecord(value, "dynamic fact")["id"] === id,
++        );
++        if (!selected)
++          throw new Error(`Case ${index} selected cap facts are missing.`);
++        const mass = finiteNumber(
++          asRecord(selected, "selected cap fact")["nativeMass"],
++          "selected cap mass",
++        );
+         const expectedPostImpulseVelocity = { x: 0, y: 0, z: tuple[2] / mass };
+-        assertSameVector(state["linearVelocity"], expectedPostImpulseVelocity, `Case ${index} tick-zero impulse velocity`);
++        assertSameVector(
++          state["linearVelocity"],
++          expectedPostImpulseVelocity,
++          `Case ${index} tick-zero impulse velocity`,
++        );
+       } else {
+-        assertSameVector(state["linearVelocity"], expected.linearVelocity, `Case ${index} initial ${id} linear velocity`);
++        assertSameVector(
++          state["linearVelocity"],
++          expected.linearVelocity,
++          `Case ${index} initial ${id} linear velocity`,
++        );
+       }
+-      assertSameVector(state["angularVelocity"], expected.angularVelocity, `Case ${index} initial ${id} angular velocity`);
++      assertSameVector(
++        state["angularVelocity"],
++        expected.angularVelocity,
++        `Case ${index} initial ${id} angular velocity`,
++      );
+     }
+     bodyRows += 1;
+     bodyIndex += 1;
+@@ -1237,9 +1591,16 @@ async function validateMatrixCase(
+       let settled = true;
+       for (const entityId of MATRIX_ENTITY_IDS) {
+         const sample = currentTickStates.get(entityId);
+-        if (!sample) throw new Error(`Case ${index} tick ${tick} is missing ${entityId}.`);
+-        const linearVelocity = asRecord(sample["linearVelocity"], "body linear velocity");
+-        const angularVelocity = asRecord(sample["angularVelocity"], "body angular velocity");
++        if (!sample)
++          throw new Error(`Case ${index} tick ${tick} is missing ${entityId}.`);
++        const linearVelocity = asRecord(
++          sample["linearVelocity"],
++          "body linear velocity",
++        );
++        const angularVelocity = asRecord(
++          sample["angularVelocity"],
++          "body angular velocity",
++        );
+         const linearSpeed = Math.hypot(
+           finiteNumber(linearVelocity["x"], "linear x"),
+           finiteNumber(linearVelocity["y"], "linear y"),
+@@ -1253,9 +1614,11 @@ async function validateMatrixCase(
+         linear.push(linearSpeed);
+         angular.push(angularSpeed);
+         if (
+-          linearSpeed > COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold ||
++          linearSpeed >
++            COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold ||
+           angularSpeed > COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold
+-        ) settled = false;
++        )
++          settled = false;
+       }
+       endpointSettleFacts.push({ settled, linear, angular });
+       bodyIndex = 0;
+@@ -1266,16 +1629,22 @@ async function validateMatrixCase(
+     bodyRows < 30 ||
+     bodyRows > MATRIX_ROW_MAXIMUM_COUNT ||
+     bodyRows % MATRIX_ENTITY_IDS.length !== 0
+-  ) throw new Error(`Case ${index} has an invalid complete-body row count.`);
++  )
++    throw new Error(`Case ${index} has an invalid complete-body row count.`);
+   const tickCount = bodyRows / MATRIX_ENTITY_IDS.length;
+   expect(bodyTick).toBe(tickCount);
+   expect(bodyIndex).toBe(0);
+   expect(tickCount).toBeLessThanOrEqual(1_801);
+   if (!startStates || finalStates.size !== MATRIX_ENTITY_IDS.length) {
+-    throw new Error(`Case ${index} is missing complete start or final body states.`);
++    throw new Error(
++      `Case ${index} is missing complete start or final body states.`,
++    );
+   }
+   const finalBodies = metadata["finalBodies"];
+-  if (!Array.isArray(finalBodies) || finalBodies.length !== MATRIX_ENTITY_IDS.length) {
++  if (
++    !Array.isArray(finalBodies) ||
++    finalBodies.length !== MATRIX_ENTITY_IDS.length
++  ) {
+     throw new Error(`Case ${index} final body list is malformed.`);
+   }
+   finalBodies.forEach((value: unknown, bodyIndex: number) => {
+@@ -1283,11 +1652,24 @@ async function validateMatrixCase(
+     if (id === undefined) throw new Error(`Case ${index} final id is missing.`);
+     const state = assertBodyState(value, id, `Case ${index} final body ${id}`);
+     const sampled = finalStates.get(id);
+-    if (!sampled) throw new Error(`Case ${index} final sample ${id} is missing.`);
+-    for (const key of ["position", "linearVelocity", "angularVelocity"] as const) {
+-      assertSameVector(state[key], sampled[key], `Case ${index} final ${id} ${key}`);
++    if (!sampled)
++      throw new Error(`Case ${index} final sample ${id} is missing.`);
++    for (const key of [
++      "position",
++      "linearVelocity",
++      "angularVelocity",
++    ] as const) {
++      assertSameVector(
++        state[key],
++        sampled[key],
++        `Case ${index} final ${id} ${key}`,
++      );
+     }
+-    assertSameQuaternion(state["rotation"], sampled["rotation"], `Case ${index} final ${id} rotation`);
++    assertSameQuaternion(
++      state["rotation"],
++      sampled["rotation"],
++      `Case ${index} final ${id} rotation`,
++    );
+   });
+ 
+   let contactRows = 0;
+@@ -1295,24 +1677,52 @@ async function validateMatrixCase(
+   let previousContactCall = -1;
+   let buttonObstacleContact = false;
+   const contactAddresses: Array<readonly [tick: number, call: number]> = [];
+-  for (const span of arrayValueSpans(raw, contactSpan, `Case ${index} contactRows`)) {
++  for (const span of arrayValueSpans(
++    raw,
++    contactSpan,
++    `Case ${index} contactRows`,
++  )) {
+     const rowText = raw.slice(span.start, span.end);
+-    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(MATRIX_ROW_MAXIMUM_BYTES);
+-    const row = assertExactKeys(JSON.parse(rowText) as unknown, MATRIX_CONTACT_ROW_KEYS, `Case ${index} contact row ${contactRows}`);
++    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(
++      MATRIX_ROW_MAXIMUM_BYTES,
++    );
++    const row = assertExactKeys(
++      JSON.parse(rowText) as unknown,
++      MATRIX_CONTACT_ROW_KEYS,
++      `Case ${index} contact row ${contactRows}`,
++    );
+     assertTuple(row["tuple"], tuple, `Case ${index} contact tuple`);
+-    const tick = boundedInteger(row["nominalTick"], 0, tickCount - 1, `Case ${index} contact tick`);
+-    const call = boundedInteger(row["callIndex"], 0, COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumExecuteStepCallsPerCase - 1, `Case ${index} contact call`);
++    const tick = boundedInteger(
++      row["nominalTick"],
++      0,
++      tickCount - 1,
++      `Case ${index} contact tick`,
++    );
++    const call = boundedInteger(
++      row["callIndex"],
++      0,
++      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++        .maximumExecuteStepCallsPerCase - 1,
++      `Case ${index} contact call`,
++    );
+     if (tick < previousContactTick || call < previousContactCall) {
+-      throw new Error(`Case ${index} contact occurrence order moved backwards.`);
++      throw new Error(
++        `Case ${index} contact occurrence order moved backwards.`,
++      );
+     }
+     previousContactTick = tick;
+     previousContactCall = call;
+     contactAddresses.push([tick, call]);
+-    if (call >= finiteNumber(metadata["executeStepCalls"], `Case ${index} calls`)) {
+-      throw new Error(`Case ${index} contact call is beyond its executed calls.`);
++    if (
++      call >= finiteNumber(metadata["executeStepCalls"], `Case ${index} calls`)
++    ) {
++      throw new Error(
++        `Case ${index} contact call is beyond its executed calls.`,
++      );
+     }
+     const pair = row["pair"];
+-    if (!Array.isArray(pair) || pair.length !== 2) throw new Error(`Case ${index} contact pair is malformed.`);
++    if (!Array.isArray(pair) || pair.length !== 2)
++      throw new Error(`Case ${index} contact pair is malformed.`);
+     if (typeof pair[0] !== "string" || typeof pair[1] !== "string") {
+       throw new Error(`Case ${index} contact pair members are not strings.`);
+     }
+@@ -1320,13 +1730,25 @@ async function validateMatrixCase(
+     const leftIndex = contactOrder.findIndex((id) => id === pair[0]);
+     const rightIndex = contactOrder.findIndex((id) => id === pair[1]);
+     if (leftIndex < 0 || rightIndex < 0 || leftIndex >= rightIndex) {
+-      throw new Error(`Case ${index} contact pair is unknown, identical, or noncanonical.`);
++      throw new Error(
++        `Case ${index} contact pair is unknown, identical, or noncanonical.`,
++      );
+     }
+-    if (typeof row["eventType"] !== "string" || row["eventType"].length === 0 || Buffer.byteLength(row["eventType"], "utf8") > COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.artifact.maximumEventTypeBytes) {
+-      throw new Error(`Case ${index} event type is invalid or over its byte cap.`);
++    if (
++      typeof row["eventType"] !== "string" ||
++      row["eventType"].length === 0 ||
++      Buffer.byteLength(row["eventType"], "utf8") >
++        COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.artifact
++          .maximumEventTypeBytes
++    ) {
++      throw new Error(
++        `Case ${index} event type is invalid or over its byte cap.`,
++      );
+     }
+-    if (row["point"] !== null) assertVector(row["point"], `Case ${index} contact point`);
+-    if (pair[0] === "button" && pair[1] === "home-1") buttonObstacleContact = true;
++    if (row["point"] !== null)
++      assertVector(row["point"], `Case ${index} contact point`);
++    if (pair[0] === "button" && pair[1] === "home-1")
++      buttonObstacleContact = true;
+     contactRows += 1;
+   }
+   expect(contactRows).toBeLessThanOrEqual(MATRIX_CONTACT_MAXIMUM_COUNT);
+@@ -1336,22 +1758,41 @@ async function validateMatrixCase(
+   let anyOverlap = false;
+   let everyOverlappingSweepClear = true;
+   const callRanges: Array<readonly [start: number, end: number]> = [];
+-  for (const span of arrayValueSpans(raw, sweepSpan, `Case ${index} sweepRows`)) {
++  for (const span of arrayValueSpans(
++    raw,
++    sweepSpan,
++    `Case ${index} sweepRows`,
++  )) {
+     const rowText = raw.slice(span.start, span.end);
+-    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(MATRIX_SWEEP_ROW_MAXIMUM_BYTES);
++    expect(Buffer.byteLength(rowText, "utf8")).toBeLessThanOrEqual(
++      MATRIX_SWEEP_ROW_MAXIMUM_BYTES,
++    );
+     const row = JSON.parse(rowText) as unknown;
+-    const intervalCalls = validateSweepRow(row, tuple, sweepRows, `Case ${index} sweep row ${sweepRows}`);
++    const intervalCalls = validateSweepRow(
++      row,
++      tuple,
++      sweepRows,
++      `Case ${index} sweep row ${sweepRows}`,
++    );
+     callRanges.push([checkedCalls, checkedCalls + intervalCalls - 1]);
+     checkedCalls += intervalCalls;
+     const sweep = asRecord(row, `Case ${index} sweep row`);
+     const endpointFacts = endpointSettleFacts[sweepRows + 1];
+-    if (!endpointFacts) throw new Error(`Case ${index} sweep has no matching endpoint state.`);
++    if (!endpointFacts)
++      throw new Error(`Case ${index} sweep has no matching endpoint state.`);
+     expect(sweep["all15Settled"]).toBe(endpointFacts.settled);
+     const classification = sweep["intervalClassification"];
+     if (classification !== "no-horizontal-overlap") {
+       anyOverlap = true;
+-      const clearance = asRecord(sweep["minimumWholeButtonObstacleClearance"], "sweep clearance");
+-      if (finiteNumber(clearance["value"], "sweep clearance value") <= COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.sweep.verticalClearanceMargin) {
++      const clearance = asRecord(
++        sweep["minimumWholeButtonObstacleClearance"],
++        "sweep clearance",
++      );
++      if (
++        finiteNumber(clearance["value"], "sweep clearance value") <=
++        COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.sweep
++          .verticalClearanceMargin
++      ) {
+         everyOverlappingSweepClear = false;
+       }
+     }
+@@ -1362,57 +1803,151 @@ async function validateMatrixCase(
+   for (const [tick, call] of contactAddresses) {
+     const range = callRanges[tick];
+     if (!range || call < range[0] || call > range[1]) {
+-      throw new Error(`Case ${index} contact call does not belong to its nominal interval.`);
++      throw new Error(
++        `Case ${index} contact call does not belong to its nominal interval.`,
++      );
+     }
+   }
+   const workload = COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload;
+-  const executeStepCalls = boundedInteger(metadata["executeStepCalls"], 1, workload.maximumExecuteStepCallsPerCase, `Case ${index} executeStepCalls`);
++  const executeStepCalls = boundedInteger(
++    metadata["executeStepCalls"],
++    1,
++    workload.maximumExecuteStepCallsPerCase,
++    `Case ${index} executeStepCalls`,
++  );
+   expect(checkedCalls).toBe(executeStepCalls);
+-  const batches = boundedInteger(metadata["batches"], 1, workload.maximumBatchesPerCase, `Case ${index} batches`);
++  const batches = boundedInteger(
++    metadata["batches"],
++    1,
++    workload.maximumBatchesPerCase,
++    `Case ${index} batches`,
++  );
+   expect(batches).toBeLessThanOrEqual(executeStepCalls);
+-  expect(batches * COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumCallsPerBatch).toBeGreaterThanOrEqual(executeStepCalls);
+-  const wallTimeMs = finiteNumber(metadata["wallTimeMs"], `Case ${index} wallTimeMs`);
++  expect(
++    batches *
++      COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++        .maximumCallsPerBatch,
++  ).toBeGreaterThanOrEqual(executeStepCalls);
++  const wallTimeMs = finiteNumber(
++    metadata["wallTimeMs"],
++    `Case ${index} wallTimeMs`,
++  );
+   expect(wallTimeMs).toBeGreaterThanOrEqual(0);
+-  expect(wallTimeMs).toBeLessThanOrEqual(COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumWallTimePerCaseMs);
++  expect(wallTimeMs).toBeLessThanOrEqual(
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++      .maximumWallTimePerCaseMs,
++  );
+ 
+-  const settling = asRecord(metadata["settlingWindow"], `Case ${index} settlingWindow`);
+-  const endTick = boundedInteger(settling["endTick"], 0, tickCount - 1, `Case ${index} settling endTick`);
++  const settling = asRecord(
++    metadata["settlingWindow"],
++    `Case ${index} settlingWindow`,
++  );
++  const endTick = boundedInteger(
++    settling["endTick"],
++    0,
++    tickCount - 1,
++    `Case ${index} settling endTick`,
++  );
+   expect(endTick).toBe(tickCount - 1);
+   const settlingTicks = settling["ticks"];
+-  if (!Array.isArray(settlingTicks) || settlingTicks.length !== 60) throw new Error(`Case ${index} must include all 60 settle samples.`);
+-  const startTick = boundedInteger(settling["startTick"], 0, tickCount - 1, `Case ${index} settle startTick`);
++  if (!Array.isArray(settlingTicks) || settlingTicks.length !== 60)
++    throw new Error(`Case ${index} must include all 60 settle samples.`);
++  const startTick = boundedInteger(
++    settling["startTick"],
++    0,
++    tickCount - 1,
++    `Case ${index} settle startTick`,
++  );
+   expect(endTick - startTick + 1).toBe(60);
+-  expect(finiteNumber(settling["linearSpeedThreshold"], "settling linear threshold")).toBe(COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold);
+-  expect(finiteNumber(settling["angularSpeedThreshold"], "settling angular threshold")).toBe(COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold);
++  expect(
++    finiteNumber(settling["linearSpeedThreshold"], "settling linear threshold"),
++  ).toBe(COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold);
++  expect(
++    finiteNumber(
++      settling["angularSpeedThreshold"],
++      "settling angular threshold",
++    ),
++  ).toBe(COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold);
+   let allSettled = true;
+-  for (let settleIndex = 0; settleIndex < settlingTicks.length; settleIndex += 1) {
++  for (
++    let settleIndex = 0;
++    settleIndex < settlingTicks.length;
++    settleIndex += 1
++  ) {
+     const value: unknown = settlingTicks[settleIndex];
+-    const item = assertExactKeys(value, ["tick", "linearSpeeds", "angularSpeeds", "settledMask"], `Case ${index} settle sample ${settleIndex}`);
+-    const tick = boundedInteger(item["tick"], 0, tickCount - 1, `Case ${index} settle tick`);
++    const item = assertExactKeys(
++      value,
++      ["tick", "linearSpeeds", "angularSpeeds", "settledMask"],
++      `Case ${index} settle sample ${settleIndex}`,
++    );
++    const tick = boundedInteger(
++      item["tick"],
++      0,
++      tickCount - 1,
++      `Case ${index} settle tick`,
++    );
+     expect(tick).toBe(startTick + settleIndex);
+-    const mask = boundedInteger(item["settledMask"], 0, 0x7fff, `Case ${index} settle mask`);
++    const mask = boundedInteger(
++      item["settledMask"],
++      0,
++      0x7fff,
++      `Case ${index} settle mask`,
++    );
+     const linear = item["linearSpeeds"];
+     const angular = item["angularSpeeds"];
+-    if (!Array.isArray(linear) || !Array.isArray(angular) || linear.length !== 15 || angular.length !== 15) throw new Error(`Case ${index} settle speed arrays are malformed.`);
+-    const expectedMask = linear.reduce((bits: number, speed: unknown, bodyIndex: number) => {
+-      const linearSpeed = finiteNumber(speed, `Case ${index} settle linear speed`);
+-      const angularSpeed = finiteNumber(angular[bodyIndex], `Case ${index} settle angular speed`);
+-      if (linearSpeed < 0 || angularSpeed < 0) throw new Error("Settle speeds cannot be negative.");
+-      return linearSpeed <= finiteNumber(settling["linearSpeedThreshold"], "linear threshold") && angularSpeed <= finiteNumber(settling["angularSpeedThreshold"], "angular threshold") ? bits | (1 << bodyIndex) : bits;
+-    }, 0);
++    if (
++      !Array.isArray(linear) ||
++      !Array.isArray(angular) ||
++      linear.length !== 15 ||
++      angular.length !== 15
++    )
++      throw new Error(`Case ${index} settle speed arrays are malformed.`);
++    const expectedMask = linear.reduce(
++      (bits: number, speed: unknown, bodyIndex: number) => {
++        const linearSpeed = finiteNumber(
++          speed,
++          `Case ${index} settle linear speed`,
++        );
++        const angularSpeed = finiteNumber(
++          angular[bodyIndex],
++          `Case ${index} settle angular speed`,
++        );
++        if (linearSpeed < 0 || angularSpeed < 0)
++          throw new Error("Settle speeds cannot be negative.");
++        return linearSpeed <=
++          finiteNumber(settling["linearSpeedThreshold"], "linear threshold") &&
++          angularSpeed <=
++            finiteNumber(settling["angularSpeedThreshold"], "angular threshold")
++          ? bits | (1 << bodyIndex)
++          : bits;
++      },
++      0,
++    );
+     expect(mask).toBe(expectedMask);
+     const endpoint = endpointSettleFacts[tick];
+-    if (!endpoint) throw new Error(`Case ${index} settle row has no body-state endpoint.`);
++    if (!endpoint)
++      throw new Error(`Case ${index} settle row has no body-state endpoint.`);
+     expect(linear).toEqual(endpoint.linear);
+     expect(angular).toEqual(endpoint.angular);
+     if (mask !== 0x7fff) allSettled = false;
+   }
+ 
+-  const buttonFact = (metadata["dynamicBodies"] as unknown[]).find((value) => asRecord(value, "dynamic fact")["id"] === "button");
+-  const obstacleFact = (metadata["dynamicBodies"] as unknown[]).find((value) => asRecord(value, "dynamic fact")["id"] === "home-1");
+-  if (!buttonFact || !obstacleFact) throw new Error(`Case ${index} lacks button/obstacle collider facts.`);
+-  const buttonDimensions = asRecord(asRecord(buttonFact, "button fact")["colliderDimensions"], "button dimensions");
+-  const obstacleDimensions = asRecord(asRecord(obstacleFact, "obstacle fact")["colliderDimensions"], "obstacle dimensions");
++  const buttonFact = (metadata["dynamicBodies"] as unknown[]).find(
++    (value) => asRecord(value, "dynamic fact")["id"] === "button",
++  );
++  const obstacleFact = (metadata["dynamicBodies"] as unknown[]).find(
++    (value) => asRecord(value, "dynamic fact")["id"] === "home-1",
++  );
++  if (!buttonFact || !obstacleFact)
++    throw new Error(`Case ${index} lacks button/obstacle collider facts.`);
++  const buttonDimensions = asRecord(
++    asRecord(buttonFact, "button fact")["colliderDimensions"],
++    "button dimensions",
++  );
++  const obstacleDimensions = asRecord(
++    asRecord(obstacleFact, "obstacle fact")["colliderDimensions"],
++    "obstacle dimensions",
++  );
+   const buttonRadius = Math.hypot(
+     finiteNumber(buttonDimensions["x"], "button dimension x") / 2,
+     finiteNumber(buttonDimensions["y"], "button dimension y") / 2,
+@@ -1427,21 +1962,59 @@ async function validateMatrixCase(
+   const startObstacle = startStates.get("home-1");
+   const endButton = finalStates.get("button");
+   const endObstacle = finalStates.get("home-1");
+-  if (!startButton || !startObstacle || !endButton || !endObstacle) throw new Error(`Case ${index} is missing crossing endpoints.`);
+-  const startsBefore = finiteNumber(asRecord(startButton["position"], "start button position")["z"], "start button z") + buttonRadius < finiteNumber(asRecord(startObstacle["position"], "start obstacle position")["z"], "start obstacle z") - obstacleRadius;
+-  const finishesBeyond = finiteNumber(asRecord(endButton["position"], "end button position")["z"], "end button z") - buttonRadius > finiteNumber(asRecord(endObstacle["position"], "end obstacle position")["z"], "end obstacle z") + obstacleRadius;
++  if (!startButton || !startObstacle || !endButton || !endObstacle)
++    throw new Error(`Case ${index} is missing crossing endpoints.`);
++  const startsBefore =
++    finiteNumber(
++      asRecord(startButton["position"], "start button position")["z"],
++      "start button z",
++    ) +
++      buttonRadius <
++    finiteNumber(
++      asRecord(startObstacle["position"], "start obstacle position")["z"],
++      "start obstacle z",
++    ) -
++      obstacleRadius;
++  const finishesBeyond =
++    finiteNumber(
++      asRecord(endButton["position"], "end button position")["z"],
++      "end button z",
++    ) -
++      buttonRadius >
++    finiteNumber(
++      asRecord(endObstacle["position"], "end obstacle position")["z"],
++      "end obstacle z",
++    ) +
++      obstacleRadius;
+   const expectedReasons: string[] = [];
+-  if (!startsBefore) expectedReasons.push("button-does-not-start-fully-before-obstacle");
+-  if (!finishesBeyond) expectedReasons.push("button-does-not-finish-fully-beyond-obstacle");
++  if (!startsBefore)
++    expectedReasons.push("button-does-not-start-fully-before-obstacle");
++  if (!finishesBeyond)
++    expectedReasons.push("button-does-not-finish-fully-beyond-obstacle");
+   if (!anyOverlap) expectedReasons.push("no-full-horizontal-overlap-sampled");
+-  if (!everyOverlappingSweepClear) expectedReasons.push("vertical-clearance-not-above-diagnostic-margin");
+-  if (buttonObstacleContact) expectedReasons.push("button-obstacle-contact-observed");
+-  if (!allSettled) expectedReasons.push("all-body-settling-window-not-achieved");
+-  const eligibility = assertExactKeys(metadata["eligibility"], ["eligible", "reasons"], `Case ${index} eligibility`);
++  if (!everyOverlappingSweepClear)
++    expectedReasons.push("vertical-clearance-not-above-diagnostic-margin");
++  if (buttonObstacleContact)
++    expectedReasons.push("button-obstacle-contact-observed");
++  if (!allSettled)
++    expectedReasons.push("all-body-settling-window-not-achieved");
++  const eligibility = assertExactKeys(
++    metadata["eligibility"],
++    ["eligible", "reasons"],
++    `Case ${index} eligibility`,
++  );
+   expect(eligibility["reasons"]).toEqual(expectedReasons);
+   expect(eligibility["eligible"]).toBe(expectedReasons.length === 0);
+ 
+-  return { bodyRows, contactRows, sweepRows, executeStepCalls, batches, wallTimeMs, eligible: expectedReasons.length === 0 };
++  return {
++    bodyRows,
++    contactRows,
++    sweepRows,
++    executeStepCalls,
++    batches,
++    wallTimeMs,
++    eligible: expectedReasons.length === 0,
++  };
+ }
+ 
+ async function validateMatrixFile(path: string): Promise<{
+@@ -1451,25 +2024,55 @@ async function validateMatrixFile(path: string): Promise<{
+ }> {
+   const file = await open(path, "r");
+   let primaryFailure: { readonly value: unknown } | null = null;
+-  let result: { digest: DownloadDigest; totals: MatrixTotals; identity: MatrixRecord } | undefined;
++  let result:
++    | { digest: DownloadDigest; totals: MatrixTotals; identity: MatrixRecord }
++    | undefined;
+   try {
+     const stats = await file.stat();
+-    if (stats.size > MATRIX_MAXIMUM_BYTES) throw new Error("The downloaded matrix exceeds its inclusive file cap.");
++    if (stats.size > MATRIX_MAXIMUM_BYTES)
++      throw new Error("The downloaded matrix exceeds its inclusive file cap.");
+     const reader = new MatrixJsonFileReader(file);
+     await reader.consumeAscii('{"metadata":');
+-    const metadataJson = await reader.readObject(MATRIX_METADATA_MAXIMUM_BYTES, "Matrix metadata");
+-    if (!isCompactJson(metadataJson)) throw new Error("Matrix metadata is not compact JSON.");
++    const metadataJson = await reader.readObject(
++      MATRIX_METADATA_MAXIMUM_BYTES,
++      "Matrix metadata",
++    );
++    if (!isCompactJson(metadataJson))
++      throw new Error("Matrix metadata is not compact JSON.");
+     const fixture = await readPinnedFixture();
+     const configHash = await hashCounterballConfig();
+-    const identity = validateMatrixIdentity(JSON.parse(metadataJson) as unknown, configHash, fixture.rawSha256);
++    const identity = validateMatrixIdentity(
++      JSON.parse(metadataJson) as unknown,
++      configHash,
++      fixture.rawSha256,
++    );
+     await reader.consumeAscii(',"cases":[');
+-    const aggregate = { caseCount: 0, bodyRows: 0, contactRows: 0, sweepRows: 0, executeStepCalls: 0, batches: 0, wallTimeMs: 0, eligibleCases: 0 };
++    const aggregate = {
++      caseCount: 0,
++      bodyRows: 0,
++      contactRows: 0,
++      sweepRows: 0,
++      executeStepCalls: 0,
++      batches: 0,
++      wallTimeMs: 0,
++      eligibleCases: 0,
++    };
+     for (let index = 0; index < EXPECTED_MATRIX_TUPLES.length; index += 1) {
+       if (index > 0) await reader.consumeAscii(",");
+       const tuple = EXPECTED_MATRIX_TUPLES[index];
+-      if (!tuple) throw new Error(`Canonical matrix tuple ${index} is missing.`);
+-      const rawCase = await reader.readObject(MATRIX_CASE_MAXIMUM_BYTES, `Case ${index}`);
+-      const counts = await validateMatrixCase(rawCase, index, tuple, identity, fixture.initialState);
++      if (!tuple)
++        throw new Error(`Canonical matrix tuple ${index} is missing.`);
++      const rawCase = await reader.readObject(
++        MATRIX_CASE_MAXIMUM_BYTES,
++        `Case ${index}`,
++      );
++      const counts = await validateMatrixCase(
++        rawCase,
++        index,
++        tuple,
++        identity,
++        fixture.initialState,
++      );
+       aggregate.caseCount += 1;
+       aggregate.bodyRows += counts.bodyRows;
+       aggregate.contactRows += counts.contactRows;
+@@ -1478,18 +2081,54 @@ async function validateMatrixFile(path: string): Promise<{
+       aggregate.batches += counts.batches;
+       aggregate.wallTimeMs += counts.wallTimeMs;
+       if (counts.eligible) aggregate.eligibleCases += 1;
+-      if (aggregate.bodyRows > MATRIX_TOTAL_BODY_MAXIMUM_COUNT || aggregate.contactRows > MATRIX_TOTAL_CONTACT_MAXIMUM_COUNT || aggregate.sweepRows > MATRIX_SWEEP_MAXIMUM_COUNT * EXPECTED_MATRIX_TUPLES.length || aggregate.executeStepCalls > MATRIX_TOTAL_CALL_MAXIMUM_COUNT || aggregate.batches > MATRIX_TOTAL_BATCH_MAXIMUM_COUNT || aggregate.wallTimeMs > COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumWallTimeMatrixMs) {
+-        throw new Error("The matrix exceeds a frozen aggregate row/workload cap.");
++      if (
++        aggregate.bodyRows > MATRIX_TOTAL_BODY_MAXIMUM_COUNT ||
++        aggregate.contactRows > MATRIX_TOTAL_CONTACT_MAXIMUM_COUNT ||
++        aggregate.sweepRows >
++          MATRIX_SWEEP_MAXIMUM_COUNT * EXPECTED_MATRIX_TUPLES.length ||
++        aggregate.executeStepCalls > MATRIX_TOTAL_CALL_MAXIMUM_COUNT ||
++        aggregate.batches > MATRIX_TOTAL_BATCH_MAXIMUM_COUNT ||
++        aggregate.wallTimeMs >
++          COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++            .maximumWallTimeMatrixMs
++      ) {
++        throw new Error(
++          "The matrix exceeds a frozen aggregate row/workload cap.",
++        );
+       }
+     }
+     await reader.consumeAscii('],"envelope":');
+-    const envelopeJson = await reader.readObject(MATRIX_METADATA_MAXIMUM_BYTES, "Matrix envelope");
++    const envelopeJson = await reader.readObject(
++      MATRIX_METADATA_MAXIMUM_BYTES,
++      "Matrix envelope",
++    );
+     const envelopeBytes = Buffer.byteLength(envelopeJson, "utf8");
+     expect(envelopeBytes).toBeLessThanOrEqual(MATRIX_METADATA_MAXIMUM_BYTES);
+-    if (!isCompactJson(envelopeJson)) throw new Error("Matrix envelope is not compact JSON.");
+-    const envelope = assertExactKeys(JSON.parse(envelopeJson) as unknown, ["tuples", "caseCount", "bodyRows", "contactRows", "sweepRows", "executeStepCalls", "batches", "wallTimeMs"], "Matrix envelope");
++    if (!isCompactJson(envelopeJson))
++      throw new Error("Matrix envelope is not compact JSON.");
++    const envelope = assertExactKeys(
++      JSON.parse(envelopeJson) as unknown,
++      [
++        "tuples",
++        "caseCount",
++        "bodyRows",
++        "contactRows",
++        "sweepRows",
++        "executeStepCalls",
++        "batches",
++        "wallTimeMs",
++      ],
++      "Matrix envelope",
++    );
+     expect(envelope["tuples"]).toEqual(EXPECTED_MATRIX_TUPLES);
+-    for (const key of ["caseCount", "bodyRows", "contactRows", "sweepRows", "executeStepCalls", "batches"] as const) {
++    for (const key of [
++      "caseCount",
++      "bodyRows",
++      "contactRows",
++      "sweepRows",
++      "executeStepCalls",
++      "batches",
++    ] as const) {
+       expect(envelope[key], `Envelope ${key}`).toBe(aggregate[key]);
+     }
+     expect(envelope["wallTimeMs"]).toBe(aggregate.wallTimeMs);
+@@ -1497,7 +2136,12 @@ async function validateMatrixFile(path: string): Promise<{
+     const digest = await reader.assertEnd();
+     expect(digest.byteLength).toBe(stats.size);
+     expect(digest.byteLength).toBeLessThanOrEqual(MATRIX_MAXIMUM_BYTES);
+-    const totals: MatrixTotals = { ...aggregate, matrixBytes: digest.byteLength, envelopeBytes, measuredMatrixWallTimeMs: 0 };
++    const totals: MatrixTotals = {
++      ...aggregate,
++      matrixBytes: digest.byteLength,
++      envelopeBytes,
++      measuredMatrixWallTimeMs: 0,
++    };
+     result = { digest, totals, identity };
+   } catch (error) {
+     primaryFailure = { value: error };
+@@ -1509,34 +2153,92 @@ async function validateMatrixFile(path: string): Promise<{
+     closeFailure = { value: error };
+   }
+   if (primaryFailure !== null && closeFailure !== null) {
+-    throw new AggregateError([primaryFailure.value, closeFailure.value], "Matrix validation failed and its file handle did not close.", { cause: primaryFailure.value });
++    throw new AggregateError(
++      [primaryFailure.value, closeFailure.value],
++      "Matrix validation failed and its file handle did not close.",
++      { cause: primaryFailure.value },
++    );
+   }
+   if (primaryFailure !== null) {
+-    rethrowCaughtError(primaryFailure.value, "Matrix validation failed with a non-Error value.");
++    rethrowCaughtError(
++      primaryFailure.value,
++      "Matrix validation failed with a non-Error value.",
++    );
+   }
+   if (closeFailure !== null) {
+-    rethrowCaughtError(closeFailure.value, "Matrix file close failed with a non-Error value.");
++    rethrowCaughtError(
++      closeFailure.value,
++      "Matrix file close failed with a non-Error value.",
++    );
+   }
+   if (!result) throw new Error("Matrix validation ended without a result.");
+   return result;
+ }
+ 
+-function validateBrowserMatrixSummary(value: unknown, totals: MatrixTotals, identity: MatrixRecord): void {
+-  const summary = assertExactKeys(value, ["caseCount", "bodyRows", "contactRows", "sweepRows", "executeStepCalls", "batches", "wallTimeMs", "matrixBytes", "envelopeBytes", "configHash", "fixtureFileSha256", "fixturePayloadSha256", "wasmSha256", "runtimeIdentity", "eligibleCases", "measuredMatrixWallTimeMs"], "Browser matrix summary");
+-  for (const key of ["caseCount", "bodyRows", "contactRows", "sweepRows", "executeStepCalls", "batches", "wallTimeMs", "matrixBytes", "envelopeBytes"] as const) {
++function validateBrowserMatrixSummary(
++  value: unknown,
++  totals: MatrixTotals,
++  identity: MatrixRecord,
++): void {
++  const summary = assertExactKeys(
++    value,
++    [
++      "caseCount",
++      "bodyRows",
++      "contactRows",
++      "sweepRows",
++      "executeStepCalls",
++      "batches",
++      "wallTimeMs",
++      "matrixBytes",
++      "envelopeBytes",
++      "configHash",
++      "fixtureFileSha256",
++      "fixturePayloadSha256",
++      "wasmSha256",
++      "runtimeIdentity",
++      "eligibleCases",
++      "measuredMatrixWallTimeMs",
++    ],
++    "Browser matrix summary",
++  );
++  for (const key of [
++    "caseCount",
++    "bodyRows",
++    "contactRows",
++    "sweepRows",
++    "executeStepCalls",
++    "batches",
++    "wallTimeMs",
++    "matrixBytes",
++    "envelopeBytes",
++  ] as const) {
+     expect(summary[key], `Browser summary ${key}`).toBe(totals[key]);
+   }
+   expect(summary["configHash"]).toBe(identity["configHash"]);
+   expect(summary["fixtureFileSha256"]).toBe(identity["fixtureFileSha256"]);
+-  expect(summary["fixturePayloadSha256"]).toBe(identity["fixturePayloadSha256"]);
++  expect(summary["fixturePayloadSha256"]).toBe(
++    identity["fixturePayloadSha256"],
++  );
+   expect(summary["wasmSha256"]).toBe(identity["wasmSha256"]);
+   expect(summary["runtimeIdentity"]).toBe(identity["runtimeIdentity"]);
+-  const eligibleCases = boundedInteger(summary["eligibleCases"], 0, 24, "Browser eligibleCases");
++  const eligibleCases = boundedInteger(
++    summary["eligibleCases"],
++    0,
++    24,
++    "Browser eligibleCases",
++  );
+   expect(eligibleCases).toBe(totals.eligibleCases);
+-  const measured = finiteNumber(summary["measuredMatrixWallTimeMs"], "Browser measuredMatrixWallTimeMs");
++  const measured = finiteNumber(
++    summary["measuredMatrixWallTimeMs"],
++    "Browser measuredMatrixWallTimeMs",
++  );
+   expect(measured).toBeGreaterThanOrEqual(0);
+   expect(measured).toBeGreaterThanOrEqual(totals.wallTimeMs);
+-  expect(measured).toBeLessThanOrEqual(COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload.maximumWallTimeMatrixMs);
++  expect(measured).toBeLessThanOrEqual(
++    COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.workload
++      .maximumWallTimeMatrixMs,
++  );
+ }
+ 
+ function expectedTransportDigest(): string {
+@@ -2080,7 +2782,9 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+ }, testInfo) => {
+   test.setTimeout(1_100_000);
+   await openDiagnostic(page);
+-  await expect(page.getByTestId("loft-matrix-panel")).toBeVisible({ timeout: 5_000 });
++  await expect(page.getByTestId("loft-matrix-panel")).toBeVisible({
++    timeout: 5_000,
++  });
+ 
+   const status = page.getByTestId("loft-matrix-status");
+   let temporaryPath: string | undefined;
+@@ -2092,14 +2796,20 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+   const cleanupErrors: unknown[] = [];
+ 
+   try {
+-    await page.getByRole("button", { name: "Run 24-case Havok matrix" }).click();
++    await page
++      .getByRole("button", { name: "Run 24-case Havok matrix" })
++      .click();
+     await expect
+       .poll(
+         async () => {
+           const text = await status.textContent();
+           if (text === MATRIX_FAILED_STATUS) {
+-            const error = await page.getByTestId("loft-matrix-error").textContent();
+-            throw new Error(`The browser matrix failed before download: ${error ?? "unknown reason"}`);
++            const error = await page
++              .getByTestId("loft-matrix-error")
++              .textContent();
++            throw new Error(
++              `The browser matrix failed before download: ${error ?? "unknown reason"}`,
++            );
+           }
+           return text;
+         },
+@@ -2107,11 +2817,21 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+       )
+       .toBe(MATRIX_READY_STATUS);
+ 
+-    const outputText = await page.getByTestId("loft-matrix-export").textContent();
+-    if (!outputText || Buffer.byteLength(outputText, "utf8") > MATRIX_METADATA_MAXIMUM_BYTES) {
+-      throw new Error("The compact browser matrix summary is missing or over its bound.");
++    const outputText = await page
++      .getByTestId("loft-matrix-export")
++      .textContent();
++    if (
++      !outputText ||
++      Buffer.byteLength(outputText, "utf8") > MATRIX_METADATA_MAXIMUM_BYTES
++    ) {
++      throw new Error(
++        "The compact browser matrix summary is missing or over its bound.",
++      );
+     }
+-    const output = asRecord(JSON.parse(outputText) as unknown, "Browser export output");
++    const output = asRecord(
++      JSON.parse(outputText) as unknown,
++      "Browser export output",
++    );
+     expect(output["phase"]).toBe("ready");
+     const exportInfo = assertExactKeys(
+       output["export"],
+@@ -2125,8 +2845,16 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+     }
+     const fileName = `counterball-l01-${runId}.json`;
+     expect(exportInfo["fileName"]).toBe(fileName);
+-    boundedInteger(exportInfo["byteLength"], 1, MATRIX_MAXIMUM_BYTES, "Browser matrix byteLength");
+-    const browserSummary = asRecord(exportInfo["summary"], "Browser matrix summary");
++    boundedInteger(
++      exportInfo["byteLength"],
++      1,
++      MATRIX_MAXIMUM_BYTES,
++      "Browser matrix byteLength",
++    );
++    const browserSummary = asRecord(
++      exportInfo["summary"],
++      "Browser matrix summary",
++    );
+ 
+     const downloadPromise = page.waitForEvent("download", { timeout: 60_000 });
+     await page.getByRole("button", { name: "Download matrix" }).click();
+@@ -2138,9 +2866,15 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+     finalPath = testInfo.outputPath("counterball-l01-matrix.json");
+     await browserDownload.saveAs(temporaryPath);
+     const validated = await validateMatrixFile(temporaryPath);
+-    expect(validated.digest.byteLength).toBeLessThanOrEqual(MATRIX_MAXIMUM_BYTES);
++    expect(validated.digest.byteLength).toBeLessThanOrEqual(
++      MATRIX_MAXIMUM_BYTES,
++    );
+     expect(exportInfo["byteLength"]).toBe(validated.digest.byteLength);
+-    validateBrowserMatrixSummary(browserSummary, validated.totals, validated.identity);
++    validateBrowserMatrixSummary(
++      browserSummary,
++      validated.totals,
++      validated.identity,
++    );
+ 
+     const attestation: LoftMatrixHostAttestation = {
+       runId,
+@@ -2154,7 +2888,9 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
+       return acknowledge ? acknowledge(value) : false;
+     }, attestation);
+     expect(acknowledged).toBe(true);
+-    await expect(status).toHaveText(MATRIX_READY_ACK_STATUS, { timeout: 60_000 });
++    await expect(status).toHaveText(MATRIX_READY_ACK_STATUS, {
++      timeout: 60_000,
++    });
+     await cleanupBrowserTransport(page);
+     await browserDownload.delete();
+     browserDownload = undefined;
