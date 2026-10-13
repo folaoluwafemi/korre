@@ -111,6 +111,22 @@ jobs:
             grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \
               .artifacts/counterball-tsc-resolution.log || true
           } > .artifacts/counterball-tsc-summary.log
+      - name: Diagnose apps/web Counterball TypeScript asset resolution after failed verification
+        if: failure() && steps.verify.outcome == 'failure'
+        shell: bash
+        run: |
+          mkdir -p .artifacts
+          set +e
+          pnpm exec tsc --noEmit -p apps/web/tsconfig.json --listFiles --traceResolution \
+            > .artifacts/counterball-web-tsc-resolution.log 2>&1
+          tsc_status=$?
+          set -e
+          printf 'tsc_exit_code=%s\n' "$tsc_status" > .artifacts/counterball-web-tsc-status.log
+          {
+            printf 'tsc_exit_code=%s\n' "$tsc_status"
+            grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \
+              .artifacts/counterball-web-tsc-resolution.log || true
+          } > .artifacts/counterball-web-tsc-summary.log
       - name: Check production build excludes the diagnostic renderer
         run: node tests/production/counterball-dev-match-absent.mjs
       - name: Package the exact dry-run Worker build

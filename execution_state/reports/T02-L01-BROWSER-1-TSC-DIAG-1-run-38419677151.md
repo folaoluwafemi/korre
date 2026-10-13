@@ -1,0 +1,11 @@
+# T02-L01-BROWSER-1-TSC-DIAG-1 hosted diagnosis run 38419677151
+
+- Exact commit: `bda8be30fa320523d87b44988e6aaeb6e018643b`
+- Run: [GitHub Actions 38419677151](https://github.com/folaoluwafemi/korre/actions/runs/38419677151)
+- Overall result: **FAIL**, as expected, because Verify still fails. The new targeted diagnostic step (step 14) completed **SUCCESS**. Job step counts: 24 success, 1 failure, 13 skipped. Build, integration, preview/browser and production gates remained skipped.
+- The captured diagnostic compiler exit is `tsc_exit_code=0` for `pnpm exec tsc --noEmit -p games/counterball/tsconfig.json --listFiles --traceResolution`. The 85,296-line trace lists `games/counterball/src/viteAssetModules.d.ts` (line 85,122 in the trace).
+- The trace records both queried imports from `loftCoarseRunner.ts` as unresolved by ordinary file/package lookup: `@babylonjs/havok/lib/esm/HavokPhysics.wasm?url` and `../../../../tests/fixtures/counterball-v1.json?raw`. Even so, the standalone Counterball project returns 0 with the package declaration file included.
+- The preserved Verify log shows `games/counterball typecheck: Done`, followed by `apps/web typecheck$ tsc --noEmit -p tsconfig.json`; that consumer project emits the two TS2307 errors. This narrows the next investigation to the web app TypeScript program. **Inference to verify:** the app's project graph may omit the package-owned ambient declaration when it imports Counterball source through the workspace export. Do not change source from this hypothesis yet.
+- Exact downloaded evidence and SHA-256 values: `execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151-artifact-inventory.json`. The inventory contains 13 files. The three T03 PNGs are prior evidence included by the existing upload step, not new results from this run.
+- Full GitHub log: `execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151-github.log`. Snapshot: `execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151-job-snapshot.json`. The actual artifact directory is `execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151-artifacts`.
+- Independent exact-run/diagnosis review is pending. This run made no product-source changes and did not verify playable gameplay.
