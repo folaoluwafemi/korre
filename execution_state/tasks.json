@@ -5708,7 +5708,7 @@
         },
         {
           "id": "T02-L01-BROWSER-1",
-          "status": "CHANGES_REQUIRED",
+          "status": "SUPERSEDED",
           "ready": false,
           "role": "worker",
           "title": "Add the development-only L01 page action and file-backed download",
@@ -5900,7 +5900,7 @@
           "attempt_count": 2,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-review.md",
-          "next_action": "Both focused repair attempts failed with the same TS2307 diagnostics. Do not make a third Browser1 repair. Run the materialized remote TypeScript-resolution diagnosis card; use its evidence to prepare a separately reviewed successor.",
+          "next_action": "Superseded after its two permitted hosted source attempts and independently reviewed TypeScript diagnosis; the separately reviewed T02-L01-BROWSER-1-SUCCESSOR-1 inherits the full original browser-flick acceptance criteria.",
           "repair_implementation_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-implementation.md",
           "repair_review_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md",
           "run_evidence": {
@@ -6650,7 +6650,7 @@
         },
         {
           "id": "T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
-          "status": "RUNNING",
+          "status": "ACCEPTED",
           "ready": false,
           "role": "coordinator",
           "title": "Include Counterball asset-query declarations in the root test TypeScript project",
@@ -6714,6 +6714,32 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-review.md",
               "detail": "Reviewer confirmed only the package-owned declaration path was added to include, prior includes/options are preserved, the accepted trace proves the omission, and no local app command was run."
+            },
+            {
+              "command": "GitHub Actions exact-SHA pnpm verify and downstream gates",
+              "result": "FAIL",
+              "environment": "github",
+              "run_id": 38424575646,
+              "commit": "431f63b8b1fcd0c037eb7b6310463e558cdec1cc",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38424575646",
+              "detail": "The source change succeeds: all four compiler invocations exit 0 and the tests trace now includes the package declaration. Verify then fails at the next existing ESLint issue, preserve-caught-error in CounterballDirectProbe.tsx:317; downstream gates are skipped.",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646.md"
+            },
+            {
+              "command": "Independent exact-run evidence review for GitHub run 38424575646",
+              "result": "PASS",
+              "environment": "run-evidence-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646-independent-review.md",
+              "detail": "Independent reviewer verified exact SHA, 26/1/13 counts, all four TypeScript statuses at 0, tests trace includes the package declarations and contains neither former TS2307, sole Verify failure is the separate ESLint rule at CounterballDirectProbe.tsx:317, downstream skip counts, and all 22 file hashes/sizes."
+            },
+            {
+              "command": "Hosted root type configuration result",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38424575646,
+              "commit": "431f63b8b1fcd0c037eb7b6310463e558cdec1cc",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646.md",
+              "detail": "All four compiler invocations exit 0, and the root tests trace now includes the package-owned asset declarations. Overall Verify FAIL at the next ESLint rule is separately recorded; this card accepts only the bounded type configuration repair."
             }
           ],
           "acceptance": [
@@ -6737,10 +6763,166 @@
           "attempt_count": 0,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-review.md",
-          "next_action": "One-file source review passed. Commit/push exact reviewed change and reports, then inspect the exact-SHA hosted Verify and downstream gates."
+          "next_action": "Accepted narrowly: tests/tsconfig.json includes the existing Vite query declaration; all four TypeScript projects pass on exact SHA 431f63b8b1fcd0c037eb7b6310463e558cdec1cc. Overall Verify failed at the separately recorded lint diagnostic, before browser/build/integration gates; those remain successor requirements.",
+          "hosted_run": {
+            "run_id": 38424575646,
+            "commit": "431f63b8b1fcd0c037eb7b6310463e558cdec1cc",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38424575646",
+            "status": "completed",
+            "conclusion": "failure",
+            "job_id": 115390475933,
+            "stepCounts": {
+              "success": 26,
+              "failure": 1,
+              "skipped": 13
+            },
+            "typescriptExitCodes": {
+              "counterball": 0,
+              "web": 0,
+              "tests": 0,
+              "server": 0
+            },
+            "artifact_inventory": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646-artifact-inventory.json"
+          },
+          "independent_review": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646-independent-review.md",
+          "reviewer_identity": "/root/executor_type_review — exact one-file source PASS; /root/run_evidence_review — run 38424575646 evidence PASS",
+          "acceptance_report": "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-acceptance.md"
+        },
+        {
+          "id": "T02-L01-BROWSER-1-SUCCESSOR-1",
+          "parent": "T02",
+          "title": "Repair diagnosed type and lint failures, then prove the first browser flick",
+          "role": "worker",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1",
+            "T02-L01-PACKET-SPLIT-1",
+            "T02-L01-EXECUTOR-1",
+            "T02-BR02-FORMAT-REPAIR-1",
+            "T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1"
+          ],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/TASKS.md",
+            "knowledge_base/execution/SWARM.md",
+            "knowledge_base/execution/completion/README.md",
+            "knowledge_base/execution/completion/OPERATIONS.md",
+            "knowledge_base/execution/completion/ACCEPTANCE.md",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-BROWSER-1-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646.md",
+            "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-run-38424575646-independent-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1-review.md",
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "games/counterball/src/browser.ts",
+            "games/counterball/src/simulation/loftCoarseRunner.ts",
+            "tests/e2e/counterball-direct-probe.spec.ts",
+            "playwright.config.ts",
+            ".github/workflows/ci.yml",
+            "package.json",
+            "eslint.config.js"
+          ],
+          "write_paths": [
+            "apps/web/src/CounterballDirectProbe.tsx"
+          ],
+          "outputs": [
+            "A one-line AggregateError cause fix preserves the original setup error and both setup/cleanup errors after the accepted type-configuration repair.",
+            "An exact-head, real-browser validation of the existing development-only direct-shot and OPFS transport flow, with the full first-browser-flick acceptance evidence."
+          ],
+          "steps": [
+            "Extract this exact successor card and confirm its original L01 prerequisites, accepted BR02 formatter card, and accepted root TypeScript configuration repair are recorded as ACCEPTED. It supersedes the two-attempt Browser1 card only after preserving all original L01 acceptance conditions below.",
+            "Read the exact Verify lint output for GitHub run 38424575646 and the independent artifact review. At the OPFS setup cleanup catch, add `{ cause: error }` as the third AggregateError argument while preserving `[error, cleanupError]` and all cleanup behavior.",
+            "Change only apps/web/src/CounterballDirectProbe.tsx. Do not disable lint, add suppressions, weaken tests, alter the runner, or modify shared config/contracts/status.",
+            "Run only `git diff --check -- apps/web/src/CounterballDirectProbe.tsx` locally. No app install/typecheck/lint/build/test/browser/deploy command may run locally.",
+            "Write the unique implementation report and release the exact one-file diff for an independent source reviewer before committing or pushing.",
+            "After source review, run GitHub Actions on the exact reviewed SHA. Capture complete logs, exact artifact hashes, and every gate status. Require Verify/typecheck/lint/unit, production packaging and diagnostic exclusion, integration, preview and the real browser diagnostic/flick path to execute and pass; explain any failure-only diagnostic skips separately.",
+            "Have a different reviewer verify the exact SHA, source diff, real-browser evidence, all step/skip counts and artifact hashes. Keep this successor unaccepted if any required check fails or is skipped."
+          ],
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-coordinator-setup.md",
+              "detail": "All 104 packets are consistent across 21 remaining parents."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-SUCCESSOR-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-coordinator-setup.md",
+              "detail": "Successor is the only initially ready packet; all original prerequisites plus formatter and root TypeScript repairs are accepted."
+            },
+            {
+              "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-implementation.md",
+              "detail": "Worker changed only the AggregateError options at the exact hosted lint diagnostic; no application command ran."
+            },
+            {
+              "command": "Independent exact-diff source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-independent-review.md",
+              "detail": "Reviewer confirmed exact one-file scope, cause option, preserved [error, cleanupError] iterable and unchanged cleanup behavior."
+            }
+          ],
+          "acceptance": [
+            "The original setup error is AggregateError.cause and both setup and cleanup failures remain in the AggregateError errors iterable.",
+            "The direct-shot page uses the page-owned Babylon Engine and accepted canonical browser runner; it demonstrates a real browser flick without a mock or Node-only result.",
+            "Matrix bytes use awaited bounded OPFS writes, full rows do not cross into DOM/page IPC, download follows successful finalization only, and lifecycle/failure cleanup remains safe.",
+            "The transport hook and direct diagnostic feature are development-only and absent from production output.",
+            "The exact reviewed SHA passes all required Verify, production packaging, integration, preview, and browser diagnostic gates with independent source and run review; conditional failure-only traces may skip only when their condition is false.",
+            "This card accepts only the first browser flick diagnostic; it does not accept deployed Havok, full match, AI, online/social flows, or the T02 parent."
+          ],
+          "negative_cases": [
+            "No local application install/typecheck/lint/build/test/browser run or Cloudflare/Wrangler command.",
+            "No mock, Node-only physics, screenshot-only evidence, buffer/blob/data-URL/page-message transport, production exposure, lint suppression, test weakening, guest bypass, or changed canonical rules.",
+            "No claim that deployed Havok or a playable complete match is accepted."
+          ],
+          "review_questions": [
+            "Does AggregateError.cause preserve the caught setup error while the iterable still contains both setup and cleanup failures?",
+            "Does the exact browser evidence show the actual development UI invoking the canonical runner with the page-owned engine and completing the intended real flick path?",
+            "Do successful OPFS file finalization, download, cleanup/retry, cancellation/error handling, and production exclusion remain demonstrated?",
+            "Are all required checks, skip counts, exact SHA, logs and artifact hashes accurate and independently reviewed?"
+          ],
+          "stop_conditions": [
+            "If the exact lint diagnostic remains, stop with the real next diagnostic and request a new independently reviewed successor instead of adding another edit to this card.",
+            "If any required browser/build/production/integration gate fails or is skipped, preserve the failure and do not accept the browser-flick milestone.",
+            "If review finds expanded write scope, altered test semantics, noncanonical runner/physics, or incomplete cleanup, stop before publication."
+          ],
+          "supersedes": [
+            "T02-L01-BROWSER-1"
+          ],
+          "status": "REVIEWING",
+          "ready": false,
+          "owner": "/root/toolchain_audit — sole component source edit; /root/executor_type_review — independent source review; /root/run_evidence_review — independent exact-run review",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/executor_type_review — independent source review PASS",
+          "attempt_count": 0,
+          "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-1-review.md",
+          "next_action": "Independent source review passed; commit and push this exact reviewed code/evidence for GitHub checks. Keep acceptance pending exact-SHA gates and a separate run-evidence review.",
+          "started_at": "2026-10-13"
         }
       ],
-      "next_action": "T02 remains RUNNING; Browser1 remains CHANGES_REQUIRED after two bounded repairs. Root tests diagnostic is accepted and source fix independently reviewed. The exact hosted verification is the next gate; gameplay and Cloudflare remain unverified."
+      "next_action": "T02 remains RUNNING. The original Browser1 packet is superseded after its two hosted attempts and diagnosis. Its replacement one-file cause repair passed independent source review; commit/push for exact-SHA GitHub validation is next. Browser-flick, deployed Havok, and playable-match acceptance remain pending."
     },
     {
       "id": "T03",

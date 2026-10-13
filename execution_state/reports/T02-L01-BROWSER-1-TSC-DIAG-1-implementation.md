@@ -10,4 +10,4 @@ Checks actually run:
 - `node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TSC-DIAG-1` — PASS, card remains ready under T02 with T01 as its only required parent acceptance.
 - `git diff --check -- .github/workflows/ci.yml` — PASS.
 
-No local application typecheck, build, test, browser run, or deployment was run. Workflow source review is pending before commit and hosted execution.
+No local application typecheck, build, test, browser run, or deployment was run. The exact workflow source was independently reviewed; commit `bda8be30fa320523d87b44988e6aaeb6e018643b` ran on GitHub as [38419677151](https://github.com/folaoluwafemi/korre/actions/runs/38419677151). Verify failed as expected, and the failure-only Counterball trace completed successfully with compiler exit code 0. The run and all 13 uploaded files were independently checked; see `T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151-independent-review.md`. The diagnostic narrowed the issue to a web-project TypeScript error; it did not verify playable gameplay.
