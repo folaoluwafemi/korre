@@ -404,7 +404,13 @@ function setAndReadMaterial(
   ] as const) {
     if (readback[key] !== setter[key]) {
       throw resourceFailure(
-        `Native ${key} material readback differs from its setter.`,
+        `Native ${key} material readback differs from its setter. ${JSON.stringify(
+          {
+            field: key,
+            setter: setter[key],
+            readback: readback[key],
+          },
+        )}`,
       );
     }
   }

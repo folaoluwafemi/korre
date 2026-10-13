@@ -602,3 +602,23 @@ No local application build/test/browser/physics ran for this contract correction
 - Independent source and failed-run evidence reviews passed for formatting repair attempt 1. The run review confirms no full unit/build/browser/physics run occurred on SHA d7477075de44ade129067e177acc07f8f5cb0655; exact failure and artifact hashes are saved in the run folder and summary report.
 - `/root` owns commit/push of the reviewed single-hunk formatter patch and shared state; the exact next hosted run is expected on runner SHA `f14a0fdebb883500849339b3bc76f928667631872e0e45d248990811d906ce30`. `/root/run_evidence_review` will independently review the next exact run. No local app commands or Cloudflare/Wrangler.
 - F32 remains RUNNING pending hosted Verify and real-Havok browser evidence; MATRIX-1 remains CHANGES_REQUIRED; T02 remains RUNNING.
+
+## Current ownership — 2026-10-13 (F32 exact hosted run 38470988448)
+
+- Exact source commit `9977d984ee91dae726baff56d49e23cfe1d5f53d` is pushed and hosted run 38470988448 is in progress. `/root` owns run monitoring, full logs/artifact/hash capture and task status; `/root/run_evidence_review` owns independent exact-run review.
+- Do not change source or start a duplicate run while this exact 24-case matrix attempt is executing. No local app commands or Cloudflare/Wrangler.
+
+## Current ownership — 2026-10-13 (F32 accepted; material diagnostic packet review)
+
+- `/root` accepted `T02-L01-SUPPORT-F32-1` narrowly after run 38470988448 and independent exact-run review. The real Chromium support AABB-Y predicate passed; a distinct native friction readback failed later at runner line 1420. MATRIX-1 remains CHANGES_REQUIRED and T02 remains RUNNING.
+- The exact run report, independent review, acceptance report, 1,158-file extracted hash inventory, and API artifact metadata are retained under `execution_state/reports/T02-L01-SUPPORT-F32-run-38470988448*`.
+- Coordinator owns the proposed packet and shared status for `T02-L01-MATERIAL-DIAGNOSTIC-1`. `/root/executor_type_review` is the independent pre-dispatch packet reviewer. `/root/toolchain_audit` is reserved as the sole implementation worker for `games/counterball/src/simulation/loftCoarseRunner.ts` after review. Do not dispatch before PASS and exact READY extraction.
+- The new packet preserves the full MATRIX-1 dependency set and adds accepted T02-L01-EXECUTOR-1/F32 dependencies. It permits only disclosure of exact setter/readback values on the existing strict failure path; it does not authorize material or physics changes.
+- No local app install/build/test/browser/physics command ran. Cloudflare/Wrangler remains unused until the user signals access.
+
+## Current ownership — 2026-10-13 (material diagnostic source reviewed; hosted run pending)
+
+- `T02-L01-SUPPORT-F32-1` remains ACCEPTED only for exact support AABB-Y projection; MATRIX-1 remains CHANGES_REQUIRED with no matrix cases/artifact; T02 remains RUNNING.
+- `T02-L01-MATERIAL-DIAGNOSTIC-1` passed exact packet review/READY extraction and is SOURCE_REVIEWED_HOSTED_PENDING. `/root/toolchain_audit` released the sole path `games/counterball/src/simulation/loftCoarseRunner.ts`; `/root/executor_type_review` independently passed source review; `/root` owns exact commit/push and hosted Verify/Chromium run; `/root/run_evidence_review` is reserved for exact-run evidence review.
+- Runner SHA-256 is `672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87`. The one hunk adds only exact `{field, setter, readback}` data to the existing strict `resourceFailure`; no material or physics behavior changes.
+- Local app commands and Cloudflare/Wrangler remain unused.
