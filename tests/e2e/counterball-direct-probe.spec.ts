@@ -144,6 +144,49 @@ async function openDiagnostic(page: Page): Promise<void> {
   await expect(page.getByText("Diagnostic only · not playable")).toBeVisible();
 }
 
+type CanvasBounds = Readonly<{
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}>;
+
+type PointerPoint = Readonly<{ x: number; y: number }>;
+
+async function canvasBoundsInsideViewport(page: Page): Promise<CanvasBounds> {
+  const canvas = page.getByTestId("counterball-canvas");
+  await canvas.scrollIntoViewIfNeeded();
+  const bounds = await canvas.boundingBox();
+  const viewport = page.viewportSize();
+  expect(bounds).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  if (!bounds || !viewport) {
+    throw new Error("The diagnostic canvas or browser viewport has no bounds.");
+  }
+
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.y).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width);
+  expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height);
+  return bounds;
+}
+
+function assertPointerPointsInsideViewport(
+  page: Page,
+  points: readonly PointerPoint[],
+): void {
+  const viewport = page.viewportSize();
+  expect(viewport).not.toBeNull();
+  if (!viewport) throw new Error("The browser viewport has no bounds.");
+
+  for (const point of points) {
+    expect(point.x).toBeGreaterThanOrEqual(0);
+    expect(point.y).toBeGreaterThanOrEqual(0);
+    expect(point.x).toBeLessThan(viewport.width);
+    expect(point.y).toBeLessThan(viewport.height);
+  }
+}
+
 async function assertAcceptedSceneFacts(page: Page): Promise<void> {
   const facts = await page.getByTestId("scene-facts").evaluate((element) => {
     const parsed: unknown = JSON.parse(element.textContent ?? "null");
@@ -176,9 +219,7 @@ async function flickAndReadTrace(
   testInfo: TestInfo,
 ): Promise<ProbeTrace> {
   const canvas = page.getByTestId("counterball-canvas");
-  const box = await canvas.boundingBox();
-  expect(box).not.toBeNull();
-  if (!box) throw new Error("The diagnostic WebGL canvas has no bounds.");
+  await canvas.scrollIntoViewIfNeeded();
 
   const initialLifecycle = await lifecycle(page);
   expect(initialLifecycle.activeListeners).toBeGreaterThan(0);
@@ -187,11 +228,20 @@ async function flickAndReadTrace(
     path: testInfo.outputPath("direct-probe-before.png"),
   });
 
+  // Element screenshots may scroll the page. Read fresh bounds after the
+  // screenshot's scroll so the pointer gesture uses current viewport space.
+  const box = await canvasBoundsInsideViewport(page);
   const startX = box.x + box.width * 0.2;
   const startY = box.y + box.height * 0.78;
+  const endX = startX + 64;
+  const endY = startY - 32;
+  assertPointerPointsInsideViewport(page, [
+    { x: startX, y: startY },
+    { x: endX, y: endY },
+  ]);
   await page.mouse.move(startX, startY);
   await page.mouse.down();
-  await page.mouse.move(startX + 64, startY - 32, { steps: 8 });
+  await page.mouse.move(endX, endY, { steps: 8 });
   await page.mouse.up();
 
   const result = page.getByTestId("probe-result");
@@ -313,14 +363,18 @@ test("a blocked real WASM load is visible and retry cleans up before a real shot
   await openDiagnostic(page);
   await assertAcceptedSceneFacts(page);
 
-  const box = await page.getByTestId("counterball-canvas").boundingBox();
-  expect(box).not.toBeNull();
-  if (!box) throw new Error("The diagnostic WebGL canvas has no bounds.");
+  const box = await canvasBoundsInsideViewport(page);
   const startX = box.x + box.width * 0.2;
   const startY = box.y + box.height * 0.78;
+  const endX = startX + 64;
+  const endY = startY - 32;
+  assertPointerPointsInsideViewport(page, [
+    { x: startX, y: startY },
+    { x: endX, y: endY },
+  ]);
   await page.mouse.move(startX, startY);
   await page.mouse.down();
-  await page.mouse.move(startX + 64, startY - 32, { steps: 8 });
+  await page.mouse.move(endX, endY, { steps: 8 });
   await page.mouse.up();
 
   await expect(page.getByTestId("probe-error")).toContainText("Havok/WASM", {

@@ -648,6 +648,15 @@
           "environment": "local-document",
           "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-packet-review.md",
           "detail": "108-card plan is consistent; this exact card reports ready:true, with all ten packet dependencies accepted and parent T01 retained. Document check only."
+        },
+        {
+          "command": "GitHub exact-head workflow for T02-L01-TRANSPORT-HARNESS-1",
+          "result": "PENDING",
+          "environment": "github",
+          "run_id": 38443895020,
+          "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32",
+          "url": "https://github.com/folaoluwafemi/korre/actions/runs/38443895020",
+          "detail": "Queued; no runtime checks or artifact results yet."
         }
       ],
       "blocker": "T02-L01 strict guard/schema and packet split are accepted, but its real 24-case Chromium matrix has not run. The calibrated gameplay runner, deployed Cloudflare Havok and playable match remain open.",
@@ -6329,9 +6338,9 @@
           "ready": true,
           "role": "worker",
           "title": "Expose test-only transport controls in the diagnostic build",
-          "owner": "/root/toolchain_audit — implementation complete; /root/run_evidence_review — source review PASS; coordinator exact-head integration pending",
+          "owner": "coordinator — exact-head GitHub run after source PASS",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/run_evidence_review",
+          "reviewer_identity": "/root/executor_type_review",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-HARNESS-1",
           "depends_on": [
             "C00-B",
@@ -6404,37 +6413,56 @@
               "command": "pnpm verify",
               "environment": "github",
               "expected": "Exact-head CI typecheck, lint, unit tests, and production builds pass.",
-              "result": "PENDING"
+              "result": "PASS",
+              "detail": "Exact run 38443895020 on the recorded SHA passed Verify.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32"
             },
             {
               "command": "node tests/production/counterball-dev-match-absent.mjs",
               "environment": "github",
               "expected": "Ordinary production bundle contains neither transport control nor host acknowledgement marker.",
-              "result": "PENDING"
+              "result": "PASS",
+              "detail": "Ordinary production output omitted both diagnostic transport markers.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32"
             },
             {
               "command": "pnpm test:integration",
               "environment": "github",
               "expected": "Integration suite passes with no unreported skips.",
-              "result": "PENDING"
+              "result": "PASS",
+              "detail": "Integration passed in exact run 38443895020.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32"
             },
             {
               "command": "COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e --workers=1",
               "environment": "github",
               "expected": "Existing production-preview browser suite passes against the built production artifact.",
-              "result": "PENDING"
+              "result": "PASS",
+              "detail": "Production preview E2E passed 4/4.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32"
             },
             {
               "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
               "environment": "github",
               "expected": "Existing diagnostic browser suite runs against the CI-built dist-dev and full-cap transfer passes in real Chromium with exact size/digest, cleanup, and zero skips/retries.",
-              "result": "PENDING"
+              "result": "CHANGES_REQUIRED",
+              "detail": "The named maximum-size transport test passed with exact byte/hash/ack/cleanup assertions. The overall diagnostic suite had 1 passed, 2 failed, 0 skipped, 0 retries and 0 flaky; the two failures were pointer tests, so the command and workflow exited failure.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32"
             },
             {
               "command": "Independent exact-source and exact-run review",
               "environment": "source-review",
               "expected": "Reviewer confirms the three source gates, production absence, unchanged route/config/physics, and actual browser transport evidence.",
-              "result": "PENDING"
+              "result": "PASS",
+              "detail": "Source and exact-run reviews passed for the transport-specific gates. Reviewer explicitly records the overall workflow/suite as failed and diagnoses both off-viewport pointer tests.",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-run-38443895020-review.md"
             },
             {
               "command": "Independent exact-source review of T02-L01-TRANSPORT-HARNESS-1",
@@ -6442,6 +6470,43 @@
               "result": "PASS",
               "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md",
               "detail": "Source reviewer confirms the shared harness predicate, preserved acknowledgment safeguards, bounded E2E preflight, meaningful production marker checks, exact three-file scope, and no route/config/physics changes. Runtime remains NOT VERIFIED."
+            },
+            {
+              "command": "Independent viewport-repair packet review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-packet-review.md",
+              "detail": "Reviewer confirms both trace-backed failures are within the existing E2E path, a post-scroll bounding box fixes the input coordinates, and no physics/gameplay assertions need to change."
+            },
+            {
+              "command": "GitHub exact-head workflow 38443895020",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38443895020,
+              "source_sha": "92294c26713c54c585db5a40be1c8fb5060ffb32",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-run-38443895020-review.md",
+              "detail": "Verify, production exclusion, integration, and production preview passed. The named exact-cap transport test passed; the full diagnostic suite failed its two pointer tests, so the card remains in repair."
+            },
+            {
+              "command": "Repair attempt 1 plan consistency and scoped diff check",
+              "result": "PASS",
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-implementation.md",
+              "detail": "The exact plan checker exited 0 (plan PASS; ready:false because this card is already RUNNING), and `git diff --check -- tests/e2e/counterball-direct-probe.spec.ts` exited 0. No app checks ran."
+            },
+            {
+              "command": "Independent source review of viewport repair attempt 1",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md",
+              "detail": "Independent reviewer confirms both tests measure fresh, fully visible canvas bounds after scrolling; both gesture endpoints are asserted inside the viewport; all existing physics, WASM, retry, teardown and transport assertions remain unchanged; runtime NOT VERIFIED."
+            },
+            {
+              "command": "Independent source review of viewport repair attempt 1",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md",
+              "detail": "SOURCE PASS; RUNTIME NOT VERIFIED. Exact authorized E2E path only; all meaningful physics, failure, retry, cleanup, and transfer assertions are preserved."
             }
           ],
           "acceptance": [
@@ -6462,16 +6527,64 @@
             "If workflow routing/configuration, another write path, a shared contract, or production-visible behavior must change, stop and request a separately reviewed coordinator packet.",
             "Keep the original transport card CHANGES_REQUIRED until this source repair is accepted and its exact full-cap transport evidence receives independent review."
           ],
-          "attempt_count": 0,
+          "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md",
-          "next_action": "Source review PASS, but no host/runtime check has run. Commit and push this reviewed tree, then inspect the exact GitHub workflow results/artifacts. Keep packet unaccepted until production exclusion and full-cap Chromium transfer pass and receive independent exact-run review.",
+          "next_action": "Viewport repair received independent SOURCE PASS. Coordinator owns the exact reviewed commit and GitHub workflow; preserve exact run/artifacts, then accept the transport harness only if the required gates pass.",
           "required_parent_acceptance": [
             "T01"
           ],
-          "hosted_run": null,
+          "hosted_run": {
+            "run_id": 38443895020,
+            "attempt": 1,
+            "job_id": 115457155230,
+            "commit": "92294c26713c54c585db5a40be1c8fb5060ffb32",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38443895020",
+            "status": "completed",
+            "conclusion": "failure",
+            "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-run-38443895020-review.md",
+            "artifact_ids": {
+              "browser_evidence": 11836952611,
+              "hosted_checks": 11838052138
+            },
+            "diagnostic_tests": {
+              "total": 3,
+              "passed": 1,
+              "failed": 2,
+              "skipped": 0,
+              "flaky": 0,
+              "retries": 0
+            },
+            "transport_test": {
+              "result": "PASS",
+              "bytes": 504365056,
+              "digest_assertion": "PASS",
+              "host_acknowledgement": "PASS",
+              "cleanup": "PASS"
+            },
+            "detail": "Transport test passed on the exact SHA; overall diagnostic suite and workflow failed on two distinct pointer tests with trace-backed off-viewport inputs."
+          },
           "blocker": null,
-          "repair_attempts": []
+          "repair_attempts": [
+            {
+              "number": 1,
+              "failure_signature": "The two existing real-pointer E2E tests calculate page.mouse coordinates below the 720px viewport after the diagnostic panel increases document height; the first also reuses a pre-screenshot bounding box after the screenshot auto-scrolls.",
+              "discovered_in_run": 38443895020,
+              "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md",
+              "packet_amendment_review": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-packet-review.md",
+              "packet_amendment_verdict": "PASS",
+              "allowed_write_paths": [
+                "tests/e2e/counterball-direct-probe.spec.ts",
+                "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-implementation.md"
+              ],
+              "source_reviewer_path": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md",
+              "status": "SOURCE_REVIEW_PASS_HOSTED_PENDING",
+              "detail": "Use a post-scroll canvas bounding box for both pointer tests, keep the baseline screenshot, and prove start/end coordinates fit the viewport. Preserve all physics, Havok-load, retry, teardown, and transport assertions. This is a separate viewport failure signature; no gameplay source change.",
+              "worker_acknowledged": true,
+              "review": "PASS"
+            }
+          ]
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7778,7 +7891,7 @@
           "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "Harness source implementation and independent source review are complete; source-only PASS is saved. No hosted app check has run on this code yet. Publish the exact reviewed tree and use GitHub for full verify, production exclusion, integration, preview, and the Chromium full-cap transfer. Keep the child IMPLEMENTED until exact run/artifact review passes."
+      "next_action": "Source review PASS and commit 92294c26713c54c585db5a40be1c8fb5060ffb32 pushed. GitHub run 38443895020 is queued; wait for full workspace, production exclusion, integration, preview, and diagnostic transfer results. T02 remains open."
     },
     {
       "id": "T03",
@@ -8370,5 +8483,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. The latest exact GitHub run passed verify, production/exclusion, integration and preview, but the maximum-size test timed out before writing bytes because dev-only controls were omitted from the diagnostic build. Root-cause review and a reviewed harness-only scope amendment are next; no transfer or playable match is proven."
+  "next": "The first browser flick is accepted. Exact-cap transport passed on run 38443895020, while the full suite failed two off-screen pointer tests. Their approved one-file repair has independent source PASS; the exact reviewed source and evidence are being published to GitHub next. The diagnostic suite, matrix, deployed Cloudflare Havok and playable match remain unaccepted."
 }

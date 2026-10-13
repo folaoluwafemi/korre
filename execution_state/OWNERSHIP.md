@@ -416,3 +416,13 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root/run_evidence_review` is the independent source reviewer, with sole write path `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md`.
 - `/root` retains ownership of packet/catalogue/status/ledger, CI publication and exact-run integration evidence. Workflow routing and production configuration are read-only for this card.
 - The original `T02-L01-TRANSPORT-1` card remains `CHANGES_REQUIRED` and waits on this accepted child; its failed run produced no transport result. No local app build/test or Cloudflare access is authorized or needed here.
+
+## Current ownership — 2026-10-13 (transport viewport repair attempt 1)
+
+- `/root/toolchain_audit` owns only `tests/e2e/counterball-direct-probe.spec.ts` and `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-implementation.md`. Exact run traces show both pointer gestures target y=891.23 in a 720px viewport; the first test also reuses a bounding box captured before the canvas screenshot scrolls the page. Take the baseline screenshot before the final bounding-box read, scroll the canvas fully into view, and keep start/end pointer coordinates inside the viewport. Preserve every Havok, movement, pixel, blocked-WASM, retry, teardown, transport-size/hash/acknowledgement and cleanup assertion.
+- `/root/executor_type_review` owns only `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md` after the author releases the source path.
+- `/root` owns shared status, commit/push and exact-head GitHub evidence. Local work is limited to the plan checker and scoped `git diff --check`; app builds/tests/browser automation run on GitHub. Cloudflare remains untouched until the user signals.
+
+- Viewport repair attempt 1 implementation is complete and scoped source whitespace check passed. `/root/toolchain_audit` released its source path; `/root/executor_type_review` now owns only `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md`. Coordinator retains publication and shared-state ownership. No local app tests/builds were run.
+
+- The viewport repair has independent SOURCE PASS at `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md`; source ownership is released. `/root` now owns the exact reviewed commit, push, and full GitHub rerun. Runtime is NOT VERIFIED until that run and its independent evidence review complete.
