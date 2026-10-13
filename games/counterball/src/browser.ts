@@ -14,6 +14,7 @@ export type {
   CounterballConfig,
   TeamId,
 } from "@korre/game-protocol";
+export { COUNTERBALL_CONFIG_V1 } from "@korre/game-protocol";
 export {
   runBrowserDirectProbe,
   type BrowserDirectProbeContact,
@@ -25,5 +26,12 @@ export type {
   CapAssembly,
   PieceAssembly,
 } from "./scene/pieces.js";
+export { runLoftCoarseMatrix } from "./simulation/loftCoarseRunner.js";
+export type {
+  LoftCoarseProgress,
+  LoftCoarseRunOptions,
+  LoftCoarseRunSummary,
+} from "./simulation/loftCoarseRunner.js";
+export type { LoftCoarseByteSink } from "./simulation/loftCoarseProbe.js";
 
 export const scaffoldPackage = "@korre/counterball/browser";

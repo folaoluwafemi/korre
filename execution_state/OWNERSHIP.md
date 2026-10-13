@@ -368,3 +368,15 @@ No local application build/test/browser/physics ran for this contract correction
 - GitHub run 38405747942 on `b7a97ce15039ac7885439c18a67bcfe3732f8dd1` passed typecheck and ESLint, then failed Prettier on `games/counterball/src/simulation/loftCoarseRunner.ts`. Unit/build/integration/browser work was skipped. Full logs, exact snapshot, downloaded artifacts and file hashes are saved under `execution_state/reports/T02-L01-EXECUTOR-1-run-38405747942*`.
 - The run's exact formatting-repair artifact was applied to the runner only and independently reviewed PASS by `/root/run_evidence_review` at `execution_state/reports/T02-L01-EXECUTOR-1-review-9.md`. `/root` owns publication, shared status, and exact-SHA GitHub verification; a rotated reviewer will inspect the next run's evidence.
 - The card is not accepted. No real matrix, deployed Havok or playable match is proved. No Cloudflare/Wrangler access is needed or used at this stage.
+
+## Current ownership — 2026-10-13 (executor source accepted; browser-action packet next)
+
+- Exact commit `aa001fd4297e06a828444394a56685519dc61edf` passed run 38408175100: 179/179 unit tests, 1/1 integration, 4/4 Chromium preview, 2/2 diagnostic browser tests, typecheck, lint, build and the workflow checks. The diagnostic suite demonstrates a real browser Havok flick, but not the L01 matrix or a playable match.
+- `/root/executor_type_review` independently reviewed the exact run snapshot, logs, test summaries, browser classifications and all 1,152 artifact hashes. `/root` accepted only the executor source packet and owns shared status and the next packet dispatch.
+- The next candidate is `T02-L01-BROWSER-1`; its original dependency list remains intact. T02 remains RUNNING. No Cloudflare access/deploy occurred; the 24-case matrix, playable match and deployed Havok remain open.
+
+## Current ownership — 2026-10-13 (T02-L01-BROWSER-1 source review passed; hosted checks next)
+
+- The implementation source paths are released. The exact scoped diff check passed and independent review returned PASS at execution_state/reports/T02-L01-BROWSER-1-review.md.
+- No worker owns this packet now. /root owns shared task state, ledger, publication, and exact-SHA GitHub checks. Hosted production output and runtime transport checks remain pending.
+- Cloudflare access is not part of this packet; the user asked to be notified before that gate.

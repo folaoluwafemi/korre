@@ -1,0 +1,28 @@
+# T02-L01-BROWSER-1 independent source review
+
+## Verdict
+
+- **SOURCE: PASS** for the assigned browser transport and page integration.
+- **RUNTIME: NOT RUN.** No application command, browser automation, OPFS exercise, build, production bundle check, or Havok run was performed for this review. This is not acceptance of T02-L01 or proof of a playable game.
+
+## Evidence reviewed
+
+I extracted `T02-L01-BROWSER-1` from `LOCAL_PACKETS.json` with the completion-plan checker. Its two source write paths match the reviewed files: `games/counterball/src/browser.ts` and `apps/web/src/CounterballDirectProbe.tsx`. I read the accepted browser-to-host transport clauses in `CONTRACT_WORK.md`, the specified page/runner/probe sources, and `execution_state/reports/T02-L01-BROWSER-1-implementation.md`.
+
+The browser entry exports the accepted `runLoftCoarseMatrix` function, option/progress/summary types, byte-sink type, and canonical config (`games/counterball/src/browser.ts:18-38`). The page creates its Babylon `Engine` and scene in its existing effect (`apps/web/src/CounterballDirectProbe.tsx:1055-1075`), captures that same engine for the matrix call, and passes it to the accepted runner with the abort signal, sink, and compact progress callback (`:701-749`). The runner rejects a non-Babylon `Engine` (`games/counterball/src/simulation/loftCoarseRunner.ts:2286-2312`). Its summary contains aggregate counts and identities, not case rows (`:110-119`); the underlying matrix writer uses a fixed 256-KiB buffer and awaits each sink flush (`games/counterball/src/simulation/loftCoarseProbe.ts:1539-1602`). The page stores and renders only compact progress and export metadata, not matrix rows (`CounterballDirectProbe.tsx:735-753, 1262-1281`).
+
+The page reads the maximum file size from the hashed config, and `openOpfsExport` rejects unsafe, non-positive, or over-cap lengths (`CounterballDirectProbe.tsx:151-156, 234-246`). Preflight uses `StorageManager.estimate()` and adds 16 MiB headroom, while correctly treating the estimate as approximate; actual writes and close are awaited. Each OPFS write is nonempty, at most 256 KiB, and cannot exceed the expected total (`:326-344`). Finalization requires an exact byte count, awaits `close()`, obtains the browser-managed `File`, and verifies its exact size before offering a download (`:346-363`). No full matrix string, concatenated `Blob`, full-file `ArrayBuffer`, data URL, or page-evaluation payload is created in this path.
+
+The synthetic transport is exactly 504,365,056 bytes, matching the config cap in `packages/game-protocol/src/config.ts:170`. It checks this size against the canonical cap, writes exactly 1,924 awaited 256-KiB chunks, and checks the chunk count (`CounterballDirectProbe.tsx:153-154, 366-391`). It goes through the same OPFS open, finalization, object-URL download, acknowledgement, timeout, and cleanup path as a matrix export (`:714-784`).
+
+The development panel and host-ack hook require `import.meta.env.DEV` (`CounterballDirectProbe.tsx:608-646, 1173-1184`). The route’s import-time gate in `apps/web/src/App.tsx:3-10` additionally requires `VITE_COUNTERBALL_DEV_HARNESS === "1"`, and the route is rendered only at `/diagnostic/direct-shot` when that import exists (`App.tsx:59-72`). This is a compile-time environment gate, not proof of a production artifact: the exact-head hosted production output check remains required to establish that the flag is absent and the diagnostic code is excluded.
+
+The acknowledgement accepts only the exact four-field shape, current run ID and filename, exact safe byte length, lowercase 64-character SHA-256 syntax, a closed writer, complete writes, and a started download (`CounterballDirectProbe.tsx:98-127, 608-642`). The page validates the digest’s format but does not compute or compare the downloaded file’s digest; the accepted contract assigns saving, streaming validation, and SHA-256 calculation to the Playwright host. The implementation report states this boundary correctly. The host-side implementation and actual acknowledgement were not part of this review.
+
+Cleanup is shared through a per-session promise. It removes the abort listener, attempts writer abort once, clears the expiry timer, revokes the object URL, and removes the OPFS entry; cleanup failures are surfaced and allow a later cleanup attempt (`CounterballDirectProbe.tsx:177-232`). Setup errors, failed writes/finalization, cancellation, explicit discard, acknowledgement expiry, and unmount all route to this cleanup. Unmount aborts an active matrix run and waits for its promise to settle before disposing the page-owned scene and engine (`:649-685`). Setup checks cancellation after each asynchronous acquisition and cleans a partially created entry (`:262-323`). The runner and page can both request cleanup safely because they share the session cleanup promise. An acknowledgement/expiry overlap may race the displayed phase, but both paths use the same cleanup and I found no path that treats an incomplete export as a successful download.
+
+The direct-shot calculation and retry handler remain unchanged in the reviewed diff. The only shot-path coordination added is to suppress a pointer shot while the matrix is using the same engine (`:871-880, 985-994`).
+
+## Limits
+
+The implementation report records a scoped `git diff --check` pass. I did not rerun it and did not run any application checks. Exact-head hosted typecheck/build, browser transport, and production-exclusion checks remain pending. The packet extraction reports `ready:false` with T01 as a required parent acceptance; this review does not change that dependency or status. No evidence here proves deployed Havok, a real matrix run, a flick, or playability.
