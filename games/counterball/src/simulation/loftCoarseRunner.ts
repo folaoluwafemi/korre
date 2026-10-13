@@ -304,7 +304,10 @@ function maskIsValid(value: number): boolean {
   );
 }
 
-function materialName(value: number): string {
+function materialName(value: PhysicsMaterialCombineMode | undefined): string {
+  if (value === undefined) {
+    throw resourceFailure("A native material combine mode is missing.");
+  }
   switch (value) {
     case PhysicsMaterialCombineMode.MINIMUM:
       return "MINIMUM";
@@ -322,12 +325,26 @@ function materialName(value: number): string {
 }
 
 function materialValues(material: PhysicsMaterial): DiagnosticMaterialValues {
+  const friction = material.friction;
+  const staticFriction = material.staticFriction;
+  const restitution = material.restitution;
+  const frictionCombine = material.frictionCombine;
+  const restitutionCombine = material.restitutionCombine;
+  if (
+    typeof friction !== "number" ||
+    typeof staticFriction !== "number" ||
+    typeof restitution !== "number" ||
+    frictionCombine === undefined ||
+    restitutionCombine === undefined
+  ) {
+    throw resourceFailure("A native material coefficient or combine mode is missing.");
+  }
   const nativeValues = {
-    friction: material.friction,
-    staticFriction: material.staticFriction,
-    restitution: material.restitution,
-    frictionCombine: materialName(material.frictionCombine),
-    restitutionCombine: materialName(material.restitutionCombine),
+    friction,
+    staticFriction,
+    restitution,
+    frictionCombine: materialName(frictionCombine),
+    restitutionCombine: materialName(restitutionCombine),
   };
   if (
     !Number.isFinite(nativeValues.friction) ||
@@ -739,6 +756,15 @@ function eventPoint(point: IPhysicsCollisionEvent["point"]): Vec3 | null {
   return { x: point.x, y: point.y, z: point.z };
 }
 
+function isButtonObstaclePair(
+  pair: LoftCoarseCase["contactRows"][number]["pair"],
+): boolean {
+  return (
+    (pair[0] === "button" && pair[1] === "home-1") ||
+    (pair[0] === "home-1" && pair[1] === "button")
+  );
+}
+
 function makeMatrixMetadata(
   configHash: string,
   fixtureFileSha256: string,
@@ -962,6 +988,7 @@ async function runCase(
   completedCases: number,
 ): Promise<LoftCoarseCase> {
   const caseStartedAt = nowMs();
+  const caseBeginCalls = counts.calls;
   let world: CounterballWorld | undefined;
   let replacementShape: PhysicsShapeBox | undefined;
   let replacementAttached = false;
@@ -975,25 +1002,26 @@ async function runCase(
     ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
     const caseState = regeneratedState(fixture, tuple);
     const initialStateHash = await makeCaseInitialBodyState(caseState);
-    world = createCounterballWorld({
+    const activeWorld = createCounterballWorld({
       engine,
       havok,
       state: caseState,
       gravity: new Vector3(config.simulation.gravity.x, config.simulation.gravity.y, config.simulation.gravity.z),
     });
-    if (world.plugin.isSupported() !== true) throw failure("Pinned browser Havok plugin is not supported.");
-    const physicsEngine = world.scene.getPhysicsEngine();
+    world = activeWorld;
+    if (activeWorld.plugin.isSupported() !== true) throw failure("Pinned browser Havok plugin is not supported.");
+    const physicsEngine = activeWorld.scene.getPhysicsEngine();
     if (!(physicsEngine instanceof PhysicsEngineV2)) throw failure("The trial did not create PhysicsEngineV2.");
     const physicsBodies = physicsEngine.getBodies();
     if (
-      world.staticBodies.length !== 7 ||
-      world.bodies.size !== 15 ||
+      activeWorld.staticBodies.length !== 7 ||
+      activeWorld.bodies.size !== 15 ||
       physicsBodies.length !== 22 ||
-      [...world.bodies.values(), ...world.staticBodies].some((body) => !physicsBodies.includes(body))
+      [...activeWorld.bodies.values(), ...activeWorld.staticBodies].some((body) => !physicsBodies.includes(body))
     ) {
       throw resourceFailure("The trial does not have exactly the canonical 15 dynamic and 7 static bodies.");
     }
-    surfaceBody = world.staticBodies.find((body) => body.transformNode.name === "counterball-surface");
+    surfaceBody = activeWorld.staticBodies.find((body) => body.transformNode.name === "counterball-surface");
     if (surfaceBody === undefined) throw resourceFailure("Canonical support surface is missing.");
     originalSurfaceShape = surfaceBody.shape ?? undefined;
     const originalShape = originalSurfaceShape;
@@ -1035,7 +1063,7 @@ async function runCase(
     }
     // The detached original is restored only during disposal. Set the accepted
     // diagnostic material before cloning it so the replacement preserves it.
-    resourceGuard(() => setAndReadMaterial(world, originalShape));
+    resourceGuard(() => setAndReadMaterial(activeWorld, originalShape));
     const dimensionsX = config.geometry.pitchWidth + 2 * guard.setup.supportApronMargin;
     const dimensionsZ = config.geometry.pitchLength + 2 * guard.setup.supportApronMargin;
     if (dimensionsX !== 662 || dimensionsZ !== 670 || config.geometry.surfaceThickness !== 0.2) {
@@ -1045,7 +1073,7 @@ async function runCase(
       Vector3.Zero(),
       Quaternion.Identity(),
       new Vector3(dimensionsX, config.geometry.surfaceThickness, dimensionsZ),
-      world.scene,
+      activeWorld.scene,
     );
     replacementShape.filterMembershipMask = originalMembership;
     replacementShape.filterCollideMask = originalCollide;
@@ -1055,7 +1083,7 @@ async function runCase(
     surfaceBody.shape = replacementShape;
     if (surfaceBody.shape !== replacementShape) throw resourceFailure("Diagnostic apron attachment was not confirmed.");
 
-    const bodyFacts = resourceGuard(() => readNativeBodies(world));
+    const bodyFacts = resourceGuard(() => readNativeBodies(activeWorld));
     const samples = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
     if (!allZero(samples)) throw resourceFailure("Initial dynamic velocities are not exactly zero.");
     const expectedStates = new Map(caseState.bodies.map((body) => [body.id, body]));
@@ -1200,7 +1228,6 @@ async function runCase(
     let totalBatches = 0;
     let callsInBatch = 0;
     let finalSamples = afterImpulse;
-    const caseBeginCalls = counts.calls;
     const maxTicks = guard.workload.maximumNominalTicksPerCase;
     const minLinear = config.simulation.linearSettleThreshold;
     const minAngular = config.simulation.angularSettleThreshold;
@@ -1276,7 +1303,7 @@ async function runCase(
             candidateSample = sample;
             if (sweptDrop > maximumDrop.value) maximumDrop = { value: sweptDrop, callIndex: substep, bodyId: metric.id };
           }
-          if (margins.apron < minimumApron.value) minimumApron = { value: margins.apron, callIndex: substep, bodyId: metric.id };
+          if (margins.apronClearance < minimumApron.value) minimumApron = { value: margins.apronClearance, callIndex: substep, bodyId: metric.id };
           if (margins.surfaceClearance < minimumSlab.value) minimumSlab = { value: margins.surfaceClearance, callIndex: substep, bodyId: metric.id };
           const bodyPointSweep = bound.pointSpeedBound * plan.substepSeconds;
           const bodyRotationSweep = bound.angularSpeedBound * plan.substepSeconds;
@@ -1307,7 +1334,7 @@ async function runCase(
           }
         }
         currentCallIndex = totalCalls;
-        world.plugin.executeStep(plan.substepSeconds, physicsBodies);
+        activeWorld.plugin.executeStep(plan.substepSeconds, physicsBodies);
         totalCalls += 1;
         counts.calls += 1;
         checkedCalls += 1;
@@ -1384,7 +1411,7 @@ async function runCase(
         throw resourceFailure("A nominal interval is missing required extrema.");
       }
       if (minimumClearance.value === Infinity) minimumClearance = { value: 0, callIndex: 0, obstaclePair: ["button", "home-1"] };
-      const tickContacts = contactRows.some((row) => (row as { nominalTick: number }).nominalTick === tick - 1 && JSON.stringify((row as { pair: string[] }).pair) === '["button","home-1"]');
+      const tickContacts = contactRows.some((row) => row.nominalTick === tick - 1 && isButtonObstaclePair(row.pair));
       const classification = !sawHorizontalOverlap ? "no-horizontal-overlap" : tickContacts ? "contact" : minimumClearance.value > guard.sweep.verticalClearanceMargin ? "clear-above-margin" : "clearance-at-or-below-margin";
       sweepRows.push({
         tuple,
@@ -1440,7 +1467,7 @@ async function runCase(
       buttonFinal.state.position.z - buttonMetric.farthestOriginRadius > obstacleFinal.state.position.z + obstacleMetric.farthestOriginRadius;
     const overlapSeen = sweepRows.some((row) => (row as { intervalClassification: string }).intervalClassification !== "no-horizontal-overlap");
     const clearancePass = sweepRows.filter((row) => (row as { intervalClassification: string }).intervalClassification !== "no-horizontal-overlap").every((row) => (row as { minimumWholeButtonObstacleClearance: { value: number } }).minimumWholeButtonObstacleClearance.value > guard.sweep.verticalClearanceMargin);
-    const contactWithObstacle = contactRows.some((row) => JSON.stringify((row as { pair: string[] }).pair) === '["button","home-1"]');
+    const contactWithObstacle = contactRows.some((row) => isButtonObstaclePair(row.pair));
     const reasons: string[] = [];
     if (!startsBefore) reasons.push("button-does-not-start-fully-before-obstacle");
     if (!finishesBeyond) reasons.push("button-does-not-finish-fully-beyond-obstacle");

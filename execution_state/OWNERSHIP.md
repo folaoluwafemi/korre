@@ -322,3 +322,24 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root` owns exact-head commit/push, GitHub `pnpm verify`, evidence capture, and the next shared status update. `/root/foundation_review` has released its review report.
 - `T02-L01-EXECUTOR-1` remains VERIFIED, not ACCEPTED, until the exact reviewed SHA passes hosted checks. The full Chromium/Havok matrix remains a later gate.
 - No Cloudflare access or local app build/test is needed at this point. Notify the user before T04 staging Havok and wait for their signal before using Wrangler.
+
+## Current ownership — 2026-10-13 (hosted typecheck failed; source review pending)
+
+- Exact GitHub run `38400680491` on `71ccff8f9aa98428064d9cb6c2519fc894105f21` failed Counterball TypeScript with 18 diagnostics before lint, the full test suite, build, integration, or browser steps. Independent run review is at `execution_state/reports/T02-L01-EXECUTOR-1-run-38400680491-independent-review.md`; full logs and downloaded artifacts are under `execution_state/reports/T02-L01-EXECUTOR-1-run-38400680491/`.
+- `T02-L01-EXECUTOR-1` remains unaccepted. The focused source repair is complete at `execution_state/reports/T02-L01-EXECUTOR-1-implementation-5.md`; only its exact scoped diff check ran locally. A fresh independent source review is underway in `execution_state/reports/T02-L01-EXECUTOR-1-review-6.md`.
+- `/root` owns task status, ledger, ownership, commit/push and hosted verification. If the review passes, the exact reviewed source will be sent to GitHub; no local application checks are allowed.
+- The run produced no browser suite, 24-case matrix, deployed Havok, or playability result. Cloudflare access remains unnecessary until the T04 staging gate; notify the user before that gate and wait for their signal before using Wrangler.
+
+## Current ownership — 2026-10-13 (package-owned Vite declarations; source review pending)
+
+- Independent review 6 returned CHANGES_REQUIRED because the runner referenced `apps/web/node_modules/vite/client.d.ts`, tying the game package to its consumer app's installed layout.
+- `/root` revised the `T02-L01-EXECUTOR-1` packet in `knowledge_base/execution/completion/LOCAL_PACKETS.json` and `execution_state/tasks.json` to add exactly `games/counterball/src/viteAssetModules.d.ts`. The coordinator owns both scoped source paths and the shared packet/status files for this repair.
+- The coordinator repair is complete. It replaces the app-path reference with narrow package-owned declarations for the two existing `?url` / `?raw` imports, without changing imported bytes or hashes. The exact staged diff and packet consistency checks passed; no application command ran locally.
+- `/root/run_evidence_review` is the rotated independent source reviewer and may write only `execution_state/reports/T02-L01-EXECUTOR-1-review-7.md`. After PASS, `/root` will commit/push and run exact-SHA `pnpm verify` on GitHub.
+- The executor remains unaccepted. The full browser matrix and deployed Havok gates are still open; Cloudflare remains untouched until the user signals for T04.
+
+## Current ownership — 2026-10-13 (source review reconciled; hosted verify next)
+
+- `/root/run_evidence_review` completed source review 7 and two narrow follow-ups. Source disposition remains PASS. The timing note in review 7 was a report-text error: the accepted interval definitions in `knowledge_base/execution/completion/CONTRACT_WORK.md:180` are explicit and match the runner. The reconciliation is at `execution_state/reports/T02-L01-EXECUTOR-1-review-7-reconciliation.md`.
+- T01 is ACCEPTED, so the packet's original parent gate is satisfied. `/root` owns the shared status update, exact commit/push and hosted verification; the executor is VERIFIED for source only, not ACCEPTED.
+- Next: publish the reviewed runner and package-owned declarations with reports/status, then run `pnpm verify` on the exact GitHub SHA. No local app checks, real 24-case matrix, deployed Havok, or playable match are established. Cloudflare stays untouched until the user signals for T04.

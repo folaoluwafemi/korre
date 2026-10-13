@@ -1,0 +1,74 @@
+verify	Verify	﻿2026-10-13T12:54:45.0075800Z ##[group]Run mkdir -p .artifacts
+verify	Verify	2026-10-13T12:54:45.0076256Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Verify	2026-10-13T12:54:45.0076597Z ^[[36;1mset -o pipefail^[[0m
+verify	Verify	2026-10-13T12:54:45.0076973Z ^[[36;1mpnpm verify 2>&1 | tee .artifacts/verify.log^[[0m
+verify	Verify	2026-10-13T12:54:45.0143172Z shell: /usr/bin/bash -e {0}
+verify	Verify	2026-10-13T12:54:45.0143559Z env:
+verify	Verify	2026-10-13T12:54:45.0144418Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Verify	2026-10-13T12:54:45.0144933Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Verify	2026-10-13T12:54:45.0145401Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Verify	2026-10-13T12:54:45.0146170Z   IDENTITY_SERVICE_SECRET: ***
+verify	Verify	2026-10-13T12:54:45.0146798Z   IDENTITY_CSRF_SECRET: ***
+verify	Verify	2026-10-13T12:54:45.0147420Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Verify	2026-10-13T12:54:45.0148061Z   COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
+verify	Verify	2026-10-13T12:54:45.0149018Z   COUNTERBALL_INTENDED_SHOT_OUTPUT: .artifacts/counterball-intended-shot-observations.json
+verify	Verify	2026-10-13T12:54:45.0149718Z ##[endgroup]
+verify	Verify	2026-10-13T12:54:45.3191819Z 
+verify	Verify	2026-10-13T12:54:45.3192767Z > korre@0.1.0 verify /home/runner/work/korre/korre
+verify	Verify	2026-10-13T12:54:45.3194587Z > pnpm typecheck && pnpm lint && pnpm test && pnpm build
+verify	Verify	2026-10-13T12:54:45.3195777Z 
+verify	Verify	2026-10-13T12:54:45.6243234Z 
+verify	Verify	2026-10-13T12:54:45.6245533Z > korre@0.1.0 typecheck /home/runner/work/korre/korre
+verify	Verify	2026-10-13T12:54:45.6247489Z > pnpm -r --sort typecheck && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.server.json
+verify	Verify	2026-10-13T12:54:45.6248493Z 
+verify	Verify	2026-10-13T12:54:45.9382336Z Scope: 8 of 9 workspace projects
+verify	Verify	2026-10-13T12:54:45.9441214Z packages/game-protocol typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:45.9448347Z packages/identity-client typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:45.9452880Z packages/ui typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:47.8077123Z packages/identity-client typecheck: Done
+verify	Verify	2026-10-13T12:54:47.8775490Z packages/ui typecheck: Done
+verify	Verify	2026-10-13T12:54:48.5061835Z packages/game-protocol typecheck: Done
+verify	Verify	2026-10-13T12:54:48.5067083Z apps/api typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:48.5070822Z packages/game-sdk typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:50.7049139Z apps/api typecheck: Done
+verify	Verify	2026-10-13T12:54:51.0801087Z packages/game-sdk typecheck: Done
+verify	Verify	2026-10-13T12:54:51.0810162Z games/counterball typecheck$ node --input-type=module -e "for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T12:54:51.4137713Z games/counterball typecheck: > @korre/counterball@ check:headless-bundle /home/runner/work/korre/korre/games/counterball
+verify	Verify	2026-10-13T12:54:51.4168651Z games/counterball typecheck: > node --input-type=module -e "import { build } from 'esbuild'; import { fileURLToPath } from 'node:url'; import { relative, sep } from 'node:path'; const publicUrl = import.meta.resolve('@korre/counterball/headless'); const entry = fileURLToPath(publicUrl); const entryRelative = relative(process.cwd(), entry).split(sep).join('/'); if (!entryRelative.endsWith('/src/headless.ts') && entryRelative !== 'src/headless.ts') throw new Error('Unexpected public headless entry: ' + entryRelative); const result = await build({ entryPoints: [entry], absWorkingDir: process.cwd(), bundle: true, write: false, platform: 'browser', conditions: ['workerd', 'worker'], format: 'esm', target: 'es2022', metafile: true, treeShaking: false, minifyWhitespace: true }); const normalize = (value) => value.split(String.fromCharCode(92)).join('/'); const inputPaths = Object.keys(result.metafile.inputs).map(normalize); if (!inputPaths.some((value) => value === entryRelative || value.endsWith('/' + entryRelative))) throw new Error('Public headless entry is absent from the resolved bundle graph.'); const forbiddenPaths = inputPaths.filter((value) => (value === 'src/browser.ts' || value.endsWith('/src/browser.ts')) || value.includes('/apps/web/') || value.includes('/node_modules/react/') || value.includes('/node_modules/react-dom/') || value.includes('/@babylonjs/core/Engines/engine.js') || value.includes('/@babylonjs/core/Engines/webgpuEngine.js')); if (forbiddenPaths.length) throw new Error('Headless bundle reaches browser-only modules: ' + forbiddenPaths.join(', ')); const output = result.outputFiles.map((file) => file.text).join(' '); const isIdent = (value) => value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9') || value === '_' || value === '$'); const hasGlobal = (name) => { for (let at = output.indexOf(name); at !== -1; at = output.indexOf(name, at + 1)) if (!isIdent(output[at - 1]) && !isIdent(output[at + name.length])) return true; return false; }; const forbiddenGlobals = ['React', 'ReactDOM', 'window', 'document', 'HTMLElement', 'HTMLCanvasElement', 'DOMParser', 'localStorage', 'sessionStorage'].filter(hasGlobal); if (forbiddenGlobals.length) throw new Error('Headless bundle references browser globals: ' + forbiddenGlobals.join(', ')); const entryOutputs = Object.values(result.metafile.outputs).filter((item) => item.entryPoint && (normalize(item.entryPoint) === entryRelative || normalize(item.entryPoint).endsWith('/' + entryRelative))); if (entryOutputs.length !== 1 || result.outputFiles.length !== 1 || result.outputFiles[0].contents.length === 0) throw new Error('Expected one nonempty bundle emitted from the public headless entry.'); console.log('Public Counterball headless Worker-target bundle boundary passed.');"
+verify	Verify	2026-10-13T12:54:51.4666940Z games/counterball typecheck: Public Counterball headless Worker-target bundle boundary passed.
+verify	Verify	2026-10-13T12:54:55.4996362Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(26,26): error TS2307: Cannot find module '@babylonjs/havok/lib/esm/HavokPhysics.wasm?url' or its corresponding type declarations.
+verify	Verify	2026-10-13T12:54:55.5009789Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(28,24): error TS2307: Cannot find module '../../../../tests/fixtures/counterball-v1.json?raw' or its corresponding type declarations.
+verify	Verify	2026-10-13T12:54:55.5016687Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(329,35): error TS2345: Argument of type 'import("/home/runner/work/korre/korre/node_modules/.pnpm/@babylonjs+core@9.30.0/node_modules/@babylonjs/core/Physics/v2/physicsMaterial").PhysicsMaterialCombineMode | undefined' is not assignable to parameter of type 'number'.
+verify	Verify	2026-10-13T12:54:55.5020275Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5025337Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(330,38): error TS2345: Argument of type 'import("/home/runner/work/korre/korre/node_modules/.pnpm/@babylonjs+core@9.30.0/node_modules/@babylonjs/core/Physics/v2/physicsMaterial").PhysicsMaterialCombineMode | undefined' is not assignable to parameter of type 'number'.
+verify	Verify	2026-10-13T12:54:55.5029054Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5031075Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(336,5): error TS18048: 'nativeValues.friction' is possibly 'undefined'.
+verify	Verify	2026-10-13T12:54:55.5034519Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(337,5): error TS18048: 'nativeValues.staticFriction' is possibly 'undefined'.
+verify	Verify	2026-10-13T12:54:55.5037582Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(338,5): error TS18048: 'nativeValues.restitution' is possibly 'undefined'.
+verify	Verify	2026-10-13T12:54:55.5040579Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(339,5): error TS18048: 'nativeValues.restitution' is possibly 'undefined'.
+verify	Verify	2026-10-13T12:54:55.5043728Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(346,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5046550Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5048549Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(347,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5050745Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5052670Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(348,5): error TS2322: Type 'number | undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5055122Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'number'.
+verify	Verify	2026-10-13T12:54:55.5057740Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1038,44): error TS2345: Argument of type 'CounterballWorld | undefined' is not assignable to parameter of type 'CounterballWorld'.
+verify	Verify	2026-10-13T12:54:55.5060313Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'CounterballWorld'.
+verify	Verify	2026-10-13T12:54:55.5063084Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1058,60): error TS2345: Argument of type 'CounterballWorld | undefined' is not assignable to parameter of type 'CounterballWorld'.
+verify	Verify	2026-10-13T12:54:55.5066304Z games/counterball typecheck:   Type 'undefined' is not assignable to type 'CounterballWorld'.
+verify	Verify	2026-10-13T12:54:55.5069326Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1279,23): error TS2339: Property 'apron' does not exist on type '{ apronClearance: number; surfaceClearance: number; restDropClearance: number; }'.
+verify	Verify	2026-10-13T12:54:55.5073789Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1279,83): error TS2339: Property 'apron' does not exist on type '{ apronClearance: number; surfaceClearance: number; restDropClearance: number; }'.
+verify	Verify	2026-10-13T12:54:55.5079690Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1387,131): error TS2352: Conversion of type 'LoftCoarseContactRow' to type '{ pair: string[]; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+verify	Verify	2026-10-13T12:54:55.5082839Z games/counterball typecheck:   Types of property 'pair' are incompatible.
+verify	Verify	2026-10-13T12:54:55.5084952Z games/counterball typecheck:     The type 'readonly [first: LoftCoarseContactBodyId, second: LoftCoarseContactBodyId]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+verify	Verify	2026-10-13T12:54:55.5089613Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1443,75): error TS2352: Conversion of type 'LoftCoarseContactRow' to type '{ pair: string[]; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+verify	Verify	2026-10-13T12:54:55.5092683Z games/counterball typecheck:   Types of property 'pair' are incompatible.
+verify	Verify	2026-10-13T12:54:55.5094734Z games/counterball typecheck:     The type 'readonly [first: LoftCoarseContactBodyId, second: LoftCoarseContactBodyId]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+verify	Verify	2026-10-13T12:54:55.5097066Z ##[error]games/counterball typecheck: src/simulation/loftCoarseRunner.ts(1513,22): error TS2304: Cannot find name 'caseBeginCalls'.
+verify	Verify	2026-10-13T12:54:55.5463584Z games/counterball typecheck: Failed
+verify	Verify	2026-10-13T12:54:55.5588489Z /home/runner/work/korre/korre/games/counterball:
+verify	Verify	2026-10-13T12:54:55.5593429Z  ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @korre/counterball@ typecheck: `node --input-type=module -e "for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json`
+verify	Verify	2026-10-13T12:54:55.5596901Z Exit status 2
+verify	Verify	2026-10-13T12:54:55.6136430Z  ELIFECYCLE  Command failed with exit code 2.
+verify	Verify	2026-10-13T12:54:55.6481832Z  ELIFECYCLE  Command failed with exit code 2.
+verify	Verify	2026-10-13T12:54:55.6706792Z ##[error]Process completed with exit code 2.
