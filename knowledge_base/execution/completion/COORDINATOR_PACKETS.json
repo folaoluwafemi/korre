@@ -1560,5 +1560,86 @@
     "stop_conditions": [
       "If the reviewed contract card is not ACCEPTED or any original prerequisite is missing, leave dependent work gated and report the mismatch."
     ]
+  },
+  {
+    "id": "T02-L01-BROWSER-1-TSC-DIAG-1",
+    "parent": "T02",
+    "title": "Capture remote TypeScript asset declaration resolution evidence",
+    "role": "coordinator",
+    "depends_on": [],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-TSC-DIAG-1",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-BROWSER-1-run-38415702575.md",
+      "execution_state/reports/T02-L01-BROWSER-1-run-38417855065.md",
+      "execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md",
+      "execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md",
+      "games/counterball/tsconfig.json",
+      "games/counterball/src/viteAssetModules.d.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "package.json",
+      ".github/workflows/ci.yml",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/OPERATIONS.md"
+    ],
+    "write_paths": [
+      ".github/workflows/ci.yml"
+    ],
+    "outputs": [
+      "A failure-only GitHub step runs the same Counterball TypeScript project with --listFiles and --traceResolution after pnpm verify fails.",
+      "The trace, focused resolution summary, and exact diagnostic tsc exit code are retained by the existing hosted-check log artifact upload.",
+      "A coordinator report states whether viteAssetModules.d.ts entered the TypeScript program and records the two asset-query resolution traces."
+    ],
+    "steps": [
+      "Add one `if: failure()` workflow step immediately after Verify. Run `pnpm exec tsc --noEmit -p games/counterball/tsconfig.json --listFiles --traceResolution`, save complete stdout/stderr to `.artifacts/counterball-tsc-resolution.log`, capture its exit code in a separate `.artifacts/*.log`, and write a focused grep summary for viteAssetModules.d.ts, HavokPhysics.wasm?url, counterball-v1.json?raw, and TS2307.",
+      "Ensure the diagnostic step returns success after recording the expected failing compiler status, without changing Verify, later gates, artifact-upload conditions, or test assertions.",
+      "Run only `git diff --check -- .github/workflows/ci.yml` locally. Do not run application typecheck/build/tests/browser locally.",
+      "After independent review, commit/push and inspect the exact-SHA GitHub run. Download and hash all actual trace/log artifacts, then provide a finite cause hypothesis and smallest follow-up packet; do not edit application source in this diagnosis card."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TSC-DIAG-1",
+        "environment": "local-document",
+        "expected": "This coordinator diagnosis packet remains under T02, depends only on accepted T01, and preserves Browser1 gates."
+      },
+      {
+        "command": "git diff --check -- .github/workflows/ci.yml",
+        "environment": "local-document",
+        "expected": "Only the exact coordinator-owned workflow file passes whitespace validation; no local app command."
+      },
+      {
+        "command": "GitHub Actions pnpm verify plus failure-only TypeScript list/trace on exact reviewed SHA",
+        "environment": "github",
+        "expected": "When Verify fails, the diagnostic step succeeds, records the compiler exit code, and uploads trace evidence that conclusively shows declaration-file inclusion and both asset-query resolutions."
+      },
+      {
+        "command": "Independent workflow and exact-run evidence review",
+        "environment": "source-review",
+        "expected": "PASS confirms Verify was not weakened, the failure-only trace ran after the real typecheck failure, and uploaded evidence matches exact source SHA/run."
+      }
+    ],
+    "acceptance": [
+      "A real remote TypeScript trace proves whether the package declaration file is included in the compiler program and records resolution attempts for both TS2307 imports.",
+      "The diagnostic command does not turn the existing verification failure into a pass or skip; it adds no runtime dependency and preserves all existing checks.",
+      "Exact run logs, trace, exit status, job snapshot, and file hashes are saved and independently reviewed.",
+      "The resulting diagnosis is finite and supports a separately reviewed bounded successor or packet split; no third repair is made under Browser1."
+    ],
+    "negative_cases": [
+      "No local app typecheck/build/test/browser run; no TS suppression, declaration relaxation, workflow weakening, application-source repair, Browser1 acceptance, physics claim, or Cloudflare use."
+    ],
+    "review_questions": [
+      "Does the trace step run only after an actual failed Verify and does its status file capture the compiler's nonzero result?",
+      "Does the existing hosted-check upload include the full trace and focused summary logs?",
+      "Does the trace identify declaration-file inclusion and both queried imports without changing product code?"
+    ],
+    "stop_conditions": [
+      "If the diagnostic step does not run or the trace is absent/truncated, stop before further source work and prepare a narrower reviewed diagnostic packet.",
+      "Do not use this diagnosis card to perform repair attempt 3; after its evidence, the coordinator must split/review a successor or escalate under the bounded procedure."
+    ],
+    "required_parent_acceptance": [
+      "T01"
+    ]
   }
 ]

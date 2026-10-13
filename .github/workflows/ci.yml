@@ -87,6 +87,7 @@ jobs:
           set -o pipefail
           pnpm exec vitest run packages/game-protocol/src/protocol.test.ts 2>&1 | tee .artifacts/protocol.log
       - name: Verify
+        id: verify
         env:
           COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
           COUNTERBALL_INTENDED_SHOT_OUTPUT: .artifacts/counterball-intended-shot-observations.json
@@ -94,6 +95,22 @@ jobs:
           mkdir -p .artifacts
           set -o pipefail
           pnpm verify 2>&1 | tee .artifacts/verify.log
+      - name: Diagnose Counterball TypeScript asset resolution after failed verification
+        if: failure() && steps.verify.outcome == 'failure'
+        shell: bash
+        run: |
+          mkdir -p .artifacts
+          set +e
+          pnpm exec tsc --noEmit -p games/counterball/tsconfig.json --listFiles --traceResolution \
+            > .artifacts/counterball-tsc-resolution.log 2>&1
+          tsc_status=$?
+          set -e
+          printf 'tsc_exit_code=%s\n' "$tsc_status" > .artifacts/counterball-tsc-status.log
+          {
+            printf 'tsc_exit_code=%s\n' "$tsc_status"
+            grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \
+              .artifacts/counterball-tsc-resolution.log || true
+          } > .artifacts/counterball-tsc-summary.log
       - name: Check production build excludes the diagnostic renderer
         run: node tests/production/counterball-dev-match-absent.mjs
       - name: Package the exact dry-run Worker build

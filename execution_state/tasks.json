@@ -5708,11 +5708,11 @@
         },
         {
           "id": "T02-L01-BROWSER-1",
-          "status": "RUNNING",
+          "status": "CHANGES_REQUIRED",
           "ready": false,
           "role": "worker",
           "title": "Add the development-only L01 page action and file-backed download",
-          "owner": "/root — publication and exact-head GitHub verification",
+          "owner": "/root — bounded escalation/diagnosis",
           "author_identity": "/root/toolchain_audit",
           "reviewer_identity": "/root/run_evidence_review — repair-2 source review PASS",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
@@ -5860,6 +5860,22 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md",
               "detail": "Only the amended declaration file changed. Both Vite query suffixes use concrete string default exports. Hosted/runtime behavior remains unverified."
+            },
+            {
+              "command": "GitHub Actions run 38417855065: pnpm verify on exact SHA ff0b6dfead1c76f405a2cc3946b148b16e1e392f",
+              "result": "FAIL",
+              "environment": "github",
+              "run_id": 38417855065,
+              "exit_code": 1,
+              "report": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065.md",
+              "detail": "Verify failed with the same two TS2307 query-module errors after repair attempt 2. Captured steps: 23 success, 1 failure, 13 skipped. Downstream production, integration, preview/browser and diagnostic checks were skipped; no test-skip count is claimed."
+            },
+            {
+              "command": "Independent exact-run evidence review for run 38417855065",
+              "result": "PASS",
+              "environment": "run-evidence-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065-independent-review.md",
+              "detail": "Exact SHA/run, two TS2307s, 23/1/13 step counts, and all ten artifact hashes/sizes verified; three T03 PNGs identified as carried evidence."
             }
           ],
           "acceptance": [
@@ -5884,7 +5900,7 @@
           "attempt_count": 2,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-review.md",
-          "next_action": "Repair attempt 2 changed only the amended package asset declaration file and passed independent source review. Publish this exact source and run full GitHub verification; inspect actual production output. Browser packet remains unaccepted until original hosted/runtime gates pass.",
+          "next_action": "Both focused repair attempts failed with the same TS2307 diagnostics. Do not make a third Browser1 repair. Run the materialized remote TypeScript-resolution diagnosis card; use its evidence to prepare a separately reviewed successor.",
           "repair_implementation_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-implementation.md",
           "repair_review_report": "execution_state/reports/T02-L01-BROWSER-1-repair-1-review.md",
           "run_evidence": {
@@ -5909,13 +5925,16 @@
             {
               "attempt": 2,
               "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md",
-              "outcome": "SOURCE_REVIEW_PASS_HOSTED_PENDING",
+              "outcome": "SOURCE_REVIEW_PASS_HOSTED_FAIL",
               "source_changes": "Only games/counterball/src/viteAssetModules.d.ts; exact amended scope.",
               "scope_amendment_proposal": "execution_state/reports/T02-L01-BROWSER-1-scope-amendment-1-proposal.md",
               "scope_amendment_review": "execution_state/reports/T02-L01-BROWSER-1-scope-amendment-1-review.md",
-              "detail": "Independent reviewer passed the two wildcard suffix declarations with string default types; hosted/runtime verification remains pending.",
+              "detail": "Exact-head run 38417855065 failed at Verify with the same two TS2307 Vite query-module errors. Repair attempt limit is reached; no third repair under Browser1.",
               "review_report": "execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md",
-              "source_review": "PASS"
+              "source_review": "PASS",
+              "hosted_verification": "FAIL",
+              "run_id": 38417855065,
+              "commit": "ff0b6dfead1c76f405a2cc3946b148b16e1e392f"
             }
           ],
           "run_evidence_history": [
@@ -5929,6 +5948,17 @@
               "artifact_inventory": "execution_state/reports/T02-L01-BROWSER-1-run-38415702575-artifact-inventory.json",
               "independent_review": "execution_state/reports/T02-L01-BROWSER-1-run-38415702575-independent-review.md",
               "detail": "23 successful, 1 failed and 13 skipped workflow steps. Independent run-evidence review passed and verified all ten downloaded file hashes. Verify stopped at two TS2307 diagnostics; tests/build/integration/browser/production checks did not run."
+            },
+            {
+              "run_id": 38417855065,
+              "commit": "ff0b6dfead1c76f405a2cc3946b148b16e1e392f",
+              "result": "FAIL",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065.md",
+              "log": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065-github.log",
+              "job_snapshot": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065-job-snapshot.json",
+              "artifact_inventory": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065-artifact-inventory.json",
+              "independent_review": "execution_state/reports/T02-L01-BROWSER-1-run-38417855065-independent-review.md",
+              "detail": "23 successful, 1 failed and 13 skipped workflow steps. Verify failed on the same two TS2307 errors; downstream browser/build/integration checks were skipped."
             }
           ],
           "scope_amendments": [
@@ -6172,9 +6202,111 @@
           "implementation_report": "execution_state/reports/T02-L01-MATRIX-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-MATRIX-1-review.md",
           "next_action": "Wait for accepted transport proof; then run full real-Havok matrix."
+        },
+        {
+          "id": "T02-L01-BROWSER-1-TSC-DIAG-1",
+          "status": "RUNNING",
+          "ready": true,
+          "role": "coordinator",
+          "title": "Capture remote TypeScript asset declaration resolution evidence",
+          "owner": "/root — coordinator workflow diagnosis implementation",
+          "author_identity": "/root",
+          "reviewer_identity": "/root/run_evidence_review — assigned independent reviewer",
+          "packet": "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-TSC-DIAG-1",
+          "depends_on": [],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-TSC-DIAG-1",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-BROWSER-1-run-38415702575.md",
+            "execution_state/reports/T02-L01-BROWSER-1-run-38417855065.md",
+            "execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md",
+            "execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md",
+            "games/counterball/tsconfig.json",
+            "games/counterball/src/viteAssetModules.d.ts",
+            "games/counterball/src/simulation/loftCoarseRunner.ts",
+            "package.json",
+            ".github/workflows/ci.yml",
+            "knowledge_base/execution/SWARM.md",
+            "knowledge_base/execution/completion/OPERATIONS.md"
+          ],
+          "write_paths": [
+            ".github/workflows/ci.yml"
+          ],
+          "outputs": [
+            "A failure-only GitHub step runs the same Counterball TypeScript project with --listFiles and --traceResolution after pnpm verify fails.",
+            "The trace, focused resolution summary, and exact diagnostic tsc exit code are retained by the existing hosted-check log artifact upload.",
+            "A coordinator report states whether viteAssetModules.d.ts entered the TypeScript program and records the two asset-query resolution traces."
+          ],
+          "steps": [
+            "Add one `if: failure()` workflow step immediately after Verify. Run `pnpm exec tsc --noEmit -p games/counterball/tsconfig.json --listFiles --traceResolution`, save complete stdout/stderr to `.artifacts/counterball-tsc-resolution.log`, capture its exit code in a separate `.artifacts/*.log`, and write a focused grep summary for viteAssetModules.d.ts, HavokPhysics.wasm?url, counterball-v1.json?raw, and TS2307.",
+            "Ensure the diagnostic step returns success after recording the expected failing compiler status, without changing Verify, later gates, artifact-upload conditions, or test assertions.",
+            "Run only `git diff --check -- .github/workflows/ci.yml` locally. Do not run application typecheck/build/tests/browser locally.",
+            "After independent review, commit/push and inspect the exact-SHA GitHub run. Download and hash all actual trace/log artifacts, then provide a finite cause hypothesis and smallest follow-up packet; do not edit application source in this diagnosis card."
+          ],
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TSC-DIAG-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact coordinator card extracted as ready under T02; original Browser1 dependencies and gates remain unchanged."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Full completion plan consistency check passed (100 packets, 21 remaining parents); this is not an implementation/runtime result."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TSC-DIAG-1",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact diagnosis card is ready under T02 and preserves the existing Browser1 gate and dependency record."
+            },
+            {
+              "command": "git diff --check -- .github/workflows/ci.yml",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "detail": "Only coordinator-owned workflow diff checked; no local application commands ran."
+            },
+            {
+              "command": "Independent workflow review of the exact diagnostic condition, status capture, and artifact upload",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-review.md",
+              "detail": "Reviewer verified `failure() && steps.verify.outcome == 'failure'` runs only after Verify itself fails; the tsc result is captured without masking the sticky Verify failure, and the unchanged always-upload retains all three diagnostic logs."
+            }
+          ],
+          "acceptance": [
+            "A real remote TypeScript trace proves whether the package declaration file is included in the compiler program and records resolution attempts for both TS2307 imports.",
+            "The diagnostic command does not turn the existing verification failure into a pass or skip; it adds no runtime dependency and preserves all existing checks.",
+            "Exact run logs, trace, exit status, job snapshot, and file hashes are saved and independently reviewed.",
+            "The resulting diagnosis is finite and supports a separately reviewed bounded successor or packet split; no third repair is made under Browser1."
+          ],
+          "negative_cases": [
+            "No local app typecheck/build/test/browser run; no TS suppression, declaration relaxation, workflow weakening, application-source repair, Browser1 acceptance, physics claim, or Cloudflare use."
+          ],
+          "review_questions": [
+            "Does the trace step run only after an actual failed Verify and does its status file capture the compiler's nonzero result?",
+            "Does the existing hosted-check upload include the full trace and focused summary logs?",
+            "Does the trace identify declaration-file inclusion and both queried imports without changing product code?"
+          ],
+          "stop_conditions": [
+            "If the diagnostic step does not run or the trace is absent/truncated, stop before further source work and prepare a narrower reviewed diagnostic packet.",
+            "Do not use this diagnosis card to perform repair attempt 3; after its evidence, the coordinator must split/review a successor or escalate under the bounded procedure."
+          ],
+          "attempt_count": 0,
+          "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-review.md",
+          "next_action": "Independent workflow review passed. Commit and push the exact workflow change, then inspect the hosted diagnostic trace run."
         }
       ],
-      "next_action": "T02-L01-BROWSER-1 repair attempt 2 passed independent source review; publish and run exact-head full GitHub verification plus production-output inspection. Previous failures and all run evidence remain recorded."
+      "next_action": "T02 remains RUNNING. Browser1 is CHANGES_REQUIRED after two hosted failures. The remote TypeScript trace workflow is source-reviewed and is ready for exact-SHA GitHub verification. No playable match, complete L01 matrix, or deployed Havok is verified."
     },
     {
       "id": "T03",
