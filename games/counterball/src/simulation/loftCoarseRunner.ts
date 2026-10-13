@@ -37,7 +37,6 @@ import {
   normalizeDiagnosticError,
   type DiagnosticEnergyBody,
   type DiagnosticSweepGuard,
-  type DiagnosticSweepPlan,
 } from "./browserDirectProbe.js";
 import {
   canonicalizeLoftCoarseContactPair,
@@ -290,10 +289,6 @@ function add(left: Vec3, right: Vec3): Vec3 {
   return { x: left.x + right.x, y: left.y + right.y, z: left.z + right.z };
 }
 
-function subtract(left: Vec3, right: Vec3): Vec3 {
-  return { x: left.x - right.x, y: left.y - right.y, z: left.z - right.z };
-}
-
 function distance(left: Vec3, right: Vec3): number {
   return Math.hypot(left.x - right.x, left.y - right.y, left.z - right.z);
 }
@@ -490,7 +485,7 @@ function withAbort<T>(operation: Promise<T>, signal: AbortSignal): Promise<T> {
       },
       (error: unknown) => {
         signal.removeEventListener("abort", onAbort);
-        reject(error);
+        reject(normalizeDiagnosticError(error, "initialization"));
       },
     );
   });
@@ -559,7 +554,7 @@ function regeneratedState(
   const bodies = ENTITY_IDS.map((id) => {
     const original = existing.get(id);
     if (original === undefined) throw failure(`Fixture body ${id} is missing.`);
-    let position = original.position;
+    let position: Vec3;
     let rotation: Quat = { x: 0, y: 0, z: 0, w: 1 };
     if (id === "home-0") position = selectedPosition;
     else if (id === "home-1") position = obstaclePosition;
@@ -820,7 +815,7 @@ function readNativeBodies(world: CounterballWorld): {
   const materials: LoftCoarseCase["metadata"]["materials"][number][] = [];
   const metrics: NativeBodyMetrics[] = [];
   for (const entityId of ENTITY_IDS) {
-    const id = entityId as LoftCoarseEntityId;
+    const id = entityId;
     const body = world.bodies.get(entityId);
     if (body === undefined) throw resourceFailure(`Canonical dynamic body ${id} is missing.`);
     const shape = body.shape;
@@ -1339,7 +1334,9 @@ async function runCase(
         counts.calls += 1;
         checkedCalls += 1;
         callsInBatch += 1;
-        if (callbackFailure !== undefined) throw callbackFailure;
+        if (callbackFailure !== undefined) {
+          throw normalizeDiagnosticError(callbackFailure, "resourceLimit");
+        }
         if (callsInBatch === guard.workload.maximumCallsPerBatch) {
           if (totalBatches >= guard.workload.maximumBatchesPerCase || counts.batches >= guard.workload.maximumBatchesMatrix) {
             throw Object.assign(new Error("The L01 host-yield batch ceiling was reached."), { code: "resourceLimit" });
@@ -1352,7 +1349,9 @@ async function runCase(
           ensureWithin(signal, caseStartedAt, guard.workload.maximumWallTimePerCaseMs, "L01 case");
           progress({ completedCases, totalCases: LOFT_COARSE_TUPLES.length, currentMatrixIndex: matrixIndex, nominalTick: tick - 1, nominalTickLimit: maxTicks, executeStepCalls: counts.calls, batches: counts.batches, elapsedMs: nowMs() - runStartedAt });
         }
-        if (callbackFailure !== undefined) throw callbackFailure;
+        if (callbackFailure !== undefined) {
+          throw normalizeDiagnosticError(callbackFailure, "resourceLimit");
+        }
         const after = resourceGuard(() => getWorldSamples(bodyFacts.metrics));
         const afterEnergy = resourceGuard(() =>
           computeDiagnosticShiftedEnergy(
@@ -1460,9 +1459,12 @@ async function runCase(
     const buttonFinal = finalSamples[buttonIndex];
     const obstacleFinal = finalSamples[obstacleIndex];
     if (buttonMetric === undefined || obstacleMetric === undefined || buttonFinal === undefined || obstacleFinal === undefined) throw resourceFailure("Final button/obstacle states are missing.");
+    const buttonStart = samples[buttonIndex];
+    const obstacleStart = samples[obstacleIndex];
     const startsBefore =
-      samples[buttonIndex] !== undefined &&
-      samples[buttonIndex]!.state.position.z + buttonMetric.farthestOriginRadius < samples[obstacleIndex]!.state.position.z - obstacleMetric.farthestOriginRadius;
+      buttonStart !== undefined &&
+      obstacleStart !== undefined &&
+      buttonStart.state.position.z + buttonMetric.farthestOriginRadius < obstacleStart.state.position.z - obstacleMetric.farthestOriginRadius;
     const finishesBeyond =
       buttonFinal.state.position.z - buttonMetric.farthestOriginRadius > obstacleFinal.state.position.z + obstacleMetric.farthestOriginRadius;
     const overlapSeen = sweepRows.some((row) => (row as { intervalClassification: string }).intervalClassification !== "no-horizontal-overlap");

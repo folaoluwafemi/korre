@@ -343,3 +343,22 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root/run_evidence_review` completed source review 7 and two narrow follow-ups. Source disposition remains PASS. The timing note in review 7 was a report-text error: the accepted interval definitions in `knowledge_base/execution/completion/CONTRACT_WORK.md:180` are explicit and match the runner. The reconciliation is at `execution_state/reports/T02-L01-EXECUTOR-1-review-7-reconciliation.md`.
 - T01 is ACCEPTED, so the packet's original parent gate is satisfied. `/root` owns the shared status update, exact commit/push and hosted verification; the executor is VERIFIED for source only, not ACCEPTED.
 - Next: publish the reviewed runner and package-owned declarations with reports/status, then run `pnpm verify` on the exact GitHub SHA. No local app checks, real 24-case matrix, deployed Havok, or playable match are established. Cloudflare stays untouched until the user signals for T04.
+
+## Current ownership — 2026-10-13 (hosted lint repair attempt 1)
+
+- Exact run `38404197531` on SHA `139e82ec5c20caf93466adf5fef132e59a02aaba` passed workspace typechecks and headless package-boundary checks, then failed `pnpm lint` with eight runner findings. Unit tests/build, integration and browser steps were skipped. Full log, run snapshot, artifact downloads and per-file hashes are recorded at `execution_state/reports/T02-L01-EXECUTOR-1-run-38404197531*`.
+- `/root/toolchain_audit` owns only `games/counterball/src/simulation/loftCoarseRunner.ts` and `execution_state/reports/T02-L01-EXECUTOR-1-implementation-6.md` for focused lint repair attempt 1. It must preserve guard/error behavior, avoid rule suppression and run no local application commands.
+- `/root/executor_type_review` is the independent reviewer for the repair and may write only `execution_state/reports/T02-L01-EXECUTOR-1-review-8.md`. `/root` owns shared status, commit/push and exact-SHA GitHub verification.
+- The card remains RUNNING and unaccepted. No browser matrix, deployed Havok, playable match, or Cloudflare use is established/authorized yet.
+
+## Current ownership — 2026-10-13 (lint repair complete; independent source review active)
+
+- The run 38404197531 evidence review passed. The downloaded logs and artifacts, the 23/1/13 step totals, and the ten file hashes are independently verified.
+- `/root/toolchain_audit` released the runner after a scoped, semantics-preserving lint repair and a passing runner-only diff check. No local application checks ran. `/root/executor_type_review` is reviewing the exact source diff at `execution_state/reports/T02-L01-EXECUTOR-1-review-8.md`.
+- `/root` owns the current task/status, commit/push and next exact-SHA GitHub verification. No acceptance, browser matrix, deployed Havok or playable match is claimed.
+
+## Current ownership — 2026-10-13 (source review passed; hosted verification next)
+
+- Independent source review 8 passed the eight-finding runner lint repair. The run-evidence review for 38404197531 also passed. Reports are under `execution_state/reports/T02-L01-EXECUTOR-1-review-8.md` and `execution_state/reports/T02-L01-EXECUTOR-1-run-38404197531-independent-review.md`.
+- `/root` owns commit/push of the exact reviewed runner, status and evidence, followed by hosted `pnpm verify` on that SHA. No local app checks were run.
+- T02-L01-EXECUTOR-1 remains unaccepted until hosted verification passes; the 24-case browser matrix, deployed Havok and playability are separate unmet gates.
