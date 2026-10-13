@@ -1725,5 +1725,92 @@
       "If the web-project diagnostic does not run, is incomplete, or does not reproduce the failed project context, stop before source work and prepare a narrower reviewed diagnostic.",
       "Do not make a third repair under Browser1; source changes require a separately reviewed successor packet with a limited exact write scope."
     ]
+  },
+  {
+    "id": "T02-L01-BROWSER-1-ROOT-TSC-DIAG-1",
+    "parent": "T02",
+    "title": "Trace the root test and web-server TypeScript projects for Counterball asset declarations",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-L01-BROWSER-1-WEB-TSC-DIAG-1"
+    ],
+    "required_parent_acceptance": [
+      "T01"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-ROOT-TSC-DIAG-1",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-BROWSER-1-run-38417855065.md",
+      "execution_state/reports/T02-L01-BROWSER-1-TSC-DIAG-1-run-38419677151.md",
+      "execution_state/reports/T02-L01-BROWSER-1-WEB-TSC-DIAG-1-run-38421056934.md",
+      "execution_state/reports/T02-L01-BROWSER-1-WEB-TSC-DIAG-1-run-38421056934-independent-review.md",
+      "tests/tsconfig.json",
+      "tests/unit/workspace.test.ts",
+      "apps/web/tsconfig.server.json",
+      "games/counterball/src/browser.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "games/counterball/src/viteAssetModules.d.ts",
+      "package.json",
+      ".github/workflows/ci.yml",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/OPERATIONS.md"
+    ],
+    "write_paths": [
+      ".github/workflows/ci.yml"
+    ],
+    "outputs": [
+      "One failure-only GitHub diagnostic step runs the exact root tests and apps/web server TypeScript projects after Verify fails.",
+      "Each project full --listFiles/--traceResolution output, exact TypeScript exit code, and focused summary are uploaded with the existing hosted-check artifacts.",
+      "A coordinator report identifies which root TypeScript project emits the two TS2307 errors and whether the package-owned Vite declarations enter each compiler program."
+    ],
+    "steps": [
+      "After the existing apps/web trace, add one step guarded by `if: failure() && steps.verify.outcome == 'failure'`. Run `pnpm exec tsc --noEmit -p tests/tsconfig.json --listFiles --traceResolution` and `pnpm exec tsc --noEmit -p apps/web/tsconfig.server.json --listFiles --traceResolution` independently; preserve each complete output in `.artifacts/counterball-tests-tsc-resolution.log` and `.artifacts/counterball-server-tsc-resolution.log`.",
+      "Capture each compiler exit code in separate `.artifacts/counterball-tests-tsc-status.log` and `.artifacts/counterball-server-tsc-status.log`; write separate focused summaries for `viteAssetModules.d.ts`, both `?url`/`?raw` imports, and TS2307. The diagnostic step itself must succeed after capturing compiler codes and must not alter Verify or any later gate.",
+      "The existing `always()` hosted-check upload must retain all six new logs. Do not add a source fix, declaration, suppression, package change, or test change in this card.",
+      "Run only `git diff --check -- .github/workflows/ci.yml` locally. Do not run app typecheck, install, build, test, browser automation, or deployment locally.",
+      "After independent workflow review, push the exact commit and inspect its GitHub run. Download and hash every actual artifact, record skip counts, and have an independent reviewer confirm exact SHA, both compiler statuses, and all evidence hashes."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-ROOT-TSC-DIAG-1",
+        "environment": "local-document",
+        "expected": "The exact root-project diagnosis packet is a child of T02, depends on the accepted web-project diagnosis, and preserves accepted T01."
+      },
+      {
+        "command": "git diff --check -- .github/workflows/ci.yml",
+        "environment": "local-document",
+        "expected": "Only the coordinator-owned workflow diagnostic passes scoped whitespace validation; no local application command runs."
+      },
+      {
+        "command": "GitHub Actions exact-SHA Verify and root TypeScript traces",
+        "environment": "github",
+        "expected": "Verify remains failed on its real diagnostics; the post-failure diagnostic succeeds and uploads full trace, separate status, and summary logs for both root projects."
+      },
+      {
+        "command": "Independent workflow and exact-run evidence review",
+        "environment": "source-review",
+        "expected": "PASS verifies the step condition, unchanged gates, exact SHA/run, captured statuses, and all downloaded artifact hashes."
+      }
+    ],
+    "acceptance": [
+      "Hosted evidence determines whether tests/tsconfig.json or apps/web/tsconfig.server.json produces the TS2307 diagnostics and whether the Counterball Vite declaration enters each compiler program.",
+      "Both traces and exact exit codes are retained, independently reviewed, and tied to the actual Verify-failing SHA.",
+      "The step runs only after Verify fails and does not mask that failure or change any existing gate.",
+      "This remains diagnosis only: no source repair, Browser1 acceptance, build/runtime/physics/playability claim, or Cloudflare use."
+    ],
+    "negative_cases": [
+      "No local app typecheck, install, build, tests, browser automation, or deployment; no source or test edits; no TS suppression; no weakening or skipping checks; no third repair under Browser1; no Cloudflare use."
+    ],
+    "review_questions": [
+      "Which of the two exact root TypeScript configs reproduces TS2307, if either?",
+      "Do the declaration file, import traces, and exact compiler codes appear in full and focused artifacts for both projects?",
+      "Does the diagnostic execute only after Verify itself fails while CI remains failed?"
+    ],
+    "stop_conditions": [
+      "If either trace is absent, truncated, or does not preserve its exit status, stop before product-source edits and prepare a narrower reviewed diagnostic.",
+      "Do not attempt a third Browser1 repair. After diagnosis, prepare a separate bounded and independently reviewed successor packet for any source change."
+    ]
   }
 ]
