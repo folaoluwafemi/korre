@@ -7137,6 +7137,23 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-independent-review.md",
               "detail": "Reviewer verified cleanupError is the nested caught error and cause, both errors remain in the iterable, cleanup behavior is unchanged, and exact path scope."
+            },
+            {
+              "command": "GitHub Actions exact-SHA Verify, production packaging, integration, preview and diagnostic browser gates",
+              "result": "FAIL",
+              "environment": "github",
+              "run_id": 38428842636,
+              "commit": "bf99a8a0dd150e1e1ba3b6979658bc2399d0f26e",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38428842636",
+              "detail": "Independent exact-run review confirms typecheck and ESLint passed, Prettier failed on apps/web/src/CounterballDirectProbe.tsx, and full tests/build plus production, integration, preview and diagnostic browser gates were skipped. Job counts: 26 success, 1 failure, 13 skipped. No browser result or flick evidence exists.",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-independent-review.md"
+            },
+            {
+              "command": "Independent exact-run evidence review",
+              "result": "PASS",
+              "environment": "run-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-independent-review.md",
+              "detail": "Evidence accuracy passed; hosted run outcome remains FAIL and does not satisfy browser-flick acceptance."
             }
           ],
           "acceptance": [
@@ -7161,19 +7178,190 @@
             "If any required browser/build/production/integration gate fails or skips, preserve the result and keep the first-flick milestone unaccepted.",
             "If a second attempt at the same cause failure is unsuccessful, stop all edits per SWARM bounded-failure policy."
           ],
-          "status": "REVIEWING",
+          "status": "SUPERSEDED",
           "ready": false,
           "owner": "/root/toolchain_audit — sole component source edit; /root/executor_type_review — independent source review; /root/run_evidence_review — independent exact-run review",
           "author_identity": "/root/toolchain_audit",
           "reviewer_identity": "/root/executor_type_review — independent source review PASS",
-          "attempt_count": 0,
+          "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-implementation.md",
           "review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-review.md",
-          "next_action": "Independent source review passed; commit and push exact reviewed code for GitHub Verify and first-browser-flick gates. Acceptance is pending hosted checks and independent run review.",
-          "started_at": "2026-10-13"
+          "next_action": "Superseded after independently reviewed run 38428842636 failed at Prettier. The evidence review and failure remain recorded; successor 3 applies only the exact saved formatting patch and inherits the complete browser-flick acceptance.",
+          "started_at": "2026-10-13",
+          "hosted_run": {
+            "run_id": 38428842636,
+            "commit": "bf99a8a0dd150e1e1ba3b6979658bc2399d0f26e",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38428842636",
+            "status": "completed",
+            "conclusion": "failure"
+          }
+        },
+        {
+          "id": "T02-L01-BROWSER-1-SUCCESSOR-3",
+          "parent": "T02",
+          "title": "Apply the exact hosted format patch and prove the first browser flick",
+          "role": "worker",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1",
+            "T02-L01-PACKET-SPLIT-1",
+            "T02-L01-EXECUTOR-1",
+            "T02-BR02-FORMAT-REPAIR-1",
+            "T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
+            "T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1"
+          ],
+          "supersedes": [
+            "T02-L01-BROWSER-1-SUCCESSOR-2"
+          ],
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/TASKS.md",
+            "knowledge_base/execution/SWARM.md",
+            "knowledge_base/execution/completion/README.md",
+            "knowledge_base/execution/completion/OPERATIONS.md",
+            "knowledge_base/execution/completion/ACCEPTANCE.md",
+            "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-SUCCESSOR-3",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+            "execution_state/tasks.json",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-implementation.md",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-independent-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-independent-review.md",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-artifacts/formatting-repair/formatting-repair.patch",
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "games/counterball/src/browser.ts",
+            "games/counterball/src/simulation/loftCoarseRunner.ts",
+            "tests/e2e/counterball-direct-probe.spec.ts",
+            "playwright.config.ts",
+            ".github/workflows/ci.yml",
+            "package.json",
+            "eslint.config.js"
+          ],
+          "write_paths": [
+            "apps/web/src/CounterballDirectProbe.tsx"
+          ],
+          "outputs": [
+            "Apply the exact Prettier patch emitted by GitHub run 38428842636, with no behavioral edits; preserve the reviewed cleanupError AggregateError cause correction.",
+            "Prove the inherited first real browser flick and OPFS flow on the exact reviewed SHA with all required hosted gates executed and passing."
+          ],
+          "steps": [
+            "Extract this successor and confirm every listed dependency and original T01 parent acceptance is ACCEPTED. Confirm successor 2's failed run is independently reviewed and remains unaccepted.",
+            "Inspect run 38428842636's Prettier artifact. Apply its saved formatting-repair.patch verbatim with git apply; do not run Prettier locally or re-create the formatting by hand.",
+            "Edit only apps/web/src/CounterballDirectProbe.tsx. The patch must change formatting only; preserve { cause: cleanupError }, [error, cleanupError], and all browser, OPFS, cancellation, and cleanup behavior.",
+            "Run only git diff --check -- apps/web/src/CounterballDirectProbe.tsx locally. Do not run application installs, typecheck, lint, tests, builds, browsers, deployment, or Cloudflare commands locally.",
+            "Write the unique implementation report and obtain independent exact-source review before commit/push.",
+            "Run GitHub CI on the exact reviewed SHA. Verify, tests, build, production exclusion/package, integration, built preview, and actual diagnostic browser tests must each execute and pass; capture full logs, counts, hashes, and skips.",
+            "Obtain independent exact-run review. If formatting, any other required gate, or any browser behavior fails or skips, record the precise outcome and leave the first-flick milestone unaccepted."
+          ],
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-SUCCESSOR-3",
+              "environment": "local-document",
+              "expected": "All inherited prerequisites and original T01 parent acceptance are accepted; the failed successor 2 is superseded, not treated as accepted."
+            },
+            {
+              "command": "git apply execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-artifacts/formatting-repair/formatting-repair.patch",
+              "environment": "local-document",
+              "expected": "The exact hosted patch applies cleanly to the owned source file and changes formatting only."
+            },
+            {
+              "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx",
+              "environment": "local-document",
+              "expected": "Scoped whitespace validation passes without running application commands locally."
+            },
+            {
+              "command": "GitHub Actions exact-SHA Verify, production, integration, preview, and diagnostic browser gates",
+              "environment": "github",
+              "expected": "Every required gate executes and passes; browser evidence demonstrates a real page-owned-engine flick and OPFS behavior, with exact counts and artifact hashes recorded."
+            },
+            {
+              "command": "Independent exact-source and exact-run review",
+              "environment": "source-review",
+              "expected": "PASS confirms formatting-only repair, preserved reviewed cause behavior, exact SHA and artifacts, and all required executed gate outcomes."
+            },
+            {
+              "command": "Independent coordinator packet-amendment review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-packet-review.md",
+              "detail": "Reviewer confirmed inherited accepted dependencies and T01 parent, exact one-file write scope, patch identity and formatting-only hunks, no dependence on failed successor 2, full browser-flick acceptance, and hosted gate requirements."
+            },
+            {
+              "command": "git apply --check execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-artifacts/formatting-repair/formatting-repair.patch",
+              "result": "PASS",
+              "environment": "local-document",
+              "detail": "Exact hosted patch applies to current source without modifying it."
+            },
+            {
+              "command": "git apply -- execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-2-run-38428842636-artifacts/formatting-repair/formatting-repair.patch",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-implementation.md",
+              "detail": "Exact patch SHA-256 D3A2BD82C998BEA80EB0642738F1B9AFF12A3F40BC20F0537773BA8BBFF7A68C; only the owned TSX file changed, 31 insertions/18 deletions; implementation report says formatting only."
+            },
+            {
+              "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx",
+              "result": "PASS",
+              "exit_code": 0,
+              "environment": "local-document",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-implementation.md",
+              "detail": "Scoped whitespace check passed."
+            },
+            {
+              "command": "Independent exact-source review",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-review.md",
+              "detail": "Exact one-path diff matches the hosted formatting patch in both directions; the cause cleanupError fix and two-error iterable remain unchanged. Runtime remains NOT RUN."
+            }
+          ],
+          "acceptance": [
+            "Only the exact hosted formatting patch is added to the reviewed cleanupError cause fix; no browser, physics, transport, or product behavior changes.",
+            "The canonical browser runner and real page-owned Babylon Engine perform the first real browser flick; no mock or Node-only result is used.",
+            "OPFS uses awaited bounded writes, success-only file download, and complete lifecycle/failure cleanup; the diagnostic action and transport hook remain excluded from production output.",
+            "The exact reviewed SHA passes Verify, tests, build, production exclusion/package, integration, preview, and diagnostic browser gates, with independent source and run reviews.",
+            "This accepts only the first browser-flick milestone, not deployed Havok, a complete match, AI, online/social flows, or T02."
+          ],
+          "negative_cases": [
+            "No local application commands, Cloudflare/Wrangler use, lint suppressions, weakened tests, fake/Node-only physics, screenshot-only proof, transport-limit changes, or diagnostic production exposure.",
+            "No claim that the full game is playable or that deployed Havok is proven."
+          ],
+          "review_questions": [
+            "Does the exact patch alter formatting only and preserve the independently reviewed cause cleanupError correction?",
+            "Are the prior error/cancel/unmount/host-ack cleanup paths unchanged?",
+            "Does the exact diagnostic browser suite demonstrate a real engine flick and OPFS transport behavior?",
+            "Did all required production, integration, preview, and browser gates execute, and are skip counts and exact artifact hashes verified?"
+          ],
+          "stop_conditions": [
+            "If the saved patch does not apply cleanly or includes semantic changes, stop and report the mismatch without reformatting by hand.",
+            "If any required gate fails or skips, preserve the evidence and keep the first-flick milestone unaccepted.",
+            "After two focused unsuccessful repairs of the same failure, stop edits and follow the SWARM escalation procedure."
+          ],
+          "status": "REVIEWING",
+          "ready": false,
+          "owner": "/root/toolchain_audit — sole component source edit",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/run_evidence_review — independent source review PASS",
+          "attempt_count": 1,
+          "implementation_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-review.md",
+          "next_action": "Independent source review PASS. Commit and push the exact reviewed source plus coordinator evidence; then capture and independently review full GitHub Verify, production, integration, preview, and diagnostic browser results.",
+          "coordinator_setup_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-coordinator-setup.md",
+          "packet_review_report": "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-packet-review.md"
         }
       ],
-      "next_action": "T02 remains RUNNING. Successor 2 corrects the reviewed nested AggregateError cause and has passed independent source review; the next gate is exact-SHA GitHub Verify plus full browser-flick validation."
+      "next_action": "T02 remains RUNNING. Successor 3 exact formatting patch and independent source review passed. Publish the reviewed SHA to GitHub; the first browser-flick milestone stays unaccepted until every hosted gate and independent exact-run review passes."
     },
     {
       "id": "T03",

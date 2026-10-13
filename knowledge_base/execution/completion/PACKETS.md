@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-99 bounded cards cover 21 remaining parents. Initially ready: none.
+107 bounded cards cover 21 remaining parents. Initially ready: T02-L01-BROWSER-1-SUCCESSOR-3.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -26,6 +26,14 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-CONTACT-CONTRACT-1 | T02 | Freeze the additive L01 contact participant contract | coordinator | T02-L01-ARTIFACT-1 | 5 |
 | T02-L01 | T02 | Integrate and accept the bounded restart-loft diagnostic | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-EXECUTOR-1, T02-L01-BROWSER-1, T02-L01-TRANSPORT-1, T02-L01-MATRIX-1 | 3 |
 | T02-L01-CONTACT-STATUS-1 | T02 | Reconcile contact contract and runner execution state | coordinator | T02-L01-CONTACT-CONTRACT-1 | 3 |
+| T02-L01-BROWSER-1-TSC-DIAG-1 | T02 | Capture remote TypeScript asset declaration resolution evidence | coordinator | None | 1 |
+| T02-L01-BROWSER-1-WEB-TSC-DIAG-1 | T02 | Trace the consuming web TypeScript project for Counterball asset declarations | coordinator | T02-L01-BROWSER-1-TSC-DIAG-1 | 1 |
+| T02-L01-BROWSER-1-ROOT-TSC-DIAG-1 | T02 | Trace the root test and web-server TypeScript projects for Counterball asset declarations | coordinator | T02-L01-BROWSER-1-WEB-TSC-DIAG-1 | 1 |
+| T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1 | T02 | Include Counterball asset-query declarations in the root test TypeScript project | coordinator | T02-L01-BROWSER-1-ROOT-TSC-DIAG-1 | 1 |
+| T02-L01-BROWSER-1-SUCCESSOR-1 | T02 | Repair diagnosed type and lint failures, then prove the first browser flick | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1, T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1 | 1 |
+| T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | T02 | Independently verify the first browser-flick successor failure evidence | coordinator | T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1 | 0 |
+| T02-L01-BROWSER-1-SUCCESSOR-2 | T02 | Use the nested cleanup error as AggregateError cause and prove first browser flick | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1, T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1, T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | 1 |
+| T02-L01-BROWSER-1-SUCCESSOR-3 | T02 | Apply the exact hosted format patch and prove the first browser flick | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1, T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1, T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | 1 |
 | T02-D01 | T02 | Measure direct-shot impulse response on the canonical fixture | worker | C00-B, C01, T02-B0, T02-A, C00 | 1 |
 | T02-F01 | T02 | Implement pure simulation facts from physics-step observations | worker | T02-C0, T02-C2, C00-A, C00 | 2 |
 | T02-F01-ROTATION-1 | T02 | Replace endpoint-axis travel with a conservative rotational support bound | worker | T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 2 |
@@ -71,8 +79,8 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-BR02-OBSERVED-MASS-PROJECTION-1 | T02 | Use the observed native mass representation without weakening the guard | worker | T02-BR02-MASS-READBACK-1, T02-BR02-FORMAT-REPAIR-1 | 3 |
 | T02-L01-ARTIFACT-1 | T02 | Define pure L01 matrix types, guards, and bounded JSON encoding | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1 | 2 |
 | T02-L01-CONTACT-SCHEMA-1 | T02 | Represent dynamic and static L01 contact participants | worker | T02-L01-CONTACT-CONTRACT-1, T02-L01-CONTACT-STATUS-1, C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1 | 2 |
-| T02-L01-EXECUTOR-1 | T02 | Run L01 cases with the real page Havok engine | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-CONTACT-SCHEMA-1 | 1 |
-| T02-L01-BROWSER-1 | T02 | Add the development-only L01 page action and file-backed download | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1 | 2 |
+| T02-L01-EXECUTOR-1 | T02 | Run L01 cases with the real page Havok engine | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-CONTACT-SCHEMA-1 | 2 |
+| T02-L01-BROWSER-1 | T02 | Add the development-only L01 page action and file-backed download | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1 | 3 |
 | T02-L01-TRANSPORT-1 | T02 | Prove maximum-size browser-to-host transfer in Chromium | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-BROWSER-1 | 1 |
 | T02-L01-MATRIX-1 | T02 | Run and retain the complete 24-case browser Havok matrix | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1 | 1 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
