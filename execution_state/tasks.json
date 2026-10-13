@@ -634,6 +634,20 @@
           "report": "execution_state/reports/T02-L01-CONTACT-SCHEMA-1-acceptance.md",
           "review": "execution_state/reports/T02-L01-CONTACT-SCHEMA-1-run-38180511032-review.md",
           "detail": "The diagnostic serializer card is accepted after independent exact-source review, exact-head hosted checks and independent run/artifact review. This does not accept T02, physics calibration, deployed Havok, or playability."
+        },
+        {
+          "command": "Independent T02-L01-TRANSPORT-HARNESS-1 packet amendment review",
+          "result": "PASS",
+          "environment": "source-review",
+          "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-packet-review.md",
+          "detail": "The narrow harness gate, three exact write paths, preserved prerequisite graph, production exclusion, and existing diagnostic CI route passed independent proposal review. The packet checker also passed after correcting the ledger terminator; implementation/runtime remain pending."
+        },
+        {
+          "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-HARNESS-1",
+          "result": "PASS",
+          "environment": "local-document",
+          "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-packet-review.md",
+          "detail": "108-card plan is consistent; this exact card reports ready:true, with all ten packet dependencies accepted and parent T01 retained. Document check only."
         }
       ],
       "blocker": "T02-L01 strict guard/schema and packet split are accepted, but its real 24-case Chromium matrix has not run. The calibrated gameplay runner, deployed Cloudflare Havok and playable match remain open.",
@@ -5975,7 +5989,7 @@
         },
         {
           "id": "T02-L01-TRANSPORT-1",
-          "status": "REVIEWING",
+          "status": "CHANGES_REQUIRED",
           "ready": false,
           "role": "worker",
           "title": "Prove maximum-size browser-to-host transfer in Chromium",
@@ -5993,7 +6007,8 @@
             "T02-L01-GUARD-CONTRACT-1",
             "T02-L01-GUARD-SCHEMA-1",
             "T02-L01-PACKET-SPLIT-1",
-            "T02-L01-BROWSER-1-SUCCESSOR-3"
+            "T02-L01-BROWSER-1-SUCCESSOR-3",
+            "T02-L01-TRANSPORT-HARNESS-1"
           ],
           "read_paths": [
             "AGENTS.md",
@@ -6219,6 +6234,32 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-TRANSPORT-1-format-repair-review.md",
               "detail": "Reviewer matched the current diff to the exact hosted patch SHA and confirmed only three formatting wraps changed. Transport semantics are untouched; scoped diff-check passed."
+            },
+            {
+              "command": "GitHub exact-SHA full verify, production, integration, preview, diagnostic browser suite, and full-cap transport after formatter repair",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38438560050,
+              "source_sha": "d79d049a296d21f6282ef7cbe21c9c56fd2f00bd",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38438560050",
+              "detail": "35/40 workflow steps succeeded, 1 failed, 4 skipped. Verify, production/exclusion, integration and preview passed. Diagnostic browser suite was 2 passed, 1 failed, 0 skipped/flaky; the full-cap test timed out after 480 seconds waiting for a transport button omitted by the production-mode diagnostic bundle. No transfer started.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050.md"
+            },
+            {
+              "command": "Capture exact failed-run logs, trace, browser artifacts and artifact provenance for run 38438560050",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38438560050,
+              "source_sha": "d79d049a296d21f6282ef7cbe21c9c56fd2f00bd",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050.md",
+              "detail": "Full job log, structured job snapshot, all ten artifact metadata entries, verification log, browser results, Playwright page snapshot and trace are retained with hashes/byte counts in the run evidence directory."
+            },
+            {
+              "command": "Independent exact-run and root-cause review for run 38438560050",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050-review.md",
+              "detail": "Independent review confirms exact counts, snapshot, absent controls, Vite mode mismatch and no transfer start. This validates failure evidence only; packet remains CHANGES_REQUIRED."
             }
           ],
           "acceptance": [
@@ -6242,19 +6283,19 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
-          "next_action": "The source repair passed typecheck and ESLint. The exact hosted Prettier patch was applied verbatim and independently reviewed; commit and push this formatting-only patch, then rerun GitHub verification. Full-cap Chromium transfer remains unproven.",
+          "next_action": "Wait for T02-L01-TRANSPORT-HARNESS-1 acceptance. Then rerun the existing full-cap browser transport test on the exact reviewed SHA; transport runtime remains unproven after failed run 38438560050.",
           "required_parent_acceptance": [
             "T01"
           ],
           "hosted_run": {
-            "run_id": 38437750598,
-            "commit": "296b1041db5384d167537102e7bcac1c28010f43",
-            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38437750598",
+            "run_id": 38438560050,
+            "commit": "d79d049a296d21f6282ef7cbe21c9c56fd2f00bd",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38438560050",
             "status": "completed",
             "conclusion": "failure",
-            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38437750598.md"
+            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050.md"
           },
-          "blocker": "The latest GitHub run failed Prettier after typecheck and ESLint passed. The exact hosted formatting patch is applied and independently reviewed; hosted rerun is pending.",
+          "blocker": "Full-cap test failed before transfer because production-mode dist-dev excludes controls and host ACK guarded only by import.meta.env.DEV, while CI sets VITE_COUNTERBALL_DEV_HARNESS=1. Prepare a separately reviewed scope amendment; production absence must stay proven. No transport result.",
           "repair_implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
           "repair_review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
           "repair_attempts": [
@@ -6281,6 +6322,156 @@
             "status": "REVIEWED_HOSTED_RERUN_PENDING",
             "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-format-repair-review.md"
           }
+        },
+        {
+          "id": "T02-L01-TRANSPORT-HARNESS-1",
+          "status": "IMPLEMENTED",
+          "ready": true,
+          "role": "worker",
+          "title": "Expose test-only transport controls in the diagnostic build",
+          "owner": "/root/toolchain_audit — implementation complete; /root/run_evidence_review — source review PASS; coordinator exact-head integration pending",
+          "author_identity": "/root/toolchain_audit",
+          "reviewer_identity": "/root/run_evidence_review",
+          "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-HARNESS-1",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1",
+            "T02-L01-PACKET-SPLIT-1",
+            "T02-L01-BROWSER-1-SUCCESSOR-3"
+          ],
+          "read_paths": [
+            "AGENTS.md",
+            "knowledge_base/execution/DECISIONS.md",
+            "knowledge_base/execution/CONTRACTS.md",
+            "knowledge_base/execution/TASKS.md",
+            "knowledge_base/execution/SWARM.md",
+            "knowledge_base/execution/completion/README.md",
+            "knowledge_base/execution/completion/OPERATIONS.md",
+            "knowledge_base/execution/completion/CONTRACT_WORK.md",
+            "knowledge_base/execution/completion/ACCEPTANCE.md",
+            "knowledge_base/execution/completion/LOCAL_NOTES.md",
+            "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-acceptance.md",
+            "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050.md",
+            "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050-review.md",
+            "execution_state/packets/T02-L01-TRANSPORT-HARNESS-1.md",
+            "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-HARNESS-1",
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "apps/web/src/App.tsx",
+            "apps/web/src/vite-env.d.ts",
+            "tests/production/counterball-dev-match-absent.mjs",
+            "tests/e2e/counterball-direct-probe.spec.ts",
+            "playwright.config.ts",
+            ".github/workflows/ci.yml"
+          ],
+          "write_paths": [
+            "apps/web/src/CounterballDirectProbe.tsx",
+            "tests/production/counterball-dev-match-absent.mjs",
+            "tests/e2e/counterball-direct-probe.spec.ts"
+          ],
+          "outputs": [
+            "Expose the existing restart-loft transport test controls and bounded host acknowledgement in the explicitly flagged diagnostic bundle, while asserting their absence from ordinary production output."
+          ],
+          "steps": [
+            "Define one compile-time predicate DEV || VITE_COUNTERBALL_DEV_HARNESS === \"1\" and use it for the existing panel render, host-attestation validation, and acknowledgement callback installation.",
+            "Add a bounded visibility assertion to the existing full-cap transport test before the write. Once the diagnostic scene is ready, verify the callback completes only for the matching downloaded file and valid byte-count/SHA attestation; do not add a callback timing gate.",
+            "Extend the production marker scan with the Write transport test file label and __counterballLoftMatrixHostAck marker; retain the existing unset-flag guard.",
+            "Do not alter CI routing. If the workflow does not collect the diagnostic spec or serve dist-dev as expected, stop and request a separately reviewed coordinator packet."
+          ],
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-HARNESS-1",
+              "environment": "local-document",
+              "expected": "Exact extraction reports ready:true with all accepted prerequisites and the T01 parent gate preserved.",
+              "result": "PASS",
+              "detail": "Exact packet extraction returned ready:true, preserved all ten original packet prerequisites, and retained the T01 parent acceptance gate.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-packet-review.md"
+            },
+            {
+              "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx tests/production/counterball-dev-match-absent.mjs tests/e2e/counterball-direct-probe.spec.ts",
+              "environment": "local-document",
+              "expected": "Only the three assigned paths are checked; no application build or test runs locally.",
+              "result": "PASS",
+              "detail": "Worker ran the exact three-path git diff --check; exit 0. Git emitted a line-ending conversion warning for the MJS file only.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-implementation.md"
+            },
+            {
+              "command": "pnpm verify",
+              "environment": "github",
+              "expected": "Exact-head CI typecheck, lint, unit tests, and production builds pass.",
+              "result": "PENDING"
+            },
+            {
+              "command": "node tests/production/counterball-dev-match-absent.mjs",
+              "environment": "github",
+              "expected": "Ordinary production bundle contains neither transport control nor host acknowledgement marker.",
+              "result": "PENDING"
+            },
+            {
+              "command": "pnpm test:integration",
+              "environment": "github",
+              "expected": "Integration suite passes with no unreported skips.",
+              "result": "PENDING"
+            },
+            {
+              "command": "COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e --workers=1",
+              "environment": "github",
+              "expected": "Existing production-preview browser suite passes against the built production artifact.",
+              "result": "PENDING"
+            },
+            {
+              "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+              "environment": "github",
+              "expected": "Existing diagnostic browser suite runs against the CI-built dist-dev and full-cap transfer passes in real Chromium with exact size/digest, cleanup, and zero skips/retries.",
+              "result": "PENDING"
+            },
+            {
+              "command": "Independent exact-source and exact-run review",
+              "environment": "source-review",
+              "expected": "Reviewer confirms the three source gates, production absence, unchanged route/config/physics, and actual browser transport evidence.",
+              "result": "PENDING"
+            },
+            {
+              "command": "Independent exact-source review of T02-L01-TRANSPORT-HARNESS-1",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md",
+              "detail": "Source reviewer confirms the shared harness predicate, preserved acknowledgment safeguards, bounded E2E preflight, meaningful production marker checks, exact three-file scope, and no route/config/physics changes. Runtime remains NOT VERIFIED."
+            }
+          ],
+          "acceptance": [
+            "The flagged diagnostic browser run sees and activates the existing transport writer; its host acknowledgement succeeds only for the matching completed download and valid size/SHA attestation.",
+            "The ordinary production output omits both the transport UI and host acknowledgement marker, and the production absence command passes.",
+            "The existing full-cap transfer passes on exact-head Chromium with the accepted byte count/digest, bounded transfer behavior, cleanup, and no skips/retries.",
+            "Independent source and exact-run review pass. This child does not accept parent T02; the coordinator records the transport card against its original criteria."
+          ],
+          "negative_cases": [
+            "No mock or Node result substitutes for Chromium; do not lower byte/chunk caps, weaken cleanup, add a production escape hatch, or describe synthetic transport as physics evidence."
+          ],
+          "review_questions": [
+            "Do all three existing controls use the same explicit harness predicate?",
+            "Does the ordinary production bundle lack both diagnostic markers?",
+            "Does the exact routed browser test exercise the unchanged bounded transfer and cleanup path?"
+          ],
+          "stop_conditions": [
+            "If workflow routing/configuration, another write path, a shared contract, or production-visible behavior must change, stop and request a separately reviewed coordinator packet.",
+            "Keep the original transport card CHANGES_REQUIRED until this source repair is accepted and its exact full-cap transport evidence receives independent review."
+          ],
+          "attempt_count": 0,
+          "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md",
+          "next_action": "Source review PASS, but no host/runtime check has run. Commit and push this reviewed tree, then inspect the exact GitHub workflow results/artifacts. Keep packet unaccepted until production exclusion and full-cap Chromium transfer pass and receive independent exact-run review.",
+          "required_parent_acceptance": [
+            "T01"
+          ],
+          "hosted_run": null,
+          "blocker": null,
+          "repair_attempts": []
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7587,7 +7778,7 @@
           "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "Transport source repairs passed typecheck and ESLint on GitHub. The exact formatter patch is independently reviewed and ready for a hosted rerun; runtime remains unrun."
+      "next_action": "Harness source implementation and independent source review are complete; source-only PASS is saved. No hosted app check has run on this code yet. Publish the exact reviewed tree and use GitHub for full verify, production exclusion, integration, preview, and the Chromium full-cap transfer. Keep the child IMPLEMENTED until exact run/artifact review passes."
     },
     {
       "id": "T03",
@@ -8179,5 +8370,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. Source typecheck and ESLint pass; the exact formatter patch is independently reviewed and ready for GitHub. Full-cap transfer and playable match remain unproven."
+  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. The latest exact GitHub run passed verify, production/exclusion, integration and preview, but the maximum-size test timed out before writing bytes because dev-only controls were omitted from the diagnostic build. Root-cause review and a reviewed harness-only scope amendment are next; no transfer or playable match is proven."
 }

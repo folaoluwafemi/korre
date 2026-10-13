@@ -376,6 +376,19 @@ test("the maximum synthetic transport streams through the browser download", asy
   test.setTimeout(480_000);
   await openDiagnostic(page);
 
+  await expect(page.getByTestId("loft-matrix-panel")).toBeVisible({
+    timeout: 5_000,
+  });
+  await expect(
+    page.getByRole("button", { name: "Write transport test file" }),
+  ).toBeVisible({ timeout: 5_000 });
+  const hostAcknowledgementAvailable = await page.evaluate(
+    () =>
+      typeof (window as WindowWithDirectProbe)
+        .__counterballLoftMatrixHostAck === "function",
+  );
+  expect(hostAcknowledgementAvailable).toBe(true);
+
   const expectedSha256 = expectedTransportDigest();
   const status = page.getByTestId("loft-matrix-status");
   let hostPath: string | undefined;

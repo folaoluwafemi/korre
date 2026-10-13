@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-107 bounded cards cover 21 remaining parents. Initially ready: T02-L01-TRANSPORT-1.
+108 bounded cards cover 21 remaining parents. Initially ready: T02-L01-TRANSPORT-HARNESS-1.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -81,7 +81,8 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-CONTACT-SCHEMA-1 | T02 | Represent dynamic and static L01 contact participants | worker | T02-L01-CONTACT-CONTRACT-1, T02-L01-CONTACT-STATUS-1, C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1 | 2 |
 | T02-L01-EXECUTOR-1 | T02 | Run L01 cases with the real page Havok engine | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-CONTACT-SCHEMA-1 | 2 |
 | T02-L01-BROWSER-1 | T02 | Add the development-only L01 page action and file-backed download | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1 | 3 |
-| T02-L01-TRANSPORT-1 | T02 | Prove maximum-size browser-to-host transfer in Chromium | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-BROWSER-1-SUCCESSOR-3 | 1 |
+| T02-L01-TRANSPORT-HARNESS-1 | T02 | Expose test-only transport controls in the diagnostic build | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-BROWSER-1-SUCCESSOR-3 | 3 |
+| T02-L01-TRANSPORT-1 | T02 | Prove maximum-size browser-to-host transfer in Chromium | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-L01-TRANSPORT-HARNESS-1 | 1 |
 | T02-L01-MATRIX-1 | T02 | Run and retain the complete 24-case browser Havok matrix | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1 | 1 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
 | O02 | T04 | Build restricted real-WASM smoke Durable Object | coordinator | C00, O01, parent:T02, C01 | 5 |

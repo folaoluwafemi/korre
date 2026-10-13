@@ -3489,6 +3489,122 @@
     ]
   },
   {
+    "id": "T02-L01-TRANSPORT-HARNESS-1",
+    "parent": "T02",
+    "title": "Expose test-only transport controls in the diagnostic build",
+    "role": "worker",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1",
+      "T02-L01-PACKET-SPLIT-1",
+      "T02-L01-BROWSER-1-SUCCESSOR-3"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/DECISIONS.md",
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/TASKS.md",
+      "knowledge_base/execution/SWARM.md",
+      "knowledge_base/execution/completion/README.md",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/ACCEPTANCE.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md",
+      "execution_state/reports/T02-L01-BROWSER-1-SUCCESSOR-3-acceptance.md",
+      "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050.md",
+      "execution_state/reports/T02-L01-TRANSPORT-1-run-38438560050-review.md",
+      "execution_state/packets/T02-L01-TRANSPORT-HARNESS-1.md",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-HARNESS-1",
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "apps/web/src/App.tsx",
+      "apps/web/src/vite-env.d.ts",
+      "tests/production/counterball-dev-match-absent.mjs",
+      "tests/e2e/counterball-direct-probe.spec.ts",
+      "playwright.config.ts",
+      ".github/workflows/ci.yml"
+    ],
+    "write_paths": [
+      "apps/web/src/CounterballDirectProbe.tsx",
+      "tests/production/counterball-dev-match-absent.mjs",
+      "tests/e2e/counterball-direct-probe.spec.ts"
+    ],
+    "outputs": [
+      "Expose the existing restart-loft transport test controls and bounded host acknowledgement in the explicitly flagged diagnostic bundle, while asserting their absence from ordinary production output."
+    ],
+    "steps": [
+      "Define one compile-time predicate DEV || VITE_COUNTERBALL_DEV_HARNESS === \"1\" and use it for the existing panel render, host-attestation validation, and acknowledgement callback installation.",
+      "Add a bounded visibility assertion to the existing full-cap transport test before the write. Once the diagnostic scene is ready, verify the callback completes only for the matching downloaded file and valid byte-count/SHA attestation; do not add a callback timing gate.",
+      "Extend the production marker scan with the Write transport test file label and __counterballLoftMatrixHostAck marker; retain the existing unset-flag guard.",
+      "Do not alter CI routing. If the workflow does not collect the diagnostic spec or serve dist-dev as expected, stop and request a separately reviewed coordinator packet."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-TRANSPORT-HARNESS-1",
+        "environment": "local-document",
+        "expected": "Exact extraction reports ready:true with all accepted prerequisites and the T01 parent gate preserved."
+      },
+      {
+        "command": "git diff --check -- apps/web/src/CounterballDirectProbe.tsx tests/production/counterball-dev-match-absent.mjs tests/e2e/counterball-direct-probe.spec.ts",
+        "environment": "local-document",
+        "expected": "Only the three assigned paths are checked; no application build or test runs locally."
+      },
+      {
+        "command": "pnpm verify",
+        "environment": "github",
+        "expected": "Exact-head CI typecheck, lint, unit tests, and production builds pass."
+      },
+      {
+        "command": "node tests/production/counterball-dev-match-absent.mjs",
+        "environment": "github",
+        "expected": "Ordinary production bundle contains neither transport control nor host acknowledgement marker."
+      },
+      {
+        "command": "pnpm test:integration",
+        "environment": "github",
+        "expected": "Integration suite passes with no unreported skips."
+      },
+      {
+        "command": "COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e --workers=1",
+        "environment": "github",
+        "expected": "Existing production-preview browser suite passes against the built production artifact."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "Existing diagnostic browser suite runs against the CI-built dist-dev and full-cap transfer passes in real Chromium with exact size/digest, cleanup, and zero skips/retries."
+      },
+      {
+        "command": "Independent exact-source and exact-run review",
+        "environment": "source-review",
+        "expected": "Reviewer confirms the three source gates, production absence, unchanged route/config/physics, and actual browser transport evidence."
+      }
+    ],
+    "acceptance": [
+      "The flagged diagnostic browser run sees and activates the existing transport writer; its host acknowledgement succeeds only for the matching completed download and valid size/SHA attestation.",
+      "The ordinary production output omits both the transport UI and host acknowledgement marker, and the production absence command passes.",
+      "The existing full-cap transfer passes on exact-head Chromium with the accepted byte count/digest, bounded transfer behavior, cleanup, and no skips/retries.",
+      "Independent source and exact-run review pass. This child does not accept parent T02; the coordinator records the transport card against its original criteria."
+    ],
+    "negative_cases": [
+      "No mock or Node result substitutes for Chromium; do not lower byte/chunk caps, weaken cleanup, add a production escape hatch, or describe synthetic transport as physics evidence."
+    ],
+    "review_questions": [
+      "Do all three existing controls use the same explicit harness predicate?",
+      "Does the ordinary production bundle lack both diagnostic markers?",
+      "Does the exact routed browser test exercise the unchanged bounded transfer and cleanup path?"
+    ],
+    "stop_conditions": [
+      "If workflow routing/configuration, another write path, a shared contract, or production-visible behavior must change, stop and request a separately reviewed coordinator packet.",
+      "Keep the original transport card CHANGES_REQUIRED until this source repair is accepted and its exact full-cap transport evidence receives independent review."
+    ]
+  },
+  {
     "id": "T02-L01-TRANSPORT-1",
     "parent": "T02",
     "title": "Prove maximum-size browser-to-host transfer in Chromium",
@@ -3503,7 +3619,8 @@
       "T02-L01-GUARD-CONTRACT-1",
       "T02-L01-GUARD-SCHEMA-1",
       "T02-L01-PACKET-SPLIT-1",
-      "T02-L01-BROWSER-1-SUCCESSOR-3"
+      "T02-L01-BROWSER-1-SUCCESSOR-3",
+      "T02-L01-TRANSPORT-HARNESS-1"
     ],
     "read_paths": [
       "AGENTS.md",

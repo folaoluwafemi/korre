@@ -7,6 +7,8 @@ const buildDirectory = path.resolve("apps/web/dist");
 const diagnosticMarkers = [
   "Development-only renderer diagnostic",
   "renderer-diagnostic__label",
+  "Write transport test file",
+  "__counterballLoftMatrixHostAck",
 ];
 
 if (process.env.VITE_COUNTERBALL_DEV_HARNESS !== undefined) {

@@ -409,3 +409,10 @@ No local application build/test/browser/physics ran for this contract correction
 - Repair attempt 2's only source change is `games/counterball/src/viteAssetModules.d.ts`; independent source review passed at `execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md`.
 - `/root` owns committing/pushing the reviewed repair, exact-SHA GitHub verification, production-output and run-evidence review, then Browser1 acceptance only if all original gates pass.
 - No local application command ran. `T02-L01-TRANSPORT-1` remains blocked until Browser1 is accepted. Cloudflare remains untouched pending the user's signal.
+
+## Current ownership — 2026-10-13 (transport harness source released for review)
+
+- `/root/toolchain_audit` completed `T02-L01-TRANSPORT-HARNESS-1`; its exact three source paths and implementation report are released. No further writes are authorized until a new assignment.
+- `/root/run_evidence_review` is the independent source reviewer, with sole write path `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-review.md`.
+- `/root` retains ownership of packet/catalogue/status/ledger, CI publication and exact-run integration evidence. Workflow routing and production configuration are read-only for this card.
+- The original `T02-L01-TRANSPORT-1` card remains `CHANGES_REQUIRED` and waits on this accepted child; its failed run produced no transport result. No local app build/test or Cloudflare access is authorized or needed here.

@@ -154,6 +154,8 @@ const SYNTHETIC_TRANSPORT_BYTES = 504_365_056;
 const OPFS_WRITE_CHUNK_BYTES = 256 * 1024;
 const OPFS_ESTIMATE_HEADROOM_BYTES = 16 * 1024 * 1024;
 const EXPORT_ACKNOWLEDGEMENT_TIMEOUT_MS = 15 * 60 * 1000;
+const isDiagnosticHarness =
+  import.meta.env.DEV || import.meta.env.VITE_COUNTERBALL_DEV_HARNESS === "1";
 
 function throwIfAborted(signal: AbortSignal): void {
   if (signal.aborted) {
@@ -613,7 +615,7 @@ export default function CounterballDirectProbe({
     };
 
     const hostAcknowledge = async (value: unknown): Promise<boolean> => {
-      if (!import.meta.env.DEV || !isLoftMatrixHostAttestation(value))
+      if (!isDiagnosticHarness || !isLoftMatrixHostAttestation(value))
         return false;
       const attestation = value;
       const session = pendingMatrixDownload;
@@ -648,7 +650,7 @@ export default function CounterballDirectProbe({
       }
     };
 
-    if (import.meta.env.DEV) {
+    if (isDiagnosticHarness) {
       browserWindow.__counterballLoftMatrixHostAck = hostAcknowledge;
     }
 
@@ -674,7 +676,10 @@ export default function CounterballDirectProbe({
           new DOMException("The diagnostic page was unmounted.", "AbortError"),
         ).catch(() => undefined);
       }
-      if (browserWindow.__counterballLoftMatrixHostAck === hostAcknowledge) {
+      if (
+        isDiagnosticHarness &&
+        browserWindow.__counterballLoftMatrixHostAck === hostAcknowledge
+      ) {
         delete browserWindow.__counterballLoftMatrixHostAck;
       }
       runMatrixActionRef.current = null;
@@ -1185,7 +1190,7 @@ export default function CounterballDirectProbe({
       <p role="status" aria-live="polite" data-testid="probe-status">
         {status}
       </p>
-      {import.meta.env.DEV ? (
+      {isDiagnosticHarness ? (
         <section
           aria-labelledby="loft-matrix-title"
           data-testid="loft-matrix-panel"
