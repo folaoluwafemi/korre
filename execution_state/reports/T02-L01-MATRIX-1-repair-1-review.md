@@ -1,0 +1,11 @@
+# T02-L01-MATRIX-1 repair 1 source review
+
+**SOURCE: PASS. RUNTIME AND 20-MINUTE FIT: NOT RUN.**
+
+The repair is within the packet’s sole source write path, `tests/e2e/counterball-direct-probe.spec.ts`. The prior review found two identical 147-line matrix-test blocks; the current source contains exactly one `test("the full real-Havok loft matrix downloads and passes bounded host validation", ...)`, beginning at line 2061. It retains the complete matrix test flow: starts the 24-case diagnostic, waits up to the existing 780,000ms cap, downloads and incrementally validates the file, verifies host acknowledgement, attaches validation/full-matrix artifacts only after success, and cleans up on failure (`:2061–2206`). The unused first `allSettled` binding is absent; `rg` finds only the second, used binding.
+
+Both 60-sample settling traversals now use indexed `for` loops over arrays whose exact length is first required to be 60. The metadata traversal at lines 1001–1022 validates each tick ID, both 15-body arrays, every finite/nonnegative speed, and each settled mask against thresholds. A valid earlier sample with a partial settled mask does not stop that loop. The row/endpoint traversal at lines 1369–1395 likewise visits each sample, validates tick and mask, checks all speeds and their equality with the corresponding endpoint arrays, and continues after an unsettled mask. Its separate `allSettled` accumulator starts true at line 1374 and becomes false for any partial mask at line 1395; eligibility consumes it at line 1426. No `.every()` short-circuit remains in either settling window.
+
+The repair report’s description matches the source. Apart from removing the duplicate test and changing those settling traversals/eligibility bookkeeping, no matrix cap or assertion was weakened in the reviewed repair: canonical tuples, workload and byte limits, provenance, native/material/static facts, contact/sweep checks, digest, acknowledgement order, artifact rules, and cleanup remain present. The existing 24-case test is not skipped or reduced.
+
+No application commands, tests, lint, builds, browser checks, CI, or physics runs were performed for this source review. This review does not establish a real Chromium/Havok result or that the test fits the existing 20-minute job; exact-head hosted verification remains required.

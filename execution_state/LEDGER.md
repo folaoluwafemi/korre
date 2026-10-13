@@ -504,3 +504,37 @@ Source review is in progress for the exact three-file harness repair. Local app 
 The source and exact-run reviewers confirm that GitHub run [38443895020](https://github.com/folaoluwafemi/korre/actions/runs/38443895020), commit `92294c26713c54c585db5a40be1c8fb5060ffb32`, completed Verify, production diagnostic exclusion, integration, and production-preview browser checks. The maximum synthetic transfer test passed all `504,365,056` bytes, the expected SHA-256, the matching host acknowledgement, and browser/host cleanup. The overall diagnostic run is not green: it had 1 pass, 2 failures, and zero skips/retries/flakes. Independent trace review confirms both failures target y=891.23 in a 720px viewport; the first screenshot changes scroll after its bounding box is captured. No flick physics or retry claim follows from these failures.
 
 The reviewer-approved repair is limited to the existing E2E spec. `/root/toolchain_audit` implemented fresh in-viewport canvas bounds for both gestures; `/root/executor_type_review` returned independent SOURCE PASS, with runtime still NOT VERIFIED. The exact reviewed source is ready for GitHub publication and rerun. The browser suite and transport card remain unaccepted until that exact-hosted suite passes. Deployed Cloudflare Havok, a full playable match, AI, identity and online flows remain open. No local application build/test or Cloudflare access was used.
+
+GitHub run [38446757474](https://github.com/folaoluwafemi/korre/actions/runs/38446757474) is now executing the independently source-reviewed viewport repair on exact SHA `8e31b3320295d02d57dbf40a6acded3a9ea57485`. The prior run's full-cap transport pass is recorded separately from its two failed pointer tests; no acceptance or playability claim is made until this exact-head workflow and independent run review finish.
+
+
+## Coordinator checkpoint — 2026-10-13 (transport accepted; matrix next)
+
+T02-L01-TRANSPORT-HARNESS-1 and its original T02-L01-TRANSPORT-1 card are ACCEPTED on exact SHA `8e31b3320295d02d57dbf40a6acded3a9ea57485` after GitHub run [38446757474](https://github.com/folaoluwafemi/korre/actions/runs/38446757474) and independent exact-source/run/artifact review. The run passed Verify (30 files, 179 tests), production diagnostic exclusion, integration (1/1), production preview (4/4), and diagnostic Chromium (3/3; zero skips, retries, or flaky tests). The synthetic transport assertions verified exactly 504,365,056 bytes, the expected digest, matching host acknowledgement, and cleanup. Five of 40 workflow steps were conditional failure-only skips; no required check failed. Acceptance evidence is in `execution_state/reports/T02-L01-TRANSPORT-1-acceptance-38446757474.md` and `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-run-38446757474-review.md`.
+
+This does not accept parent T02, prove deployed Cloudflare Havok, or make the game playable. The complete 24-case real-Havok matrix remains next; no Wrangler/Cloudflare session was used.
+
+
+## Coordinator checkpoint — 2026-10-13 (T02-L01 matrix dispatched)
+
+T02-L01-TRANSPORT-1 is ACCEPTED on run 38446757474. The exact plan checker now reports T02-L01-MATRIX-1 as the sole initially ready card; its exact extraction is ready:true with all original prerequisites and the T01 parent gate preserved. The matrix card is assigned to /root/toolchain_audit for one E2E write path, with /root/run_evidence_review as independent reviewer. The worker may run only the scoped E2E diff check locally. Hosted verify, the complete 24-case real-Havok Chromium matrix, artifact/hash review, and the 20-minute job-fit gate remain pending; parent T02 is RUNNING. See `execution_state/reports/T02-L01-MATRIX-1-coordinator-setup.md`.
+
+
+## Coordinator checkpoint — 2026-10-13 (matrix source implemented; review pending)
+
+T02-L01-MATRIX-1 implementation is complete in the single assigned E2E source path. The worker's scoped `git diff --check -- tests/e2e/counterball-direct-probe.spec.ts` passed. Its report records a bounded 64-KiB streaming reader, one-case-at-a-time validation with the 20-MiB case cap, exact 24-tuple/identity/row/guard/envelope checks, browser acknowledgement and cleanup, and a complete JSON artifact attached only after validation. The independent source review is pending; no app test, build, browser, Havok, or 20-minute job-fit check ran. Parent T02 remains RUNNING; matrix runtime is unproven.
+
+
+## Coordinator checkpoint — 2026-10-13 (matrix source repair required)
+
+Independent source review at `execution_state/reports/T02-L01-MATRIX-1-review.md` returned CHANGES_REQUIRED before CI. It found one duplicated 147-line matrix test that would double the expensive run, two short-circuit `.every` traversals that fail to validate all 60 settling rows after an early unsettled sample, and an unused `allSettled` local. No runtime check was run. Repair attempt 1 is limited to deleting one duplicate, converting both traversals to full-row validation with a separate accumulated all-settled result, and removing the unused binding. Preserve all 24 cases and every existing cap/assertion. MATRIX-1 and parent T02 remain unaccepted.
+
+
+## Coordinator checkpoint — 2026-10-13 (matrix repair 1 source complete; review pending)
+
+Repair attempt 1 is implemented and released in the single assigned E2E path. It removes the duplicate matrix test, validates every row in both 60-row settling traversals without short-circuiting, separately accumulates settlement eligibility, and removes the unused binding. The scoped whitespace check passed after removing one EOF blank line; no app check/runtime ran. Rotated independent re-review by /root/executor_type_review is pending. MATRIX-1 and parent T02 remain unaccepted.
+
+
+## Coordinator checkpoint — 2026-10-13 (matrix repair source review passed; hosted run next)
+
+Rotated independent source review of MATRIX-1 repair attempt 1 passed at `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md`. It confirms exactly one full 24-case test, complete non-short-circuit validation of both 60-row settling windows, preserved caps/assertions, and the exact three corrections. The source-only gate and scoped diff check are now verified; no app/runtime checks ran. The coordinator owns publication and exact-head GitHub acceptance. The hosted 24-case run and 20-minute fit remain NOT RUN; T02 remains RUNNING.

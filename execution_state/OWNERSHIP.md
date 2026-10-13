@@ -426,3 +426,40 @@ No local application build/test/browser/physics ran for this contract correction
 - Viewport repair attempt 1 implementation is complete and scoped source whitespace check passed. `/root/toolchain_audit` released its source path; `/root/executor_type_review` now owns only `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md`. Coordinator retains publication and shared-state ownership. No local app tests/builds were run.
 
 - The viewport repair has independent SOURCE PASS at `execution_state/reports/T02-L01-TRANSPORT-HARNESS-1-pointer-repair-source-review.md`; source ownership is released. `/root` now owns the exact reviewed commit, push, and full GitHub rerun. Runtime is NOT VERIFIED until that run and its independent evidence review complete.
+
+
+## Current ownership — 2026-10-13 (T02-L01 matrix implementation)
+
+- T02-L01-TRANSPORT-1 is accepted on exact SHA `8e31b3320295d02d57dbf40a6acded3a9ea57485`, GitHub run 38446757474, with independent exact-source/run review. It proves browser-file transport only.
+- /root/toolchain_audit owns only `tests/e2e/counterball-direct-probe.spec.ts` and unique report `execution_state/reports/T02-L01-MATRIX-1-implementation.md` for the fixed 24-case Chromium matrix. It may run only `git diff --check -- tests/e2e/counterball-direct-probe.spec.ts` locally. No build, tests, browser automation, commit, push, workflow/config, simulation producer, contract, or status/ledger/ownership edits.
+- /root/run_evidence_review owns independent source review after the worker releases its source path; its only report path is `execution_state/reports/T02-L01-MATRIX-1-review.md`.
+- /root owns shared status/contracts/config, CI publication and exact-SHA hosted acceptance. If source review passes, publish the reviewed source and run the existing GitHub workflow; any matrix, cap or 20-minute fit failure stops before another matrix trial. Cloudflare remains unused pending the user's signal.
+
+
+## Current ownership — 2026-10-13 (matrix source released for independent review)
+
+- /root/toolchain_audit completed MATRIX-1 and released `tests/e2e/counterball-direct-probe.spec.ts`; the only local path check passed. No app commands ran.
+- /root/run_evidence_review owns only `execution_state/reports/T02-L01-MATRIX-1-review.md` for independent source review against the exact packet, producer schema, caps, parser memory bound, guard/row/envelope validation, ACK/cleanup and artifact handling. It must not run builds, tests, browsers or CI.
+- /root owns the status/ledger/ownership records and, only after source PASS, exact-head GitHub publication, full hosted run, artifact capture and acceptance decision. The first hosted run alone measures the existing 20-minute job fit; if it times out, stop before another matrix trial.
+
+
+## Current ownership — 2026-10-13 (matrix repair attempt 1)
+
+- The original MATRIX-1 source review is complete with CHANGES_REQUIRED at `execution_state/reports/T02-L01-MATRIX-1-review.md`; its source is released for coordinator-directed repair only.
+- /root/toolchain_audit owns only `tests/e2e/counterball-direct-probe.spec.ts` and unique report `execution_state/reports/T02-L01-MATRIX-1-repair-1-implementation.md` to remove one duplicate test, fully validate all 60 settling rows in both traversals while separately tracking all-settled, and delete the unused binding. No other source or status writes; only the scoped diff check locally.
+- /root/executor_type_review owns only `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md` after source release. No app build/test/browser/CI runs until source review PASS.
+- /root owns task state, integration, and exact-head hosted run after independent review.
+
+
+## Current ownership — 2026-10-13 (matrix repair 1 released for re-review)
+
+- /root/toolchain_audit completed repair attempt 1 and released `tests/e2e/counterball-direct-probe.spec.ts`; the exact scoped diff check passed after an EOF whitespace fix.
+- /root/executor_type_review owns only `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md` for independent review of the three reported defects and exact scope. No app commands.
+- /root owns task state and CI publication; no hosted run until this rotated source review passes.
+
+
+## Current ownership — 2026-10-13 (matrix source verified; GitHub run next)
+
+- MATRIX-1 repair source is independently reviewed PASS at `execution_state/reports/T02-L01-MATRIX-1-repair-1-review.md`; worker/reviewer source ownership is released.
+- /root owns staging/committing only the reviewed project/test and exact evidence/status reports, push to the authorized feature branch, then full exact-SHA GitHub CI and artifact review. No local application build/test/browser command.
+- Any hosted failure or 20-minute timeout is recorded exactly; do not rerun the expensive matrix without a bounded repair and review. Cloudflare remains unused pending the user's signal.
