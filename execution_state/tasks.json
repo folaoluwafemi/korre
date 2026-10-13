@@ -5975,13 +5975,13 @@
         },
         {
           "id": "T02-L01-TRANSPORT-1",
-          "status": "REVIEWING",
+          "status": "RUNNING",
           "ready": false,
           "role": "worker",
           "title": "Prove maximum-size browser-to-host transfer in Chromium",
-          "owner": "/root/toolchain_audit — implementation complete; /root/run_evidence_review — independent source review assigned",
+          "owner": "/root/toolchain_audit — bounded repair attempt 1; /root/executor_type_review — independent repair source reviewer",
           "author_identity": "/root/toolchain_audit",
-          "reviewer_identity": "/root/run_evidence_review",
+          "reviewer_identity": "/root/executor_type_review",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-1",
           "depends_on": [
             "C00-B",
@@ -6111,6 +6111,47 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
               "detail": "Independent source reviewer confirmed the sole E2E path, exact size/chunk/quota, amended UI sequence, streamed host digest, post-verification ACK, cleanup and production/CI scope. Runtime remains pending."
+            },
+            {
+              "command": "GitHub exact-SHA full verify, production, integration, preview, diagnostic browser E2E, and full-cap transport",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38435557340,
+              "source_sha": "0d4084f202ee96743e15f6c950b724960a9a1fc7",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38435557340",
+              "detail": "Exact run failed at Verify: typechecks passed, ESLint found three findings in the assigned E2E file. 26/40 steps succeeded, 1 failed, 13 skipped; production, tests/build, integration, preview, and diagnostic browser gates did not run. No full-cap transfer result.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38435557340.md"
+            },
+            {
+              "command": "Independent exact-run review after successful full-cap transport run",
+              "result": "PENDING",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38435557340-review.md",
+              "detail": "Failure gate and artifact provenance captured; final exact-run acceptance review will follow after successful repair run."
+            },
+            {
+              "command": "Capture exact failed-run logs and artifact provenance for run 38435557340",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38435557340,
+              "source_sha": "0d4084f202ee96743e15f6c950b724960a9a1fc7",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38435557340.md",
+              "detail": "Full job log, job-step API snapshot, artifacts API, verification log artifacts, and local extracted-file hashes/sizes were saved under the run-specific evidence folders."
+            },
+            {
+              "command": "Repair attempt 1 scoped git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
+              "detail": "Only tests/e2e/counterball-direct-probe.spec.ts changed; no local application checks ran."
+            },
+            {
+              "command": "Independent exact-source review of repair attempt 1",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
+              "detail": "Typed bounded 64 KiB file reads remove the unsafe-any stream path; cleanup errors are reported after finally and preserve any primary failure. Hosted verification is outstanding."
             }
           ],
           "acceptance": [
@@ -6131,14 +6172,24 @@
             "Quota, timeout, download or digest failure blocks matrix dispatch; do not lower the exact accepted test size.",
             "If CI routing needs edits, stop and get a separately reviewed coordinator card."
           ],
-          "attempt_count": 0,
+          "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
-          "next_action": "Exact-source review PASS. Coordinator stages the reviewed E2E and evidence/catalogue changes, commits and pushes the exact SHA to GitHub; then independently review the hosted transfer results before acceptance.",
+          "next_action": "Repair attempt 1 passed independent source review. Commit and push the exact reviewed patch, then run GitHub verification; accept only after the hosted full-cap Chromium transfer and exact-run review pass.",
           "required_parent_acceptance": [
             "T01"
           ],
-          "blocker": null
+          "hosted_run": {
+            "run_id": 38435557340,
+            "commit": "0d4084f202ee96743e15f6c950b724960a9a1fc7",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38435557340",
+            "status": "completed",
+            "conclusion": "failure",
+            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38435557340.md"
+          },
+          "blocker": "The initial exact-SHA run failed ESLint before runtime gates. Repair 1 is source-reviewed; the repaired hosted verification and transport runtime remain pending.",
+          "repair_implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
+          "repair_review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md"
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7445,7 +7496,7 @@
           "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "T02-L01-TRANSPORT-1 source is implemented and under independent review. After source PASS, coordinator submits the exact reviewed SHA to GitHub and retains run logs/artifacts before exact-run review."
+      "next_action": "T02-L01-TRANSPORT-1 attempt 1 failed at ESLint before tests/build/Chromium. Exact run and artifacts are preserved. One focused repair is assigned; no transfer runtime evidence exists."
     },
     {
       "id": "T03",
@@ -8037,5 +8088,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. First diagnostic browser flick accepted. Full-cap OPFS browser-to-host proof is now in progress in one E2E file, using the accepted two-step UI. The 24-case physics matrix, complete playable match, AI, online/social, staging, Cloudflare deployment, and device playtest still remain."
+  "next": "T02 remains RUNNING. The first browser-flick milestone is accepted. Full-cap transport attempt 1 failed ESLint before browser execution; one bounded lint repair is in progress with independent review. No full transfer or playable match is claimed."
 }

@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
-import { rm } from "node:fs/promises";
+import { open, rm } from "node:fs/promises";
 import {
   expect,
   test,
@@ -57,15 +56,36 @@ function expectedTransportDigest(): string {
 async function hashDownloadedFile(path: string): Promise<DownloadDigest> {
   const hash = createHash("sha256");
   let byteLength = 0;
-  for await (const chunk of createReadStream(path, {
-    highWaterMark: 64 * 1024,
-  })) {
-    byteLength += chunk.byteLength;
-    if (byteLength > TRANSPORT_BYTES) {
-      throw new Error("The downloaded transport file exceeds its exact cap.");
+  const file = await open(path, "r");
+  try {
+    const buffer = new Uint8Array(64 * 1024);
+    while (true) {
+      const { bytesRead } = await file.read(
+        buffer,
+        0,
+        buffer.byteLength,
+        null,
+      );
+      if (bytesRead === 0) break;
+      byteLength += bytesRead;
+      if (byteLength > TRANSPORT_BYTES) {
+        throw new Error("The downloaded transport file exceeds its exact cap.");
+      }
+      hash.update(buffer.subarray(0, bytesRead));
     }
-    hash.update(chunk);
+  } catch (error) {
+    try {
+      await file.close();
+    } catch (closeError) {
+      throw new AggregateError(
+        [error, closeError],
+        "The downloaded transport could not be read or closed.",
+        { cause: error },
+      );
+    }
+    throw error;
   }
+  await file.close();
   return { byteLength, sha256: hash.digest("hex") };
 }
 
@@ -361,6 +381,7 @@ test("the maximum synthetic transport streams through the browser download", asy
   let browserDownload: Download | undefined;
   let hasPrimaryError = false;
   let primaryError: unknown;
+  const cleanupErrors: unknown[] = [];
 
   try {
     await page
@@ -454,9 +475,7 @@ test("the maximum synthetic transport streams through the browser download", asy
   } catch (error) {
     hasPrimaryError = true;
     primaryError = error;
-    throw error;
   } finally {
-    const cleanupErrors: unknown[] = [];
     try {
       await cleanupBrowserTransport(page);
     } catch (error) {
@@ -474,15 +493,22 @@ test("the maximum synthetic transport streams through the browser download", asy
         cleanupErrors.push(error);
       }
     }
+  }
+
+  if (hasPrimaryError) {
     if (cleanupErrors.length > 0) {
-      const errors = hasPrimaryError
-        ? [primaryError, ...cleanupErrors]
-        : cleanupErrors;
       throw new AggregateError(
-        errors,
-        "The transport test failed to remove every temporary file.",
-        hasPrimaryError ? { cause: primaryError } : undefined,
+        [primaryError, ...cleanupErrors],
+        "The transport test failed and cleanup was incomplete.",
+        { cause: primaryError },
       );
     }
+    throw primaryError;
+  }
+  if (cleanupErrors.length > 0) {
+    throw new AggregateError(
+      cleanupErrors,
+      "The transport test failed to remove every temporary file.",
+    );
   }
 });
