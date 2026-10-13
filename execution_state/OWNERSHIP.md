@@ -403,3 +403,9 @@ No local application build/test/browser/physics ran for this contract correction
 - Repair attempt 2 is authorized to edit the original two Browser1 source paths plus existing `games/counterball/src/viteAssetModules.d.ts`, as recorded in the accepted scope amendment and `LOCAL_PACKETS.json`.
 - `/root/toolchain_audit` owns only those three source paths and `execution_state/reports/T02-L01-BROWSER-1-repair-2-implementation.md`; it may run only scoped `git diff --check` and must not attempt another repair after this one.
 - `/root/run_evidence_review` is the independent source/run reviewer after implementation paths are released. `/root` owns shared status, exact-SHA GitHub checks, artifact review, and packet acceptance. Cloudflare remains untouched pending the user signal.
+
+## Current ownership — 2026-10-13 (repair-2 source review passed; hosted check next)
+
+- Repair attempt 2's only source change is `games/counterball/src/viteAssetModules.d.ts`; independent source review passed at `execution_state/reports/T02-L01-BROWSER-1-repair-2-review.md`.
+- `/root` owns committing/pushing the reviewed repair, exact-SHA GitHub verification, production-output and run-evidence review, then Browser1 acceptance only if all original gates pass.
+- No local application command ran. `T02-L01-TRANSPORT-1` remains blocked until Browser1 is accepted. Cloudflare remains untouched pending the user's signal.
