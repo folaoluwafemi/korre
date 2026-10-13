@@ -1812,5 +1812,90 @@
       "If either trace is absent, truncated, or does not preserve its exit status, stop before product-source edits and prepare a narrower reviewed diagnostic.",
       "Do not attempt a third Browser1 repair. After diagnosis, prepare a separate bounded and independently reviewed successor packet for any source change."
     ]
+  },
+  {
+    "id": "T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
+    "parent": "T02",
+    "title": "Include Counterball asset-query declarations in the root test TypeScript project",
+    "role": "coordinator",
+    "depends_on": [
+      "T02-L01-BROWSER-1-ROOT-TSC-DIAG-1"
+    ],
+    "required_parent_acceptance": [
+      "T01"
+    ],
+    "read_paths": [
+      "AGENTS.md",
+      "knowledge_base/execution/completion/COORDINATOR_PACKETS.json#T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
+      "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-BROWSER-1",
+      "knowledge_base/execution/completion/OPERATIONS.md",
+      "knowledge_base/execution/ACCEPTANCE.md",
+      "knowledge_base/execution/SWARM.md",
+      "execution_state/tasks.json",
+      "execution_state/reports/T02-L01-BROWSER-1-ROOT-TSC-DIAG-1-run-38423047143.md",
+      "execution_state/reports/T02-L01-BROWSER-1-ROOT-TSC-DIAG-1-run-38423047143-independent-review.md",
+      "tests/tsconfig.json",
+      "games/counterball/src/viteAssetModules.d.ts",
+      "tests/unit/workspace.test.ts",
+      "games/counterball/src/browser.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "package.json",
+      ".github/workflows/ci.yml"
+    ],
+    "write_paths": [
+      "tests/tsconfig.json"
+    ],
+    "outputs": [
+      "The root tests TypeScript project explicitly includes the existing Counterball package-owned Vite query declaration file.",
+      "The two exact TS2307 errors disappear from the tests project without runtime code, dependency, or suppression changes.",
+      "An exact-SHA GitHub run records Verify and downstream gate results so this typing repair is reviewed without claiming a playable flow."
+    ],
+    "steps": [
+      "Use only the accepted root-project trace as the diagnosis: tests/tsconfig.json is the sole failing TypeScript project, it imports the public Counterball browser entry, and it omits games/counterball/src/viteAssetModules.d.ts. The package and apps/web server configs return 0.",
+      "Add `../games/counterball/src/viteAssetModules.d.ts` to the existing `include` array in tests/tsconfig.json. Preserve every existing compiler option and include. Do not add Vite as a root dependency, relax declarations, suppress diagnostics, alter application source, or change tests.",
+      "Run `node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1` and only `git diff --check -- tests/tsconfig.json` locally. Do not run app install/typecheck/build/tests/browser automation locally.",
+      "After independent review of the exact one-file diff, commit and push. Inspect the exact-SHA GitHub run: require Verify to clear TypeScript and complete its tests/build, then inspect actual production, integration, preview/browser and diagnostic-browser gate outcomes. Record expected failure-only diagnostic-step skips separately from required gates; do not claim a no-skip result when any gate is skipped.",
+      "Download complete run logs and actual artifacts, record exact SHA and counts, and obtain independent evidence review before accepting this followup. If another gate fails, stop at the first real failure and create a separate bounded card; do not weaken or skip it."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1",
+        "environment": "local-document",
+        "expected": "This separately reviewed source followup is under T02, depends on the accepted root diagnostic, and preserves accepted T01."
+      },
+      {
+        "command": "git diff --check -- tests/tsconfig.json",
+        "environment": "local-document",
+        "expected": "Only the exact TypeScript include change passes scoped whitespace validation; no local app command runs."
+      },
+      {
+        "command": "GitHub Actions exact-SHA pnpm verify and downstream gates",
+        "environment": "github",
+        "expected": "Root typecheck no longer emits the two TS2307s. Record actual Verify, build, integration, production, preview/browser outcomes and skipped counts; no failure may be hidden."
+      },
+      {
+        "command": "Independent source and exact-run evidence review",
+        "environment": "source-review",
+        "expected": "PASS verifies the one-file type-context change and exact run artifacts; no playability claim is made by this config fix."
+      }
+    ],
+    "acceptance": [
+      "The root tests project includes the existing package declaration and its exact compiler trace no longer reports either TS2307.",
+      "The source change is only tests/tsconfig.json and introduces no Vite dependency, runtime code, suppression, assertion change, or verification weakening.",
+      "The exact-SHA hosted run and actual downstream gate outcomes are retained and independently reviewed.",
+      "This followup unblocks the browser runner typecheck only; it does not accept Browser1, prove first flick, physics, deployed Havok, or playability."
+    ],
+    "negative_cases": [
+      "No third repair under Browser1; no local application command; no ambient type relaxation, ignore pattern, compiler weakening, test modification, Cloudflare use, or playability claim."
+    ],
+    "review_questions": [
+      "Does the new include resolve the actual package-owned query declarations for the root consumer without unrelated types?",
+      "Is the exact changed-file scope limited to tests/tsconfig.json?",
+      "Does the hosted run show both compiler errors gone and preserve all required gates/results?"
+    ],
+    "stop_conditions": [
+      "If the declaration file is missing or the errors persist, stop without another source change and report the exact new trace.",
+      "If a downstream test/build/browser gate fails, record its real result and materialize a separate narrow successor after review; never accept by skipping it."
+    ]
   }
 ]

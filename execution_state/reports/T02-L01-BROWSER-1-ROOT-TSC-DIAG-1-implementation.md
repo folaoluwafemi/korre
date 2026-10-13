@@ -13,3 +13,4 @@ Checks actually run:
 No local application typecheck, install, build, test, browser run, or deployment was run. Independent workflow review and exact-SHA hosted verification are pending.
 
 Independent workflow review passed: execution_state/reports/T02-L01-BROWSER-1-ROOT-TSC-DIAG-1-review.md. Exact-SHA hosted verification is pending.
+Independent exact-run evidence review passed: `execution_state/reports/T02-L01-BROWSER-1-ROOT-TSC-DIAG-1-run-38423047143-independent-review.md`. The reviewer verified the exact run/SHA, all step counts and compiler outcomes, and every file hash/size. The isolated root TypeScript error is confirmed; a separately reviewed one-file config followup is now in progress.
