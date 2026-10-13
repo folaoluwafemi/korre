@@ -317,7 +317,7 @@ async function openOpfsExport(
       throw new AggregateError(
         [error, cleanupError],
         "OPFS setup failed and cleanup was incomplete.",
-        { cause: error },
+        { cause: cleanupError },
       );
     }
     throw error;
