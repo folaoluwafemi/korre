@@ -485,3 +485,30 @@ No local application build/test/browser/physics ran for this contract correction
 - /root/toolchain_audit completed bounded repair attempt 2 and released the E2E source path; /root/run_evidence_review independently returned SOURCE PASS at execution_state/reports/T02-L01-MATRIX-1-repair-2-review.md.
 - /root owns staging the reviewed source and exact run-38457484401 failure/review evidence with current status/ledger, publishing the resulting exact SHA to the authorized feature branch, and capturing/reviewing its full GitHub run and matrix artifact.
 - The hosted typecheck and matrix runtime remain unverified. Do not accept MATRIX-1 or T02 until the acceptance conditions pass. If this next exact-host run reaches the 24-case matrix and fails or times out, stop before another matrix trial and follow the bounded repair/review rule. No local app build/test/browser run; Cloudflare remains untouched pending the user's signal.
+
+
+## Current ownership — 2026-10-13 (repair 2 exact-head GitHub run 38458662778)
+
+- Run 38458662778 is in progress on exact reviewed SHA fdedf9e1b8a0218ff1efc42d3b8afeca2a1f7f2f. /root owns status capture, complete logs/artifacts, matrix acceptance decision, and independent exact-run review.
+- This is the first attempt to reach the real 24-case matrix; the prior failure happened in TypeScript typecheck. No outcome or matrix pass is claimed yet.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 new hosted lint failure)
+
+- The exact-head repair-2 run 38458662778 passed typecheck but failed Verify lint with seven reported findings before application tests or matrix runtime. Coordinator report and full run evidence are under execution_state/reports/T02-L01-MATRIX-1-run-38458662778*.
+- /root/toolchain_audit owns only tests/e2e/counterball-direct-probe.spec.ts and execution_state/reports/T02-L01-MATRIX-1-repair-3-implementation.md for one focused repair attempt on this newly exposed lint signature. Only git diff --check for the assigned source file may run locally. Preserve all assertions and the accepted validator semantics.
+- /root/executor_type_review owns only execution_state/reports/T02-L01-MATRIX-1-repair-3-review.md for independent source review after release. No app commands. /root owns task state, exact-run publication, run evidence and acceptance. This new lint signature gets at most two focused repair attempts total; MATRIX-1 runtime remains unrun.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 repair 3 review finding)
+
+- /root/executor_type_review completed the independent repair-3 source review with CHANGES_REQUIRED at execution_state/reports/T02-L01-MATRIX-1-repair-3-review.md. Placement branches, native-mask validation and matrix assertions passed review; the caught-undefined sentinel issue needs correction.
+- /root/toolchain_audit owns only tests/e2e/counterball-direct-probe.spec.ts and execution_state/reports/T02-L01-MATRIX-1-repair-4-implementation.md for the second and final focused attempt on this signature. Only scoped git diff --check may run locally.
+- /root/run_evidence_review owns only execution_state/reports/T02-L01-MATRIX-1-repair-4-review.md. No app commands. If this repair/re-review does not pass, stop editing and escalate the exact source evidence per SWARM.md. Matrix runtime has not run.
+
+
+## Current ownership — 2026-10-13 (MATRIX-1 repair 4 reviewed)
+
+- /root/toolchain_audit released the bounded final repair path; /root/run_evidence_review independently passed its source review at execution_state/reports/T02-L01-MATRIX-1-repair-4-review.md.
+- /root owns exact reviewed-source commit/push, one exact-head GitHub run, complete run/artifact capture, independent runtime review and the acceptance decision.
+- Runs 38457484401 and 38458662778 failed before matrix runtime (typecheck then lint). No 24-case trial has run. This next GitHub run is the first runtime attempt; preserve the accepted 20-minute/zero-skip gates and do not claim matrix evidence until the actual browser/Havok artifact is reviewed. Cloudflare remains untouched pending the user's signal.

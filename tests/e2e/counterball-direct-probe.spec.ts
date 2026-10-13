@@ -391,6 +391,11 @@ function boundedInteger(
   return value;
 }
 
+function rethrowCaughtError(error: unknown, message: string): never {
+  if (error instanceof Error) throw error;
+  throw new Error(message, { cause: error });
+}
+
 function assertTuple(value: unknown, expected: MatrixTuple, label: string): void {
   expect(Array.isArray(value), `${label} must be an array`).toBe(true);
   expect(value, `${label} must equal its canonical tuple`).toEqual(expected);
@@ -558,7 +563,7 @@ async function readPinnedFixture(): Promise<{
 }> {
   const path = resolve(process.cwd(), "tests/fixtures/counterball-v1.json");
   const file = await open(path, "r");
-  let primaryError: unknown;
+  let primaryFailure: { readonly value: unknown } | null = null;
   let result:
     | { rawSha256: string; initialState: ReturnType<typeof parseMatchState> }
     | undefined;
@@ -603,23 +608,27 @@ async function readPinnedFixture(): Promise<{
       initialState: parseMatchState(states["initial"]),
     };
   } catch (error) {
-    primaryError = error;
+    primaryFailure = { value: error };
   }
-  let closeError: unknown;
+  let closeFailure: { readonly value: unknown } | null = null;
   try {
     await file.close();
   } catch (error) {
-    closeError = error;
+    closeFailure = { value: error };
   }
-  if (primaryError !== undefined && closeError !== undefined) {
+  if (primaryFailure !== null && closeFailure !== null) {
     throw new AggregateError(
-      [primaryError, closeError],
+      [primaryFailure.value, closeFailure.value],
       "Fixture verification failed and its handle did not close cleanly.",
-      { cause: primaryError },
+      { cause: primaryFailure.value },
     );
   }
-  if (primaryError !== undefined) throw primaryError;
-  if (closeError !== undefined) throw closeError;
+  if (primaryFailure !== null) {
+    rethrowCaughtError(primaryFailure.value, "Fixture verification failed with a non-Error value.");
+  }
+  if (closeFailure !== null) {
+    rethrowCaughtError(closeFailure.value, "Fixture handle close failed with a non-Error value.");
+  }
   if (result === undefined) throw new Error("Fixture verification ended without a result.");
   return result;
 }
@@ -658,7 +667,7 @@ function regeneratedInitialState(
   const bodies = ENTITY_IDS.map((id) => {
     const original = originals.get(id);
     if (original === undefined) throw new Error(`Fixture body ${id} is missing.`);
-    let position = { ...original.position };
+    let position: typeof original.position;
     let rotation = { x: 0, y: 0, z: 0, w: 1 };
     if (id === "home-0") position = selectedPosition;
     else if (id === "home-1") position = obstaclePosition;
@@ -716,8 +725,8 @@ function assertFilterPair(value: unknown, label: string): readonly [number, numb
   if (!Array.isArray(value) || value.length !== 2) {
     throw new Error(`${label} must contain two native collision masks.`);
   }
-  const membership = value[0];
-  const collide = value[1];
+  const membership: unknown = value[0];
+  const collide: unknown = value[1];
   for (const [mask, name] of [
     [membership, "membership"],
     [collide, "collide"],
@@ -1441,7 +1450,7 @@ async function validateMatrixFile(path: string): Promise<{
   identity: MatrixRecord;
 }> {
   const file = await open(path, "r");
-  let primaryError: unknown;
+  let primaryFailure: { readonly value: unknown } | null = null;
   let result: { digest: DownloadDigest; totals: MatrixTotals; identity: MatrixRecord } | undefined;
   try {
     const stats = await file.stat();
@@ -1491,19 +1500,23 @@ async function validateMatrixFile(path: string): Promise<{
     const totals: MatrixTotals = { ...aggregate, matrixBytes: digest.byteLength, envelopeBytes, measuredMatrixWallTimeMs: 0 };
     result = { digest, totals, identity };
   } catch (error) {
-    primaryError = error;
+    primaryFailure = { value: error };
   }
-  let closeError: unknown;
+  let closeFailure: { readonly value: unknown } | null = null;
   try {
     await file.close();
   } catch (error) {
-    closeError = error;
+    closeFailure = { value: error };
   }
-  if (primaryError !== undefined && closeError !== undefined) {
-    throw new AggregateError([primaryError, closeError], "Matrix validation failed and its file handle did not close.", { cause: primaryError });
+  if (primaryFailure !== null && closeFailure !== null) {
+    throw new AggregateError([primaryFailure.value, closeFailure.value], "Matrix validation failed and its file handle did not close.", { cause: primaryFailure.value });
   }
-  if (primaryError !== undefined) throw primaryError;
-  if (closeError !== undefined) throw closeError;
+  if (primaryFailure !== null) {
+    rethrowCaughtError(primaryFailure.value, "Matrix validation failed with a non-Error value.");
+  }
+  if (closeFailure !== null) {
+    rethrowCaughtError(closeFailure.value, "Matrix file close failed with a non-Error value.");
+  }
   if (!result) throw new Error("Matrix validation ended without a result.");
   return result;
 }
