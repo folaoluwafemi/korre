@@ -74,9 +74,15 @@ async function hashDownloadedFile(path: string): Promise<DownloadDigest> {
       hash.update(buffer.subarray(0, bytesRead));
     }
   } catch (error) {
+    let closeFailed = false;
+    let closeError: unknown;
     try {
       await file.close();
-    } catch (closeError) {
+    } catch (errorWhileClosing) {
+      closeFailed = true;
+      closeError = errorWhileClosing;
+    }
+    if (closeFailed) {
       throw new AggregateError(
         [error, closeError],
         "The downloaded transport could not be read or closed.",

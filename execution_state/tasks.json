@@ -5975,11 +5975,11 @@
         },
         {
           "id": "T02-L01-TRANSPORT-1",
-          "status": "RUNNING",
+          "status": "REVIEWING",
           "ready": false,
           "role": "worker",
           "title": "Prove maximum-size browser-to-host transfer in Chromium",
-          "owner": "/root/toolchain_audit — bounded repair attempt 1; /root/executor_type_review — independent repair source reviewer",
+          "owner": "/root/toolchain_audit — bounded repair attempt 2; /root/executor_type_review — independent repair source reviewer",
           "author_identity": "/root/toolchain_audit",
           "reviewer_identity": "/root/executor_type_review",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-TRANSPORT-1",
@@ -6152,6 +6152,40 @@
               "environment": "source-review",
               "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
               "detail": "Typed bounded 64 KiB file reads remove the unsafe-any stream path; cleanup errors are reported after finally and preserve any primary failure. Hosted verification is outstanding."
+            },
+            {
+              "command": "GitHub exact-SHA full verify, production, integration, preview, diagnostic browser E2E, and full-cap transport after repair 1",
+              "result": "CHANGES_REQUIRED",
+              "environment": "github",
+              "run_id": 38436788486,
+              "source_sha": "681d47f71a08dc0104e2eca2fda7ee815398065f",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38436788486",
+              "detail": "Exact run failed Verify at ESLint preserve-caught-error on the AggregateError cause in a nested close catch. 26/40 steps succeeded, 1 failed, 13 skipped. Downstream tests/build/integration/preview/browser/full-cap transfer did not run.",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38436788486.md"
+            },
+            {
+              "command": "Capture exact failed-run logs and artifact provenance for run 38436788486",
+              "result": "PASS",
+              "environment": "github",
+              "run_id": 38436788486,
+              "source_sha": "681d47f71a08dc0104e2eca2fda7ee815398065f",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38436788486.md",
+              "detail": "Full Actions log, job-step snapshot, artifacts API, and verification-log artifact were captured with byte counts and SHA-256 digests under the run-specific evidence folder."
+            },
+            {
+              "command": "Repair attempt 2 scoped git diff --check",
+              "result": "PASS",
+              "environment": "local-document",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-implementation.md",
+              "detail": "Only tests/e2e/counterball-direct-probe.spec.ts changed; no local application checks ran."
+            },
+            {
+              "command": "Independent exact-source review of repair attempt 2",
+              "result": "PASS",
+              "environment": "source-review",
+              "report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-review.md",
+              "detail": "Reviewer confirmed the aggregate throw is outside the nested close catch, preserves the read error as cause and both errors in AggregateError.errors, and leaves bounded reads/cap/transport unchanged. Hosted Verify remains pending."
             }
           ],
           "acceptance": [
@@ -6175,21 +6209,39 @@
           "attempt_count": 1,
           "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-review.md",
-          "next_action": "Repair attempt 1 passed independent source review. Commit and push the exact reviewed patch, then run GitHub verification; accept only after the hosted full-cap Chromium transfer and exact-run review pass.",
+          "next_action": "Final repair attempt 2 passed independent source review and scoped diff-check. Commit and push the exact reviewed repair, then run the final permitted GitHub verification. If the repeated lint failure remains, stop and follow SWARM escalation; do not make a third source repair.",
           "required_parent_acceptance": [
             "T01"
           ],
           "hosted_run": {
-            "run_id": 38435557340,
-            "commit": "0d4084f202ee96743e15f6c950b724960a9a1fc7",
-            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38435557340",
+            "run_id": 38436788486,
+            "commit": "681d47f71a08dc0104e2eca2fda7ee815398065f",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38436788486",
             "status": "completed",
             "conclusion": "failure",
-            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38435557340.md"
+            "report": "execution_state/reports/T02-L01-TRANSPORT-1-run-38436788486.md"
           },
-          "blocker": "The initial exact-SHA run failed ESLint before runtime gates. Repair 1 is source-reviewed; the repaired hosted verification and transport runtime remain pending.",
+          "blocker": "GitHub Verify failed preserve-caught-error after repair 1; no runtime gates ran. Repair attempt 2 is the final focused attempt before SWARM escalation.",
           "repair_implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
-          "repair_review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md"
+          "repair_review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
+          "repair_attempts": [
+            {
+              "number": 1,
+              "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-1-review.md",
+              "review": "PASS",
+              "hosted_run": 38436788486,
+              "result": "CHANGES_REQUIRED",
+              "detail": "Exact hosted Verify failed preserve-caught-error because AggregateError was thrown inside the nested close catch with the outer read error as cause."
+            },
+            {
+              "number": 2,
+              "status": "SOURCE_REVIEWED_HOSTED_PENDING",
+              "implementation_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-TRANSPORT-1-repair-2-review.md",
+              "detail": "Final bounded repair attempt passed scoped diff check and independent source review. The exact repaired SHA must pass GitHub Verify before any runtime claim."
+            }
+          ]
         },
         {
           "id": "T02-L01-MATRIX-1",
@@ -7496,7 +7548,7 @@
           "evidence": "Coordinator accepted the first real browser-flick milestone after independent exact-source and exact-run PASS reviews. GitHub run 38430577910 on af5f499a06df4a3cf472ecf0d3991ee330a70bd8: 35 successful, zero failed, five conditional failure-only steps skipped; verify 30 files/179 tests; integration/Worker smoke pass; built preview 4/4; diagnostic browser 2/2 with no skips/retries/flakes. Exact artifact inventory: 1,152 files and five decoded browser attachments hash/size matched. Scope is a diagnostic browser flick only. Full-cap OPFS transport, playable match, deployed Cloudflare Havok and later product flows remain unproven."
         }
       ],
-      "next_action": "T02-L01-TRANSPORT-1 attempt 1 failed at ESLint before tests/build/Chromium. Exact run and artifacts are preserved. One focused repair is assigned; no transfer runtime evidence exists."
+      "next_action": "Transport repair attempt 2 is independently source-reviewed and ready for the final permitted GitHub verification. No full-cap transport runtime result or playable match is established."
     },
     {
       "id": "T03",
@@ -8088,5 +8140,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02 remains RUNNING. The first browser-flick milestone is accepted. Full-cap transport attempt 1 failed ESLint before browser execution; one bounded lint repair is in progress with independent review. No full transfer or playable match is claimed."
+  "next": "T02 remains RUNNING. The diagnostic browser flick milestone is accepted. Transport verification failed twice at ESLint; the final bounded source repair passed independent review and is ready for GitHub. No full transfer or playable match is claimed."
 }
