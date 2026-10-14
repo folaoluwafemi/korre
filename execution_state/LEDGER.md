@@ -756,3 +756,9 @@ Independent exact-source review PASS is recorded at `execution_state/reports/T02
 2026-10-14: T02 remains RUNNING. Reviewed goal-frame readback packet passed exact ready:true extraction and is RUNNING with one-file ownership. Apron matrix failed attempt SUPERSEDED for ownership; no matrix acceptance. Source and hosted evidence pending.
 
 2026-10-14: Goal-frame readback source review PASS; real hosted Verify/integration/preview/diagnostic checks pending. T02 and complete matrix remain unaccepted.
+
+2026-10-14: T02-L01-GOALFRAME-READBACK-1 ACCEPTED for disclosure only after exact-source and real hosted-run/artifact reviews. Native frame0 spans exactly Float32(0.12,0.8,0.12); no matrix/physics step. T02 RUNNING; exact representation contract and full matrix successor next.
+
+2026-10-14: Goal-frame exact projection contract ACCEPTED (diagnostic clause only); full24-case matrix packet independently reviewed/ready:true, now RUNNING with two-file scope. Physics/calibration/T02 still unaccepted.
+
+2026-10-14: Full-matrix goal guard source PASS plus one assertion-format confirmation. Runtime and matrix remain pending. Reviewed stale dependency refs reconciled without parent/gate changes. Refinement input readiness audit identifies missing shared case API/handoff/score, to resolve before dispatch.

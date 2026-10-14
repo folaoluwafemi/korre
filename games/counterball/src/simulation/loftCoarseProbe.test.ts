@@ -477,6 +477,64 @@ describe("matchesExactFloat32Projection", () => {
     }
   });
 
+  it("matches only exact Float32 projections for goal-frame spans", () => {
+    const geometry = COUNTERBALL_CONFIG_V1.geometry;
+    const frameDimensions = [
+      {
+        kind: "upright",
+        dimensions: {
+          x: geometry.goalFrameRadius * 2,
+          y: geometry.goalHeight,
+          z: geometry.goalFrameRadius * 2,
+        },
+      },
+      {
+        kind: "crossbar",
+        dimensions: {
+          x: geometry.goalWidth,
+          y: geometry.goalFrameRadius * 2,
+          z: geometry.goalFrameRadius * 2,
+        },
+      },
+    ] as const;
+
+    expect(frameDimensions.map(({ dimensions }) => dimensions)).toEqual([
+      { x: 0.12, y: 0.8, z: 0.12 },
+      { x: 2.4, y: 0.12, z: 0.12 },
+    ]);
+    for (const { dimensions } of frameDimensions) {
+      for (const axis of ["x", "y", "z"] as const) {
+        const configured = dimensions[axis];
+        const projected = Math.fround(configured);
+        const view = new DataView(
+          new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
+        );
+        view.setFloat32(0, projected);
+        const projectedBits = view.getUint32(0);
+        const adjacentValues = [-1, 1].map((offset) => {
+          const adjacentView = new DataView(
+            new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
+          );
+          adjacentView.setUint32(0, projectedBits + offset);
+          return adjacentView.getFloat32(0);
+        });
+
+        expect(projected).not.toBe(configured);
+        expect(matchesExactFloat32Projection(configured, projected)).toBe(true);
+        expect(matchesExactFloat32Projection(configured, configured)).toBe(
+          false,
+        );
+        for (const adjacent of adjacentValues) {
+          expect(adjacent).not.toBe(projected);
+          expect(Math.fround(adjacent)).toBe(adjacent);
+          expect(matchesExactFloat32Projection(configured, adjacent)).toBe(
+            false,
+          );
+        }
+      }
+    }
+  });
+
   it("accepts only the exact finite projection and rejects adjacent values", () => {
     const configured = 0.2;
     const projected = Math.fround(configured);

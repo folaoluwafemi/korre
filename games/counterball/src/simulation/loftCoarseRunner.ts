@@ -1149,9 +1149,9 @@ function readNativeBodies(world: CounterballWorld): {
             z: geometry.goalFrameRadius * 2,
           };
       if (
-        dimensions.x !== expected.x ||
-        dimensions.y !== expected.y ||
-        dimensions.z !== expected.z
+        !matchesExactFloat32Projection(expected.x, dimensions.x) ||
+        !matchesExactFloat32Projection(expected.y, dimensions.y) ||
+        !matchesExactFloat32Projection(expected.z, dimensions.z)
       ) {
         throw resourceFailure(
           `Goal frame collider ${id} dimensions differ from canonical geometry. ${JSON.stringify(

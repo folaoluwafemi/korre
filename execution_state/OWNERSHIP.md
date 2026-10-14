@@ -764,3 +764,13 @@ No local application build/test/browser/physics ran for this contract correction
 - /root/toolchain_audit: independent source review report only.
 - /root/run_evidence_review: critical-path audit report only; later exact-run review.
 - Coordinator retains config/contracts/catalogues/status/commit/CI. No local app command or Cloudflare action. Superseded failed apron attempt remains unaccepted.
+
+Goal-frame implementation and source review complete; worker/reviewer source ownership released. Coordinator captures hosted-run evidence. All children idle until exact-run review or next accepted dependency; no Cloudflare access used. Static file server session94849 serves the earlier verified remote diagnostic artifact only.
+
+## Goal-frame full-matrix repair ownership — 2026-10-14
+
+- Executor: only games/counterball/src/simulation/loftCoarseRunner.ts, games/counterball/src/simulation/loftCoarseProbe.test.ts and unique T02-L01-GOALFRAME-F32-MATRIX-1-implementation.md report.
+- Toolchain auditor: independent source report only. Run reviewer: preparation audit report then exact-run report only. Coordinator alone owns contracts/config/catalogues/status/commit/CI.
+- 15 accepted dependencies and T01 preserved; independent packet PASS and exact ready:true extraction saved. No local app command or Cloudflare access.
+
+Goal-frame matrix author/source reviewers released ownership. Coordinator confirmed one wrapping-only unit assertion edit under independent review; exact runner/test hashes recorded. No local app command. Coordinator owns exact source commit and hosted checks.

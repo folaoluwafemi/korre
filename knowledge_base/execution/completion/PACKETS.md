@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-116 bounded cards cover 21 remaining parents. Initially ready: T02-L01-GOALFRAME-READBACK-1.
+118 bounded cards cover 21 remaining parents. Initially ready: T02-L01-GOALFRAME-F32-MATRIX-1.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -34,6 +34,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | T02 | Independently verify the first browser-flick successor failure evidence | coordinator | T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1 | 0 |
 | T02-L01-BROWSER-1-SUCCESSOR-2 | T02 | Use the nested cleanup error as AggregateError cause and prove first browser flick | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1, T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1, T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | 1 |
 | T02-L01-BROWSER-1-SUCCESSOR-3 | T02 | Apply the exact hosted format patch and prove the first browser flick | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-EXECUTOR-1, T02-BR02-FORMAT-REPAIR-1, T02-L01-BROWSER-1-TESTS-ASSET-TYPES-FIX-1, T02-L01-BROWSER-1-SUCCESSOR-1-RUN-REVIEW-1 | 1 |
+| T02-L01-GOALFRAME-F32-CONTRACT-1 | T02 | Accept the measured exact native goal-frame representation clause | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1 | 1 |
 | T02-D01 | T02 | Measure direct-shot impulse response on the canonical fixture | worker | C00-B, C01, T02-B0, T02-A, C00 | 1 |
 | T02-F01 | T02 | Implement pure simulation facts from physics-step observations | worker | T02-C0, T02-C2, C00-A, C00 | 2 |
 | T02-F01-ROTATION-1 | T02 | Replace endpoint-axis travel with a conservative rotational support bound | worker | T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 2 |
@@ -43,7 +44,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-BR02 | T02 | Show the first real direct shot in the diagnostic browser | coordinator | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H, T02-BR02-FORMAT-REPAIR-1 | 0 |
 | T02-BR02-CI-ESCALATION-1 | T02 | Classify exact-head BR02 formatting failure before another source edit | coordinator | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H | 0 |
 | T02-BR02-FORMAT-REPAIR-1 | T02 | Apply only the exact hosted BR02 formatting artifact | worker | T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H, T02-BR02-CI-ESCALATION-1 | 2 |
-| T02-R01 | T02 | Implement isolated asynchronous runner and host entrypoints | worker | T02-F01, T02-W01, T02-C0, T02-C2, C00-A, C00-B, C03, C00 | 3 |
+| T02-R01 | T02 | Implement isolated asynchronous runner and host entrypoints | worker | T02-F01-ROTATION-1, T02-W01, T02-C0, T02-C2, C00-A, C00-B, C03, C00 | 3 |
 | T02-R02 | T02 | Prove direct shot movement in pinned Havok WASM | worker | T02-R01, T02-D01, C03 | 1 |
 | T02-R03 | T02 | Prove placed restart pose and physical traversal | worker | T02-R02, T02-L02, C02, C03 | 1 |
 | T02-R04 | T02 | Prove timeout, cancellation, limits and isolated cleanup | worker | T02-R01, C00-A, C00 | 1 |
@@ -92,6 +93,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-GEOMETRY-READBACK-1 | T02 | Expose native button bounds on strict dimension preflight failure | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-EXECUTOR-1, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-MATERIAL-DIAGNOSTIC-1 | 1 |
 | T02-L01-DIAGNOSTIC-APRON-F32-1 | T02 | Apply the exact temporary-apron thickness projection and complete the 24-case matrix | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1 | 2 |
 | T02-L01-GOALFRAME-READBACK-1 | T02 | Expose exact native goal-frame bounds before any physics step | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1 | 1 |
+| T02-L01-GOALFRAME-F32-MATRIX-1 | T02 | Match exact native goal-frame representation and finish the full 24-case matrix | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1 | 2 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
 | O02 | T04 | Build restricted real-WASM smoke Durable Object | coordinator | C00, O01, parent:T02, C01 | 5 |
 | O03 | T04 | Prove deployed staging WASM before online authority | coordinator | O02, C01 | 4 |
