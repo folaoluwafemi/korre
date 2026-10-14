@@ -572,9 +572,7 @@ describe("writeLoftCoarseMatrix", () => {
     );
     expect(support).toBeDefined();
     expect(supportMaterialRecord).toBeDefined();
-    expect(support?.material).toEqual(
-      supportMaterialRecord?.readback,
-    );
+    expect(support?.material).toEqual(supportMaterialRecord?.readback);
   });
 
   it("rejects a native material value adjacent to the exact Float32 projection", async () => {

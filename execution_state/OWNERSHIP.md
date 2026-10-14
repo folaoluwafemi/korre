@@ -667,3 +667,15 @@ No local application build/test/browser/physics ran for this contract correction
 - The revised contract/packet review and exact-source review both PASS: `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md` and `execution_state/reports/T02-L01-MATERIAL-F32-source-review.md`. All implementation hashes match.
 - `/root` accepted only the diagnostic material representation/validator semantics in `execution_state/reports/T02-L01-MATERIAL-F32-contract-acceptance.md` and reconciled `CONTRACT_WORK.md`. The implementation card, matrix and T02 remain unaccepted pending hosted/runtime evidence.
 - Next: stage only the intended source, contract, task and report paths; commit/push to `codex/remote-ci-bootstrap`, which triggers CI only. Capture all hosted checks and the real Chromium/Havok matrix result, then rotate `/root/run_evidence_review` for exact-run review. No Cloudflare access is needed yet.
+
+## Current ownership — 2026-10-14 (exact hosted verification queued)
+
+- Source-reviewed commit `7af31de911a6489b244dc0fe9679ca3834912414` is pushed to `codex/remote-ci-bootstrap`; GitHub CI run [38593653165](https://github.com/folaoluwafemi/korre/actions/runs/38593653165) is queued.
+- `/root` owns exact run polling, complete API/log/artifact capture and execution-state update. `/root/run_evidence_review` is reserved for independent exact-run review after completion.
+- The workflow has no deploy step. No hosted check, browser result, matrix artifact or pass is claimed yet. Cloudflare remains unused.
+
+## Current ownership — material formatting repair reviewed; hosted retry pending
+
+- Repair attempt 1 is complete and independently source-reviewed PASS by `/root/run_evidence_review`; reports are `execution_state/reports/T02-L01-MATERIAL-F32-format-repair-1.md` and `execution_state/reports/T02-L01-MATERIAL-F32-repair-1-source-review.md`.
+- The repaired source differs from the prior reviewed tree only by assertion wrapping in `games/counterball/src/simulation/loftCoarseProbe.test.ts`. The implementation card is IMPLEMENTED; runtime, MATRIX-1 and T02 are still unaccepted.
+- `/root` owns exact-path staging, commit/push to `codex/remote-ci-bootstrap`, fresh GitHub run evidence capture, and rotated independent exact-run review. No local app builds/tests/browser/physics commands and no Wrangler action are authorized or needed now.
