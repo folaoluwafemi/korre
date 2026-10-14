@@ -588,7 +588,10 @@ function assertPositiveVector(value: unknown, label: string): void {
   }
 }
 
-function assertMaterial(value: unknown, label: string): void {
+function assertMaterialValues(
+  value: unknown,
+  label: string,
+): asserts value is LoftCoarseMaterialValues {
   assertExactKeys(
     value,
     [
@@ -609,14 +612,38 @@ function assertMaterial(value: unknown, label: string): void {
     material.restitutionCombine,
     `${label}.restitutionCombine`,
   );
+}
+
+function assertConfiguredMaterial(value: unknown, label: string): void {
+  assertMaterialValues(value, label);
   if (
-    material.friction !== guard.materials.friction ||
-    material.staticFriction !== guard.materials.staticFriction ||
-    material.restitution !== guard.materials.restitution ||
-    material.frictionCombine !== guard.materials.frictionCombine ||
-    material.restitutionCombine !== guard.materials.restitutionCombine
+    value.friction !== guard.materials.friction ||
+    value.staticFriction !== guard.materials.staticFriction ||
+    value.restitution !== guard.materials.restitution ||
+    value.frictionCombine !== guard.materials.frictionCombine ||
+    value.restitutionCombine !== guard.materials.restitutionCombine
   )
     invalid(`${label} differs from the frozen material policy.`);
+}
+
+function assertNativeMaterialReadback(
+  value: unknown,
+  setter: LoftCoarseMaterialValues,
+  label: string,
+): void {
+  assertMaterialValues(value, label);
+  if (
+    !matchesExactFloat32Projection(setter.friction, value.friction) ||
+    !matchesExactFloat32Projection(
+      setter.staticFriction,
+      value.staticFriction,
+    ) ||
+    !matchesExactFloat32Projection(setter.restitution, value.restitution) ||
+    value.frictionCombine !== guard.materials.frictionCombine ||
+    value.restitutionCombine !== guard.materials.restitutionCombine
+  ) {
+    invalid(`${label} differs from the exact native material projection.`);
+  }
 }
 
 function validateMatrixMetadata(
@@ -833,18 +860,12 @@ function validateCaseMetadata(
     if (materialKeys.has(uniqueKey))
       invalid(`${label} duplicates a material shape.`);
     materialKeys.add(uniqueKey);
-    assertMaterial(material.setter, `${label}.setter`);
-    assertMaterial(material.readback, `${label}.readback`);
-    for (const field of [
-      "friction",
-      "staticFriction",
-      "restitution",
-      "frictionCombine",
-      "restitutionCombine",
-    ] as const) {
-      if (material.setter[field] !== material.readback[field])
-        invalid(`${label} setter/readback mismatch.`);
-    }
+    assertConfiguredMaterial(material.setter, `${label}.setter`);
+    assertNativeMaterialReadback(
+      material.readback,
+      material.setter,
+      `${label}.readback`,
+    );
   });
 
   assertArray(metadata.staticBodies, `Case ${expectedIndex} staticBodies`);
@@ -883,12 +904,16 @@ function validateCaseMetadata(
       `${label}.colliderDimensions`,
     );
     assertFilterPair(body.collisionFilter, `${label}.collisionFilter`);
-    assertMaterial(body.material, `${label}.material`);
     const materialRecord = metadata.materials.find(
       (candidate) => candidate.bodyId === body.id && candidate.shapeIndex === 0,
     );
     if (materialRecord === undefined)
       invalid(`${label} has no matching material readback.`);
+    assertNativeMaterialReadback(
+      body.material,
+      materialRecord.setter,
+      `${label}.material`,
+    );
     for (const field of [
       "friction",
       "staticFriction",

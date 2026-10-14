@@ -622,3 +622,48 @@ No local application build/test/browser/physics ran for this contract correction
 - `T02-L01-MATERIAL-DIAGNOSTIC-1` passed exact packet review/READY extraction and is SOURCE_REVIEWED_HOSTED_PENDING. `/root/toolchain_audit` released the sole path `games/counterball/src/simulation/loftCoarseRunner.ts`; `/root/executor_type_review` independently passed source review; `/root` owns exact commit/push and hosted Verify/Chromium run; `/root/run_evidence_review` is reserved for exact-run evidence review.
 - Runner SHA-256 is `672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87`. The one hunk adds only exact `{field, setter, readback}` data to the existing strict `resourceFailure`; no material or physics behavior changes.
 - Local app commands and Cloudflare/Wrangler remain unused.
+
+## Current ownership — 2026-10-13 (material diagnostic exact-SHA run)
+
+- Exact reviewed commit `a20c96a4c7a097b19b867e164cac89141b84036` is pushed; GitHub Actions run 38473828114 is in progress. `/root` owns run monitoring, full log/artifact/hash capture and shared task status; `/root/run_evidence_review` owns independent exact-run evidence review.
+- The runner implementation SHA remains `672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87`; source review PASS is saved. No semantic material or physics change occurred.
+- Do not run local application commands, another matrix attempt, or Cloudflare/Wrangler while this exact source run is underway.
+
+## Current ownership — 2026-10-14 (material diagnostic accepted; next contract review)
+
+- T02-L01-SUPPORT-F32-1 and T02-L01-MATERIAL-DIAGNOSTIC-1 are ACCEPTED narrowly. MATRIX-1 completed zero cases and remains CHANGES_REQUIRED; parent T02 remains RUNNING.
+- Run 38473828114 on exact commit `a20c96a4c7a097b19b867e164cac89141b84036d` is independently reviewed. Exact native friction mismatch is 0.15 setter versus 0.15000000596046448 readback. The run report, acceptance report, extracted evidence and SHA-256 inventory are saved under `execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC*`.
+- `/root` owns the separate material representation contract proposal, exact packet and shared status. `/root/run_evidence_review` is the rotated independent proposal reviewer. No implementation worker is dispatched until the exact packet is reviewed and READY.
+- Current source write paths are released. No local app commands ran. Cloudflare/Wrangler remains untouched until the user signals access; it is not needed for this blocker.
+
+## Current ownership — 2026-10-14 (material F32 contract/packet review)
+
+- `T02-L01-MATERIAL-DIAGNOSTIC-1` is ACCEPTED only for exact setter/readback disclosure; T02-L01-MATERIAL-F32-1 is REVIEWING and is not ready for implementation.
+- `/root` owns the proposed contract amendment, `CONTRACT_WORK.md`, packet JSON/index and runtime state. `/root/run_evidence_review` owns only the independent review report `execution_state/reports/T02-L01-MATERIAL-F32-packet-review.md`.
+- If reviewer passes, `/root/toolchain_audit` is reserved to edit only `games/counterball/src/simulation/loftCoarseRunner.ts`; `/root/executor_type_review` is the rotated source reviewer; `/root/run_evidence_review` can review the exact hosted run. No worker is dispatched before the coordinator records packet PASS and READY extraction.
+- No local application check, Cloudflare/Wrangler action, or new physics run has started. The matrix remains blocked before case one.
+
+## Current ownership — 2026-10-14 (material validator conflict corrected in packet)
+
+- The independent review of the first `T02-L01-MATERIAL-F32-1` draft returned CHANGES_REQUIRED: `loftCoarseProbe.ts` would reject raw Float32 readbacks after runner preflight. No implementation ran.
+- `/root` amended the proposed diagnostic contract and expanded the packet's exact write set to `loftCoarseRunner.ts`, `loftCoarseProbe.ts`, and `loftCoarseProbe.test.ts`. The revised writer tests must cover exact projected raw values, serialized preservation and adjacent-value rejection. Configured setters and combine strings remain strict; no tolerance or physics tuning is proposed.
+- The 112-card document checker and exact packet extraction pass. The card remains REVIEWING/not ready and retains all 14 explicit dependencies plus the inherited T01 acceptance gate. `/root/run_evidence_review` owns only the revised independent packet review report `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md`.
+- `/root/toolchain_audit` remains reserved as the sole worker after PASS; source reviewer rotates to `/root/executor_type_review`. No source edit, local app command, new physics run or Cloudflare action has started.
+
+## Current ownership — 2026-10-14 (reviewed material implementation dispatched)
+
+- Independent revised packet review PASS is recorded at `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md`; exact extraction reports this as the sole initially ready card, with all explicit dependencies accepted and inherited T01 accepted.
+- `/root/toolchain_audit` is dispatched to edit only `games/counterball/src/simulation/loftCoarseRunner.ts`, `games/counterball/src/simulation/loftCoarseProbe.ts`, and `games/counterball/src/simulation/loftCoarseProbe.test.ts`. Its unique implementation report is `execution_state/reports/T02-L01-MATERIAL-F32-implementation.md`.
+- `/root/executor_type_review` is reserved for rotated exact-source review after the worker releases paths. GitHub Verify and real pinned-WASM Chromium run follow only after that independent source review. No local application checks, Cloudflare/Wrangler actions or new physics run have started.
+
+## Current ownership — 2026-10-14 (material source implementation complete)
+
+- `/root/toolchain_audit` changed only the three authorized source files. Its report records per-file hashes at `execution_state/reports/T02-L01-MATERIAL-F32-implementation.md`; scoped `git diff --check` passed. No app/runtime command ran.
+- `/root/executor_type_review` is now the independent reviewer for only those three source files and exact hashes, writing only `execution_state/reports/T02-L01-MATERIAL-F32-source-review.md`. No commit/push or hosted run until that review passes.
+- If source review passes, `/root` will publish the exact reviewed source on `codex/remote-ci-bootstrap` and use GitHub CI, which has no deploy step. MATRIX-1 remains unaccepted; Cloudflare is not yet needed.
+
+## Current ownership — 2026-10-14 (narrow contract and source reviews accepted)
+
+- The revised contract/packet review and exact-source review both PASS: `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md` and `execution_state/reports/T02-L01-MATERIAL-F32-source-review.md`. All implementation hashes match.
+- `/root` accepted only the diagnostic material representation/validator semantics in `execution_state/reports/T02-L01-MATERIAL-F32-contract-acceptance.md` and reconciled `CONTRACT_WORK.md`. The implementation card, matrix and T02 remain unaccepted pending hosted/runtime evidence.
+- Next: stage only the intended source, contract, task and report paths; commit/push to `codex/remote-ci-bootstrap`, which triggers CI only. Capture all hosted checks and the real Chromium/Havok matrix result, then rotate `/root/run_evidence_review` for exact-run review. No Cloudflare access is needed yet.

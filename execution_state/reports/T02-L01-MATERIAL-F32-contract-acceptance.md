@@ -1,0 +1,9 @@
+# T02-L01-MATERIAL-F32 contract acceptance
+
+**Contract status: ACCEPTED, narrowly for the T02-L01 diagnostic material representation and artifact validation.** The implementation packet itself is not accepted yet; hosted and real-browser runtime checks remain outstanding.
+
+The revised contract and three-file worker packet passed independent review in `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md`. The resulting source diff passed independent exact-source review in `execution_state/reports/T02-L01-MATERIAL-F32-source-review.md`; all three source hashes matched the implementation report. The reviewer confirmed strict configured setters, exact finite `Math.fround(setter)` numeric native readbacks, strict combine strings, raw metadata preservation, static-body/readback equality and positive/adjacent-value writer coverage.
+
+The accepted rule applies only to T02-L01 diagnostic materials. Configured setters stay at the frozen values. Numeric native getters must be exactly the finite Float32 projection of their corresponding setter, with no tolerance. Combine strings remain exact. Serialized values remain the raw getter values, and a static body's record must exactly match its linked raw shape readback. The `staticFriction` and `restitution` projection behavior is an inference from the pinned adapter's shared numeric material array; the browser gate checks both fields across all 22 shapes before any impulse.
+
+This does not change physics coefficients, solver, world, config/hash/schema, fixture, artifact schema or product defaults. It does not accept the full 24-case matrix, playability, or parent T02. The implementation report records only a scoped `git diff --check`; no local or hosted application test, browser run, physics trial, or matrix artifact has yet verified this rule end to end. The next gate is commit/push of the exact source-reviewed tree and GitHub CI with the real pinned-WASM Chromium matrix route.

@@ -4107,5 +4107,111 @@
       "If any setter, readback, equality rule, material configuration, geometry, solver behavior, matrix tuple/cap or artifact contract changes, stop and request a new coordinator packet.",
       "If hosted checks have skipped/retried/flaky gates, source SHA differs, or independent review fails, leave this card unaccepted."
     ]
+  },
+  {
+    "id": "T02-L01-MATERIAL-F32-1",
+    "parent": "T02",
+    "title": "Apply exact native float32 material semantics through preflight and artifact validation",
+    "role": "worker",
+    "depends_on": [
+      "C00-B",
+      "C01",
+      "T02-B0",
+      "T02-C0",
+      "T02-C2",
+      "C00",
+      "T02-L01-EXECUTOR-1",
+      "T02-L01-GUARD-CONTRACT-1",
+      "T02-L01-GUARD-SCHEMA-1",
+      "T02-L01-PACKET-SPLIT-1",
+      "T02-L01-TRANSPORT-1",
+      "T02-L01-SUPPORT-PREFLIGHT-1",
+      "T02-L01-SUPPORT-F32-1",
+      "T02-L01-MATERIAL-DIAGNOSTIC-1"
+    ],
+    "read_paths": [
+      "knowledge_base/execution/CONTRACTS.md",
+      "knowledge_base/execution/completion/CONTRACT_WORK.md",
+      "knowledge_base/execution/completion/LOCAL_NOTES.md",
+      "execution_state/reports/T02-L01-MATERIAL-F32-contract-proposal.md",
+      "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-acceptance.md",
+      "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114-independent-review.md",
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts",
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "packages/game-protocol/src/config.ts",
+      "execution_state/reports/T02-L01-MATERIAL-F32-packet-review.md",
+      "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-source-review.md"
+    ],
+    "write_paths": [
+      "games/counterball/src/simulation/loftCoarseRunner.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.ts",
+      "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+    ],
+    "outputs": [
+      "The runner compares numeric friction, staticFriction and restitution readbacks with the exact finite Math.fround projection of their unchanged setters before any impulse; both combine strings remain strict exact matches and raw values remain unchanged.",
+      "The artifact validator distinguishes canonical setter records from raw native readbacks, accepts only exact finite Float32 projections for numeric readbacks, keeps combine strings strict, and requires each static-body material to equal its matching shape readback exactly.",
+      "Focused writer fixtures/tests prove exact projected native values are accepted and preserved in serialized metadata, while an adjacent Float32 value is rejected; no schema, config/hash or physics value changes."
+    ],
+    "steps": [
+      "Read only the packet read paths and the two independent diagnostic reports. Confirm the coordinator has recorded independent PASS for the revised contract and exact packet before editing; do not edit shared contracts, catalogues, task state or any unassigned path.",
+      "In loftCoarseRunner.ts, change only setAndReadMaterial numeric comparison to the already imported matchesExactFloat32Projection(setter[key], readback[key]) for friction, staticFriction and restitution. Keep exact equality for frictionCombine and restitutionCombine, retain finite/range guards and resourceFailure, disclose configured/projected/observed numbers on mismatch, and preserve raw setter/readback objects.",
+      "In loftCoarseProbe.ts, split material validation into strict frozen-policy setter validation and native-readback validation. Check numeric readback as exact finite Math.fround(corresponding setter), check both combine strings exactly, and cross-check static-body material records against the matching shape readback without replacing raw values.",
+      "In loftCoarseProbe.test.ts, model default readbacks as raw native Float32 projections while keeping setters at frozen decimal config values. Add focused writer cases proving projected readbacks are accepted and preserved in serialized JSON and an adjacent Float32 readback is rejected; keep a static-body matching check in the accepted fixture path.",
+      "Do not change helpers, unit-test semantics outside this focused packet, packages, config/protocol/hash/schema/fixture, material coefficients, solver, world, shape, filters, geometry, impulse, tuples, caps, artifact schema, transport, workflow or public UI. Stop if another write path or rule change is needed.",
+      "Run only git diff --check scoped to the three assigned source files locally. Record exact diff and SHA in the unique implementation report. Run no local install, build, typecheck, lint, test, browser or physics command.",
+      "After independent exact-source review, run GitHub Verify and the existing real pinned-WASM Chromium diagnostic matrix route on the exact SHA. Capture complete logs/counts, browser test result, matrix artifact provenance/hash and an inventory of actual no-skip results. If an unexpected material value fails exact projection, preserve the failure and emit no successful matrix artifact.",
+      "Obtain independent exact-source and exact-run review. Accept this material rule only after the exact source and hosted browser route pass. Keep the separate MATRIX-1/T02 acceptance gate until its full artifact acceptance criteria independently pass."
+    ],
+    "checks": [
+      {
+        "command": "node scripts/check-completion-plan.mjs --packet T02-L01-MATERIAL-F32-1",
+        "environment": "local-document",
+        "expected": "Exact revised packet extraction succeeds only with every inherited/original dependency preserved and accepted; document check only."
+      },
+      {
+        "command": "git diff --check -- games/counterball/src/simulation/loftCoarseRunner.ts games/counterball/src/simulation/loftCoarseProbe.ts games/counterball/src/simulation/loftCoarseProbe.test.ts",
+        "environment": "local-document",
+        "expected": "Only the three assigned source files have no whitespace errors; no local application command runs."
+      },
+      {
+        "command": "pnpm verify on the exact independently reviewed SHA",
+        "environment": "github",
+        "expected": "Hosted type, lint, format, unit, production-boundary and build checks pass with exact counts and zero skipped/retried/flaky tests."
+      },
+      {
+        "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+        "environment": "github",
+        "expected": "Real pinned Havok in Chromium runs all 22 pre-impulse material checks; accepted matrix output passes raw metadata validation and host artifact checks, or any exact mismatch fails closed before impulse and leaves no successful artifact."
+      },
+      {
+        "command": "Independent exact-source and exact-run evidence review",
+        "environment": "source-review",
+        "expected": "PASS confirms exact helper use, strict setter/combine semantics, native readback validator consistency, raw metadata preservation, three-file source SHA, complete no-skip hosted evidence and separate matrix acceptance."
+      }
+    ],
+    "acceptance": [
+      "The only source edits are exactly the three assigned files, independently reviewed at the same SHA used by GitHub; no shared config, contract, status or workflow was edited by the worker.",
+      "All 22 material shapes retain exact configured setters; three numeric getter values pass only finite exact Math.fround(setter), combine strings remain exact, and any failure occurs before impulse with no partial/success matrix artifact.",
+      "The validator accepts projected raw getters without altering them, rejects any adjacent float32 value, and enforces exact static-body-to-shape-readback equality; focused writer tests demonstrate acceptance, serialized raw preservation and rejection.",
+      "Hosted Verify and the real pinned-Havok Chromium route pass with zero skipped/retried/flaky checks and complete evidence; if physics eligibility is zero, the complete 24-case artifact still satisfies the accepted matrix contract.",
+      "Independent exact-source and exact-run reviews pass. This card does not itself accept MATRIX-1 or parent T02; those retain their own gates."
+    ],
+    "negative_cases": [
+      "No tolerance, arbitrary rounding or substitution of raw setter/getter metadata; no changed material coefficient, combine mode, protocol/config/hash/schema/fixture, solver, world, shape, filter, geometry, impulse, tuple, cap, step, artifact schema, transport, workflow, or UI.",
+      "No local install/build/typecheck/lint/test/browser/physics execution, no Node/mock/dry-run acceptance, no Wrangler/Cloudflare action, and no matrix pass claim without complete validated real-browser artifact evidence."
+    ],
+    "review_questions": [
+      "Does the runner reject non-finite, projection-overflowed and adjacent numeric native values before any impulse while preserving raw values and exact combine modes?",
+      "Does the artifact validator independently enforce frozen setters, exact projected native numeric getters, strict combine strings and exact static-body/readback correspondence?",
+      "Do focused writer tests prove exact projected values are accepted and serialized raw, while an adjacent value is rejected without a successful artifact?",
+      "Do the exact source SHA, hosted no-skip checks and pinned-WASM browser evidence match, with MATRIX-1 acceptance still separate?"
+    ],
+    "stop_conditions": [
+      "If an actual native numeric readback is not exactly the finite Math.fround projection, stop before impulse, report the exact values and produce no success artifact; do not add a tolerance or alternate representation.",
+      "If setter metadata changes, static material facts are substituted rather than cross-checked, raw values are rewritten, or exact combine comparisons are weakened, reject the packet.",
+      "If any required fix needs an unassigned file, config/schema/hash/fixture/workflow change or different policy, stop and obtain a new coordinator packet before editing.",
+      "If exact SHA, source review, hosted Verify, browser evidence, zero-skip requirements or independent run review fails, leave the packet unaccepted; do not accept MATRIX-1 from a partial artifact."
+    ]
   }
 ]

@@ -395,13 +395,22 @@ function setAndReadMaterial(
     restitutionCombine: targetRestitutionCombine,
   };
   const readback = materialValues(world.plugin.getMaterial(shape));
-  for (const key of [
-    "friction",
-    "staticFriction",
-    "restitution",
-    "frictionCombine",
-    "restitutionCombine",
-  ] as const) {
+  for (const key of ["friction", "staticFriction", "restitution"] as const) {
+    if (!matchesExactFloat32Projection(setter[key], readback[key])) {
+      const projected = Math.fround(setter[key]);
+      throw resourceFailure(
+        `Native ${key} material readback differs from its setter. ${JSON.stringify(
+          {
+            field: key,
+            configuredSetter: setter[key],
+            projected,
+            readback: readback[key],
+          },
+        )}`,
+      );
+    }
+  }
+  for (const key of ["frictionCombine", "restitutionCombine"] as const) {
     if (readback[key] !== setter[key]) {
       throw resourceFailure(
         `Native ${key} material readback differs from its setter. ${JSON.stringify(

@@ -657,3 +657,39 @@ The coordinator materialized `T02-L01-MATERIAL-DIAGNOSTIC-1` under T02, preservi
 ## Coordinator checkpoint — 2026-10-13 (material mismatch disclosure source-reviewed)
 
 The diagnostic card passed independent pre-dispatch packet review and exact READY extraction. `/root/toolchain_audit` changed only the existing `setAndReadMaterial` failure message to include `{field, setter, readback}` without conversion or weakening the strict comparison. Scoped `git diff --check` passed; runner SHA-256 is `672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87`. `/root/executor_type_review` independently passed source review at `execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-source-review.md`. The card is SOURCE_REVIEWED_HOSTED_PENDING; no hosted/runtime result is claimed yet. `/root` will publish the exact source and run Verify plus the same Chromium diagnostic route on GitHub. MATRIX-1 and T02 remain open.
+
+## Coordinator checkpoint — 2026-10-13 (material diagnostic exact-SHA run started)
+
+Exact source-reviewed commit `a20c96a4c7a097b19b867e164cac89141b84036` is pushed on `codex/remote-ci-bootstrap`. GitHub Actions run [38473828114](https://github.com/folaoluwafemi/korre/actions/runs/38473828114) is in progress. `/root/run_evidence_review` is reserved for the exact-run review. No Verify, browser count, mismatch value, or artifact outcome is claimed until capture/review. The accepted F32 card does not accept the matrix; T02 remains RUNNING.
+
+## Coordinator checkpoint — 2026-10-14 (material mismatch diagnosed and narrowly accepted)
+
+Exact GitHub run [38473828114](https://github.com/folaoluwafemi/korre/actions/runs/38473828114) on `a20c96a4c7a097b19b867e164cac89141b84036d` completed. Verify passed 30 files/181 tests; integration passed 1/1; ordinary Chromium preview passed 4/4; the diagnostic suite passed 3 and stopped the matrix check before case one. Every suite had zero skips, retries, or flaky tests. The exact native friction values are setter `0.15` and readback `0.15000000596046448`. `Math.fround(0.15)` produces the same value; this indicates exact float32 projection but does not by itself change the accepted material rule. Independent source and exact-run review passed.
+
+`T02-L01-MATERIAL-DIAGNOSTIC-1` is ACCEPTED only for exposing the exact failure values (`execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-acceptance.md`). No matrix case, result, or download artifact exists. `MATRIX-1` remains CHANGES_REQUIRED and T02 remains RUNNING. The remaining gate is a separately reviewed exact native material representation contract and implementation card before any comparison change or full matrix retry. Cloudflare has not been used and is not needed for this local blocker.
+
+## Coordinator checkpoint — 2026-10-14 (material float32 proposal under independent review)
+
+Pinned Babylon 9.30.0 source maps the numeric material inputs into one native array and maps the native getter array back to `staticFriction`, `friction`, and `restitution`; run 38473828114 empirically observed exact float32 projection for friction. The coordinator drafted a deliberately narrow contract proposal: exact finite `Math.fround(setter)` checks for the three numeric properties, strict combine-mode strings, and unchanged raw setter/getter facts. It changes no current material values, shared config, hash, protocol, fixture, physics, or matrix acceptance rule. The `readbackPolicy` interpretation is under review, not yet accepted.
+
+Packet `T02-L01-MATERIAL-F32-1` is materialized under T02 with all 14 dependencies, including every original MATRIX-1 prerequisite and accepted exact-value diagnostic. The document checker passes for all 112 cards; this packet remains `REVIEWING` and is not dispatchable. `/root/run_evidence_review` is the rotated independent contract/packet reviewer. No implementation or new matrix run has started.
+
+## Coordinator checkpoint — 2026-10-14 (material packet expanded after independent rejection)
+
+The independent review at `execution_state/reports/T02-L01-MATERIAL-F32-packet-review.md` found that the artifact validator still required native getter metadata to equal the unprojected decimal setter. It correctly returned CHANGES_REQUIRED before implementation. The coordinator amended `CONTRACT_WORK.md` and the proposal to define strict configured setters, exact finite `Math.fround(setter)` numeric getter checks, strict combine strings, raw metadata preservation and exact static-body/readback correspondence. The revised packet now assigns three disjoint source files, including focused writer acceptance/adjacent-value tests; every prior explicit MATRIX-1 dependency and inherited T01 gate remains in place.
+
+The regenerated 112-packet index, full plan consistency check, exact packet extraction and scoped documentation diff check pass. These are documentation checks only. The revised packet remains REVIEWING and undispatchable pending independent re-review at `execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md`. No application source change, build, test, browser/physics run or Cloudflare action has started; MATRIX-1 remains blocked before case one.
+
+## Coordinator checkpoint — 2026-10-14 (material implementation dispatched)
+
+The revised packet `T02-L01-MATERIAL-F32-1` passed independent contract/packet review (`execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md`) and exact extraction reports `ready:true` with all 14 explicit dependencies plus accepted T01. The coordinator recorded the contract/packet PASS. `/root/toolchain_audit` is implementing only `loftCoarseRunner.ts`, `loftCoarseProbe.ts`, and `loftCoarseProbe.test.ts`; no other source/config/contract/status path is assigned. The worker may run only scoped `git diff --check` locally, with all app verification/browser/physics checks reserved for GitHub after independent source review. MATRIX-1 remains unaccepted and blocked before case one until this change is reviewed and exercised.
+
+## Coordinator checkpoint — 2026-10-14 (material source implementation complete; review pending)
+
+`/root/toolchain_audit` completed the exact three-file implementation in `loftCoarseRunner.ts`, `loftCoarseProbe.ts`, and `loftCoarseProbe.test.ts`. The implementation report records SHA-256 for each file; the scoped `git diff --check` passed. No unit tests, build, typecheck, lint, browser, physics or hosted checks ran. Task state is IMPLEMENTED, not accepted. `/root/executor_type_review` now owns only the independent exact-source review report `execution_state/reports/T02-L01-MATERIAL-F32-source-review.md`. Commit/push and GitHub CI wait for PASS. No Cloudflare action is needed for this local matrix blocker.
+
+## Coordinator checkpoint — 2026-10-14 (material contract/source accepted; hosted gate next)
+
+The revised contract/packet review and implementation source review both PASS. Reviewer `/root/executor_type_review` confirmed exact reported hashes for the three assigned source files, strict setter/combine checks, exact finite native projections, pre-impulse failure ordering, raw serialization, static-body cross-check and focused projected/adjacent-value writer coverage. `/root` accepted only the narrow T02-L01 diagnostic contract semantics; the new report is `execution_state/reports/T02-L01-MATERIAL-F32-contract-acceptance.md`. The contract text no longer labels the accepted amendment pending.
+
+No application test, typecheck, lint, build, browser or physics run has executed. The implementation card remains unaccepted, MATRIX-1 remains blocked before case one, and parent T02 remains RUNNING. The next step is to publish the unchanged source-reviewed tree to GitHub CI, capture complete exact-SHA evidence, and get an independent run review. CI has no deploy step; Cloudflare access is not needed at this stage.

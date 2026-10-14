@@ -691,9 +691,61 @@
           "report": "execution_state/reports/T02-L01-SUPPORT-F32-acceptance.md",
           "review_report": "execution_state/reports/T02-L01-SUPPORT-F32-run-38470988448-independent-review.md",
           "detail": "Exact F32 support-Y preflight passed before a distinct friction material readback failure. MATRIX-1 and T02 remain open."
+        },
+        {
+          "command": "T02-L01-MATERIAL-DIAGNOSTIC-1 exact-source hosted run",
+          "result": "CHANGES_REQUIRED",
+          "environment": "github",
+          "run_id": 38473828114,
+          "source_sha": "a20c96a4c7a097b19b867e164cac89141b84036d",
+          "url": "https://github.com/folaoluwafemi/korre/actions/runs/38473828114",
+          "detail": "Run completed on exact SHA. Verify 30/30 files and 181/181 tests; integration 1/1; ordinary Chromium 4/4; diagnostic Chromium 3 passed/1 matrix guard failed, with zero skips/retries/flakes. Native friction setter/readback are 0.15/0.15000000596046448. No matrix case, result or download artifact.",
+          "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114.md"
+        },
+        {
+          "command": "Independent exact-run evidence review 38473828114",
+          "result": "PASS",
+          "environment": "source-review",
+          "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114-independent-review.md",
+          "detail": "Exact SHA, values, support-preflight ordering, test counts and absent matrix result/artifact independently confirmed."
+        },
+        {
+          "command": "Narrow acceptance of T02-L01-MATERIAL-DIAGNOSTIC-1",
+          "result": "ACCEPTED",
+          "environment": "coordinator",
+          "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-acceptance.md",
+          "detail": "Exact mismatch disclosure only. Strict comparison and all physics behavior remain unchanged."
+        },
+        {
+          "command": "T02-L01-MATERIAL-F32-1 contract and packet review",
+          "result": "CHANGES_REQUIRED",
+          "environment": "source-review",
+          "report": "execution_state/reports/T02-L01-MATERIAL-F32-packet-review.md",
+          "detail": "Reviewer found the artifact validator still rejected raw Float32 readbacks after simulation. Coordinator expanded the packet to include validator and focused tests; no implementation ran."
+        },
+        {
+          "command": "Revised T02-L01-MATERIAL-F32-1 contract and packet review",
+          "result": "PASS",
+          "environment": "source-review",
+          "report": "execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md",
+          "detail": "Independent reviewer PASS: the revised three-file packet resolves native-readback validator conflict, covers projected/raw-preservation/adjacent-value tests, preserves all dependencies and inherited T01 gate. Runtime NOT RUN."
+        },
+        {
+          "command": "T02-L01-MATERIAL-F32-1 independent exact-source review",
+          "environment": "source-review",
+          "result": "PASS",
+          "report": "execution_state/reports/T02-L01-MATERIAL-F32-source-review.md",
+          "detail": "Independent reviewer recomputed and confirmed all three source hashes and passed strict setter/f32 getter/combine checks, pre-impulse ordering, raw serialization, static-body matching, and focused positive/adjacent-value writer coverage. Runtime/hosted NOT RUN."
+        },
+        {
+          "command": "Coordinator narrow acceptance of T02-L01 diagnostic material representation contract",
+          "environment": "coordinator",
+          "result": "ACCEPTED",
+          "report": "execution_state/reports/T02-L01-MATERIAL-F32-contract-acceptance.md",
+          "detail": "Contract semantics accepted after independent packet and source PASS. This is not implementation, MATRIX-1 or T02 runtime acceptance."
         }
       ],
-      "blocker": "The 24-case matrix is blocked before its first impulse until T02-L01-SUPPORT-F32-1 completes source implementation/review and hosted verification. This card preserves canonical 0.2 geometry and requires exact Math.fround support-AABB-Y projection with adjacent and non-finite rejection. Afterward the complete hosted matrix and deployed Cloudflare Havok remain open.",
+      "blocker": "MATRIX-1 remains blocked before case one because the corrected implementation has not yet been exercised by hosted CI or real pinned-WASM Chromium. The contract and source review passed; the next gate is exact-tree GitHub verification and the full real browser matrix route. T02 remains RUNNING. Deployed Cloudflare Havok is a later gate and awaits the user signal for access.",
       "packet": "execution_state/packets/T02-A.md",
       "packet_progress": [
         {
@@ -8714,12 +8766,12 @@
         },
         {
           "id": "T02-L01-MATERIAL-DIAGNOSTIC-1",
-          "status": "SOURCE_REVIEWED_HOSTED_PENDING",
+          "status": "ACCEPTED",
           "ready": false,
           "role": "worker",
           "title": "Expose exact native material setter/readback mismatch values",
-          "owner": "/root/toolchain_audit — implementation released; /root — exact-SHA publication and hosted validation",
-          "reviewer_identity": "/root/executor_type_review — independent source review PASS; /root/run_evidence_review — exact hosted-run review reserved",
+          "owner": "/root/toolchain_audit — implementation; /root — exact-SHA hosted run and acceptance",
+          "reviewer_identity": "/root/executor_type_review — source review PASS; /root/run_evidence_review — exact-run review PASS",
           "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-MATERIAL-DIAGNOSTIC-1",
           "depends_on": [
             "C00-B",
@@ -8745,7 +8797,7 @@
           "review_report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-source-review.md",
           "acceptance_report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-acceptance.md",
           "attempt_count": 0,
-          "next_action": "Independent source review passed on runner SHA 672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87. Coordinator will commit/push the exact reviewed source with the packet/status records, then run hosted Verify and the unchanged routed Chromium diagnostic suite.",
+          "next_action": "Accepted only exact setter/readback disclosure. Prepare and independently review a separate material representation contract and packet before changing comparison semantics or retrying the matrix.",
           "checks": [
             {
               "command": "node scripts/check-completion-plan.mjs --packet T02-L01-MATERIAL-DIAGNOSTIC-1",
@@ -8781,13 +8833,146 @@
               "result": "PASS",
               "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-source-review.md",
               "detail": "Independent reviewer confirmed the sole one-hunk diagnostic disclosure, matching SHA-256, unchanged strict equality/resourceFailure, and unchanged material/geometry/physics/matrix behavior. No hosted/runtime claim."
+            },
+            {
+              "command": "GitHub exact-SHA Verify, production, integration, preview, diagnostic Chromium and material readback disclosure",
+              "environment": "github",
+              "result": "PENDING",
+              "run_id": 38473828114,
+              "source_sha": "a20c96a4c7a097b19b867e164cac89141b84036d",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38473828114",
+              "expected": "Verify passes; preview and non-matrix browser checks are recorded with zero skips/retries/flakes; the real pinned-WASM browser surfaces exact setter/readback values on the existing failure path, with no matrix result/artifact."
+            },
+            {
+              "command": "GitHub exact-SHA Verify, production, integration, preview and real-Havok diagnostic suite — run 38473828114",
+              "environment": "github",
+              "result": "CHANGES_REQUIRED",
+              "run_id": 38473828114,
+              "source_sha": "a20c96a4c7a097b19b867e164cac89141b84036d",
+              "url": "https://github.com/folaoluwafemi/korre/actions/runs/38473828114",
+              "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114.md",
+              "detail": "Verify 30/30 test files and 181/181 tests; integration 1/1; ordinary Chromium 4/4; diagnostic Chromium 3 passed and 1 matrix check failed before case one. All suites have zero skips/retries/flakes. Exact native mismatch: friction setter 0.15, readback 0.15000000596046448. No matrix result/download artifact."
+            },
+            {
+              "command": "Independent exact-run evidence review 38473828114",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114-independent-review.md",
+              "detail": "Verified exact SHA, mismatch values, support-preflight control-flow ordering, hosted counts, zero skips/retries/flakes and zero completed matrix cases/results/downloads."
+            },
+            {
+              "command": "T02-L01-MATERIAL-DIAGNOSTIC-1 narrow acceptance",
+              "environment": "coordinator",
+              "result": "ACCEPTED",
+              "report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-acceptance.md",
+              "detail": "Accepts exact failure disclosure only; does not accept material comparison semantics, matrix, T02 or playability."
             }
           ],
           "repair_attempts": [],
-          "setup_report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-coordinator-setup.md"
+          "setup_report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-coordinator-setup.md",
+          "hosted_run": {
+            "run_id": 38473828114,
+            "source_sha": "a20c96a4c7a097b19b867e164cac89141b84036d",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38473828114",
+            "status": "completed",
+            "reviewer": "/root/run_evidence_review",
+            "conclusion": "failure",
+            "completed_at": "2026-10-13T21:57:59Z",
+            "run_review": "PASS"
+          },
+          "run_review_report": "execution_state/reports/T02-L01-MATERIAL-DIAGNOSTIC-run-38473828114-independent-review.md"
+        },
+        {
+          "id": "T02-L01-MATERIAL-F32-1",
+          "status": "IMPLEMENTED",
+          "ready": false,
+          "role": "worker",
+          "title": "Apply exact native float32 material semantics through preflight and artifact validation",
+          "owner": "/root/toolchain_audit — implementation complete; /root/executor_type_review — source review PASS; /root — coordinator",
+          "reviewer_identity": "/root/run_evidence_review — independent reviewer, revised contract/packet PASS",
+          "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-MATERIAL-F32-1",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00",
+            "T02-L01-EXECUTOR-1",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1",
+            "T02-L01-PACKET-SPLIT-1",
+            "T02-L01-TRANSPORT-1",
+            "T02-L01-SUPPORT-PREFLIGHT-1",
+            "T02-L01-SUPPORT-F32-1",
+            "T02-L01-MATERIAL-DIAGNOSTIC-1"
+          ],
+          "write_paths": [
+            "games/counterball/src/simulation/loftCoarseRunner.ts",
+            "games/counterball/src/simulation/loftCoarseProbe.ts",
+            "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+          ],
+          "contract_proposal": "execution_state/reports/T02-L01-MATERIAL-F32-contract-proposal.md",
+          "contract_review_report": "execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md",
+          "implementation_report": "execution_state/reports/T02-L01-MATERIAL-F32-implementation.md",
+          "review_report": "execution_state/reports/T02-L01-MATERIAL-F32-source-review.md",
+          "acceptance_report": "execution_state/reports/T02-L01-MATERIAL-F32-acceptance.md",
+          "attempt_count": 0,
+          "next_action": "Contract and source review PASS are recorded. Commit the exact reviewed source tree on codex/remote-ci-bootstrap, push to trigger CI-only GitHub workflow, then capture exact run/logs/artifacts and obtain independent exact-run review. Keep implementation unaccepted until hosted/real-browser gates pass.",
+          "checks": [
+            {
+              "command": "node scripts/check-completion-plan.mjs --write-index",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "knowledge_base/execution/completion/PACKETS.md",
+              "detail": "Regenerated the 112-card catalogue index after the coordinator expanded the material packet; documentation consistency only."
+            },
+            {
+              "command": "node scripts/check-completion-plan.mjs --packet T02-L01-MATERIAL-F32-1",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-contract-proposal.md",
+              "detail": "Revised exact packet extraction succeeds and preserves all 14 explicit dependencies plus inherited T01 gate. It remains REVIEWING/not ready; document check only."
+            },
+            {
+              "command": "git diff --check -- knowledge_base/execution/completion/CONTRACT_WORK.md knowledge_base/execution/completion/LOCAL_PACKETS.json knowledge_base/execution/completion/PACKETS.md execution_state/reports/T02-L01-MATERIAL-F32-contract-proposal.md",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-contract-proposal.md",
+              "detail": "Coordinator contract and packet documentation diff has no whitespace errors; no application command ran."
+            },
+            {
+              "command": "Independent revised contract and exact packet review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-packet-review-2.md",
+              "detail": "Independent reviewer PASS: the revised three-file packet resolves native-readback validator conflict, covers projected/raw-preservation/adjacent-value tests, preserves all dependencies and inherited T01 gate. Runtime NOT RUN."
+            },
+            {
+              "command": "T02-L01-MATERIAL-F32-1 exact-scope implementation",
+              "environment": "coordinator",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-implementation.md",
+              "detail": "Only the three assigned source files changed; the exact scoped git diff --check passed. Worker recorded per-file source SHA-256. No application/runtime check ran."
+            },
+            {
+              "command": "Independent exact-source review T02-L01-MATERIAL-F32-1",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-source-review.md",
+              "detail": "Independent reviewer recomputed and confirmed all three source hashes and passed strict setter/f32 getter/combine checks, pre-impulse ordering, raw serialization, static-body matching, and focused positive/adjacent-value writer coverage. Runtime/hosted NOT RUN."
+            },
+            {
+              "command": "Narrow coordinator acceptance of the T02-L01 diagnostic material representation contract",
+              "environment": "coordinator",
+              "result": "ACCEPTED",
+              "report": "execution_state/reports/T02-L01-MATERIAL-F32-contract-acceptance.md",
+              "detail": "Accepted only strict configured setters, exact finite Math.fround numeric getters, strict combine strings, raw artifact preservation and exact static-body/readback validation for this diagnostic. Hosted/runtime and matrix acceptance remain pending."
+            }
+          ]
         }
       ],
-      "next_action": "Run 38464838129 failed at Prettier after the focused protocol tests (13/13), typecheck and ESLint passed; later tests/build/browser/matrix did not run. Exact hosted formatting repair 1 is applied and independently reviewed; report hashes are corrected. Preparing one exact reviewed-source GitHub run. MATRIX-1 remains unaccepted; Cloudflare remains untouched."
+      "next_action": "Coordinator has accepted only the narrow diagnostic contract after independent contract/source PASS. Publish the unchanged exact source-reviewed tree to the CI-only GitHub branch, then independently review the exact run and artifacts. Do not accept the implementation, MATRIX-1 or T02 without actual hosted results."
     },
     {
       "id": "T03",
@@ -9379,5 +9564,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "The material diagnostic implementation has independent source PASS on runner SHA 672b85bd411ca48142917e53c45fdc7e72608699723c652799d33b72f2532f87. Next: publish this exact source and status/report updates, run hosted Verify and Chromium diagnostics, then independently review the exact-run values. The 24-case matrix and full game remain incomplete."
+  "next": "Material diagnostic is accepted narrowly. The exact hosted mismatch supports a contract proposal for strict float32 representation, using Math.fround with no tolerance. A rotated independent reviewer is checking the proposal and one-file worker packet before implementation; nothing is dispatched yet. The full physics matrix remains blocked before case one."
 }

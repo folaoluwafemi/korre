@@ -115,6 +115,16 @@ function materialValues() {
   };
 }
 
+function projectedMaterialValues() {
+  const configured = materialValues();
+  return {
+    ...configured,
+    friction: Math.fround(configured.friction),
+    staticFriction: Math.fround(configured.staticFriction),
+    restitution: Math.fround(configured.restitution),
+  };
+}
+
 function caseMetadata(
   index: number,
   identity: LoftCoarseMatrixMetadata,
@@ -152,20 +162,20 @@ function caseMetadata(
     id,
     colliderDimensions: vec3(1, 1, 1),
     collisionFilter: [1, 1] as const,
-    material: materialValues(),
+    material: projectedMaterialValues(),
   }));
   const materials = [
     ...entityIds.map((bodyId) => ({
       bodyId,
       shapeIndex: 0,
       setter: materialValues(),
-      readback: materialValues(),
+      readback: projectedMaterialValues(),
     })),
     ...staticIds.map((bodyId) => ({
       bodyId,
       shapeIndex: 0,
       setter: materialValues(),
-      readback: materialValues(),
+      readback: projectedMaterialValues(),
     })),
   ];
   const settlingWindow = {
@@ -513,6 +523,89 @@ describe("writeLoftCoarseMatrix", () => {
     expect(
       first.collected.chunks.every((chunk) => chunk.byteLength <= 256 * 1_024),
     ).toBe(true);
+  });
+
+  it("accepts and preserves exact projected native material readbacks", async () => {
+    const identity = matrixMetadata();
+    const { collected } = await run({ metadata: identity });
+    const parsed = JSON.parse(collected.text()) as {
+      cases: Array<{
+        metadata: {
+          materials: Array<{
+            bodyId: string;
+            shapeIndex: number;
+            setter: ReturnType<typeof materialValues>;
+            readback: ReturnType<typeof materialValues>;
+          }>;
+          staticBodies: Array<{
+            id: string;
+            material: ReturnType<typeof materialValues>;
+          }>;
+        };
+      }>;
+    };
+    const firstCase = requiredItem(parsed.cases, 0, "serialized first case");
+    const firstMaterial = requiredItem(
+      firstCase.metadata.materials,
+      0,
+      "serialized first material",
+    );
+    expect(firstMaterial.setter.friction).toBe(guard.materials.friction);
+    expect(firstMaterial.readback.friction).toBe(
+      Math.fround(guard.materials.friction),
+    );
+    expect(firstMaterial.readback.staticFriction).toBe(
+      Math.fround(guard.materials.staticFriction),
+    );
+    expect(firstMaterial.readback.restitution).toBe(
+      Math.fround(guard.materials.restitution),
+    );
+    expect(firstMaterial.readback.frictionCombine).toBe(
+      guard.materials.frictionCombine,
+    );
+    const support = firstCase.metadata.staticBodies.find(
+      (body) => body.id === "support-apron",
+    );
+    const supportMaterialRecord = firstCase.metadata.materials.find(
+      (material) =>
+        material.bodyId === "support-apron" && material.shapeIndex === 0,
+    );
+    expect(support).toBeDefined();
+    expect(supportMaterialRecord).toBeDefined();
+    expect(support?.material).toEqual(
+      supportMaterialRecord?.readback,
+    );
+  });
+
+  it("rejects a native material value adjacent to the exact Float32 projection", async () => {
+    const identity = matrixMetadata();
+    const projected = Math.fround(guard.materials.friction);
+    const view = new DataView(new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT));
+    view.setFloat32(0, projected);
+    view.setUint32(0, view.getUint32(0) + 1);
+    const adjacent = view.getFloat32(0);
+
+    await expect(
+      run({
+        metadata: identity,
+        change: (index, current) => {
+          if (index !== 0) return current;
+          const materials = current.metadata.materials.map(
+            (material, materialIndex) =>
+              materialIndex === 0
+                ? {
+                    ...material,
+                    readback: { ...material.readback, friction: adjacent },
+                  }
+                : material,
+          );
+          return {
+            ...current,
+            metadata: { ...current.metadata, materials },
+          };
+        },
+      }),
+    ).rejects.toMatchObject({ code: "invalid" });
   });
 
   it("canonicalizes object-key order and preserves negative zero and precision", async () => {
