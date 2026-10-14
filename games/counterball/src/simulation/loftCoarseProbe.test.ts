@@ -1117,6 +1117,26 @@ describe("writeLoftCoarseMatrix", () => {
     }
   });
 
+  it("rejects other guard versions before writing bytes", async () => {
+    for (const guardSchemaVersion of [
+      guard.schemaVersion - 1,
+      guard.schemaVersion + 1,
+      guard.schemaVersion + 0.5,
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+    ]) {
+      const collected = collectingSink();
+      await expect(
+        run({
+          metadata: matrixMetadata({ guardSchemaVersion }),
+          sink: collected.sink,
+        }),
+      ).rejects.toMatchObject({ code: "invalid" });
+      expect(collected.chunks).toHaveLength(0);
+      expect(collected.aborted).toHaveLength(1);
+    }
+  });
+
   it("rejects non-finite and over-limit metadata before returning success", async () => {
     const identity = matrixMetadata({ runtimeIdentity: "x".repeat(65_537) });
     await expect(run({ metadata: identity })).rejects.toMatchObject({

@@ -653,8 +653,8 @@ function validateMatrixMetadata(
   const metadata = value as unknown as LoftCoarseMatrixIdentity;
   assertBoundedInteger(
     metadata.guardSchemaVersion,
-    1,
-    1,
+    guard.schemaVersion,
+    guard.schemaVersion,
     "Matrix guardSchemaVersion",
   );
   assertNonemptyString(metadata.scope, "Matrix scope");

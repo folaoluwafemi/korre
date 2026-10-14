@@ -1,0 +1,3 @@
+# Exact hosted canonical version mismatch
+
+Run38635348850/commit31f61953b86a31ec0410b093f1d13743961abd68 passed type/lint/format and focused protocol14/14; fullunit:179passed,12failed of191 across31files, plus2unhandled errors from early wrong writer guard version. Native-radius4tests passed. Verify failed, so builds/integration/browser NOTRUN; no producer/helper/matrix acceptance. Raw verify artifact has complete error/count output omitted from gh full-log display. Actual artifacts retained with per-file inventory. Two stale assertBoundedInteger literal1 bounds are the common cause; exact current canonical version repair prepared, not a tolerance/range expansion.

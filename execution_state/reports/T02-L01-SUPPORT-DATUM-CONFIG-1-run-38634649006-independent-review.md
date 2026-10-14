@@ -1,0 +1,22 @@
+# T02-L01-SUPPORT-DATUM-CONFIG-1 exact-run independent review
+
+**Evidence review: PASS. Run result: FAIL; producer acceptance is not supported.** The retained evidence consistently identifies GitHub Actions run [38634649006](https://github.com/folaoluwafemi/korre/actions/runs/38634649006), attempt 1, push event, exact commit `92615745c37e5f966716cd1c1f5a3d29296d2141`. The run metadata says `completed` / `failure`. SHA-256 of the retained full log is `4d970ff56aa21629936c6be670c418f5d272be0c8adf17c867695b2e8051fe83`.
+
+The GitHub job snapshot has 40 recorded steps: **26 success, 1 failure, 13 skipped**. The sole failure is step 13, **Verify**. Steps 14–16 are the subsequent TypeScript-resolution diagnostics and succeeded. Skipped steps 17–21 are production/Worker/browser packaging gates; steps 25–31 are integration, built-preview, diagnostic-browser packaging and diagnostic-browser execution; step 67 is the post-action cleanup step. Steps 22–24 and 32–35 are evidence, formatting-suggestion, or upload actions; their success does not turn Verify green.
+
+The hosted `verify.log` shows the workspace typechecks, tests-tsconfig check, web server-tsconfig check, and Counterball public headless Worker bundle boundary all passed. `pnpm lint` then reached Prettier after ESLint, and Prettier failed only on `games/counterball/src/simulation/nativeCylinderRadius.test.ts`. The recorded formatter patch targets that path. Because `pnpm verify` runs `typecheck && lint && test && build`, the failure stopped before the general unit suite and build. The prior focused protocol test step did pass **14/14** (`packages/game-protocol/src/protocol.test.ts`), and the dedicated Workers smoke step passed **1/1**. The disposable migration check ran and reported one forward-only migration. These are real, narrow successes; there is no full `pnpm test` or `pnpm build` result. Integration and all browser gates were skipped. No matrix tuple, physics step, full matrix artifact, production bundle, or browser-run result is evidenced.
+
+The artifact API snapshot lists four uploaded artifacts. Its `digest` values below are GitHub API archive metadata, not hashes recomputed from expanded files:
+
+| Artifact | ID | API size (bytes) | API archive digest |
+|---|---:|---:|---|
+| `formatting-repair` | 11928215050 | 836 | `sha256:8ede9159dbdd481c71852d84383470f5d24a8a50a3fca858e72df08038c26c82` |
+| `counterball-hosted-checks-92615745c37e5f966716cd1c1f5a3d29296d2141-run-38634649006-attempt-1` | 11926539602 | 1326535 | `sha256:8f5425204c27456f702f5c325f8c20331066442af2a1011e5ebbcb7c24d4e0ca` |
+| `counterball-verification-log` | 11926539594 | 1776 | `sha256:8ba926e329e577babb9ad62c17871401e55d0f89008210779123805f34d2bf94` |
+| `counterball-browser-evidence` | 11926299940 | 437511 | `sha256:7f1c3f3cf1c20be3b828f7e35fc5d69595b988df651c7de444a3022c114fcb6b` |
+
+I independently recomputed SHA-256 and byte length for the expanded artifact tree. All **22/22 files**, totaling **48,603,404 bytes**, match the saved inventory exactly; no listed path is missing and no extra file is present. The browser-evidence artifact contains only the three carried T03 screenshots, not results from this run. The formatting suggestion is present as `formatting-repair/formatting-repair.patch` (2,129 expanded bytes; SHA-256 `f5209967056790aa2f70d21038f70a394d3d6ede86a3248a9b379d5fd351061d`).
+
+This is an accurate record of a failed hosted check. It does not accept the config producer, native-radius helper, support datum, or matrix. The next gate is to apply/review the bounded formatting repair and obtain a new exact-head run that completes Verify and the required build checks; no physics or browser acceptance follows from this run.
+
+Evidence inspected: [run metadata](/C:/Users/USER/StudioProjects/korre/execution_state/reports/T02-L01-SUPPORT-DATUM-CONFIG-1-run-38634649006-run.json), [full log](/C:/Users/USER/StudioProjects/korre/execution_state/reports/T02-L01-SUPPORT-DATUM-CONFIG-1-run-38634649006-github.log), [artifact API snapshot](/C:/Users/USER/StudioProjects/korre/execution_state/reports/T02-L01-SUPPORT-DATUM-CONFIG-1-run-38634649006-artifacts-api.json), [expanded-file inventory](/C:/Users/USER/StudioProjects/korre/execution_state/reports/T02-L01-SUPPORT-DATUM-CONFIG-1-run-38634649006-artifact-inventory.json), and the retained downloaded files under `execution_state/reports/T02-L01-SUPPORT-DATUM-CONFIG-1-run-38634649006-artifacts/`.
