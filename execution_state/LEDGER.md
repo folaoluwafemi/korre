@@ -784,3 +784,5 @@ Independent exact-source review PASS is recorded at `execution_state/reports/T02
 2026-10-14: Contact-onset contract prose/internalinterface ACCEPTED after independentcopy/packetPASS/doc127PASS. NativeStarted-only delivery/budget andfull24 stillunverified. Configproducer5paths +pureadapter2paths READY foronehostedwave.
 
 2026-10-14: Contact-onset canonicalproducer andpureadapter independentlySOURCEPASS. Nativeeventproof/matrix stillunverified. Hostedsourcewave next; consumeroldrawpin intentionallyfailclosed.
+
+2026-10-14: Canonicalhash15/protocol/typechecks PASS inrun38647338857; Verify failedadapterarray-typewidening beforeunits/build/browser. Narrowbooleanhelperfix+nonarraynegative andexactformatterpatch independentlySOURCEPASS. Pureinitial-separation seam independentlySOURCEPASS; all3narrowcomponents joinnextfullhostedwave. Rootannounced only4filelocalformattransform(0.586sec), no appbuild/test/install. Nativeproof/matrixunaccepted.

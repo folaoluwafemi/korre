@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-127 bounded cards cover 21 remaining parents. Initially ready: T02-L01-CONTACT-ONSET-CONFIG-1, T02-L01-CONTACT-ONSET-ADAPTER-1.
+128 bounded cards cover 21 remaining parents. Initially ready: T02-L01-START-SEPARATION-SEAM-1.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -103,6 +103,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-NATIVE-RADIUS-HELPER-1 | T02 | Extract exact pure native cylinder radius from the larger matrix repair | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1 | 2 |
 | T02-L01-SUPPORT-DATUM-MATRIX-1 | T02 | Run full versioned native support-datum matrix with independently verifiable metadata | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-CANONICAL-GUARD-IDENTITY-1 | 5 |
 | T02-L01-CONTACT-ONSET-ADAPTER-1 | T02 | Implement public native onset mask adapter with exact all22 readbacks | worker | T02-L01-CONTACT-ONSET-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-ARTIFACT-1 | 2 |
+| T02-L01-START-SEPARATION-SEAM-1 | T02 | Extract shared native origin-radius and strict initial-separation math | worker | T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-SUPPORT-DATUM-CONTRACT-1 | 2 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
 | O02 | T04 | Build restricted real-WASM smoke Durable Object | coordinator | C00, O01, parent:T02, C01 | 5 |
 | O03 | T04 | Prove deployed staging WASM before online authority | coordinator | O02, C01 | 4 |

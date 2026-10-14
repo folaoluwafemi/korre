@@ -22,10 +22,7 @@ const canonicalBodyIds: readonly LoftCoarseContactBodyId[] = [
 type StubOptions = Readonly<{
   setterFailureId?: LoftCoarseContactBodyId;
   getterFailureId?: LoftCoarseContactBodyId;
-  readback?: (
-    bodyId: LoftCoarseContactBodyId,
-    requestedMask: number,
-  ) => number;
+  readback?: (bodyId: LoftCoarseContactBodyId, requestedMask: number) => number;
 }>;
 
 function makeBodies(options: StubOptions = {}) {
@@ -59,7 +56,10 @@ function makeBodies(options: StubOptions = {}) {
 describe("configureNativeCollisionOnsets", () => {
   it("sets all canonical bodies before exact readbacks and returns facts", () => {
     const { bodies, operations } = makeBodies();
-    const result = configureNativeCollisionOnsets({ value: 0x8000_0000 }, bodies);
+    const result = configureNativeCollisionOnsets(
+      { value: 0x8000_0000 },
+      bodies,
+    );
 
     expect(operations).toEqual([
       ...canonicalBodyIds.map((id) => `set:${id}:2147483648`),
@@ -98,6 +98,14 @@ describe("configureNativeCollisionOnsets", () => {
         configureNativeCollisionOnsets(startedFlag, bodies),
       ).toThrow();
       expect(operations).toEqual([]);
+    }
+  });
+
+  it("rejects non-array bodies before mutation", () => {
+    for (const supplied of [undefined, null, { length: 22 }]) {
+      const run = () =>
+        configureNativeCollisionOnsets({ value: 8 }, supplied as never);
+      expect(run).toThrow("missing or duplicated");
     }
   });
 
@@ -147,9 +155,9 @@ describe("configureNativeCollisionOnsets", () => {
     if (failingId === undefined) throw new Error("Expected canonical body.");
     const { bodies, operations } = makeBodies({ setterFailureId: failingId });
 
-    expect(() =>
-      configureNativeCollisionOnsets({ value: 8 }, bodies),
-    ).toThrow(`set failed for ${failingId}`);
+    expect(() => configureNativeCollisionOnsets({ value: 8 }, bodies)).toThrow(
+      `set failed for ${failingId}`,
+    );
     expect(operations).toEqual(
       canonicalBodyIds.slice(0, 4).map((id) => `set:${id}:8`),
     );
@@ -160,9 +168,9 @@ describe("configureNativeCollisionOnsets", () => {
     if (failingId === undefined) throw new Error("Expected canonical body.");
     const { bodies, operations } = makeBodies({ getterFailureId: failingId });
 
-    expect(() =>
-      configureNativeCollisionOnsets({ value: 8 }, bodies),
-    ).toThrow(`get failed for ${failingId}`);
+    expect(() => configureNativeCollisionOnsets({ value: 8 }, bodies)).toThrow(
+      `get failed for ${failingId}`,
+    );
     expect(operations).toEqual([
       ...canonicalBodyIds.map((id) => `set:${id}:8`),
       ...canonicalBodyIds.slice(0, 4).map((id) => `get:${id}`),
@@ -178,9 +186,9 @@ describe("configureNativeCollisionOnsets", () => {
       },
     });
 
-    expect(() =>
-      configureNativeCollisionOnsets({ value: 8 }, bodies),
-    ).toThrow("did not retain the onset mask");
+    expect(() => configureNativeCollisionOnsets({ value: 8 }, bodies)).toThrow(
+      "did not retain the onset mask",
+    );
     expect(operations).toEqual([
       ...canonicalBodyIds.map((id) => `set:${id}:8`),
       ...canonicalBodyIds.map((id) => `get:${id}`),

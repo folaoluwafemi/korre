@@ -58,6 +58,11 @@ function nativeStartedMask(startedFlag: unknown): number {
   return value;
 }
 
+// A boolean result keeps Array.isArray from widening the typed readonly input.
+function isArrayValue(value: unknown): boolean {
+  return Array.isArray(value);
+}
+
 export function configureNativeCollisionOnsets(
   startedFlag: unknown,
   orderedBodies: readonly OrderedContactBody[],
@@ -65,7 +70,7 @@ export function configureNativeCollisionOnsets(
   const nativeMask = nativeStartedMask(startedFlag);
 
   if (
-    !Array.isArray(orderedBodies) ||
+    !isArrayValue(orderedBodies) ||
     orderedBodies.length !== canonicalContactBodyIds.length
   ) {
     throw new Error("Native collision bodies are missing or duplicated.");

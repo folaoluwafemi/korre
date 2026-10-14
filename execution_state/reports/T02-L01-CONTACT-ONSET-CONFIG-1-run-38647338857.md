@@ -1,0 +1,3 @@
+# Canonicalonset producer/adapter hosted run
+
+Exactrun38647338857/37daf6b206f999add7feba74e301724415f20a23 failedVerifyaftercomplete typecheck and15focusedprotocoltests passed, includingactualcanonicalhash againstupdatedfixture. ESLint11unsafeany errors inadapter arosefromArray.isArray typepredicatewidening. Unit/build/integration/browserNOTRUN; no producer/adapter/nativeacceptance. Exactformatterpatch+explicitboolean runtimearraycheck/extra invalidarrayunit fixednarrowly, independentlySOURCEPASS; unchangedrerunrequired. FullAPI/jobs/GitHublogs/artifacthashinventory retained. No localappchecks.
