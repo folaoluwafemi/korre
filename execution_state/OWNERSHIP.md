@@ -723,3 +723,37 @@ No local application build/test/browser/physics ran for this contract correction
 - Independent source review PASS at SHA ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54; report at execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md. Runtime NOT RUN.
 - /root owns the exact CI-only commit/push and subsequent exact-run evidence. The previous source worker/reviewer have released their paths.
 - No Cloudflare/Wrangler action; no local app build/test/browser/physics check.
+
+## Current ownership — 2026-10-14 (native-dimension contract proposal review)
+
+- Coordinator accepted T02-L01-GEOMETRY-READBACK-1 only as a readback diagnostic after exact-source review and the independent exact-run review. The exact matrix test is still blocked before case one; MATRIX-1 and T02 remain unaccepted.
+- `/root/run_evidence_review` owns only `execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-PROPOSAL-1.md`, a source-free proposal. `/root/executor_type_review` owns only `execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-PROPOSAL-1-review.md` for independent proposal review.
+- `/root` retains all shared contract, task, ledger, packet-catalogue, and status ownership. No implementation worker is released until the no-epsilon contract amendment and exact implementation packet are independently reviewed.
+
+## Current ownership — 2026-10-14 (geometry Float32 matrix successor READY)
+
+- `/root` accepted the independently reviewed geometry representation clause, updated `CONTRACT_WORK.md`, and owns shared contract/catalogue/status changes.
+- Packet `T02-L01-GEOMETRY-F32-1` has independent packet-review PASS at `execution_state/reports/T02-L01-GEOMETRY-F32-1-packet-review.md`; the exact extraction returned `ready:true`. Its only source write paths are `games/counterball/src/simulation/loftCoarseRunner.ts` and `games/counterball/src/simulation/loftCoarseProbe.test.ts`.
+- `/root/run_evidence_review` is reserved as implementation worker after the coordinator dispatches the READY card. `/root/executor_type_review` is reserved for independent exact-source review; `/root/toolchain_audit` is reserved for exact hosted run/artifact review. Workers do not own contract, catalogue, task, ledger, status, commit/push, or CI paths.
+- No worker has started and no source has changed. Only scoped document checks have run locally. Application build/test/browser/physics checks remain GitHub-only. Cloudflare/Wrangler remains untouched.
+
+## Current ownership — 2026-10-14 (geometry Float32 matrix successor RUNNING)
+
+- `/root/run_evidence_review` has been dispatched to `T02-L01-GEOMETRY-F32-1` and may write only `games/counterball/src/simulation/loftCoarseRunner.ts`, `games/counterball/src/simulation/loftCoarseProbe.test.ts`, and `execution_state/reports/T02-L01-GEOMETRY-F32-1-implementation.md`.
+- The coordinator extracted the exact packet while status was READY and retained the `ready:true` output. The task is now RUNNING; the worker must not rerun the readiness gate after this transition.
+- `/root/executor_type_review` is reserved for independent exact-source review. The coordinator owns task/status, contracts/catalogues, commit/push and all GitHub run evidence; `/root/toolchain_audit` will independently review exact hosted matrix evidence.
+- No source change, app runtime command, commit/push, hosted build, Cloudflare/Wrangler action, or playability acceptance is recorded yet.
+
+## Current ownership — 2026-10-14 (geometry Float32 source review PASS)
+
+- Independent exact-source review PASS at `execution_state/reports/T02-L01-GEOMETRY-F32-1-source-review.md`, SHA-256 `39D5D10A5180D523F52AC3002CA779D031205F104B0A056B9CEA41C6C0489D4A`.
+- Worker and reviewer have released both source paths. `/root` owns staging the exact source plus task/contract reports, commit/push to the existing CI branch, then collecting run logs and artifact evidence.
+- `/root/toolchain_audit` remains the independent exact-run/artifact reviewer after the hosted workflow completes. Do not accept the packet on source review alone.
+- No application tests/builds have run locally. Cloudflare/Wrangler remains untouched. Full matrix, cap readbacks, T02, deployed physics and playability remain unaccepted.
+
+## Current ownership — 2026-10-14 (geometry Float32 source implementation REVIEWING)
+
+- `/root/run_evidence_review` completed only the two assigned source files and `execution_state/reports/T02-L01-GEOMETRY-F32-1-implementation.md`; scoped diff check passed and hashes are recorded in `execution_state/tasks.json`.
+- `/root/executor_type_review` now owns only independent review report `execution_state/reports/T02-L01-GEOMETRY-F32-1-source-review.md` for the exact source hashes. No implementation edits are permitted during review.
+- `/root` retains status, commit/push and hosted run ownership. Do not publish the code or start CI until source review PASS. `/root/toolchain_audit` will review exact hosted run/artifacts after the remote job.
+- No local app command or Cloudflare/Wrangler action has run. MATRIX-1, its successor runtime gate, T02, deployment and playability remain unaccepted.

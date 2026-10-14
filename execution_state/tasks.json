@@ -9100,7 +9100,7 @@
         },
         {
           "id": "T02-L01-GEOMETRY-READBACK-1",
-          "status": "REVIEWING",
+          "status": "ACCEPTED",
           "ready": false,
           "role": "worker",
           "title": "Expose native button bounds on strict dimension preflight failure",
@@ -9131,7 +9131,7 @@
           ],
           "packet_proposal": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-packet-proposal.md",
           "attempt_count": 0,
-          "next_action": "Commit the exact independently source-reviewed revision with its unique reports/status and exact prior-run evidence, push to the CI-only branch, and capture a fresh hosted run. Keep the diagnostic, material card and MATRIX-1 unaccepted until actual runtime evidence and independent exact-run review.",
+          "next_action": "Accepted as a bounds-readback diagnostic only. Next: independently review the exact native-dimension Float32 contract proposal; then materialize a bounded comparison packet. Keep MATRIX-1 and parent T02 RUNNING/unaccepted.",
           "checks": [
             {
               "command": "Full completion-plan document check",
@@ -9195,6 +9195,52 @@
               "result": "PASS",
               "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md",
               "detail": "Reviewer recomputed source SHA-256 ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54. One AABB supplies both comparison and diagnostics; strict equality and pre-impulse ordering unchanged. Runtime NOT RUN."
+            },
+            {
+              "command": "GitHub Actions run 38599929537: pnpm verify",
+              "environment": "github",
+              "result": "PASS",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537.md",
+              "detail": "Exact SHA 929067cc4e277b0ae0ec2d747ba0dd42841c414e; 30/30 test files and 183/183 tests passed, with no skipped tests reported."
+            },
+            {
+              "command": "GitHub Actions run 38599929537: pnpm test:integration",
+              "environment": "github",
+              "result": "PASS",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537.md",
+              "detail": "1 integration test passed."
+            },
+            {
+              "command": "GitHub Actions run 38599929537: built preview Chromium suite",
+              "environment": "github",
+              "result": "PASS",
+              "exit_code": 0,
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537.md",
+              "detail": "4 expected, 0 unexpected, 0 skipped, 0 flaky, and 0 retries."
+            },
+            {
+              "command": "GitHub Actions run 38599929537: real-Havok diagnostic browser suite",
+              "environment": "github",
+              "result": "CHANGES_REQUIRED",
+              "exit_code": 1,
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537.md",
+              "detail": "3 passed, 1 failed, 0 skipped, 0 flaky, 0 retries. The full-matrix test stopped at the strict button-dimension preflight and did not run a matrix case; the failed test is not recorded as a matrix pass."
+            },
+            {
+              "command": "T02-L01-GEOMETRY-READBACK-1 diagnostic acceptance condition",
+              "environment": "browser-runtime",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537.md",
+              "detail": "The actual Chromium/Havok error exposed body, native shape type, configured/expected dimensions, raw AABB and observed dimensions before impulse/step. UI states no successful download; no matrix artifact exists."
+            },
+            {
+              "command": "Independent exact-run evidence review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537-independent-review.md",
+              "detail": "Exact run/commit provenance verified; all 1,155 downloaded files match inventory byte counts and SHA-256; no matrix result/download/artifact."
             }
           ],
           "setup_report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-coordinator-setup.md",
@@ -9204,19 +9250,166 @@
           "implementation_source_sha": "ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54",
           "review_report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md",
           "source_review_verdict": "PASS",
-          "runtime_verdict": "NOT RUN"
+          "runtime_verdict": "PASS for the diagnostic objective only: exact native button AABB and dimensions were preserved before any matrix impulse/step/download. The matrix test itself exited 1 at this expected preflight finding; MATRIX-1 and T02 remain unaccepted.",
+          "run_review_report": "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-run-38599929537-independent-review.md",
+          "run_review_verdict": "PASS",
+          "hosted_run": {
+            "run_id": 38599929537,
+            "attempt": 1,
+            "source_sha": "929067cc4e277b0ae0ec2d747ba0dd42841c414e",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38599929537",
+            "status": "completed",
+            "reviewer": "/root/toolchain_audit",
+            "conclusion": "failure",
+            "completed_at": "2026-10-14T16:44:18Z",
+            "run_review": "PASS",
+            "workflow_steps": {
+              "verify": "success",
+              "integration": "success",
+              "preview_browser": "success",
+              "diagnostic_browser": "failure"
+            },
+            "diagnostic_browser": {
+              "passed": 3,
+              "failed": 1,
+              "skipped": 0,
+              "retries": 0,
+              "flaky": 0,
+              "completed_matrix_cases": 0,
+              "matrix_success_artifact": false
+            }
+          }
+        },
+        {
+          "id": "T02-L01-GEOMETRY-F32-1",
+          "status": "REVIEWING",
+          "ready": false,
+          "role": "worker",
+          "title": "Apply exact native geometry projections and complete the 24-case matrix",
+          "owner": "/root/run_evidence_review — implementation complete; /root — coordinator; /root/executor_type_review — independent exact-source review",
+          "reviewer_identity": "/root/executor_type_review — exact-source review; /root/toolchain_audit — exact-run/artifact review",
+          "packet": "knowledge_base/execution/completion/LOCAL_PACKETS.json#T02-L01-GEOMETRY-F32-1",
+          "depends_on": [
+            "C00-B",
+            "C01",
+            "T02-B0",
+            "T02-C0",
+            "T02-C2",
+            "C00",
+            "T02-L01-GUARD-CONTRACT-1",
+            "T02-L01-GUARD-SCHEMA-1",
+            "T02-L01-PACKET-SPLIT-1",
+            "T02-L01-TRANSPORT-1",
+            "T02-L01-SUPPORT-PREFLIGHT-1",
+            "T02-L01-SUPPORT-F32-1",
+            "T02-L01-GEOMETRY-READBACK-1"
+          ],
+          "supersedes": [
+            "T02-L01-MATRIX-1"
+          ],
+          "write_paths": [
+            "games/counterball/src/simulation/loftCoarseRunner.ts",
+            "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+          ],
+          "contract_proposal": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-contract-proposal-1.md",
+          "contract_review_report": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-contract-proposal-1-review-2.md",
+          "contract_acceptance_report": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-contract-acceptance-1.md",
+          "packet_review_report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-packet-review.md",
+          "packet_reviewer_identity": "/root/toolchain_audit",
+          "attempt_count": 1,
+          "implementation_report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-implementation.md",
+          "implementation_source_sha": {
+            "games/counterball/src/simulation/loftCoarseRunner.ts": "CF04607EE95C50F71EEA8D47156C8C2B63DBBD6253D8A8C55982C778CC33781B",
+            "games/counterball/src/simulation/loftCoarseProbe.test.ts": "50368C416CA0A613239436129DF65B13FFA8B51C2CD9956696AC7F63365797E2"
+          },
+          "review_report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-source-review.md",
+          "source_review_verdict": "PASS",
+          "next_action": "Independent exact-source review PASS. Coordinator may commit/push the exact reviewed source and required task/contract reports to the CI branch. Run all app checks on GitHub; collect full matrix artifact and a separate independent run review before acceptance.",
+          "checks": [
+            {
+              "command": "Independent native-dimension contract proposal review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-contract-proposal-1-review-2.md",
+              "detail": "Exact all-dynamic-cylinder projection clause, no epsilon, raw values, and limits reviewed; cap readbacks remain unverified."
+            },
+            {
+              "command": "Independent geometry scope adjudication",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-SCOPE-ADJUDICATION-1.md",
+              "detail": "Shared constructor supports one policy across 15 dynamic bodies; the full matrix remains required to observe caps."
+            },
+            {
+              "command": "Coordinator geometry contract acceptance",
+              "environment": "coordinator",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-NATIVE-DIMENSIONS-F32-contract-acceptance-1.md",
+              "detail": "Accepted the reviewed representation clause only; no source or runtime acceptance."
+            },
+            {
+              "command": "Independent exact packet review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-packet-review.md",
+              "detail": "All original MATRIX-1 dependencies retained; accepted geometry readback added; only failed MATRIX-1 superseded; exact paths and hosted gates confirmed."
+            },
+            {
+              "command": "Exact pre-dispatch packet extraction and full document check",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-pre-dispatch-extraction.txt",
+              "detail": "114 packet documents checked; this packet is the sole initially ready card with inherited T01 accepted. Extracted record returned ready:true before dispatch."
+            },
+            {
+              "command": "Scoped contract/catalogue/report diff check",
+              "environment": "local-document",
+              "result": "PASS",
+              "detail": "Coordinator-owned documents only; no application/runtime command ran."
+            },
+            {
+              "command": "Bounded source implementation",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-implementation.md",
+              "detail": "Only the two assigned source paths changed; worker scoped diff check passed; no local application/runtime command ran. Exact file SHA-256 values are recorded in the report."
+            },
+            {
+              "command": "Coordinator scoped source diff and hash verification",
+              "environment": "local-document",
+              "result": "PASS",
+              "detail": "Scoped git diff --check passed; exact source hashes independently match the implementation report."
+            },
+            {
+              "command": "Independent exact-source review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-GEOMETRY-F32-1-source-review.md",
+              "detail": "Reviewer recomputed both file hashes; exact all-dynamic-cylinder guard, raw-value use, two-path boundary and focused test pass source review. Hosted/runtime remains NOT RUN."
+            }
+          ]
         }
       ],
-      "next_action": "Exact source review passed. Coordinator is preparing the exact reviewed commit and will push only to the CI branch; all application checks remain hosted.",
+      "next_action": "T02-L01-GEOMETRY-F32-1 implementation and independent exact-source review have passed. Coordinator must publish the exact reviewed files to the CI branch and capture hosted gates plus the full matrix artifact; MATRIX-1 and parent T02 remain unaccepted.",
       "hosted_run": {
-        "run_id": 38595010780,
-        "source_sha": "417a2e95b5b59aebd984be903e0b406caae2bc15",
-        "url": "https://github.com/folaoluwafemi/korre/actions/runs/38595010780",
+        "run_id": 38599929537,
+        "attempt": 1,
+        "source_sha": "929067cc4e277b0ae0ec2d747ba0dd42841c414e",
+        "url": "https://github.com/folaoluwafemi/korre/actions/runs/38599929537",
         "status": "completed",
-        "reviewer": "/root/executor_type_review",
+        "reviewer": "/root/toolchain_audit",
         "conclusion": "failure",
-        "completed_at": "2026-10-14T16:08:31Z",
-        "run_review": "PASS"
+        "completed_at": "2026-10-14T16:44:18Z",
+        "run_review": "PASS",
+        "diagnostic_browser": {
+          "passed": 3,
+          "failed": 1,
+          "skipped": 0,
+          "retries": 0,
+          "flaky": 0,
+          "completed_matrix_cases": 0,
+          "matrix_success_artifact": false
+        }
       }
     },
     {
@@ -9809,5 +10002,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "T02-L01-GEOMETRY-READBACK-1 source review PASS at SHA ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54; runtime NOT RUN. Coordinator will commit/push this exact source and evidence to GitHub CI. No Cloudflare action."
+  "next": "T02-L01-GEOMETRY-F32-1 implementation and exact-source review PASS. Coordinator is preparing the exact reviewed CI commit; then run GitHub verification and the full 24-case real-Havok matrix. Preserve current blockers: no matrix success artifact, deployed Havok, T02 acceptance, or playable match yet."
 }

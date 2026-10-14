@@ -980,9 +980,9 @@ function readNativeBodies(world: CounterballWorld): {
     const radius = Math.max(dimensions.x, dimensions.z) / 2;
     const height = dimensions.y;
     if (
-      dimensions.x !== expectedDimensions.x ||
-      dimensions.z !== expectedDimensions.z ||
-      height !== expectedDimensions.y
+      !matchesExactFloat32Projection(expectedDimensions.x, dimensions.x) ||
+      !matchesExactFloat32Projection(expectedDimensions.y, dimensions.y) ||
+      !matchesExactFloat32Projection(expectedDimensions.z, dimensions.z)
     ) {
       throw resourceFailure(
         `Dynamic body ${id} native dimensions differ from canonical cylinder geometry. ${JSON.stringify(
