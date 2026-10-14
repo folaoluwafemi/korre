@@ -429,6 +429,30 @@ function exactCaseLimits(
 }
 
 describe("matchesExactFloat32Projection", () => {
+  it(
+    "projects only temporary support-apron thickness and keeps its footprint exact",
+    () => {
+      const expectedDimensions = { x: 662, y: 0.2, z: 670 };
+      const projectedY = Math.fround(expectedDimensions.y);
+      const view = new DataView(
+        new ArrayBuffer(Float32Array.BYTES_PER_ELEMENT),
+      );
+      view.setFloat32(0, projectedY);
+      view.setUint32(0, view.getUint32(0) + 1);
+      const adjacentY = view.getFloat32(0);
+      const matchesApronY = (observedY: number): boolean =>
+        matchesExactFloat32Projection(expectedDimensions.y, observedY);
+
+      expect(expectedDimensions.x).toBe(662);
+      expect(expectedDimensions.z).toBe(670);
+      expect(matchesApronY(projectedY)).toBe(true);
+      expect(matchesApronY(expectedDimensions.y)).toBe(false);
+      expect(adjacentY).not.toBe(projectedY);
+      expect(Math.fround(adjacentY)).toBe(adjacentY);
+      expect(matchesApronY(adjacentY)).toBe(false);
+    },
+  );
+
   it("projects the canonical button and cap dimensions exactly", () => {
     const geometry = COUNTERBALL_CONFIG_V1.geometry;
     const canonicalDimensions = [

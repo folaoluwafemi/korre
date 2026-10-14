@@ -1123,7 +1123,7 @@ function readNativeBodies(world: CounterballWorld): {
       if (
         shape.type !== PhysicsShapeType.BOX ||
         dimensions.x !== 662 ||
-        dimensions.y !== 0.2 ||
+        !matchesExactFloat32Projection(0.2, dimensions.y) ||
         dimensions.z !== 670
       ) {
         throw resourceFailure(
