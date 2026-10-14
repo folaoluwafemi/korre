@@ -4,9 +4,7 @@ import {
 } from "@korre/game-protocol";
 import { beforeAll, describe, expect, it } from "vitest";
 import { computeDiagnosticShiftedEnergy } from "./browserDirectProbe.js";
-import {
-  deriveNativeCylinderSupportDatum,
-} from "./nativeCylinderSupportDatum.js";
+import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
 import {
   LOFT_COARSE_TUPLES,
   canonicalizeLoftCoarseContactPair,
@@ -236,18 +234,15 @@ function caseMetadata(
     supportPlane: {
       referenceY: geometry.surfaceY,
       nativeTopY:
-        geometry.surfaceY - geometry.surfaceThickness / 2 +
+        geometry.surfaceY -
+        geometry.surfaceThickness / 2 +
         supportBounds.maximum.y,
       nativeShapeType: 3 as const,
       nativeLocalAabb: {
         minimum: supportBounds.minimum,
         maximum: supportBounds.maximum,
       },
-      position: vec3(
-        0,
-        geometry.surfaceY - geometry.surfaceThickness / 2,
-        0,
-      ),
+      position: vec3(0, geometry.surfaceY - geometry.surfaceThickness / 2, 0),
       rotation: quaternion(),
       scaling: vec3(1, 1, 1),
       hasParent: false as const,
@@ -694,17 +689,16 @@ describe("native cylinder support datum", () => {
     const tiltedSupportExtent = radius * sine + halfHeight * cosine;
     const tiltedRotatedCOMY = cosine * nativeCOM.y - sine * nativeCOM.z;
     const tiltedCOMY =
-      geometry.surfaceY +
-      tiltedSupportExtent +
-      tiltedRotatedCOMY;
+      geometry.surfaceY + tiltedSupportExtent + tiltedRotatedCOMY;
 
     expect(flatCOMY - nativeCOM.y - halfHeight).toBeCloseTo(
       geometry.surfaceY,
       14,
     );
-    expect(
-      tiltedCOMY - tiltedRotatedCOMY - tiltedSupportExtent,
-    ).toBeCloseTo(geometry.surfaceY, 14);
+    expect(tiltedCOMY - tiltedRotatedCOMY - tiltedSupportExtent).toBeCloseTo(
+      geometry.surfaceY,
+      14,
+    );
     expect(flatCOMY).toBeGreaterThanOrEqual(datum);
     expect(tiltedCOMY).toBeGreaterThanOrEqual(datum);
 
@@ -1179,15 +1173,13 @@ describe("writeLoftCoarseMatrix", () => {
             maximum: vec3(331, 0.1, 335),
           },
         },
-      ].map(
-        (supportPatch) => (metadata: LoftCoarseCase["metadata"]) => ({
-          ...metadata,
-          supportPlane: {
-            ...metadata.supportPlane,
-            ...supportPatch,
-          } as never,
-        }),
-      ),
+      ].map((supportPatch) => (metadata: LoftCoarseCase["metadata"]) => ({
+        ...metadata,
+        supportPlane: {
+          ...metadata.supportPlane,
+          ...supportPatch,
+        } as never,
+      })),
     ];
 
     for (const mutate of mutations) {

@@ -431,11 +431,14 @@ function assertNativeAabb(
   assertVector(minimum, `${label}.minimum`);
   assertVector(maximum, `${label}.maximum`);
   const dimensions = {
-    x: finiteNumber(maximum["x"], `${label}.maximum.x`) -
+    x:
+      finiteNumber(maximum["x"], `${label}.maximum.x`) -
       finiteNumber(minimum["x"], `${label}.minimum.x`),
-    y: finiteNumber(maximum["y"], `${label}.maximum.y`) -
+    y:
+      finiteNumber(maximum["y"], `${label}.maximum.y`) -
       finiteNumber(minimum["y"], `${label}.minimum.y`),
-    z: finiteNumber(maximum["z"], `${label}.maximum.z`) -
+    z:
+      finiteNumber(maximum["z"], `${label}.maximum.z`) -
       finiteNumber(minimum["z"], `${label}.minimum.z`),
   };
   for (const axis of ["x", "y", "z"] as const) {
@@ -1000,10 +1003,7 @@ function validateCaseMetadata(
     ["w", 1],
   ] as const) {
     expect(
-      finiteNumber(
-        supportRotation[axis],
-        `${supportLabel}.rotation.${axis}`,
-      ),
+      finiteNumber(supportRotation[axis], `${supportLabel}.rotation.${axis}`),
     ).toBe(expected);
   }
   expect(supportScaling).toEqual({ x: 1, y: 1, z: 1 });
@@ -1096,10 +1096,7 @@ function validateCaseMetadata(
     );
     const derivedSupportDatum =
       supportReferenceY +
-      Math.min(
-        dynamicBounds.dimensions.x / 2,
-        dynamicBounds.dimensions.y / 2,
-      ) -
+      Math.min(dynamicBounds.dimensions.x / 2, dynamicBounds.dimensions.y / 2) -
       Math.hypot(
         finiteNumber(centerOfMass["x"], `${label}.centerOfMassOffset.x`),
         finiteNumber(centerOfMass["y"], `${label}.centerOfMassOffset.y`),

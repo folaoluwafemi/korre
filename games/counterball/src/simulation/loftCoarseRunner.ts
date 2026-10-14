@@ -57,9 +57,7 @@ import {
   type CounterballWorld,
 } from "./worldFactory.js";
 import { nativeCylinderComRadius } from "./nativeCylinderRadius.js";
-import {
-  deriveNativeCylinderSupportDatum,
-} from "./nativeCylinderSupportDatum.js";
+import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
 
 const config = COUNTERBALL_CONFIG_V1;
 const guard = config.restartLoftDiagnosticGuard;

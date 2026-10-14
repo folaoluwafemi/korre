@@ -2,9 +2,7 @@ import {
   COUNTERBALL_CONFIG_V1,
   hashCounterballConfig,
 } from "@korre/game-protocol";
-import {
-  deriveNativeCylinderSupportDatum,
-} from "./nativeCylinderSupportDatum.js";
+import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
 
 export type LoftCoarseTuple = readonly [
   gapOffset: number,
@@ -622,11 +620,11 @@ function assertNativeAabb(
   dimensions: LoftCoarseVec3;
 } {
   assertExactKeys(value, ["minimum", "maximum"], label);
-  const bounds = value as Record<string, unknown>;
+  const bounds = value;
   assertVector(bounds["minimum"], `${label}.minimum`);
   assertVector(bounds["maximum"], `${label}.maximum`);
-  const minimum = bounds["minimum"] as LoftCoarseVec3;
-  const maximum = bounds["maximum"] as LoftCoarseVec3;
+  const minimum = bounds["minimum"];
+  const maximum = bounds["maximum"];
   const dimensions = {
     x: maximum.x - minimum.x,
     y: maximum.y - minimum.y,
