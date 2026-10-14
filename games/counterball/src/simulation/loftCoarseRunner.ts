@@ -426,12 +426,26 @@ function setAndReadMaterial(
   return { setter, readback };
 }
 
-function shapeDimensions(shape: PhysicsShape): Vec3 {
+function shapeBoundsAndDimensions(shape: PhysicsShape): {
+  minimum: Vec3;
+  maximum: Vec3;
+  dimensions: Vec3;
+} {
   const bounds = shape.getBoundingBox();
+  const minimum = {
+    x: bounds.minimum.x,
+    y: bounds.minimum.y,
+    z: bounds.minimum.z,
+  };
+  const maximum = {
+    x: bounds.maximum.x,
+    y: bounds.maximum.y,
+    z: bounds.maximum.z,
+  };
   const dimensions = {
-    x: bounds.maximum.x - bounds.minimum.x,
-    y: bounds.maximum.y - bounds.minimum.y,
-    z: bounds.maximum.z - bounds.minimum.z,
+    x: maximum.x - minimum.x,
+    y: maximum.y - minimum.y,
+    z: maximum.z - minimum.z,
   };
   if (
     !finiteVector(dimensions) ||
@@ -441,7 +455,11 @@ function shapeDimensions(shape: PhysicsShape): Vec3 {
   ) {
     throw resourceFailure("A native collider has unsupported dimensions.");
   }
-  return dimensions;
+  return { minimum, maximum, dimensions };
+}
+
+function shapeDimensions(shape: PhysicsShape): Vec3 {
+  return shapeBoundsAndDimensions(shape).dimensions;
 }
 
 function radiiFromBounds(
@@ -945,7 +963,8 @@ function readNativeBodies(world: CounterballWorld): {
         `Dynamic body ${id} has invalid native collision filters.`,
       );
     }
-    const dimensions = shapeDimensions(shape);
+    const nativeBounds = shapeBoundsAndDimensions(shape);
+    const dimensions = nativeBounds.dimensions;
     const isButton = id === "button";
     const configuredRadius = isButton
       ? geometry.buttonRadius
@@ -953,15 +972,33 @@ function readNativeBodies(world: CounterballWorld): {
     const configuredHeight = isButton
       ? geometry.buttonThickness
       : geometry.capHeight;
+    const expectedDimensions = {
+      x: configuredRadius * 2,
+      y: configuredHeight,
+      z: configuredRadius * 2,
+    };
     const radius = Math.max(dimensions.x, dimensions.z) / 2;
     const height = dimensions.y;
     if (
-      dimensions.x !== configuredRadius * 2 ||
-      dimensions.z !== configuredRadius * 2 ||
-      height !== configuredHeight
+      dimensions.x !== expectedDimensions.x ||
+      dimensions.z !== expectedDimensions.z ||
+      height !== expectedDimensions.y
     ) {
       throw resourceFailure(
-        `Dynamic body ${id} native dimensions differ from canonical cylinder geometry.`,
+        `Dynamic body ${id} native dimensions differ from canonical cylinder geometry. ${JSON.stringify(
+          {
+            bodyId: id,
+            nativeShapeType: shape.type,
+            configuredRadius,
+            configuredHeight,
+            expectedDimensions,
+            nativeLocalAabb: {
+              minimum: nativeBounds.minimum,
+              maximum: nativeBounds.maximum,
+            },
+            observedDimensions: dimensions,
+          },
+        )}`,
       );
     }
     const properties = body.getMassProperties();

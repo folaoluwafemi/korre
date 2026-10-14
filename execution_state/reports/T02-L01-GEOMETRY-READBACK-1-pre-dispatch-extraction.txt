@@ -1,0 +1,116 @@
+{
+  "verdict": "PASS",
+  "packets": 113,
+  "remainingParents": 21,
+  "initialReady": [
+    "T02-L01-GEOMETRY-READBACK-1"
+  ],
+  "note": "Plan consistency only; no implementation/runtime check ran."
+}
+{
+  "id": "T02-L01-GEOMETRY-READBACK-1",
+  "parent": "T02",
+  "title": "Expose native button bounds on strict dimension preflight failure",
+  "role": "worker",
+  "depends_on": [
+    "C00-B",
+    "C01",
+    "T02-B0",
+    "T02-C0",
+    "T02-C2",
+    "C00",
+    "T02-L01-EXECUTOR-1",
+    "T02-L01-GUARD-CONTRACT-1",
+    "T02-L01-GUARD-SCHEMA-1",
+    "T02-L01-PACKET-SPLIT-1",
+    "T02-L01-TRANSPORT-1",
+    "T02-L01-SUPPORT-PREFLIGHT-1",
+    "T02-L01-SUPPORT-F32-1",
+    "T02-L01-MATERIAL-DIAGNOSTIC-1"
+  ],
+  "supersedes": [
+    "T02-L01-MATERIAL-F32-1"
+  ],
+  "read_paths": [
+    "knowledge_base/execution/CONTRACTS.md",
+    "knowledge_base/execution/completion/CONTRACT_WORK.md",
+    "knowledge_base/execution/completion/LOCAL_NOTES.md",
+    "execution_state/reports/T02-L01-GEOMETRY-READBACK-1-packet-proposal.md",
+    "execution_state/reports/T02-L01-MATERIAL-F32-implementation.md",
+    "execution_state/reports/T02-L01-MATERIAL-F32-source-review.md",
+    "execution_state/reports/T02-L01-MATERIAL-F32-run-38595010780.md",
+    "execution_state/reports/T02-L01-MATERIAL-F32-run-38595010780-review.md",
+    "execution_state/reports/T02-L01-MATERIAL-F32-matrix-diagnosis-38595010780.md",
+    "games/counterball/src/simulation/loftCoarseRunner.ts",
+    "packages/game-protocol/src/config.ts"
+  ],
+  "write_paths": [
+    "games/counterball/src/simulation/loftCoarseRunner.ts"
+  ],
+  "outputs": [
+    "Keep the strict canonical cylinder dimension predicate unchanged. On its existing failure path, disclose body ID, native shape type, configured radius/thickness, expected dimensions, raw native local AABB minimum/maximum, and computed dimensions from one single AABB read.",
+    "Preserve current material F32 source behavior. This diagnostic does not accept material semantics, MATRIX-1, parent T02, physics eligibility, or playability."
+  ],
+  "steps": [
+    "Read only packet inputs and verify the exact hosted run, independent evidence review, and read-only diagnosis. Before dispatch, require the coordinator to record independent packet PASS and an exact packet extraction with ready:true while the task status is READY. Once the coordinator changes status to RUNNING, do not rerun the dispatch-readiness check: the checker intentionally returns ready:false for active work. If the recorded pre-dispatch READY check is absent, stop and ask the coordinator.",
+    "In loftCoarseRunner.ts, use one getBoundingBox() result for both the compared dimensions and the failure detail. Add body ID, shape type, configured radius/height, expected dimensions, raw minimum/maximum, and observed dimensions to the existing resourceLimit message.",
+    "Keep exact equality, native shape-type/material checks, failure code, and pre-impulse/pre-step ordering unchanged. Do not change any physical value or unassigned file.",
+    "Run only scoped git diff --check locally; record exact source SHA and diff. Run no local install, build, typecheck, lint, test, browser or physics command.",
+    "After independent exact-source review, run GitHub pnpm verify and the existing one-worker real pinned-WASM Chromium diagnostic route on the exact SHA. Capture complete logs, counts, Playwright results and artifact inventory. Expected preflight failure must expose the values before any physics case and produce no successful matrix artifact.",
+    "Obtain independent exact-source and exact-run review. Do not accept the predecessor material card, MATRIX-1, T02 or playability from this diagnostic."
+  ],
+  "checks": [
+    {
+      "command": "node scripts/check-completion-plan.mjs --packet T02-L01-GEOMETRY-READBACK-1",
+      "environment": "local-document",
+      "expected": "Exact extraction preserves all 14 accepted prerequisites, inherited T01 gate, exact one-file ownership and explicit predecessor ordering; document check only."
+    },
+    {
+      "command": "git diff --check -- games/counterball/src/simulation/loftCoarseRunner.ts",
+      "environment": "local-document",
+      "expected": "The one assigned source file has no whitespace errors; no local app command runs."
+    },
+    {
+      "command": "pnpm verify on the exact independently reviewed SHA",
+      "environment": "github",
+      "expected": "Hosted typecheck, lint/format, unit, production-boundary and build checks pass with exact counts and zero skips/retries/flakes."
+    },
+    {
+      "command": "COUNTERBALL_DEV_E2E=1 COUNTERBALL_PREBUILT_PREVIEW=1 pnpm test:e2e tests/e2e/counterball-direct-probe.spec.ts --workers=1",
+      "environment": "github",
+      "expected": "Real pinned-Havok Chromium exposes exact native bounds on the strict preflight failure; no impulse, physics case, matrix download or success artifact."
+    },
+    {
+      "command": "Independent exact-source and exact-run evidence review",
+      "environment": "source-review",
+      "expected": "PASS verifies one-file source hash/diff, unchanged strict predicate and failure ordering, exact-SHA evidence, detailed readback, zero browser skips/retries/flakes and no matrix success artifact."
+    }
+  ],
+  "acceptance": [
+    "Only loftCoarseRunner.ts changes. One native AABB read supplies both observed dimensions and disclosed raw minimum/maximum.",
+    "Failure detail identifies body and native shape type and includes configured radius/thickness, expected dimensions, raw bounds and computed dimensions; exact equality and fail-before-impulse ordering remain unchanged.",
+    "Exact hosted SHA passes pnpm verify. Real-browser matrix preflight failure exposes values needed to distinguish representation effects from shape/readback discrepancy; it emits no successful artifact.",
+    "Independent exact-source and exact-run reviews pass. This does not accept the predecessor material card, MATRIX-1, parent T02 or playability."
+  ],
+  "negative_cases": [
+    "No tolerance, comparison relaxation, changed shape/geometry/pose/material/solver/physics/config/hash/schema, altered artifact/UI contract, or unrelated source change.",
+    "No local app build/typecheck/lint/test/browser/physics command; no Node/mock/dry-run acceptance; no Cloudflare/Wrangler action; no matrix or playability pass claim."
+  ],
+  "review_questions": [
+    "Do the reported bounds and computed dimensions come from the same single native AABB read?",
+    "Does the exact strict predicate still fail before any impulse or physics step?",
+    "Do the browser error context and exact-run artifacts show configured dimensions, raw bounds and observed dimensions without a matrix success download?",
+    "Are source SHA, hosted Verify, no-skip browser results and independent exact-run review tied to the same commit?"
+  ],
+  "stop_conditions": [
+    "If the native bounds API is unavailable, disclosed bounds cannot be tied to compared dimensions, or another file is required, stop and obtain a revised packet; do not infer a cause.",
+    "If the patch changes the predicate, any physical value, or failure ordering, reject it.",
+    "If the browser failure does not preserve exact raw bounds in saved evidence, leave the diagnostic unaccepted.",
+    "If source review, hosted Verify, exact-SHA evidence or independent run review fails, do not accept this diagnostic, MATRIX-1 or T02."
+  ],
+  "catalogue": "LOCAL_PACKETS.json",
+  "ready": true,
+  "required_parent_acceptance": [
+    "T01"
+  ]
+}

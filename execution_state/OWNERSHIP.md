@@ -679,3 +679,47 @@ No local application build/test/browser/physics ran for this contract correction
 - Repair attempt 1 is complete and independently source-reviewed PASS by `/root/run_evidence_review`; reports are `execution_state/reports/T02-L01-MATERIAL-F32-format-repair-1.md` and `execution_state/reports/T02-L01-MATERIAL-F32-repair-1-source-review.md`.
 - The repaired source differs from the prior reviewed tree only by assertion wrapping in `games/counterball/src/simulation/loftCoarseProbe.test.ts`. The implementation card is IMPLEMENTED; runtime, MATRIX-1 and T02 are still unaccepted.
 - `/root` owns exact-path staging, commit/push to `codex/remote-ci-bootstrap`, fresh GitHub run evidence capture, and rotated independent exact-run review. No local app builds/tests/browser/physics commands and no Wrangler action are authorized or needed now.
+
+
+## Current ownership — 2026-10-14 (native dimension readback packet review)
+
+- Run 38595010780 is independently reviewed PASS for evidence integrity, but its real-Havok matrix stopped before case one on strict button dimensions. No matrix artifact exists; T02 remains RUNNING.
+- /root owns shared status and exact packet T02-L01-GEOMETRY-READBACK-1. /root/toolchain_audit owns only independent packet review. No source worker has been dispatched.
+- After packet PASS and READY extraction, /root/run_evidence_review may implement only games/counterball/src/simulation/loftCoarseRunner.ts; /root/executor_type_review is reserved for independent exact-source review.
+- Cloudflare/Wrangler remains unused. No local app checks ran.
+
+
+## Current ownership — 2026-10-14 (geometry readback implementation READY)
+
+- Packet T02-L01-GEOMETRY-READBACK-1 passed independent review and exact READY extraction.
+- /root/run_evidence_review owns only games/counterball/src/simulation/loftCoarseRunner.ts and its unique implementation report. /root/executor_type_review owns only the subsequent independent review report.
+- The predecessor F32 card is superseded only for shared-path ordering; no material/matrix acceptance results.
+- No local application check or Cloudflare action is authorized or needed for this diagnostic.
+
+
+## Current ownership — 2026-10-14 (geometry readback worker running)
+
+- /root/run_evidence_review owns only games/counterball/src/simulation/loftCoarseRunner.ts and its unique implementation report for T02-L01-GEOMETRY-READBACK-1.
+- /root/executor_type_review is reserved for independent exact-source review.
+- No local app checks, commit/push, GitHub runtime checks, Cloudflare action or acceptance decision has occurred on this card.
+
+
+## Current ownership — 2026-10-14 (geometry readback re-released after recorded READY gate)
+
+- Clarified packet review PASS and exact ready:true pre-dispatch output are recorded. Task status is now RUNNING; ready:false from a new extraction is expected for an active card.
+- /root/run_evidence_review is explicitly released to only games/counterball/src/simulation/loftCoarseRunner.ts and its implementation report. /root/executor_type_review owns the later independent source review.
+- No code has been pushed and no app runtime checks have run on this card.
+
+
+## Current ownership — 2026-10-14 (geometry readback source implementation complete)
+
+- Worker /root/run_evidence_review stopped after implementing only games/counterball/src/simulation/loftCoarseRunner.ts and writing the exact implementation report. Source SHA-256 is ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54; scoped diff check passed.
+- /root/executor_type_review owns only execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md for the exact source.
+- No commit/push, hosted run, local app check, Cloudflare action or acceptance decision yet.
+
+
+## Current ownership — 2026-10-14 (geometry readback source reviewed)
+
+- Independent source review PASS at SHA ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54; report at execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md. Runtime NOT RUN.
+- /root owns the exact CI-only commit/push and subsequent exact-run evidence. The previous source worker/reviewer have released their paths.
+- No Cloudflare/Wrangler action; no local app build/test/browser/physics check.

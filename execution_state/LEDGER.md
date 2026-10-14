@@ -703,3 +703,34 @@ Commit `7af31de911a6489b244dc0fe9679ca3834912414` contains the independently rev
 The bounded repair for hosted run [38593653165](https://github.com/folaoluwafemi/korre/actions/runs/38593653165) changed only line wrapping in the assigned support-material assertion. Scoped `git diff --check` passed. Rotated independent reviewer `/root/run_evidence_review` recomputed the runner, validator and test hashes and returned PASS at `execution_state/reports/T02-L01-MATERIAL-F32-repair-1-source-review.md`. The final test hash is `7b7ae60a3b40eb30a361242e454a3344f22a1e655e1ad3fe97b3e305e53a8f64`; runner and validator hashes are unchanged from the original PASS review. No app tests, builds, browser or physics runtime ran during repair/review.
 
 The card is IMPLEMENTED, not accepted. Its first GitHub run stopped at Prettier before unit/build/integration/preview/diagnostic Havok checks, so there is still no new matrix artifact or result. The next step is to commit and push the exact repair plus reports/status to the CI-only branch, then capture and independently review fresh exact-SHA results. MATRIX-1, T02 and deployed Cloudflare Havok remain unaccepted; no Cloudflare session was used.
+
+
+## Coordinator checkpoint — 2026-10-14 (strict native button dimensions; readback packet in review)
+
+GitHub run [38595010780](https://github.com/folaoluwafemi/korre/actions/runs/38595010780) on exact commit 417a2e95b5b59aebd984be903e0b406caae2bc15 passed hosted Verify (30/30 files, 183/183 tests), integration (1/1), and ordinary preview (4/4). The real pinned-Havok Chromium suite reported 3 passed and 1 failed with zero skips, retries or flakes. Its real pointer flick changed WebGL pixels. The 24-case matrix stopped on strict button dimensions before any physics case; no matrix download or accepted matrix artifact exists.
+
+Independent exact-run review PASS is saved at execution_state/reports/T02-L01-MATERIAL-F32-run-38595010780-review.md. Read-only diagnosis confirms the pinned getter returns a local AABB, so rotation alone does not explain the failure; actual bounds remain unknown. One-file packet T02-L01-GEOMETRY-READBACK-1 is materialized under T02 and is awaiting independent review by /root/toolchain_audit. It retains the predecessor’s 14 accepted prerequisites plus inherited T01 and supersedes the unaccepted F32 card only to order the overlapping runner path. No implementation worker is dispatched before packet review and exact READY extraction.
+
+The F32 card and MATRIX-1 remain CHANGES_REQUIRED; T02 remains RUNNING. No Cloudflare/Wrangler access is needed for this browser preflight diagnostic. No local app build, test, browser or physics command ran.
+
+
+## Coordinator checkpoint — 2026-10-14 (geometry readback packet ready)
+
+Independent review PASS is recorded at execution_state/reports/T02-L01-GEOMETRY-READBACK-1-packet-review.md. The exact packet extraction and full 113-card document check pass; all 14 explicit prerequisites and inherited T01 gate are accepted. The packet is READY. /root/run_evidence_review owns only games/counterball/src/simulation/loftCoarseRunner.ts and its implicit implementation report. /root/executor_type_review owns the later independent exact-source/run report only.
+
+The unaccepted F32 card is superseded solely for the overlapping runner path. Its hosted result remains CHANGES_REQUIRED, and this handoff makes no material, matrix, T02, deployed-physics or playability acceptance. Local app builds/tests/browser/physics and Cloudflare actions remain unused.
+
+
+The READY extraction immediately before dispatch reported T02-L01-GEOMETRY-READBACK-1 as the sole initially ready packet. Worker /root/run_evidence_review now owns only games/counterball/src/simulation/loftCoarseRunner.ts plus its implicit implementation report. The worker may run only scoped git diff --check and source hashing locally. /root/executor_type_review is reserved for independent exact-source review; no commit/push or runtime check until that review passes.
+
+
+Coordinator paused implementation before any source edit after the worker reported that the packet checker returned ready:false once task state was RUNNING. This is expected checker behavior, but packet step 1 was ambiguous. The coordinator clarified that a recorded ready:true extraction is required while status is READY immediately before dispatch, and that active work must not rerun that gate. The exact card is under independent re-review; worker /root/run_evidence_review confirmed no source/report edits and is held.
+
+
+The clarified exact packet review passed. While packet status was READY, the full completion-plan check passed for all 113 cards and the exact pre-dispatch extraction reported ready:true; the captured output is execution_state/reports/T02-L01-GEOMETRY-READBACK-1-pre-dispatch-extraction.txt. The coordinator then changed status to RUNNING and explicitly released /root/run_evidence_review to the sole runner path. The worker must not rerun the dispatch gate after this state transition. /root/executor_type_review remains the independent source reviewer.
+
+
+Worker /root/run_evidence_review completed T02-L01-GEOMETRY-READBACK-1. Only games/counterball/src/simulation/loftCoarseRunner.ts changed. The implementation report records SHA-256 ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54; the worker and coordinator scoped git diff --check both pass. One captured local AABB supplies both dimensions and min/max in the unchanged exact-preflight error. No local application/runtime command ran. The packet is IMPLEMENTED, not accepted. /root/executor_type_review now owns the independent exact-source review; commit/push and hosted CI wait for PASS.
+
+
+Independent exact-source review of T02-L01-GEOMETRY-READBACK-1 is PASS at source SHA ac28c7d847da1a622a832af340a5103f94e511c07714503f0b29667d1c363b54, saved at execution_state/reports/T02-L01-GEOMETRY-READBACK-1-review.md. The strict predicate and fail-before-impulse order are unchanged, and one AABB read supplies comparison and error details. Runtime is NOT RUN. The coordinator now owns exact commit/push and hosted CI; T02, MATRIX-1 and this diagnostic remain unaccepted pending runtime and run review.
