@@ -57,12 +57,15 @@ import {
   type CounterballWorld,
 } from "./worldFactory.js";
 import { nativeCylinderComRadius } from "./nativeCylinderRadius.js";
+import {
+  deriveNativeCylinderSupportDatum,
+} from "./nativeCylinderSupportDatum.js";
 
 const config = COUNTERBALL_CONFIG_V1;
 const guard = config.restartLoftDiagnosticGuard;
 const encoder = new TextEncoder();
 const expectedFixtureFileSha256 =
-  "e4ede68e3ab82e801fBCD42B03196DED4F0AD81683290E40AF7634D914364C35".toLowerCase();
+  "beaa25d969b7e0c5e863538af13d54ba9b2f8b9547c4827ef220ea863aa1b092";
 const staticNames = new Map<string, LoftCoarseStaticBodyId>([
   ["counterball-goal-post--1--1", "goal-frame-0"],
   ["counterball-goal-post--1-1", "goal-frame-1"],
@@ -127,6 +130,7 @@ type NativeBodyMetrics = {
   radius: number;
   height: number;
   dimensions: Vec3;
+  nativeLocalAabb: Readonly<{ minimum: Vec3; maximum: Vec3 }>;
   farthestPointRadius: number;
   farthestOriginRadius: number;
   mass: number;
@@ -148,6 +152,7 @@ type NamedStaticBody = {
   body: PhysicsBody;
   shape: PhysicsShape;
   dimensions: Vec3;
+  nativeLocalAabb: Readonly<{ minimum: Vec3; maximum: Vec3 }>;
   filter: readonly [number, number];
   material: ReturnType<typeof materialFact>;
 };
@@ -917,6 +922,7 @@ function readNativeBodies(world: CounterballWorld): {
   materials: LoftCoarseCase["metadata"]["materials"][number][];
   statics: NamedStaticBody[];
   staticFacts: LoftCoarseCase["metadata"]["staticBodies"][number][];
+  supportPlane: LoftCoarseCase["metadata"]["supportPlane"];
 } {
   const { geometry } = config;
   const dynamicFacts: LoftCoarseCase["metadata"]["dynamicBodies"][number][] =
@@ -929,11 +935,10 @@ function readNativeBodies(world: CounterballWorld): {
     if (body === undefined)
       throw resourceFailure(`Canonical dynamic body ${id} is missing.`);
     const shape = body.shape;
-    if (
-      shape === null ||
-      shape.type !== PhysicsShapeType.CYLINDER ||
-      shape.isTrigger
-    ) {
+    if (shape === null)
+      throw resourceFailure(`Dynamic body ${id} has an unsupported collider.`);
+    const nativeShapeType = shape.type;
+    if (nativeShapeType !== PhysicsShapeType.CYLINDER || shape.isTrigger) {
       throw resourceFailure(`Dynamic body ${id} has an unsupported collider.`);
     }
     const transform = body.transformNode;
@@ -958,6 +963,16 @@ function readNativeBodies(world: CounterballWorld): {
     }
     const nativeBounds = shapeBoundsAndDimensions(shape);
     const dimensions = nativeBounds.dimensions;
+    if (
+      nativeBounds.minimum.x !== -nativeBounds.maximum.x ||
+      nativeBounds.minimum.y !== -nativeBounds.maximum.y ||
+      nativeBounds.minimum.z !== -nativeBounds.maximum.z ||
+      dimensions.x !== dimensions.z
+    ) {
+      throw resourceFailure(
+        `Dynamic body ${id} native cylinder bounds are not centered and symmetric.`,
+      );
+    }
     const isButton = id === "button";
     const configuredRadius = isButton
       ? geometry.buttonRadius
@@ -981,7 +996,7 @@ function readNativeBodies(world: CounterballWorld): {
         `Dynamic body ${id} native dimensions differ from canonical cylinder geometry. ${JSON.stringify(
           {
             bodyId: id,
-            nativeShapeType: shape.type,
+            nativeShapeType,
             configuredRadius,
             configuredHeight,
             expectedDimensions,
@@ -1055,6 +1070,10 @@ function readNativeBodies(world: CounterballWorld): {
       radius,
       height,
       dimensions,
+      nativeLocalAabb: {
+        minimum: nativeBounds.minimum,
+        maximum: nativeBounds.maximum,
+      },
       farthestPointRadius: radii.farthestPointRadius,
       farthestOriginRadius: radii.farthestOriginRadius,
       mass,
@@ -1067,6 +1086,11 @@ function readNativeBodies(world: CounterballWorld): {
     metrics.push(metric);
     dynamicFacts.push({
       id,
+      nativeShapeType,
+      nativeLocalAabb: {
+        minimum: nativeBounds.minimum,
+        maximum: nativeBounds.maximum,
+      },
       nativeMass: mass,
       centerOfMassOffset: centerOfMassLocal,
       principalInertias: inertiaUnitMass,
@@ -1091,11 +1115,13 @@ function readNativeBodies(world: CounterballWorld): {
   }
   const statics: NamedStaticBody[] = [];
   const staticFacts: LoftCoarseCase["metadata"]["staticBodies"][number][] = [];
+  let supportPlane: LoftCoarseCase["metadata"]["supportPlane"] | undefined;
   for (const body of world.staticBodies) {
     const id = staticBodyName(body);
     const shape = body.shape;
     if (shape === null || shape.isTrigger)
       throw resourceFailure(`Static body ${id} has no solid shape.`);
+    const nativeShapeType = shape.type;
     const material = setAndReadMaterial(world, shape);
     materials.push(materialRow(id, material));
     const membership = shape.filterMembershipMask;
@@ -1115,7 +1141,10 @@ function readNativeBodies(world: CounterballWorld): {
     const dimensions = nativeBounds.dimensions;
     if (id === "support-apron") {
       if (
-        shape.type !== PhysicsShapeType.BOX ||
+        nativeShapeType !== PhysicsShapeType.BOX ||
+        nativeBounds.minimum.x !== -nativeBounds.maximum.x ||
+        nativeBounds.minimum.y !== -nativeBounds.maximum.y ||
+        nativeBounds.minimum.z !== -nativeBounds.maximum.z ||
         dimensions.x !== 662 ||
         !matchesExactFloat32Projection(0.2, dimensions.y) ||
         dimensions.z !== 670
@@ -1124,7 +1153,76 @@ function readNativeBodies(world: CounterballWorld): {
           "The diagnostic support apron does not match the exact hashed slab geometry.",
         );
       }
-    } else if (shape.type !== PhysicsShapeType.CYLINDER) {
+      const transform = body.transformNode;
+      const rotationValue = transform.rotationQuaternion;
+      let rotation: Quat;
+      let identityRotation: boolean;
+      if (rotationValue === null) {
+        identityRotation =
+          transform.rotation.x === 0 &&
+          transform.rotation.y === 0 &&
+          transform.rotation.z === 0;
+        rotation = { x: 0, y: 0, z: 0, w: 1 };
+      } else {
+        rotation = {
+          x: rotationValue.x,
+          y: rotationValue.y,
+          z: rotationValue.z,
+          w: rotationValue.w,
+        };
+        identityRotation =
+          Number.isFinite(rotation.x) &&
+          Number.isFinite(rotation.y) &&
+          Number.isFinite(rotation.z) &&
+          Number.isFinite(rotation.w) &&
+          rotation.x === 0 &&
+          rotation.y === 0 &&
+          rotation.z === 0 &&
+          rotation.w === 1;
+      }
+      const position = {
+        x: transform.position.x,
+        y: transform.position.y,
+        z: transform.position.z,
+      };
+      const hasParent = transform.parent !== null;
+      const scaling = {
+        x: transform.scaling.x,
+        y: transform.scaling.y,
+        z: transform.scaling.z,
+      };
+      const referenceY = geometry.surfaceY;
+      const nativeTopY = position.y + nativeBounds.maximum.y;
+      if (
+        position.x !== 0 ||
+        position.y !== geometry.surfaceY - geometry.surfaceThickness / 2 ||
+        position.z !== 0 ||
+        !identityRotation ||
+        hasParent ||
+        scaling.x !== 1 ||
+        scaling.y !== 1 ||
+        scaling.z !== 1 ||
+        !Number.isFinite(nativeTopY) ||
+        nativeTopY < referenceY
+      ) {
+        throw resourceFailure(
+          "The diagnostic support plane has an unsupported native pose or top.",
+        );
+      }
+      supportPlane = {
+        referenceY,
+        nativeTopY,
+        nativeShapeType,
+        nativeLocalAabb: {
+          minimum: nativeBounds.minimum,
+          maximum: nativeBounds.maximum,
+        },
+        position,
+        rotation,
+        scaling,
+        hasParent,
+      };
+    } else if (nativeShapeType !== PhysicsShapeType.CYLINDER) {
       throw resourceFailure(
         `Goal frame body ${id} has an unsupported collider type.`,
       );
@@ -1150,7 +1248,7 @@ function readNativeBodies(world: CounterballWorld): {
           `Goal frame collider ${id} dimensions differ from canonical geometry. ${JSON.stringify(
             {
               id,
-              shapeType: shape.type,
+              shapeType: nativeShapeType,
               configured: {
                 goalWidth: geometry.goalWidth,
                 goalHeight: geometry.goalHeight,
@@ -1172,6 +1270,10 @@ function readNativeBodies(world: CounterballWorld): {
       body,
       shape,
       dimensions,
+      nativeLocalAabb: {
+        minimum: nativeBounds.minimum,
+        maximum: nativeBounds.maximum,
+      },
       filter: [membership, collide],
       material: material.readback,
     };
@@ -1227,7 +1329,16 @@ function readNativeBodies(world: CounterballWorld): {
       }
     }
   }
-  return { metrics, dynamicFacts, materials, statics, staticFacts };
+  if (supportPlane === undefined)
+    throw resourceFailure("Native support-plane facts are incomplete.");
+  return {
+    metrics,
+    dynamicFacts,
+    materials,
+    statics,
+    staticFacts,
+    supportPlane,
+  };
 }
 
 async function makeCaseInitialBodyState(state: MatchState): Promise<string> {
@@ -1348,10 +1459,10 @@ async function runCase(
         ? surfaceBody.transformNode.rotation.x === 0 &&
           surfaceBody.transformNode.rotation.y === 0 &&
           surfaceBody.transformNode.rotation.z === 0
-        : Math.abs(surfaceRotation.x) <= 1e-12 &&
-          Math.abs(surfaceRotation.y) <= 1e-12 &&
-          Math.abs(surfaceRotation.z) <= 1e-12 &&
-          Math.abs(surfaceRotation.w - 1) <= 1e-12;
+        : surfaceRotation.x === 0 &&
+          surfaceRotation.y === 0 &&
+          surfaceRotation.z === 0 &&
+          surfaceRotation.w === 1;
     if (
       surfaceBody.transformNode.position.x !== 0 ||
       surfaceBody.transformNode.position.y !== expectedSurfaceY ||
@@ -1385,7 +1496,7 @@ async function runCase(
                 y: 0,
                 z: 0,
                 w: 1,
-                componentTolerance: 1e-12,
+                componentTolerance: 0,
               },
         parent: null,
         scale: { x: 1, y: 1, z: 1 },
@@ -1552,7 +1663,17 @@ async function runCase(
       const sample = samples[index];
       if (metric === undefined || sample === undefined)
         throw resourceFailure("Initial native body facts are incomplete.");
-      metric.restY = sample.centerOfMass.y;
+      metric.restY = resourceGuard(() =>
+        deriveNativeCylinderSupportDatum(
+          {
+            minimum: metric.nativeLocalAabb.minimum,
+            maximum: metric.nativeLocalAabb.maximum,
+            dimensions: metric.dimensions,
+          },
+          metric.centerOfMassLocal,
+          bodyFacts.supportPlane.referenceY,
+        ),
+      );
     }
     const plannerBodies = bodyFacts.metrics.map((metric) => ({
       id: metric.id,
@@ -2314,6 +2435,7 @@ async function runCase(
         initialStateHashAlgorithm: guard.setup.initialStateHashAlgorithm,
         initialStateHash,
         dynamicBodies: bodyFacts.dynamicFacts,
+        supportPlane: bodyFacts.supportPlane,
         materials: bodyFacts.materials,
         staticBodies: bodyFacts.staticFacts,
         preImpulseMeasuredShiftedEnergy: preEnergy,

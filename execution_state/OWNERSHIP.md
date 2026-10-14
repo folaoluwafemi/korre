@@ -789,3 +789,15 @@ Radius source/helper extraction review PASS; source workers released all paths. 
 Canonical producer implementation complete; coordinator source ownership released to read-only independent source review. Toolchain auditor owns only T02-L01-SUPPORT-DATUM-CONFIG-1-source-review.md. No local app check. Consumer is not dispatched until producer/helper ACCEPTED via hosted evidence.
 
 Coordinator made one wrapping-only helper-test correction plus shortened a new protocol test label, after independent pre-CI risk finding. All source ownership released; toolchain auditor owns final exact-format/source review only. Hosted checks remain pending.
+
+## Native support-datum consumer RUNNING — 2026-10-14
+
+Executor exclusively owns games/counterball/src/simulation/loftCoarseRunner.ts, loftCoarseProbe.ts, loftCoarseProbe.test.ts, nativeCylinderSupportDatum.ts, tests/e2e/counterball-direct-probe.spec.ts and T02-L01-SUPPORT-DATUM-MATRIX-1-implementation.md. Run reviewer later source-review report only; toolchain auditor exact-run review report only. Root alone owns all shared contracts/config/status/CI/commit.19accepted deps/T01 and ready:true extraction proven; no local app command/Cloudflare action.
+
+Executor released all5native-consumer source paths after hashes/report/scoped diffcheck0. Run reviewer owns only T02-L01-SUPPORT-DATUM-MATRIX-1-source-review.md; source read-only. Coordinator owns eventual commit/CI and shared status. No localapp check, no native/matrixacceptance.
+
+Executor reacquired the same five native support-datum source paths for bounded repair1 plus its unique repair report. Reviewer source review is complete CHANGES_REQUIRED; no runtime check. Root retains shared state/config ownership.
+
+Executor released repair1 five-source paths. Run reviewer owns only repair1-source-review report; root owns status/commit. Hosted checks remain pending.
+
+Repair1 source review PASS and all five source paths released. Root owns integrated commit/hosted run; toolchain reviewer will own unique run/artifact review only.

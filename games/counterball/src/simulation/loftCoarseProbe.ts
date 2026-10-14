@@ -2,6 +2,9 @@ import {
   COUNTERBALL_CONFIG_V1,
   hashCounterballConfig,
 } from "@korre/game-protocol";
+import {
+  deriveNativeCylinderSupportDatum,
+} from "./nativeCylinderSupportDatum.js";
 
 export type LoftCoarseTuple = readonly [
   gapOffset: number,
@@ -63,6 +66,10 @@ export type LoftCoarseQuaternion = Readonly<{
   z: number;
   w: number;
 }>;
+type LoftCoarseNativeAabb = Readonly<{
+  minimum: LoftCoarseVec3;
+  maximum: LoftCoarseVec3;
+}>;
 
 type LoftCoarseMatrixIdentity = {
   guardSchemaVersion: number;
@@ -95,6 +102,8 @@ type LoftCoarseMassProjection = {
 
 type LoftCoarseNativeBodyFacts = {
   id: LoftCoarseEntityId;
+  nativeShapeType: 2;
+  nativeLocalAabb: LoftCoarseNativeAabb;
   nativeMass: number;
   centerOfMassOffset: LoftCoarseVec3;
   principalInertias: LoftCoarseVec3;
@@ -104,6 +113,17 @@ type LoftCoarseNativeBodyFacts = {
   initialLinearVelocity: LoftCoarseVec3;
   initialAngularVelocity: LoftCoarseVec3;
   configuredMassProjection: LoftCoarseMassProjection;
+};
+
+type LoftCoarseSupportPlane = {
+  referenceY: number;
+  nativeTopY: number;
+  nativeShapeType: 3;
+  nativeLocalAabb: LoftCoarseNativeAabb;
+  position: LoftCoarseVec3;
+  rotation: LoftCoarseQuaternion;
+  scaling: LoftCoarseVec3;
+  hasParent: false;
 };
 
 type LoftCoarseMaterialValues = {
@@ -162,6 +182,7 @@ type LoftCoarseCaseMetadata = LoftCoarseMatrixIdentity & {
   initialStateHashAlgorithm: string;
   initialStateHash: string;
   dynamicBodies: readonly LoftCoarseNativeBodyFacts[];
+  supportPlane: LoftCoarseSupportPlane;
   materials: readonly LoftCoarseMaterialFact[];
   staticBodies: readonly LoftCoarseStaticBodyFacts[];
   preImpulseMeasuredShiftedEnergy: number;
@@ -327,6 +348,7 @@ const caseMetadataKeys = [
   "initialStateHashAlgorithm",
   "initialStateHash",
   "dynamicBodies",
+  "supportPlane",
   "materials",
   "staticBodies",
   "preImpulseMeasuredShiftedEnergy",
@@ -341,6 +363,8 @@ const caseMetadataKeys = [
 
 const dynamicBodyFactKeys = [
   "id",
+  "nativeShapeType",
+  "nativeLocalAabb",
   "nativeMass",
   "centerOfMassOffset",
   "principalInertias",
@@ -588,6 +612,109 @@ function assertPositiveVector(value: unknown, label: string): void {
   }
 }
 
+function assertNativeAabb(
+  value: unknown,
+  label: string,
+  equalRadialAxes: boolean,
+): {
+  minimum: LoftCoarseVec3;
+  maximum: LoftCoarseVec3;
+  dimensions: LoftCoarseVec3;
+} {
+  assertExactKeys(value, ["minimum", "maximum"], label);
+  const bounds = value as Record<string, unknown>;
+  assertVector(bounds["minimum"], `${label}.minimum`);
+  assertVector(bounds["maximum"], `${label}.maximum`);
+  const minimum = bounds["minimum"] as LoftCoarseVec3;
+  const maximum = bounds["maximum"] as LoftCoarseVec3;
+  const dimensions = {
+    x: maximum.x - minimum.x,
+    y: maximum.y - minimum.y,
+    z: maximum.z - minimum.z,
+  };
+  if (
+    dimensions.x <= 0 ||
+    dimensions.y <= 0 ||
+    dimensions.z <= 0 ||
+    !Number.isFinite(dimensions.x) ||
+    !Number.isFinite(dimensions.y) ||
+    !Number.isFinite(dimensions.z) ||
+    minimum.x !== -maximum.x ||
+    minimum.y !== -maximum.y ||
+    minimum.z !== -maximum.z ||
+    (equalRadialAxes && dimensions.x !== dimensions.z)
+  ) {
+    invalid(`${label} must have finite, positive, centered native bounds.`);
+  }
+  return { minimum, maximum, dimensions };
+}
+
+function validateSupportPlane(
+  value: unknown,
+  label: string,
+): { metadata: LoftCoarseSupportPlane; dimensions: LoftCoarseVec3 } {
+  assertExactKeys(
+    value,
+    [
+      "referenceY",
+      "nativeTopY",
+      "nativeShapeType",
+      "nativeLocalAabb",
+      "position",
+      "rotation",
+      "scaling",
+      "hasParent",
+    ],
+    label,
+  );
+  const metadata = value as unknown as LoftCoarseSupportPlane;
+  assertFiniteNumber(metadata.referenceY, `${label}.referenceY`);
+  assertFiniteNumber(metadata.nativeTopY, `${label}.nativeTopY`);
+  if (
+    metadata.nativeShapeType !== 3 ||
+    metadata.hasParent !== false ||
+    metadata.referenceY !== COUNTERBALL_CONFIG_V1.geometry.surfaceY
+  ) {
+    invalid(`${label} does not identify the canonical native support plane.`);
+  }
+  const bounds = assertNativeAabb(
+    metadata.nativeLocalAabb,
+    `${label}.nativeLocalAabb`,
+    false,
+  );
+  assertVector(metadata.position, `${label}.position`);
+  assertQuaternion(metadata.rotation, `${label}.rotation`);
+  assertVector(metadata.scaling, `${label}.scaling`);
+  const geometry = COUNTERBALL_CONFIG_V1.geometry;
+  if (
+    bounds.dimensions.x !== geometry.pitchWidth + 650 ||
+    !matchesExactFloat32Projection(
+      geometry.surfaceThickness,
+      bounds.dimensions.y,
+    ) ||
+    bounds.dimensions.z !== geometry.pitchLength + 650
+  ) {
+    invalid(`${label}.nativeLocalAabb differs from canonical apron geometry.`);
+  }
+  if (
+    metadata.position.x !== 0 ||
+    metadata.position.y !== geometry.surfaceY - geometry.surfaceThickness / 2 ||
+    metadata.position.z !== 0 ||
+    metadata.rotation.x !== 0 ||
+    metadata.rotation.y !== 0 ||
+    metadata.rotation.z !== 0 ||
+    metadata.rotation.w !== 1 ||
+    metadata.scaling.x !== 1 ||
+    metadata.scaling.y !== 1 ||
+    metadata.scaling.z !== 1 ||
+    metadata.nativeTopY !== metadata.position.y + bounds.maximum.y ||
+    metadata.nativeTopY < metadata.referenceY
+  ) {
+    invalid(`${label} does not prove the canonical unparented flat support.`);
+  }
+  return { metadata, dimensions: bounds.dimensions };
+}
+
 function assertMaterialValues(
   value: unknown,
   label: string,
@@ -788,6 +915,10 @@ function validateCaseMetadata(
     metadata.initialStateHash,
     `Case ${expectedIndex} initialStateHash`,
   );
+  const supportPlane = validateSupportPlane(
+    metadata.supportPlane,
+    `Case ${expectedIndex} supportPlane`,
+  );
 
   assertArray(metadata.dynamicBodies, `Case ${expectedIndex} dynamicBodies`);
   if (metadata.dynamicBodies.length !== canonicalEntityIds.length) {
@@ -799,6 +930,8 @@ function validateCaseMetadata(
     assertCanonicalEntityId(body.id, `${label}.id`);
     if (body.id !== canonicalEntityIds[bodyIndex])
       invalid(`${label} is out of canonical order.`);
+    if (body.nativeShapeType !== 2)
+      invalid(`${label}.nativeShapeType must identify a native cylinder.`);
     for (const key of ["nativeMass"] as const) {
       assertFiniteNumber(body[key], `${label}.${key}`);
       if (body[key] <= 0) invalid(`${label}.${key} must be positive.`);
@@ -810,6 +943,50 @@ function validateCaseMetadata(
       body.colliderDimensions,
       `${label}.colliderDimensions`,
     );
+    const bounds = assertNativeAabb(
+      body.nativeLocalAabb,
+      `${label}.nativeLocalAabb`,
+      true,
+    );
+    if (
+      bounds.dimensions.x !== body.colliderDimensions.x ||
+      bounds.dimensions.y !== body.colliderDimensions.y ||
+      bounds.dimensions.z !== body.colliderDimensions.z
+    ) {
+      invalid(`${label}.nativeLocalAabb differs from native dimensions.`);
+    }
+    const geometry = COUNTERBALL_CONFIG_V1.geometry;
+    const expectedDimensions =
+      body.id === "button"
+        ? {
+            x: geometry.buttonRadius * 2,
+            y: geometry.buttonThickness,
+            z: geometry.buttonRadius * 2,
+          }
+        : {
+            x: geometry.capRadius * 2,
+            y: geometry.capHeight,
+            z: geometry.capRadius * 2,
+          };
+    for (const axis of ["x", "y", "z"] as const) {
+      if (
+        !matchesExactFloat32Projection(
+          expectedDimensions[axis],
+          body.colliderDimensions[axis],
+        )
+      ) {
+        invalid(`${label}.colliderDimensions differ from canonical geometry.`);
+      }
+    }
+    const supportDatum = deriveNativeCylinderSupportDatum(
+      {
+        ...bounds,
+        dimensions: bounds.dimensions,
+      },
+      body.centerOfMassOffset,
+      supportPlane.metadata.referenceY,
+    );
+    assertFiniteNumber(supportDatum, `${label}.supportDatum`);
     assertFilterPair(body.collisionFilter, `${label}.collisionFilter`);
     assertVector(body.initialLinearVelocity, `${label}.initialLinearVelocity`);
     assertVector(
@@ -903,6 +1080,15 @@ function validateCaseMetadata(
       body.colliderDimensions,
       `${label}.colliderDimensions`,
     );
+    if (body.id === "support-apron") {
+      if (
+        body.colliderDimensions.x !== supportPlane.dimensions.x ||
+        body.colliderDimensions.y !== supportPlane.dimensions.y ||
+        body.colliderDimensions.z !== supportPlane.dimensions.z
+      ) {
+        invalid(`${label}.colliderDimensions differ from supportPlane bounds.`);
+      }
+    }
     assertFilterPair(body.collisionFilter, `${label}.collisionFilter`);
     const materialRecord = metadata.materials.find(
       (candidate) => candidate.bodyId === body.id && candidate.shapeIndex === 0,

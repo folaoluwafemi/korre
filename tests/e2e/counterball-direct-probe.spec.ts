@@ -62,7 +62,7 @@ const MATRIX_TOTAL_CALL_MAXIMUM_COUNT = 2_073_600;
 const MATRIX_TOTAL_BATCH_MAXIMUM_COUNT = 17_280;
 const MATRIX_FIXTURE_MAXIMUM_BYTES = 65_536;
 const MATRIX_EXPECTED_FIXTURE_FILE_SHA256 =
-  "e4ede68e3ab82e801fbcd42b03196ded4f0ad81683290e40af7634d914364c35";
+  "beaa25d969b7e0c5e863538af13d54ba9b2f8b9547c4827ef220ea863aa1b092";
 const MATRIX_READY_STATUS =
   "The bounded OPFS file is complete and ready to download.";
 const MATRIX_FAILED_STATUS =
@@ -126,6 +126,7 @@ const MATRIX_CASE_METADATA_KEYS = [
   "initialStateHashAlgorithm",
   "initialStateHash",
   "dynamicBodies",
+  "supportPlane",
   "materials",
   "staticBodies",
   "preImpulseMeasuredShiftedEnergy",
@@ -413,6 +414,42 @@ function assertVector(value: unknown, label: string): void {
   for (const axis of ["x", "y", "z"] as const) {
     finiteNumber(vector[axis], `${label}.${axis}`);
   }
+}
+
+function assertNativeAabb(
+  value: unknown,
+  label: string,
+  equalRadialAxes: boolean,
+): {
+  minimum: MatrixRecord;
+  maximum: MatrixRecord;
+  dimensions: { x: number; y: number; z: number };
+} {
+  const bounds = assertExactKeys(value, ["minimum", "maximum"], label);
+  const minimum = asRecord(bounds["minimum"], `${label}.minimum`);
+  const maximum = asRecord(bounds["maximum"], `${label}.maximum`);
+  assertVector(minimum, `${label}.minimum`);
+  assertVector(maximum, `${label}.maximum`);
+  const dimensions = {
+    x: finiteNumber(maximum["x"], `${label}.maximum.x`) -
+      finiteNumber(minimum["x"], `${label}.minimum.x`),
+    y: finiteNumber(maximum["y"], `${label}.maximum.y`) -
+      finiteNumber(minimum["y"], `${label}.minimum.y`),
+    z: finiteNumber(maximum["z"], `${label}.maximum.z`) -
+      finiteNumber(minimum["z"], `${label}.minimum.z`),
+  };
+  for (const axis of ["x", "y", "z"] as const) {
+    expect(
+      Number.isFinite(dimensions[axis]),
+      `${label}.${axis} finite span`,
+    ).toBe(true);
+    expect(dimensions[axis], `${label}.${axis} span`).toBeGreaterThan(0);
+    expect(minimum[axis], `${label}.${axis} centered minimum`).toBe(
+      -finiteNumber(maximum[axis], `${label}.${axis} maximum`),
+    );
+  }
+  if (equalRadialAxes) expect(dimensions.x).toBe(dimensions.z);
+  return { minimum, maximum, dimensions };
 }
 
 function assertQuaternion(value: unknown, label: string): void {
@@ -904,6 +941,81 @@ function validateCaseMetadata(
   );
   assertHash(metadata["initialStateHash"], `Case ${index} initialStateHash`);
 
+  const supportLabel = `Case ${index} supportPlane`;
+  const supportPlane = assertExactKeys(
+    metadata["supportPlane"],
+    [
+      "referenceY",
+      "nativeTopY",
+      "nativeShapeType",
+      "nativeLocalAabb",
+      "position",
+      "rotation",
+      "scaling",
+      "hasParent",
+    ],
+    supportLabel,
+  );
+  const geometry = COUNTERBALL_CONFIG_V1.geometry;
+  const supportReferenceY = finiteNumber(
+    supportPlane["referenceY"],
+    `${supportLabel}.referenceY`,
+  );
+  const supportTopY = finiteNumber(
+    supportPlane["nativeTopY"],
+    `${supportLabel}.nativeTopY`,
+  );
+  expect(supportPlane["nativeShapeType"]).toBe(3);
+  expect(supportPlane["hasParent"]).toBe(false);
+  expect(supportReferenceY).toBe(geometry.surfaceY);
+  const supportBounds = assertNativeAabb(
+    supportPlane["nativeLocalAabb"],
+    `${supportLabel}.nativeLocalAabb`,
+    false,
+  );
+  const supportPosition = asRecord(
+    supportPlane["position"],
+    `${supportLabel}.position`,
+  );
+  assertVector(supportPosition, `${supportLabel}.position`);
+  const supportRotation = asRecord(
+    supportPlane["rotation"],
+    `${supportLabel}.rotation`,
+  );
+  assertQuaternion(supportRotation, `${supportLabel}.rotation`);
+  const supportScaling = asRecord(
+    supportPlane["scaling"],
+    `${supportLabel}.scaling`,
+  );
+  assertVector(supportScaling, `${supportLabel}.scaling`);
+  expect(supportPosition).toEqual({
+    x: 0,
+    y: geometry.surfaceY - geometry.surfaceThickness / 2,
+    z: 0,
+  });
+  for (const [axis, expected] of [
+    ["x", 0],
+    ["y", 0],
+    ["z", 0],
+    ["w", 1],
+  ] as const) {
+    expect(
+      finiteNumber(
+        supportRotation[axis],
+        `${supportLabel}.rotation.${axis}`,
+      ),
+    ).toBe(expected);
+  }
+  expect(supportScaling).toEqual({ x: 1, y: 1, z: 1 });
+  expect(supportTopY).toBe(
+    finiteNumber(supportPosition["y"], `${supportLabel}.position.y`) +
+      finiteNumber(
+        supportBounds.maximum["y"],
+        `${supportLabel}.nativeLocalAabb.maximum.y`,
+      ),
+  );
+  expect(supportTopY).toBeGreaterThanOrEqual(supportReferenceY);
+
   const expectedBodies = new Map(
     expectedState.bodies.map((body) => [body.id, body]),
   );
@@ -926,6 +1038,8 @@ function validateCaseMetadata(
         "principalInertias",
         "inertiaOrientation",
         "colliderDimensions",
+        "nativeShapeType",
+        "nativeLocalAabb",
         "collisionFilter",
         "initialLinearVelocity",
         "initialAngularVelocity",
@@ -936,6 +1050,7 @@ function validateCaseMetadata(
     const id = MATRIX_ENTITY_IDS[bodyIndex];
     if (id === undefined) throw new Error(`${label} has no canonical id.`);
     expect(body["id"]).toBe(id);
+    expect(body["nativeShapeType"]).toBe(2);
     const nativeMass = finiteNumber(body["nativeMass"], `${label}.nativeMass`);
     expect(nativeMass).toBeGreaterThan(0);
     assertVector(body["centerOfMassOffset"], `${label}.centerOfMassOffset`);
@@ -956,19 +1071,41 @@ function validateCaseMetadata(
     );
     assertVector(dimensions, `${label}.colliderDimensions`);
     const geometry = COUNTERBALL_CONFIG_V1.geometry;
-    expect(dimensions).toEqual(
+    const expectedDimensions =
       id === "button"
         ? {
-            x: geometry.buttonRadius * 2,
-            y: geometry.buttonThickness,
-            z: geometry.buttonRadius * 2,
+            x: Math.fround(geometry.buttonRadius * 2),
+            y: Math.fround(geometry.buttonThickness),
+            z: Math.fround(geometry.buttonRadius * 2),
           }
         : {
-            x: geometry.capRadius * 2,
-            y: geometry.capHeight,
-            z: geometry.capRadius * 2,
-          },
+            x: Math.fround(geometry.capRadius * 2),
+            y: Math.fround(geometry.capHeight),
+            z: Math.fround(geometry.capRadius * 2),
+          };
+    expect(dimensions).toEqual(expectedDimensions);
+    const dynamicBounds = assertNativeAabb(
+      body["nativeLocalAabb"],
+      `${label}.nativeLocalAabb`,
+      true,
     );
+    expect(dynamicBounds.dimensions).toEqual(dimensions);
+    const centerOfMass = asRecord(
+      body["centerOfMassOffset"],
+      `${label}.centerOfMassOffset`,
+    );
+    const derivedSupportDatum =
+      supportReferenceY +
+      Math.min(
+        dynamicBounds.dimensions.x / 2,
+        dynamicBounds.dimensions.y / 2,
+      ) -
+      Math.hypot(
+        finiteNumber(centerOfMass["x"], `${label}.centerOfMassOffset.x`),
+        finiteNumber(centerOfMass["y"], `${label}.centerOfMassOffset.y`),
+        finiteNumber(centerOfMass["z"], `${label}.centerOfMassOffset.z`),
+      );
+    expect(Number.isFinite(derivedSupportDatum)).toBe(true);
     for (const axis of ["x", "y", "z"] as const) {
       expect(
         finiteNumber(dimensions[axis], `${label}.dimensions.${axis}`),
@@ -1099,21 +1236,24 @@ function validateCaseMetadata(
       id === "support-apron"
         ? {
             x: geometry.pitchWidth + 650,
-            y: geometry.surfaceThickness,
+            y: Math.fround(geometry.surfaceThickness),
             z: geometry.pitchLength + 650,
           }
         : id === "goal-frame-2" || id === "goal-frame-5"
           ? {
-              x: geometry.goalWidth,
-              y: geometry.goalFrameRadius * 2,
-              z: geometry.goalFrameRadius * 2,
+              x: Math.fround(geometry.goalWidth),
+              y: Math.fround(geometry.goalFrameRadius * 2),
+              z: Math.fround(geometry.goalFrameRadius * 2),
             }
           : {
-              x: geometry.goalFrameRadius * 2,
-              y: geometry.goalHeight,
-              z: geometry.goalFrameRadius * 2,
+              x: Math.fround(geometry.goalFrameRadius * 2),
+              y: Math.fround(geometry.goalHeight),
+              z: Math.fround(geometry.goalFrameRadius * 2),
             };
     expect(dimensions).toEqual(expected);
+    if (id === "support-apron") {
+      expect(dimensions).toEqual(supportBounds.dimensions);
+    }
     const filter = assertFilterPair(
       body["collisionFilter"],
       `${label}.collisionFilter`,

@@ -3,6 +3,10 @@ import {
   hashCounterballConfig,
 } from "@korre/game-protocol";
 import { beforeAll, describe, expect, it } from "vitest";
+import { computeDiagnosticShiftedEnergy } from "./browserDirectProbe.js";
+import {
+  deriveNativeCylinderSupportDatum,
+} from "./nativeCylinderSupportDatum.js";
 import {
   LOFT_COARSE_TUPLES,
   canonicalizeLoftCoarseContactPair,
@@ -95,6 +99,13 @@ function quaternion() {
   return { x: 0, y: 0, z: 0, w: 1 };
 }
 
+function nativeAabb(dimensions: ReturnType<typeof vec3>) {
+  return {
+    minimum: vec3(-dimensions.x / 2, -dimensions.y / 2, -dimensions.z / 2),
+    maximum: vec3(dimensions.x / 2, dimensions.y / 2, dimensions.z / 2),
+  };
+}
+
 function bodyState(id: LoftCoarseEntityId) {
   return {
     id,
@@ -136,13 +147,28 @@ function caseMetadata(
         ? COUNTERBALL_CONFIG_V1.bodies.buttonMass
         : COUNTERBALL_CONFIG_V1.bodies.capMass;
     const projectedMass = Math.fround(configuredMass);
+    const geometry = COUNTERBALL_CONFIG_V1.geometry;
+    const colliderDimensions =
+      id === "button"
+        ? vec3(
+            Math.fround(geometry.buttonRadius * 2),
+            Math.fround(geometry.buttonThickness),
+            Math.fround(geometry.buttonRadius * 2),
+          )
+        : vec3(
+            Math.fround(geometry.capRadius * 2),
+            Math.fround(geometry.capHeight),
+            Math.fround(geometry.capRadius * 2),
+          );
     return {
       id,
+      nativeShapeType: 2 as const,
+      nativeLocalAabb: nativeAabb(colliderDimensions),
       nativeMass: projectedMass,
       centerOfMassOffset: vec3(),
       principalInertias: vec3(0.01, 0.01, 0.01),
       inertiaOrientation: quaternion(),
-      colliderDimensions: vec3(0.6, 0.12, 0.6),
+      colliderDimensions,
       collisionFilter: [1, 1] as const,
       initialLinearVelocity: vec3(),
       initialAngularVelocity: vec3(),
@@ -158,12 +184,20 @@ function caseMetadata(
       },
     };
   });
+  const geometry = COUNTERBALL_CONFIG_V1.geometry;
+  const supportDimensions = vec3(
+    geometry.pitchWidth + 650,
+    Math.fround(geometry.surfaceThickness),
+    geometry.pitchLength + 650,
+  );
   const staticBodies = staticIds.map((id) => ({
     id,
-    colliderDimensions: vec3(1, 1, 1),
+    colliderDimensions:
+      id === "support-apron" ? supportDimensions : vec3(1, 1, 1),
     collisionFilter: [1, 1] as const,
     material: projectedMaterialValues(),
   }));
+  const supportBounds = nativeAabb(supportDimensions);
   const materials = [
     ...entityIds.map((bodyId) => ({
       bodyId,
@@ -199,6 +233,25 @@ function caseMetadata(
     initialStateHashAlgorithm: guard.setup.initialStateHashAlgorithm,
     initialStateHash: "c".repeat(64),
     dynamicBodies,
+    supportPlane: {
+      referenceY: geometry.surfaceY,
+      nativeTopY:
+        geometry.surfaceY - geometry.surfaceThickness / 2 +
+        supportBounds.maximum.y,
+      nativeShapeType: 3 as const,
+      nativeLocalAabb: {
+        minimum: supportBounds.minimum,
+        maximum: supportBounds.maximum,
+      },
+      position: vec3(
+        0,
+        geometry.surfaceY - geometry.surfaceThickness / 2,
+        0,
+      ),
+      rotation: quaternion(),
+      scaling: vec3(1, 1, 1),
+      hasParent: false as const,
+    },
     materials,
     staticBodies,
     preImpulseMeasuredShiftedEnergy: 1,
@@ -571,6 +624,154 @@ describe("matchesExactFloat32Projection", () => {
   });
 });
 
+describe("native cylinder support datum", () => {
+  it("derives and charges the cylinder support datum", () => {
+    const dimensions = vec3(0.64, 0.12, 0.64);
+    const bounds = nativeAabb(dimensions);
+    const nativeCOM = vec3(0.01, -0.02, 0.02);
+    const datum = deriveNativeCylinderSupportDatum(
+      { ...bounds, dimensions },
+      nativeCOM,
+      0,
+    );
+    expect(datum).toBeCloseTo(0.06 - Math.hypot(0.01, -0.02, 0.02), 14);
+
+    const bodies = entityIds.map((_, index) => ({
+      mass: 1,
+      inertiaUnitMass: vec3(1, 1, 1),
+      centerOfMassY: 0.4 + index / 100,
+      restY: datum,
+      linearVelocity: vec3(),
+      angularVelocityPrincipal: vec3(),
+    }));
+    const charged = computeDiagnosticShiftedEnergy(
+      bodies,
+      9.81,
+      guard.energy.maximumRestComDrop,
+    );
+    expect(charged.kineticEnergy).toBe(0);
+    expect(charged.shiftedMechanicalEnergy).toBeGreaterThan(0);
+    const first = bodies[0];
+    if (first === undefined) throw new Error("Energy test body is missing.");
+    first.centerOfMassY = datum - guard.energy.maximumRestComDrop;
+    expect(() =>
+      computeDiagnosticShiftedEnergy(
+        bodies,
+        9.81,
+        guard.energy.maximumRestComDrop,
+      ),
+    ).not.toThrow();
+    first.centerOfMassY -= Number.EPSILON * 4;
+    expect(() =>
+      computeDiagnosticShiftedEnergy(
+        bodies,
+        9.81,
+        guard.energy.maximumRestComDrop,
+      ),
+    ).toThrow(/below its permitted rest-height drop/);
+  });
+
+  it("charges flat and tilted supported cylinder COM height", () => {
+    const geometry = COUNTERBALL_CONFIG_V1.geometry;
+    const dimensions = vec3(
+      Math.fround(geometry.buttonRadius * 2),
+      Math.fround(geometry.buttonThickness),
+      Math.fround(geometry.buttonRadius * 2),
+    );
+    const bounds = nativeAabb(dimensions);
+    const nativeCOM = vec3(0.01, -0.02, 0.02);
+    const datum = deriveNativeCylinderSupportDatum(
+      { ...bounds, dimensions },
+      nativeCOM,
+      geometry.surfaceY,
+    );
+    const radius = dimensions.x / 2;
+    const halfHeight = dimensions.y / 2;
+    const tilt = Math.PI / 4;
+    const cosine = Math.cos(tilt);
+    const sine = Math.sin(tilt);
+    const flatCOMY = geometry.surfaceY + halfHeight + nativeCOM.y;
+    const tiltedSupportExtent = radius * sine + halfHeight * cosine;
+    const tiltedRotatedCOMY = cosine * nativeCOM.y - sine * nativeCOM.z;
+    const tiltedCOMY =
+      geometry.surfaceY +
+      tiltedSupportExtent +
+      tiltedRotatedCOMY;
+
+    expect(flatCOMY - nativeCOM.y - halfHeight).toBeCloseTo(
+      geometry.surfaceY,
+      14,
+    );
+    expect(
+      tiltedCOMY - tiltedRotatedCOMY - tiltedSupportExtent,
+    ).toBeCloseTo(geometry.surfaceY, 14);
+    expect(flatCOMY).toBeGreaterThanOrEqual(datum);
+    expect(tiltedCOMY).toBeGreaterThanOrEqual(datum);
+
+    const energyAt = (centerOfMassY: number) =>
+      computeDiagnosticShiftedEnergy(
+        entityIds.map((_, index) => ({
+          mass: 1,
+          inertiaUnitMass: vec3(1, 1, 1),
+          centerOfMassY: index === 0 ? centerOfMassY : datum,
+          restY: datum,
+          linearVelocity: vec3(),
+          angularVelocityPrincipal: vec3(),
+        })),
+        9.81,
+        guard.energy.maximumRestComDrop,
+      ).shiftedMechanicalEnergy;
+    const baselineEnergy = energyAt(datum);
+
+    expect(energyAt(flatCOMY) - baselineEnergy).toBeCloseTo(
+      9.81 * (flatCOMY - datum),
+      12,
+    );
+    expect(energyAt(tiltedCOMY) - baselineEnergy).toBeCloseTo(
+      9.81 * (tiltedCOMY - datum),
+      12,
+    );
+  });
+
+  it("rejects uncentered, unequal-radius, and non-finite bounds", () => {
+    const dimensions = vec3(0.64, 0.12, 0.64);
+    const centered = nativeAabb(dimensions);
+    expect(() =>
+      deriveNativeCylinderSupportDatum(
+        {
+          ...centered,
+          minimum: { ...centered.minimum, x: centered.minimum.x + 0.001 },
+          dimensions,
+        },
+        vec3(),
+        0,
+      ),
+    ).toThrow(RangeError);
+    expect(() =>
+      deriveNativeCylinderSupportDatum(
+        {
+          minimum: centered.minimum,
+          maximum: { ...centered.maximum, z: centered.maximum.z - 0.001 },
+          dimensions,
+        },
+        vec3(),
+        0,
+      ),
+    ).toThrow(RangeError);
+    expect(() =>
+      deriveNativeCylinderSupportDatum(
+        {
+          ...centered,
+          minimum: { ...centered.minimum, y: Number.NEGATIVE_INFINITY },
+          dimensions,
+        },
+        vec3(),
+        0,
+      ),
+    ).toThrow(RangeError);
+  });
+});
+
 describe("writeLoftCoarseMatrix", () => {
   it("exposes the exact unique tuple order from the frozen four axes", () => {
     expect(LOFT_COARSE_TUPLES).toEqual([
@@ -933,6 +1134,76 @@ describe("writeLoftCoarseMatrix", () => {
         },
       }),
     ).rejects.toMatchObject({ code: "invalid" });
+  });
+
+  it("rejects invalid native shape and support metadata", async () => {
+    const identity = matrixMetadata();
+    const mutations: Array<
+      (metadata: LoftCoarseCase["metadata"]) => LoftCoarseCase["metadata"]
+    > = [
+      (metadata) => ({
+        ...metadata,
+        dynamicBodies: metadata.dynamicBodies.map((body, index) =>
+          index === 0 ? { ...body, nativeShapeType: 3 as never } : body,
+        ),
+      }),
+      (metadata) => ({
+        ...metadata,
+        dynamicBodies: metadata.dynamicBodies.map((body, index) =>
+          index === 0
+            ? {
+                ...body,
+                nativeLocalAabb: {
+                  ...body.nativeLocalAabb,
+                  minimum: {
+                    ...body.nativeLocalAabb.minimum,
+                    x: body.nativeLocalAabb.minimum.x + 0.001,
+                  },
+                },
+              }
+            : body,
+        ),
+      }),
+      ...[
+        { nativeShapeType: 2 as const },
+        { hasParent: true as never },
+        { nativeTopY: 0.1 },
+        { position: vec3(0, 0, 0) },
+        { rotation: { x: 0, y: 0, z: 0.1, w: 1 } },
+        { rotation: { x: 0, y: 0, z: 5e-13, w: 1 } },
+        { scaling: vec3(1, 2, 1) },
+        { referenceY: 0.01 },
+        {
+          nativeLocalAabb: {
+            minimum: vec3(-331, -0.09, -335),
+            maximum: vec3(331, 0.1, 335),
+          },
+        },
+      ].map(
+        (supportPatch) => (metadata: LoftCoarseCase["metadata"]) => ({
+          ...metadata,
+          supportPlane: {
+            ...metadata.supportPlane,
+            ...supportPatch,
+          } as never,
+        }),
+      ),
+    ];
+
+    for (const mutate of mutations) {
+      await expect(
+        run({
+          metadata: identity,
+          change: (index, current) =>
+            index === 0
+              ? {
+                  ...current,
+                  metadata: mutate(current.metadata),
+                }
+              : current,
+        }),
+      ).rejects.toMatchObject({ code: "invalid" });
+    }
   });
 
   it("preserves duplicate contact callbacks and enforces the 64-byte event bound", async () => {

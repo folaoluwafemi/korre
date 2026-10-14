@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-124 bounded cards cover 21 remaining parents. Initially ready: T02-L01-CANONICAL-GUARD-IDENTITY-1.
+124 bounded cards cover 21 remaining parents. Initially ready: none.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -24,7 +24,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-GUARD-SCHEMA-1 | T02 | Implement the strict hashed L01 diagnostic guard in the protocol config | coordinator | parent:T01, C00, C00-B, C01, T02-B0, T02-C0, T02-C2, T02-D01, T02-GC01, T02-GC02, T02-BR02-OBSERVED-MASS-PROJECTION-1, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-PACKET-1 | 5 |
 | T02-L01-PACKET-SPLIT-1 | T02 | Split L01 into disjoint core, browser, transport, and matrix packets | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1 | 5 |
 | T02-L01-CONTACT-CONTRACT-1 | T02 | Freeze the additive L01 contact participant contract | coordinator | T02-L01-ARTIFACT-1 | 5 |
-| T02-L01 | T02 | Integrate and accept the bounded restart-loft diagnostic | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-EXECUTOR-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-L01-TRANSPORT-1, T02-L01-MATRIX-1 | 3 |
+| T02-L01 | T02 | Integrate and accept the bounded restart-loft diagnostic | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-EXECUTOR-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-DATUM-MATRIX-1 | 3 |
 | T02-L01-CONTACT-STATUS-1 | T02 | Reconcile contact contract and runner execution state | coordinator | T02-L01-CONTACT-CONTRACT-1 | 3 |
 | T02-L01-BROWSER-1-TSC-DIAG-1 | T02 | Capture remote TypeScript asset declaration resolution evidence | coordinator | None | 1 |
 | T02-L01-BROWSER-1-WEB-TSC-DIAG-1 | T02 | Trace the consuming web TypeScript project for Counterball asset declarations | coordinator | T02-L01-BROWSER-1-TSC-DIAG-1 | 1 |
