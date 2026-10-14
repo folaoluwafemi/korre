@@ -16,10 +16,7 @@ function nativeBounds(minimum: Vec3, maximum: Vec3) {
 
 describe("native Y-cylinder COM radius", () => {
   it("excludes the impossible square corners of a centered AABB", () => {
-    const bounds = nativeBounds(
-      { x: -2, y: -1, z: -2 },
-      { x: 2, y: 1, z: 2 },
-    );
+    const bounds = nativeBounds({ x: -2, y: -1, z: -2 }, { x: 2, y: 1, z: 2 });
 
     const radius = nativeCylinderComRadius(bounds, { x: 0, y: 0, z: 0 });
     expect(radius).toBe(Math.hypot(2, 1));
@@ -38,10 +35,7 @@ describe("native Y-cylinder COM radius", () => {
   });
 
   it("accounts for vertical COM offset and contains sampled endcap rims", () => {
-    const bounds = nativeBounds(
-      { x: -2, y: -1, z: -2 },
-      { x: 2, y: 1, z: 2 },
-    );
+    const bounds = nativeBounds({ x: -2, y: -1, z: -2 }, { x: 2, y: 1, z: 2 });
     expect(nativeCylinderComRadius(bounds, { x: 0, y: 5, z: 0 })).toBe(
       Math.hypot(2, 6),
     );
@@ -69,10 +63,7 @@ describe("native Y-cylinder COM radius", () => {
   });
 
   it("rejects non-finite, reversed, zero, inconsistent, and overflowing inputs", () => {
-    const valid = nativeBounds(
-      { x: -1, y: -1, z: -1 },
-      { x: 1, y: 1, z: 1 },
-    );
+    const valid = nativeBounds({ x: -1, y: -1, z: -1 }, { x: 1, y: 1, z: 1 });
     const centeredCom = { x: 0, y: 0, z: 0 };
     const invalidInputs: readonly [ReturnType<typeof nativeBounds>, Vec3][] = [
       [
@@ -94,9 +85,9 @@ describe("native Y-cylinder COM radius", () => {
     ];
 
     for (const [bounds, centerOfMassLocal] of invalidInputs) {
-      expect(() =>
-        nativeCylinderComRadius(bounds, centerOfMassLocal),
-      ).toThrow(RangeError);
+      expect(() => nativeCylinderComRadius(bounds, centerOfMassLocal)).toThrow(
+        RangeError,
+      );
     }
   });
 });
