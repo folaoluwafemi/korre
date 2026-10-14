@@ -56,6 +56,7 @@ import {
   createCounterballWorld,
   type CounterballWorld,
 } from "./worldFactory.js";
+import { nativeCylinderComRadius } from "./nativeCylinderRadius.js";
 
 const config = COUNTERBALL_CONFIG_V1;
 const guard = config.restartLoftDiagnosticGuard;
@@ -291,10 +292,6 @@ function add(left: Vec3, right: Vec3): Vec3 {
   return { x: left.x + right.x, y: left.y + right.y, z: left.z + right.z };
 }
 
-function distance(left: Vec3, right: Vec3): number {
-  return Math.hypot(left.x - right.x, left.y - right.y, left.z - right.z);
-}
-
 function maskIsValid(value: number): boolean {
   return (
     Number.isSafeInteger(value) && value >= -0x80000000 && value <= 0xffffffff
@@ -463,20 +460,16 @@ function shapeDimensions(shape: PhysicsShape): Vec3 {
 }
 
 function radiiFromBounds(
-  shape: PhysicsShape,
+  bounds: { minimum: Vec3; maximum: Vec3; dimensions: Vec3 },
   centerOfMassLocal: Vec3,
 ): { farthestPointRadius: number; farthestOriginRadius: number } {
-  const bounds = shape.getBoundingBox();
-  let farthestPointRadius = 0;
+  const farthestPointRadius = resourceGuard(() =>
+    nativeCylinderComRadius(bounds, centerOfMassLocal),
+  );
   let farthestOriginRadius = 0;
   for (const x of [bounds.minimum.x, bounds.maximum.x]) {
     for (const y of [bounds.minimum.y, bounds.maximum.y]) {
       for (const z of [bounds.minimum.z, bounds.maximum.z]) {
-        const point = { x, y, z };
-        farthestPointRadius = Math.max(
-          farthestPointRadius,
-          distance(point, centerOfMassLocal),
-        );
         farthestOriginRadius = Math.max(
           farthestOriginRadius,
           Math.hypot(x, y, z),
@@ -1054,7 +1047,7 @@ function readNativeBodies(world: CounterballWorld): {
         `Dynamic body ${id} failed its actual native mass/inertia projection checks.`,
       );
     }
-    const radii = radiiFromBounds(shape, centerOfMassLocal);
+    const radii = radiiFromBounds(nativeBounds, centerOfMassLocal);
     const metric: NativeBodyMetrics = {
       id,
       body,
@@ -1561,29 +1554,41 @@ async function runCase(
         throw resourceFailure("Initial native body facts are incomplete.");
       metric.restY = sample.centerOfMass.y;
     }
+    const plannerBodies = bodyFacts.metrics.map((metric) => ({
+      id: metric.id,
+      mass: metric.mass,
+      minimumUnitInertia: Math.min(
+        metric.inertiaUnitMass.x,
+        metric.inertiaUnitMass.y,
+        metric.inertiaUnitMass.z,
+      ),
+      maximumUnitInertia: Math.max(
+        metric.inertiaUnitMass.x,
+        metric.inertiaUnitMass.y,
+        metric.inertiaUnitMass.z,
+      ),
+      farthestPointRadius: metric.farthestPointRadius,
+    }));
+    const fixedStepSeconds = config.simulation.fixedStepSeconds;
+    const sweepGuard = makeSweepGuard();
     let plan: ReturnType<typeof deriveDiagnosticSweepPlan>;
     try {
       plan = deriveDiagnosticSweepPlan(
-        bodyFacts.metrics.map((metric) => ({
-          mass: metric.mass,
-          minimumUnitInertia: Math.min(
-            metric.inertiaUnitMass.x,
-            metric.inertiaUnitMass.y,
-            metric.inertiaUnitMass.z,
-          ),
-          maximumUnitInertia: Math.max(
-            metric.inertiaUnitMass.x,
-            metric.inertiaUnitMass.y,
-            metric.inertiaUnitMass.z,
-          ),
-          farthestPointRadius: metric.farthestPointRadius,
-        })),
-        config.simulation.fixedStepSeconds,
-        makeSweepGuard(),
+        plannerBodies,
+        fixedStepSeconds,
+        sweepGuard,
       );
     } catch (error) {
+      const cause = error instanceof Error ? error.message : String(error);
       throw resourceFailure(
-        "Native sweep subdivision cannot satisfy the hashed resource guard.",
+        `Native sweep subdivision cannot satisfy the hashed resource guard. ${JSON.stringify(
+          {
+            plannerBodies,
+            fixedStepSeconds,
+            sweepGuard,
+            cause,
+          },
+        )}`,
         error,
       );
     }

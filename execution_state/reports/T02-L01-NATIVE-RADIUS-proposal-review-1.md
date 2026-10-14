@@ -1,0 +1,31 @@
+# T02-L01-NATIVE-RADIUS-1 mathematics and contract review
+
+**Verdict: PASS for this bounded repair packet. Runtime: NOT RUN.** The proposed radius is a conservative, in fact exact, COM-centred bound for the validated local Y-cylinder. It is permitted by the frozen L01 guard contract. This does not establish that the radius was the sole cause of the hosted sweep failure or that the 48-call limit will pass.
+
+## Packet and dependency check
+
+`node scripts/check-completion-plan.mjs --packet T02-L01-NATIVE-RADIUS-1` returned PASS for 119 packets and `ready:true`, with this packet as the sole initial-ready item. All 15 direct dependencies in the packet are ACCEPTED; its inherited `required_parent_acceptance` is `T01`, which is ACCEPTED. Parent T02 remains RUNNING. The packet's only `supersedes` entry is the failed `T02-L01-GOALFRAME-F32-MATRIX-1`; this preserves the earlier attempt as failed evidence while serializing ownership of the same matrix paths. The task mirror is READY with the same dependency list and T01 gate.
+
+The accepted guard, full 24-tuple matrix, exact-byte artifact validation, no-skip hosted checks and later independent exact-source/run/artifact reviews remain required. The packet accepts no config, geometry, physics, calibration, T02, deployed-Havok, or playability result.
+
+## Radius derivation
+
+The current runner validates each dynamic shape as a non-trigger `CYLINDER`, rejects parented or non-unit-scaled transforms, verifies all three native dimensions against the canonical cylinder dimensions, and validates finite native COM/mass/inertia before computing `radiiFromBounds` (`loftCoarseRunner.ts:941-1065`). The factory constructs these dynamic cylinders along local Y with endpoints at `-height/2` and `+height/2` (`worldFactory.ts:303-308`). The native local-AABB bounds and dimensions are already acquired and validated in `shapeBoundsAndDimensions` (`loftCoarseRunner.ts:451-463`). This supports the packet's assumptions for this known shape path; it does not generalize the helper to other shape types or orientations.
+
+Let the validated native local-AABB midpoint be `b`, half extents be `rx`, `q`, and `rz`, and native local COM be `c`. For a centered Y-axis circular cylinder, its solid is the product of a horizontal disk and a vertical interval. With `d=c-b`, the farthest horizontal distance from the COM projection to any point in the disk is `r + hypot(d.x,d.z)`, where `r=max(rx,rz)`. The farthest vertical distance is `q+abs(d.y)`. The horizontal and vertical coordinates vary independently, so the maximum Euclidean distance to any collider point is
+
+`R = hypot(r + hypot(d.x, d.z), q + abs(d.y))`.
+
+This holds for a translated native AABB and any finite COM offset, including diagonal and vertical offsets. It equals the maximum support-point distance of the cylinder; unlike the old eight-corner calculation it does not include impossible square corners of a circular cross-section. Rotating the body preserves this Euclidean distance, so using `R` in `linearSpeedBound + angularSpeedBound * R` is conservative for every collider point. Since every coordinate projection is bounded by its Euclidean distance, it remains conservative for the runner's point-sweep and bounds that consume the same COM radius.
+
+Use the already validated `nativeBounds` returned by `shapeBoundsAndDimensions` to compute the cylinder radius. Do not call the native bounds API again. Keep the old eight-corner origin-centred `farthestOriginRadius` calculation exactly for apron/obstacle checks; it serves a distinct bound and remains conservative. Keep shape/type/trigger/parent/scale/dimension/property checks, all failure ordering, planner equations, and hashed limits unchanged. The helper should reject non-finite or reversed bounds/COM, any zero/nonpositive required extent, non-finite midpoint/offset/intermediate/result, and overflow. At the runner boundary, map helper rejection to the existing typed `resourceLimit` path before impulse or `executeStep`.
+
+The hosted failure report is careful: run 38628031652 shows the generic planner failure, but lacks the raw native planner inputs and underlying cause. The AABB-corner formula is a proven overbound for the validated cylinder; it is a plausible cause of excessive `Nrequired`, not proof that the matrix will pass after correction. The repair should build the 15 planner inputs once, pass those same objects to `deriveDiagnosticSweepPlan`, and include those inputs with canonical body IDs, exact fixed tick, unchanged guard, and the underlying cause in the failure details. It should not reimplement the planner or calculate duplicate subdivision equations. On failure, retain `resourceLimit` and emit no partial/success matrix artifact.
+
+## Contract boundary and limits
+
+The accepted `CONTRACT_WORK.md` L01 guard requires actual native COM, mass, principal inertias, complete collider extent, and a conservative full-collider sweep. It fixes shifted energy at 34, maximum COM drop and point sweep at 0.01125, rotation at π/8, and no more than 48 public `executeStep` calls per nominal tick (`CONTRACT_WORK.md:172-184`). Replacing an impossible AABB-corner distance with the exact farthest-point distance for the already validated Y-cylinder preserves conservatism and every frozen threshold. Raising the subdivision allowance, changing energy/drop/sweep limits, changing shape/solver/forces, or otherwise making the guard permissive would violate the contract; none is necessary for this proposal.
+
+The specified pure tests are sufficient and falsifiable: centered cylinder equals `hypot(r,q)`; translated bounds and diagonal or vertical COM offsets agree with the formula; sampled points on both endcaps never exceed `R` and the analytic support point attains it; NaN/Infinity, reversed/zero extents and arithmetic overflow fail closed. Preserve the existing fixture that still rejects a required subdivision over 48. A hosted real-browser rerun must then disclose the actual per-body inputs/cause and run all 24 cases through the unchanged validation/download path; if another guard fails or any required count still exceeds 48, preserve that evidence and do not relax limits.
+
+This is a proposal/contract review only. I made no source or status changes and ran no application tests, builds, browser, physics, deployment, or Cloudflare checks.

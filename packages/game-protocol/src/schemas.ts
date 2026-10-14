@@ -99,12 +99,12 @@ const diagnosticPhysicsGuardSchema: z.ZodType<DiagnosticPhysicsGuard> =
 
 const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
   z.strictObject({
-    schemaVersion: z.literal(1),
+    schemaVersion: z.literal(2),
     scope: z.literal("restart-loft-coarse-matrix-v1"),
     matrixId: z.literal("counterball-l01-grid-v1"),
-    algorithmVersion: z.literal("loft-coarse-probe-v1"),
+    algorithmVersion: z.literal("loft-coarse-probe-v2"),
     protocolVersion: z.literal(1),
-    configSchemaVersion: z.literal(3),
+    configSchemaVersion: z.literal(4),
     physicsVersion: z.literal("havok-1.3.14/adapter-1"),
     fixture: z.strictObject({
       id: z.literal("counterball-protocol-fixtures-v1"),
@@ -163,13 +163,13 @@ const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
       readbackPolicy: z.literal("exact-setter-value"),
     }),
     energy: z.strictObject({
-      formulaVersion: z.literal("shifted-mechanical-energy-v1"),
+      formulaVersion: z.literal("shifted-mechanical-energy-v2"),
       gravityMagnitude: z.literal(9.81),
       maximum: z.literal(34),
       maximumRestComDrop: z.literal(0.01125),
       nativeMassProjection: z.literal("Math.fround(configuredMass)"),
       nativeMassToleranceMultiplier: z.literal(64),
-      restReference: z.literal("tuple-initial-native-COM-y"),
+      restReference: z.literal("native-cylinder-support-COM-lower-bound-y"),
     }),
     sweep: z.strictObject({
       maximumPointSweepPerCall: z.literal(0.01125),
@@ -842,8 +842,8 @@ export const RoomCommandResponseSchema = z.union([
 
 export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
   .strictObject({
-    schemaVersion: z.literal(3),
-    configVersion: z.literal("counterball-config-3"),
+    schemaVersion: z.literal(4),
+    configVersion: z.literal("counterball-config-4"),
     geometry: z.strictObject({
       pitchWidth: finiteNumber.positive(),
       pitchLength: finiteNumber.positive(),

@@ -395,8 +395,8 @@ describe("Counterball v1 protocol", () => {
     );
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1)).toBe(true);
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1.geometry)).toBe(true);
-    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(3);
-    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-3");
+    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(4);
+    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-4");
     expect(PROTOCOL_VERSION).toBe(1);
     expect(COUNTERBALL_CONFIG_V1.bodies.capsPerTeam).toBe(7);
     expect(COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius).toBe(0.06);
@@ -556,6 +556,51 @@ describe("Counterball v1 protocol", () => {
         },
       }).success,
     ).toBe(false);
+  });
+
+  it("rejects old config and diagnostic identities", () => {
+    const config = COUNTERBALL_CONFIG_V1;
+    const guard = config.restartLoftDiagnosticGuard;
+    expect(guard.schemaVersion).toBe(2);
+    expect(guard.algorithmVersion).toBe("loft-coarse-probe-v2");
+    expect(guard.energy.formulaVersion).toBe("shifted-mechanical-energy-v2");
+    expect(guard.energy.restReference).toBe(
+      "native-cylinder-support-COM-lower-bound-y",
+    );
+    expect(
+      CounterballConfigSchema.safeParse({
+        ...config,
+        schemaVersion: 3,
+        configVersion: "counterball-config-3",
+      }).success,
+    ).toBe(false);
+    const previousGuards = [
+      { ...guard, schemaVersion: 1 },
+      { ...guard, configSchemaVersion: 3 },
+      { ...guard, algorithmVersion: "loft-coarse-probe-v1" },
+      {
+        ...guard,
+        energy: {
+          ...guard.energy,
+          formulaVersion: "shifted-mechanical-energy-v1",
+        },
+      },
+      {
+        ...guard,
+        energy: {
+          ...guard.energy,
+          restReference: "tuple-initial-native-COM-y",
+        },
+      },
+    ];
+    for (const restartLoftDiagnosticGuard of previousGuards) {
+      expect(
+        CounterballConfigSchema.safeParse({
+          ...config,
+          restartLoftDiagnosticGuard,
+        }).success,
+      ).toBe(false);
+    }
   });
 
   it("validates the nullable versioned calibration without changing null fixtures", async () => {

@@ -774,3 +774,18 @@ Goal-frame implementation and source review complete; worker/reviewer source own
 - 15 accepted dependencies and T01 preserved; independent packet PASS and exact ready:true extraction saved. No local app command or Cloudflare access.
 
 Goal-frame matrix author/source reviewers released ownership. Coordinator confirmed one wrapping-only unit assertion edit under independent review; exact runner/test hashes recorded. No local app command. Coordinator owns exact source commit and hosted checks.
+
+## Sweep repair review ownership — 2026-10-14
+
+- Coordinator owns tasks/catalogue/ledger and exact run evidence. The failed goal-frame matrix card is CHANGES_REQUIRED, no matrix acceptance.
+- Toolchain auditor owns only T02-L01-NATIVE-RADIUS-proposal-review-1.md for independent math/contract/exact packet review.
+- Run reviewer owns only T02-L01-TILTED-REST-DATUM-audit-1.md, a read-only static audit.
+- Executor is idle; the exact three-path radius card may be dispatched only after review PASS and ready:true extraction. No local application checks or Cloudflare access.
+
+Radius packet review PASS and ready:true extraction saved. Executor now exclusively owns nativeCylinderRadius.ts, nativeCylinderRadius.test.ts, loftCoarseRunner.ts and T02-L01-NATIVE-RADIUS-1-implementation.md. Toolchain auditor later source review only. Failed prior goal-frame matrix SUPERSEDED for ownership; never accepted.
+
+Radius source/helper extraction review PASS; source workers released all paths. Coordinator owns canonical datum contract/config after independent proposal PASS; source remains pending exact hosted proof. Executor owns only corrected support-datum proposal review report; no implementation edits.
+
+Canonical producer implementation complete; coordinator source ownership released to read-only independent source review. Toolchain auditor owns only T02-L01-SUPPORT-DATUM-CONFIG-1-source-review.md. No local app check. Consumer is not dispatched until producer/helper ACCEPTED via hosted evidence.
+
+Coordinator made one wrapping-only helper-test correction plus shortened a new protocol test label, after independent pre-CI risk finding. All source ownership released; toolchain auditor owns final exact-format/source review only. Hosted checks remain pending.

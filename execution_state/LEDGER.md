@@ -762,3 +762,9 @@ Independent exact-source review PASS is recorded at `execution_state/reports/T02
 2026-10-14: Goal-frame exact projection contract ACCEPTED (diagnostic clause only); full24-case matrix packet independently reviewed/ready:true, now RUNNING with two-file scope. Physics/calibration/T02 still unaccepted.
 
 2026-10-14: Full-matrix goal guard source PASS plus one assertion-format confirmation. Runtime and matrix remain pending. Reviewed stale dependency refs reconciled without parent/gate changes. Refinement input readiness audit identifies missing shared case API/handoff/score, to resolve before dispatch.
+
+2026-10-14: Run38628031652 failed sweep preflight after native geometry. Verify186/186, integration1, preview4 passed; diagnostic3pass/1fail, zero test skips. Independent evidence review PASS; no matrix/step/playability acceptance. Bounded exact cylinder radius repair under review, same safety thresholds.
+
+2026-10-14: Independently reviewed L01 support datum contract ACCEPTED (prose only). Initial tilted energy charged; all numerical limits unchanged. Canonical config producer READY; extracted pure radius helper source PASS, actual hosted proof pending. Full matrix/T02/playability unaccepted.
+
+2026-10-14: Canonical support-datum producer source PASS; pure native-radius helper source/format review PASS. Exact remote Verify/protocol/hash/build/integration/preview checks pending; old consumer retains fail-closed raw fixture pin until accepted producer/helper. No matrix/playability acceptance.

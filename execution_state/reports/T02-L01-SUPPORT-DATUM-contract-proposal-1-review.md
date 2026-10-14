@@ -1,0 +1,15 @@
+# T02-L01 support-datum contract proposal review
+
+**Verdict: CHANGES_REQUIRED.** The support-bound math and scope are sound, but the planned case metadata does not expose enough native facts for the promised independent writer/host audit.
+
+Reviewed `execution_state/reports/T02-L01-SUPPORT-DATUM-contract-proposal-1.md` (SHA-256 `ad9457033493072c959349463530ceef63737a1e8e78d6822eda28db48e1fa55`) against the static audit (SHA-256 `25787f7548b17d60cb5bf0521af13528349f6c49353ad6f22cef7a4c8f78e71a`) and current artifact types/producer.
+
+The mathematical datum is correct under its stated prerequisites. For a centered local Y cylinder, vertical support at any orientation is `r*sqrt(1-nY²)+q*abs(nY)`, whose minimum is `min(r,q)`. An arbitrary local COM offset can lower the COM by at most its Euclidean norm, so `surfaceY + min(r,q) - norm(COM)` is a conservative lower bound. Exact centered-AABB, finite-dimension, native-type, scale, parent, and support-plane checks make those assumptions fail closed. The proposal also correctly charges the tilted initial pose as potential energy and preserves energy 34, drop 0.01125, gravity, sweep limits, call/workload/artifact caps, and physical setup. Its config/guard/algorithm/energy version changes, fixture hash updates, protocol version 1, and D01 semantic preservation are explicit. No threshold increase or matrix acceptance is proposed.
+
+Two metadata gaps block contract readiness:
+
+1. The proposed `nativeSupportTopY` is only a derived scalar. The host is asked to check that it is finite and at or above `supportReferenceY`, but the planned case metadata does not carry the support transform or its raw native local AABB. Current `LoftCoarseStaticBodyFacts` contains only id, collider dimensions, collision filter, and material (`games/counterball/src/simulation/loftCoarseProbe.ts:124-129`); the runner records only those values (`games/counterball/src/simulation/loftCoarseRunner.ts:1179`). Thus the host cannot recompute `supportBody.position.y + nativeLocalAabb.maximum.y`, or independently verify identity rotation, unit scale, and no parent. Add the exact support pose facts and raw local AABB needed to reproduce the top, then require `nativeSupportTopY` to equal that recomputation and exceed/equal the configured plane.
+
+2. Dynamic native facts have no collider type (`games/counterball/src/simulation/loftCoarseProbe.ts:96-110`). The proposed AABB and dimensions are also compatible with non-cylinder shapes, whose support function differs. Add a strict recorded native shape type for each dynamic body and require `CYLINDER` in runner, writer, and host validation before recomputing the datum. Keep the existing runner type preflight; it is not present in the artifact for host validation.
+
+These additions fit the proposed bounded consumer paths and remain diagnostic metadata. Once the strict fields, producer behavior, negative tests, and metadata byte accounting are updated, the exact support-datum formula and versioning proposal are otherwise suitable for contract acceptance. This is a proposal-only review: no code, contract, status, or runtime checks were changed or performed.
