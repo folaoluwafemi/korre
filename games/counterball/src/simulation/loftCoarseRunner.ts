@@ -1118,7 +1118,8 @@ function readNativeBodies(world: CounterballWorld): {
         `Static body ${id} has invalid native filter/density properties.`,
       );
     }
-    const dimensions = shapeDimensions(shape);
+    const nativeBounds = shapeBoundsAndDimensions(shape);
+    const dimensions = nativeBounds.dimensions;
     if (id === "support-apron") {
       if (
         shape.type !== PhysicsShapeType.BOX ||
@@ -1153,7 +1154,23 @@ function readNativeBodies(world: CounterballWorld): {
         dimensions.z !== expected.z
       ) {
         throw resourceFailure(
-          `Goal frame collider ${id} dimensions differ from canonical geometry.`,
+          `Goal frame collider ${id} dimensions differ from canonical geometry. ${JSON.stringify(
+            {
+              id,
+              shapeType: shape.type,
+              configured: {
+                goalWidth: geometry.goalWidth,
+                goalHeight: geometry.goalHeight,
+                goalFrameRadius: geometry.goalFrameRadius,
+              },
+              expectedDimensions: expected,
+              nativeLocalAabb: {
+                minimum: nativeBounds.minimum,
+                maximum: nativeBounds.maximum,
+              },
+              observedDimensions: dimensions,
+            },
+          )}`,
         );
       }
     }

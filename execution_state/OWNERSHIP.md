@@ -757,3 +757,10 @@ No local application build/test/browser/physics ran for this contract correction
 - `/root/executor_type_review` now owns only independent review report `execution_state/reports/T02-L01-GEOMETRY-F32-1-source-review.md` for the exact source hashes. No implementation edits are permitted during review.
 - `/root` retains status, commit/push and hosted run ownership. Do not publish the code or start CI until source review PASS. `/root/toolchain_audit` will review exact hosted run/artifacts after the remote job.
 - No local app command or Cloudflare/Wrangler action has run. MATRIX-1, its successor runtime gate, T02, deployment and playability remain unaccepted.
+
+## Current ownership — goal-frame readback, 2026-10-14
+
+- /root/executor_type_review: only games/counterball/src/simulation/loftCoarseRunner.ts and execution_state/reports/T02-L01-GOALFRAME-READBACK-1-implementation.md.
+- /root/toolchain_audit: independent source review report only.
+- /root/run_evidence_review: critical-path audit report only; later exact-run review.
+- Coordinator retains config/contracts/catalogues/status/commit/CI. No local app command or Cloudflare action. Superseded failed apron attempt remains unaccepted.
