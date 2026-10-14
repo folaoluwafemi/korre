@@ -395,8 +395,8 @@ describe("Counterball v1 protocol", () => {
     );
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1)).toBe(true);
     expect(Object.isFrozen(COUNTERBALL_CONFIG_V1.geometry)).toBe(true);
-    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(4);
-    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-4");
+    expect(COUNTERBALL_CONFIG_V1.schemaVersion).toBe(5);
+    expect(COUNTERBALL_CONFIG_V1.configVersion).toBe("counterball-config-5");
     expect(PROTOCOL_VERSION).toBe(1);
     expect(COUNTERBALL_CONFIG_V1.bodies.capsPerTeam).toBe(7);
     expect(COUNTERBALL_CONFIG_V1.geometry.goalFrameRadius).toBe(0.06);
@@ -558,11 +558,43 @@ describe("Counterball v1 protocol", () => {
     ).toBe(false);
   });
 
+  it("requires the exact strict native onset policy", () => {
+    const config = COUNTERBALL_CONFIG_V1;
+    const policy = config.restartLoftDiagnosticGuard.contactPolicy;
+    expect(policy).toEqual({
+      eventType: "COLLISION_STARTED",
+      nativeSubscription: "started-only",
+      readback: "all-22-exact",
+      callbackRetention: "all-delivered-including-symmetric",
+    });
+    const malformed = [
+      undefined,
+      null,
+      {},
+      { ...policy, eventType: "COLLISION_CONTINUED" },
+      { ...policy, nativeSubscription: "all-events" },
+      { ...policy, readback: "none" },
+      { ...policy, callbackRetention: "deduplicated" },
+      { ...policy, unexpected: true },
+    ];
+    for (const contactPolicy of malformed) {
+      expect(
+        CounterballConfigSchema.safeParse({
+          ...config,
+          restartLoftDiagnosticGuard: {
+            ...config.restartLoftDiagnosticGuard,
+            contactPolicy,
+          },
+        }).success,
+      ).toBe(false);
+    }
+  });
+
   it("rejects old config and diagnostic identities", () => {
     const config = COUNTERBALL_CONFIG_V1;
     const guard = config.restartLoftDiagnosticGuard;
-    expect(guard.schemaVersion).toBe(2);
-    expect(guard.algorithmVersion).toBe("loft-coarse-probe-v2");
+    expect(guard.schemaVersion).toBe(3);
+    expect(guard.algorithmVersion).toBe("loft-coarse-probe-v3");
     expect(guard.energy.formulaVersion).toBe("shifted-mechanical-energy-v2");
     expect(guard.energy.restReference).toBe(
       "native-cylinder-support-COM-lower-bound-y",
@@ -574,7 +606,17 @@ describe("Counterball v1 protocol", () => {
         configVersion: "counterball-config-3",
       }).success,
     ).toBe(false);
+    expect(
+      CounterballConfigSchema.safeParse({
+        ...config,
+        schemaVersion: 4,
+        configVersion: "counterball-config-4",
+      }).success,
+    ).toBe(false);
     const previousGuards = [
+      { ...guard, schemaVersion: 2 },
+      { ...guard, configSchemaVersion: 4 },
+      { ...guard, algorithmVersion: "loft-coarse-probe-v2" },
       { ...guard, schemaVersion: 1 },
       { ...guard, configSchemaVersion: 3 },
       { ...guard, algorithmVersion: "loft-coarse-probe-v1" },

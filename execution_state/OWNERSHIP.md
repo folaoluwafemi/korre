@@ -803,3 +803,9 @@ Executor released repair1 five-source paths. Run reviewer owns only repair1-sour
 Repair1 source review PASS and all five source paths released. Root owns integrated commit/hosted run; toolchain reviewer will own unique run/artifact review only.
 
 Root applied exactrun38643119698 formatter patch and3redundantcast removals only; source released to independent hosted-lint-repair1-source reviewer. No app checks or guards changed.
+
+Contact-onset wave: root exclusively owns canonicalproducer types/schemas/config/protocol.test andcounterball-v1 fixture5paths; executor owns onlynativeCollisionSubscription.ts/.test.ts anduniqueadapterimplementation report. Reviewer source reports only. No localappcommands; fullnativegate remainsfailed/unaccepted.
+
+Root released fivecanonicalcontact-onsetproducer sources to independentread-only review. Toolchain owns onlyunique producer-source-review report. Executor adapter2sourcepaths stillRUNNING; no overlap.
+
+Executor released nativeCollisionSubscription.ts/.test.ts and report. Runreviewer owns uniqueadapter-source-review plusscopeclarification ofitsownproposalreview. Allsourcefrozen; rootcommitafterbothreviewsPASS.

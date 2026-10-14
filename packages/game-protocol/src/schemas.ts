@@ -99,13 +99,19 @@ const diagnosticPhysicsGuardSchema: z.ZodType<DiagnosticPhysicsGuard> =
 
 const restartLoftDiagnosticGuardSchema: z.ZodType<RestartLoftDiagnosticGuard> =
   z.strictObject({
-    schemaVersion: z.literal(2),
+    schemaVersion: z.literal(3),
     scope: z.literal("restart-loft-coarse-matrix-v1"),
     matrixId: z.literal("counterball-l01-grid-v1"),
-    algorithmVersion: z.literal("loft-coarse-probe-v2"),
+    algorithmVersion: z.literal("loft-coarse-probe-v3"),
     protocolVersion: z.literal(1),
-    configSchemaVersion: z.literal(4),
+    configSchemaVersion: z.literal(5),
     physicsVersion: z.literal("havok-1.3.14/adapter-1"),
+    contactPolicy: z.strictObject({
+      eventType: z.literal("COLLISION_STARTED"),
+      nativeSubscription: z.literal("started-only"),
+      readback: z.literal("all-22-exact"),
+      callbackRetention: z.literal("all-delivered-including-symmetric"),
+    }),
     fixture: z.strictObject({
       id: z.literal("counterball-protocol-fixtures-v1"),
       payloadSha256: z.literal(
@@ -842,8 +848,8 @@ export const RoomCommandResponseSchema = z.union([
 
 export const CounterballConfigSchema: z.ZodType<CounterballConfig> = z
   .strictObject({
-    schemaVersion: z.literal(4),
-    configVersion: z.literal("counterball-config-4"),
+    schemaVersion: z.literal(5),
+    configVersion: z.literal("counterball-config-5"),
     geometry: z.strictObject({
       pitchWidth: finiteNumber.positive(),
       pitchLength: finiteNumber.positive(),

@@ -778,3 +778,9 @@ Independent exact-source review PASS is recorded at `execution_state/reports/T02
 2026-10-14: Native support-datum consumer repair1 independently SOURCE PASS, including exact slab identity and tilted button energy. Full hosted24-case matrix pending; no physics/T02/playability acceptance.
 
 2026-10-14: Run38643119698 full typecheck/protocol14/Worker1 PASS; Verify failed3redundantcasts before unit/build/browser. Exacthostedformatter patch and casts repaired by root; independent focusedreview/fullrerun pending. Full24matrix stillNOTRUN.
+
+2026-10-14: Run38643635405 Verify196/196+build/integration/preview PASS. Fullnative matrix now reaches motion but firstcase hits rawcontactcap (latestprogress tick4/calls240) before download. Matrix CHANGES_REQUIRED; bounded contactlogging diagnosis, guards unchanged. No T02 acceptance.
+
+2026-10-14: Contact-onset contract prose/internalinterface ACCEPTED after independentcopy/packetPASS/doc127PASS. NativeStarted-only delivery/budget andfull24 stillunverified. Configproducer5paths +pureadapter2paths READY foronehostedwave.
+
+2026-10-14: Contact-onset canonicalproducer andpureadapter independentlySOURCEPASS. Nativeeventproof/matrix stillunverified. Hostedsourcewave next; consumeroldrawpin intentionallyfailclosed.

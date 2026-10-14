@@ -393,13 +393,19 @@ export type DiagnosticPhysicsGuard = {
 
 /** Strict config-hashed identity and bounds for the restart-loft diagnostic only. */
 export type RestartLoftDiagnosticGuard = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   scope: "restart-loft-coarse-matrix-v1";
   matrixId: "counterball-l01-grid-v1";
-  algorithmVersion: "loft-coarse-probe-v2";
+  algorithmVersion: "loft-coarse-probe-v3";
   protocolVersion: 1;
-  configSchemaVersion: 4;
+  configSchemaVersion: 5;
   physicsVersion: "havok-1.3.14/adapter-1";
+  contactPolicy: {
+    eventType: "COLLISION_STARTED";
+    nativeSubscription: "started-only";
+    readback: "all-22-exact";
+    callbackRetention: "all-delivered-including-symmetric";
+  };
   fixture: {
     id: "counterball-protocol-fixtures-v1";
     payloadSha256: "6ce26e4203017e446687dfd8ad95106ba582f09420f8c623129c7d1bbe6b625d";
@@ -483,8 +489,8 @@ export type RestartLoftDiagnosticGuard = {
 };
 
 export type CounterballConfig = {
-  schemaVersion: 4;
-  configVersion: "counterball-config-4";
+  schemaVersion: 5;
+  configVersion: "counterball-config-5";
   geometry: {
     pitchWidth: number;
     pitchLength: number;

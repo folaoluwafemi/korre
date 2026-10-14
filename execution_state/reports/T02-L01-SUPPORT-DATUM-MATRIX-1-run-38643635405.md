@@ -1,0 +1,3 @@
+# Hosted native support-datum consumer result
+
+Run38643635405 commit6c88ecc0cbc43c57b887a5f929cc9e0a46cad8ab: Verify196/196 tests31files and all type/lint/format/build passed; full integration/productionpreview passed. Diagnostic3pass/1fail: first real native tuple failed contactcallback row cap before any completedtuple/download. Errorcontext latestprogress reports nominaltick4/240executecalls/2batches. No matrix/T02/playabilityacceptance. Full API/jobs/GitHub/artifact1155file inventory preserved. Independent exactrun review pending; bounded resource-contract diagnosis next. No local appcommands/Cloudflareaction.

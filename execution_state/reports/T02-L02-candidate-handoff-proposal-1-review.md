@@ -1,0 +1,11 @@
+# T02-L02 candidate handoff proposal 1 review
+
+**PROPOSAL: CHANGES_REQUIRED. RUNTIME: NOT RUN.**
+
+The proposal correctly makes the complete independently accepted L01 artifact and its exact run/source/config/guard/WASM/fixture identities the input. It keeps validation streaming through all 24 cases and the final whole-file digest, then retains only one compact winner. The score is conservative: it maximizes the worst per-row whole-button obstacle clearance over intervals the accepted host classifies as overlapping. It rejects a candidate with no such row or a non-finite score. Exact ties use the original card's ordered tie-breaks, with no tolerance. The no-candidate path runs zero L02 trials; the positive path is limited to the existing nine ordered grid trials.
+
+The proposal does not authorize an absent executor or writer API. It explicitly notes that `runCase` is private, the coarse writer accepts only the canonical 24 tuples, the current L02 one-file card cannot implement the browser handoff, and positive/zero branch work needs concrete, reviewed packets and exact artifact inputs. Its distinct refinement identity also prevents a nine-case output from impersonating the L01 matrix. No production calibration, tunnelling proof, T02 acceptance, or runtime result is claimed.
+
+One output wording needs correction before this proposal is used to materialize a packet. The no-candidate reason says: “No validated L01 tuple satisfies whole-button traversal and settlement.” Existing eligibility can also fail because overlapping clearance is not above margin or because a button-obstacle contact was observed (`loftCoarseRunner.ts:2404-2413`; the host independently recomputes these conditions at `counterball-direct-probe.spec.ts:2127-2137`). A tuple may satisfy traversal and settlement yet fail one of those other criteria, making the fixed reason inaccurate. Use a generic reason such as “No validated L01 tuple satisfies all existing eligibility criteria,” or include the actual validated reason codes/counts.
+
+This is a bounded prose correction; the candidate score, tie rules, artifact provenance, and zero-versus-nine branch otherwise preserve the original L02 diagnostic scope. Any successor packet must still retain the original T02-L01 dependency and `required_parent_acceptance: [T01]` gate. No application or runtime commands were run.
