@@ -9504,7 +9504,7 @@
           "implementation_report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-implementation.md",
           "review_report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-source-review.md",
           "source_review_verdict": "PASS",
-          "next_action": "Exact source review passes. Coordinator must commit and push the reviewed source, capture exact-SHA GitHub gates, and obtain independent 24-case run/artifact review; no matrix/T02/playability acceptance yet.",
+          "next_action": "Repair 1 source review PASS. Commit/push the exact formatted source and capture the next full hosted verification and real-Havok matrix run.",
           "checks": [
             {
               "command": "Exact hosted run 38613508970 and independent artifact review",
@@ -9551,13 +9551,81 @@
             {
               "command": "Hosted full 24-case pinned-Havok matrix and independent run/artifact review",
               "environment": "github",
-              "result": "NOT RUN"
+              "result": "CHANGES_REQUIRED",
+              "report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-run-38616985171-independent-review.md",
+              "detail": "Exact source SHA run failed only hosted Prettier on the assigned test file. Unit/build/integration/browser/matrix did not run; no matrix artifact."
+            },
+            {
+              "command": "Independent exact hosted-run evidence and formatting-patch review",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-run-38616985171-independent-review.md",
+              "detail": "Run identity and artifacts were independently verified; the sole hosted formatting patch is test-file-only and semantic-free."
+            },
+            {
+              "command": "Apply exact CI formatter patch and scoped diff check (repair 1)",
+              "environment": "local-document",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-repair-1-implementation.md",
+              "detail": "Patch hash matches independent review; patch applied only to the assigned test file; scoped git diff --check passed."
+            },
+            {
+              "command": "Independent exact-source review after formatter repair 1",
+              "environment": "source-review",
+              "result": "PASS",
+              "report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-repair-1-review.md",
+              "detail": "The only source diff matches the CI patch; original apron assertions and the runner are unchanged."
             }
           ],
-          "packet_review_verdict": "PASS"
+          "packet_review_verdict": "PASS",
+          "hosted_run": {
+            "run_id": 38616985171,
+            "attempt": 1,
+            "source_sha": "41f70f1dd3bada6871c2099807408851ca757dba",
+            "url": "https://github.com/folaoluwafemi/korre/actions/runs/38616985171",
+            "status": "completed",
+            "conclusion": "failure",
+            "completed_at": "2026-10-14T18:41:18Z",
+            "reviewer": "/root/toolchain_audit",
+            "run_review": "PASS",
+            "verify": {
+              "typecheck": "PASS",
+              "eslint": "PASS",
+              "prettier": "FAIL",
+              "failed_files": [
+                "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+              ]
+            },
+            "unit_tests": "NOT RUN",
+            "build": "NOT RUN",
+            "integration": "NOT RUN",
+            "preview_browser": "NOT RUN",
+            "diagnostic_browser": "NOT RUN",
+            "completed_matrix_cases": 0,
+            "matrix_artifact": false
+          },
+          "repair_attempts": [
+            {
+              "attempt": 1,
+              "failure_signature": "Hosted Prettier reports only games/counterball/src/simulation/loftCoarseProbe.test.ts",
+              "status": "SOURCE_REVIEWED",
+              "owner": "/root/executor_type_review",
+              "write_paths": [
+                "games/counterball/src/simulation/loftCoarseProbe.test.ts"
+              ],
+              "setup_report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-repair-1-coordinator-setup.md",
+              "implementation_report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-repair-1-implementation.md",
+              "review_report": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-repair-1-review.md",
+              "reviewer_identity": "/root/run_evidence_review",
+              "run_failure_review": "execution_state/reports/T02-L01-DIAGNOSTIC-APRON-F32-1-run-38616985171-independent-review.md",
+              "patch_sha256": "1e6592c83044c6dec079d4fe8f31351db837343d3e6ffb041bb38c2d45315340",
+              "detail": "The exact hosted formatter patch was applied; scoped diff check passed; independent exact-source repair review PASS confirms assertions and runner source are unchanged.",
+              "next_action": "Exact hosted patch applied; scoped diff check passed. Independent exact-source review pending before commit/push."
+            }
+          ]
         }
       ],
-      "next_action": "T02-L01-DIAGNOSTIC-APRON-F32-1 implementation and independent source review PASS. Commit/push exact reviewed SHA and run all required GitHub gates plus full 24-case pinned-Havok matrix. Keep matrix, T02, deployed physics and playability unaccepted until complete exact artifact and independent review.",
+      "next_action": "Formatting-only repair attempt 1 source review PASS. Commit/push the exact patch from run 38616985171, then run full exact-SHA GitHub gates and 24-case pinned-Havok matrix; run 38616985171 remains a Prettier failure with no matrix run.",
       "hosted_run": {
         "run_id": 38613508970,
         "attempt": 1,
@@ -10170,5 +10238,5 @@
     ],
     "validation_report": "execution_state/reports/current-review-validation.md"
   },
-  "next": "Run exact reviewed source through GitHub CI and the full 24-case real pinned-Havok diagnostic matrix; then independently validate the actual artifact. No local app build/test/browser/physics and no Cloudflare access."
+  "next": "Source-reviewed formatting repair 1 is ready to commit. Push exact SHA and rerun full GitHub gates, then review the 24-case pinned-Havok artifact if produced."
 }
