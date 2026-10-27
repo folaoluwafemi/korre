@@ -62,7 +62,7 @@ const MATRIX_TOTAL_CALL_MAXIMUM_COUNT = 2_073_600;
 const MATRIX_TOTAL_BATCH_MAXIMUM_COUNT = 17_280;
 const MATRIX_FIXTURE_MAXIMUM_BYTES = 65_536;
 const MATRIX_EXPECTED_FIXTURE_FILE_SHA256 =
-  "beaa25d969b7e0c5e863538af13d54ba9b2f8b9547c4827ef220ea863aa1b092";
+  "b0d2987128b2bb486ae27a62255b16e899ebdd6419b9e8d9140351defb31e9a0";
 const MATRIX_READY_STATUS =
   "The bounded OPFS file is complete and ready to download.";
 const MATRIX_FAILED_STATUS =
@@ -129,6 +129,7 @@ const MATRIX_CASE_METADATA_KEYS = [
   "supportPlane",
   "materials",
   "staticBodies",
+  "contactSubscription",
   "preImpulseMeasuredShiftedEnergy",
   "preImpulsePredictedShiftedEnergy",
   "finalBodies",
@@ -917,12 +918,46 @@ function assertSameQuaternion(
   }
 }
 
+function validateContactSubscription(value: unknown, label: string): number {
+  const subscription = assertExactKeys(
+    value,
+    ["eventType", "nativeMask", "bodies"],
+    label,
+  );
+  expect(subscription["eventType"]).toBe("COLLISION_STARTED");
+  const mask = boundedInteger(
+    subscription["nativeMask"],
+    1,
+    0xffff_ffff,
+    `${label}.nativeMask`,
+  );
+  if ((mask & (mask - 1)) !== 0)
+    throw new Error(`${label} mask must be one bit.`);
+  const bodies = subscription["bodies"];
+  const ids = [...MATRIX_ENTITY_IDS, ...MATRIX_STATIC_IDS];
+  if (!Array.isArray(bodies) || bodies.length !== ids.length) {
+    throw new Error(`${label} must contain all 22 bodies.`);
+  }
+  for (const [index, id] of ids.entries()) {
+    const body = assertExactKeys(
+      bodies[index],
+      ["bodyId", "requestedMask", "observedMask"],
+      `${label}.bodies[${index}]`,
+    );
+    expect(body["bodyId"]).toBe(id);
+    expect(body["requestedMask"]).toBe(mask);
+    expect(body["observedMask"]).toBe(mask);
+  }
+  return mask;
+}
+
 function validateCaseMetadata(
   value: unknown,
   identity: MatrixRecord,
   tuple: MatrixTuple,
   index: number,
   expectedState: ReturnType<typeof parseMatchState>,
+  nativeMask: number,
 ): MatrixRecord {
   const metadata = assertExactKeys(
     value,
@@ -943,6 +978,13 @@ function validateCaseMetadata(
       .initialStateHashAlgorithm,
   );
   assertHash(metadata["initialStateHash"], `Case ${index} initialStateHash`);
+
+  expect(
+    validateContactSubscription(
+      metadata["contactSubscription"],
+      `Case ${index} subscription`,
+    ),
+  ).toBe(nativeMask);
 
   const supportLabel = `Case ${index} supportPlane`;
   const supportPlane = assertExactKeys(
@@ -1591,6 +1633,7 @@ async function validateMatrixCase(
   tuple: MatrixTuple,
   identity: MatrixRecord,
   fixtureState: ReturnType<typeof parseMatchState>,
+  nativeMask: number,
 ): Promise<MatrixCaseCounts> {
   if (!isCompactJson(raw))
     throw new Error(`Case ${index} is not compact JSON.`);
@@ -1618,6 +1661,7 @@ async function validateMatrixCase(
     tuple,
     index,
     regeneratedInitialState(fixtureState, tuple),
+    nativeMask,
   );
   const expectedState = regeneratedInitialState(fixtureState, tuple);
   expect(metadata["initialStateHash"]).toBe(
@@ -1872,8 +1916,7 @@ async function validateMatrixCase(
       );
     }
     if (
-      typeof row["eventType"] !== "string" ||
-      row["eventType"].length === 0 ||
+      row["eventType"] !== "COLLISION_STARTED" ||
       Buffer.byteLength(row["eventType"], "utf8") >
         COUNTERBALL_CONFIG_V1.restartLoftDiagnosticGuard.artifact
           .maximumEventTypeBytes
@@ -2154,7 +2197,10 @@ async function validateMatrixCase(
   };
 }
 
-async function validateMatrixFile(path: string): Promise<{
+async function validateMatrixFile(
+  path: string,
+  nativeMask: number,
+): Promise<{
   digest: DownloadDigest;
   totals: MatrixTotals;
   identity: MatrixRecord;
@@ -2209,6 +2255,7 @@ async function validateMatrixFile(path: string): Promise<{
         tuple,
         identity,
         fixture.initialState,
+        nativeMask,
       );
       aggregate.caseCount += 1;
       aggregate.bodyRows += counts.bodyRows;
@@ -2668,6 +2715,317 @@ async function assertUnmountedAtBaseline(page: Page): Promise<void> {
     .toEqual([true, true, true]);
 }
 
+async function runNativeLifecycleProof(
+  page: Page,
+  testInfo: TestInfo,
+): Promise<number> {
+  await page.getByTestId("native-contact-run").click();
+  const result = page.getByTestId("native-contact-result");
+  const error = page.getByTestId("native-contact-error");
+  await expect
+    .poll(async () => (await result.isVisible()) || (await error.isVisible()), {
+      timeout: 35_000,
+    })
+    .toBe(true);
+  if (await error.isVisible()) {
+    const message = await error.textContent();
+    await testInfo.attach("native-contact-error.txt", {
+      body: message ?? "missing error",
+      contentType: "text/plain",
+    });
+    throw new Error(`Native contact diagnostic failed: ${message}`);
+  }
+  const raw = await result.textContent();
+  if (!raw) throw new Error("Native contact proof is empty.");
+  await testInfo.attach("native-contact-proof.json", {
+    body: raw,
+    contentType: "application/json",
+  });
+  const proof = assertExactKeys(
+    JSON.parse(raw) as unknown,
+    [
+      "scope",
+      "configHash",
+      "wasmSha256",
+      "runtimeIdentity",
+      "subscription",
+      "nativeGeometry",
+      "initialOverlap",
+      "phases",
+      "contacts",
+      "executeStepCalls",
+      "cleanup",
+    ],
+    "Native proof",
+  );
+  expect(proof["scope"]).toBe("native-contact-onset-proof-v1");
+  expect(proof["configHash"]).toBe(await hashCounterballConfig());
+  expect(proof["wasmSha256"]).toBe(MATRIX_GUARD.wasmSha256);
+  expect(proof["runtimeIdentity"]).toMatch(/^browser:.+;physics:/);
+  const mask = validateContactSubscription(
+    proof["subscription"],
+    "Native subscription",
+  );
+  const geometry = assertExactKeys(
+    proof["nativeGeometry"],
+    ["button", "obstacle", "support"],
+    "Native geometry",
+  );
+  const button = assertExactKeys(
+    geometry["button"],
+    ["nativeShapeType", "rawAabb"],
+    "Native button",
+  );
+  const obstacle = assertExactKeys(
+    geometry["obstacle"],
+    ["nativeShapeType", "rawAabb"],
+    "Native obstacle",
+  );
+  const support = assertExactKeys(
+    geometry["support"],
+    ["nativeShapeType", "rawAabb", "pose", "nativeTopY", "buttonGravityFactor"],
+    "Native support",
+  );
+  expect(button["nativeShapeType"]).toBe(2);
+  expect(obstacle["nativeShapeType"]).toBe(2);
+  expect(support["nativeShapeType"]).toBe(3);
+  const buttonBounds = assertNativeAabb(
+    button["rawAabb"],
+    "button bounds",
+    false,
+  );
+  const obstacleBounds = assertNativeAabb(
+    obstacle["rawAabb"],
+    "obstacle bounds",
+    false,
+  );
+  const supportBounds = assertNativeAabb(
+    support["rawAabb"],
+    "support bounds",
+    false,
+  );
+  assertVector(support["pose"], "support pose");
+  const supportPose = asRecord(support["pose"], "support pose");
+  const top = finiteNumber(support["nativeTopY"], "support top");
+  expect(top).toBe(
+    finiteNumber(supportPose["y"], "support y") +
+      finiteNumber(supportBounds.maximum["y"], "support maximum y"),
+  );
+  expect(top).toBeGreaterThanOrEqual(COUNTERBALL_CONFIG_V1.geometry.surfaceY);
+  expect(support["buttonGravityFactor"]).toBe(1);
+  const overlap = assertExactKeys(
+    proof["initialOverlap"],
+    [
+      "buttonPosition",
+      "obstaclePosition",
+      "buttonOriginRadius",
+      "obstacleOriginRadius",
+      "startsBefore",
+      "actualCallsBeforeCheck",
+    ],
+    "Initial overlap",
+  );
+  assertVector(overlap["buttonPosition"], "initial button");
+  assertVector(overlap["obstaclePosition"], "initial obstacle");
+  const radius = (bounds: typeof buttonBounds): number =>
+    Math.max(
+      ...[bounds.minimum["x"], bounds.maximum["x"]].flatMap((x) =>
+        [bounds.minimum["y"], bounds.maximum["y"]].flatMap((y) =>
+          [bounds.minimum["z"], bounds.maximum["z"]].map((z) =>
+            Math.hypot(
+              finiteNumber(x, "x"),
+              finiteNumber(y, "y"),
+              finiteNumber(z, "z"),
+            ),
+          ),
+        ),
+      ),
+    );
+  expect(overlap["buttonPosition"]).toEqual(overlap["obstaclePosition"]);
+  const br = radius(buttonBounds),
+    or = radius(obstacleBounds);
+  expect(overlap["buttonOriginRadius"]).toBe(br);
+  expect(overlap["obstacleOriginRadius"]).toBe(or);
+  expect(
+    finiteNumber(
+      asRecord(overlap["buttonPosition"], "button")["z"],
+      "button z",
+    ) + br,
+  ).toBeGreaterThanOrEqual(
+    finiteNumber(
+      asRecord(overlap["obstaclePosition"], "obstacle")["z"],
+      "obstacle z",
+    ) - or,
+  );
+  expect(overlap["startsBefore"]).toBe(false);
+  expect(overlap["actualCallsBeforeCheck"]).toBe(0);
+  expect(proof["executeStepCalls"]).toBe(64);
+  expect(proof["cleanup"]).toEqual({
+    observerCountRemoved: 22,
+    sceneDisposed: true,
+    callerEngineDisposed: false,
+  });
+  const contacts = proof["contacts"];
+  const phases = proof["phases"];
+  if (
+    !Array.isArray(contacts) ||
+    contacts.length > 4096 ||
+    !Array.isArray(phases) ||
+    phases.length !== 5
+  )
+    throw new Error("Invalid native phase or contact count.");
+  const expectedPhases = [
+    ["separated-before", 1],
+    ["first-contact", 1],
+    ["sustained-contact", 60],
+    ["separated-after", 1],
+    ["recontact", 1],
+  ] as const;
+  let nextCall = 1,
+    nextContact = 0;
+  for (const [phaseIndex, [name, count]] of expectedPhases.entries()) {
+    const phase = assertExactKeys(
+      phases[phaseIndex],
+      ["name", "samples"],
+      `phase ${name}`,
+    );
+    expect(phase["name"]).toBe(name);
+    const samples = phase["samples"];
+    if (!Array.isArray(samples) || samples.length !== count)
+      throw new Error(`Invalid phase ${name} samples.`);
+    for (const [sampleIndex, value] of samples.entries()) {
+      const sample = assertExactKeys(
+        value,
+        [
+          "callIndex",
+          "buttonBefore",
+          "buttonAfter",
+          "rawContactBeginIndex",
+          "rawContactEndIndex",
+        ],
+        "native sample",
+      );
+      expect(sample["callIndex"]).toBe(nextCall);
+      expect(sample["rawContactBeginIndex"]).toBe(nextContact);
+      const end = boundedInteger(
+        sample["rawContactEndIndex"],
+        nextContact,
+        contacts.length,
+        "contact end",
+      );
+      const rows = contacts.slice(nextContact, end);
+      for (const rowValue of rows) {
+        const row = assertExactKeys(
+          rowValue,
+          ["callIndex", "observingBodyId", "otherBodyId", "eventType", "point"],
+          "native contact",
+        );
+        expect(row["callIndex"]).toBe(nextCall);
+        expect(row["eventType"]).toBe("COLLISION_STARTED");
+        expect([
+          ["button", "support-apron"],
+          ["support-apron", "button"],
+        ]).toContainEqual([row["observingBodyId"], row["otherBodyId"]]);
+        if (row["point"] !== null) assertVector(row["point"], "contact point");
+      }
+      const before = assertExactKeys(
+        sample["buttonBefore"],
+        MATRIX_BODY_STATE_KEYS,
+        "button before",
+      );
+      const after = assertExactKeys(
+        sample["buttonAfter"],
+        MATRIX_BODY_STATE_KEYS,
+        "button after",
+      );
+      for (const state of [before, after]) {
+        expect(state["id"]).toBe("button");
+        for (const key of ["position", "linearVelocity", "angularVelocity"])
+          assertVector(state[key], key);
+        const rotation = assertExactKeys(
+          state["rotation"],
+          ["x", "y", "z", "w"],
+          "rotation",
+        );
+        for (const key of ["x", "y", "z", "w"])
+          finiteNumber(rotation[key], key);
+      }
+      const beforePos = asRecord(before["position"], "before position"),
+        afterPos = asRecord(after["position"], "after position");
+      const beforeY = finiteNumber(beforePos["y"], "before y"),
+        afterY = finiteNumber(afterPos["y"], "after y");
+      if (name === "separated-before") expect(afterY).toBeLessThan(beforeY);
+      if (name === "first-contact" || name === "recontact") {
+        expect(beforeY).toBe(
+          top + COUNTERBALL_CONFIG_V1.geometry.buttonThickness / 2 - 0.002,
+        );
+      }
+      if (name.startsWith("separated-")) {
+        expect(beforeY).toBe(
+          COUNTERBALL_CONFIG_V1.geometry.surfaceY +
+            COUNTERBALL_CONFIG_V1.geometry.buttonThickness / 2 +
+            10,
+        );
+      }
+      if (name.startsWith("separated-")) {
+        expect(rows).toHaveLength(0);
+        expect(
+          afterY + finiteNumber(buttonBounds.minimum["y"], "button min y"),
+        ).toBeGreaterThan(top);
+      }
+      if (name === "first-contact" || name === "recontact") {
+        for (const id of ["button", "support-apron"])
+          expect(
+            rows.some((row) => asRecord(row, "row")["observingBodyId"] === id),
+          ).toBe(true);
+      }
+      if (name === "sustained-contact" && sampleIndex >= 50) {
+        expect(rows).toHaveLength(0);
+        expect(
+          Math.abs(
+            afterY +
+              finiteNumber(buttonBounds.minimum["y"], "button min y") -
+              top,
+          ),
+        ).toBeLessThanOrEqual(0.001);
+        expect(Math.abs(afterY - beforeY)).toBeLessThanOrEqual(0.0001);
+        for (const [key, limit] of [
+          [
+            "linearVelocity",
+            COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold,
+          ],
+          [
+            "angularVelocity",
+            COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold,
+          ],
+        ] as const) {
+          const v = asRecord(after[key], key);
+          expect(
+            Math.hypot(
+              finiteNumber(v["x"], key),
+              finiteNumber(v["y"], key),
+              finiteNumber(v["z"], key),
+            ),
+          ).toBeLessThanOrEqual(limit);
+        }
+      }
+      nextContact = end;
+      nextCall += 1;
+    }
+  }
+  expect(nextContact).toBe(contacts.length);
+  return mask;
+}
+
+test("native Havok delivers onset events across the controlled lifecycle", async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(90_000);
+  await openDiagnostic(page);
+  await runNativeLifecycleProof(page, testInfo);
+  await assertUnmountedAtBaseline(page);
+});
+
 test("a real pointer flick runs browser Havok and changes rendered WebGL pixels", async ({
   page,
 }, testInfo) => {
@@ -2923,6 +3281,7 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
     timeout: 5_000,
   });
 
+  const nativeMask = await runNativeLifecycleProof(page, testInfo);
   const status = page.getByTestId("loft-matrix-status");
   let temporaryPath: string | undefined;
   let finalPath: string | undefined;
@@ -3002,7 +3361,7 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
     temporaryPath = testInfo.outputPath("counterball-l01-matrix.json.tmp");
     finalPath = testInfo.outputPath("counterball-l01-matrix.json");
     await browserDownload.saveAs(temporaryPath);
-    const validated = await validateMatrixFile(temporaryPath);
+    const validated = await validateMatrixFile(temporaryPath, nativeMask);
     expect(validated.digest.byteLength).toBeLessThanOrEqual(
       MATRIX_MAXIMUM_BYTES,
     );
@@ -3058,6 +3417,16 @@ test("the full real-Havok loft matrix downloads and passes bounded host validati
     primaryError = error;
   } finally {
     if (!artifactAttached) {
+      if (temporaryPath) {
+        try {
+          await testInfo.attach("counterball-l01-matrix-failed.json", {
+            path: temporaryPath,
+            contentType: "application/json",
+          });
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+      }
       try {
         await cleanupBrowserTransport(page);
       } catch (error) {

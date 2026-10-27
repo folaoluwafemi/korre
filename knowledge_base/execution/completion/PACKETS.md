@@ -2,7 +2,7 @@
 
 Generated from the three JSON catalogues. This is a plan, not a status ledger. Original parent gates are added automatically. Only ACCEPTED dependencies unblock work; supersedes closes a failed card and orders write ownership but is not an acceptance gate. Coordinator-role cards have one exclusive writer even when listed dependencies do not order shared files.
 
-128 bounded cards cover 21 remaining parents. Initially ready: T02-L01-START-SEPARATION-SEAM-1.
+131 bounded cards cover 21 remaining parents. Initially ready: none.
 
 | ID | Parent | Outcome | Writer | Explicit prerequisites | Exact paths |
 |---|---|---|---|---|---|
@@ -24,7 +24,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-GUARD-SCHEMA-1 | T02 | Implement the strict hashed L01 diagnostic guard in the protocol config | coordinator | parent:T01, C00, C00-B, C01, T02-B0, T02-C0, T02-C2, T02-D01, T02-GC01, T02-GC02, T02-BR02-OBSERVED-MASS-PROJECTION-1, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-PACKET-1 | 5 |
 | T02-L01-PACKET-SPLIT-1 | T02 | Split L01 into disjoint core, browser, transport, and matrix packets | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1 | 5 |
 | T02-L01-CONTACT-CONTRACT-1 | T02 | Freeze the additive L01 contact participant contract | coordinator | T02-L01-ARTIFACT-1 | 5 |
-| T02-L01 | T02 | Integrate and accept the bounded restart-loft diagnostic | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-EXECUTOR-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-DATUM-MATRIX-1 | 3 |
+| T02-L01 | T02 | Integrate and accept the bounded restart-loft diagnostic | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-ARTIFACT-1, T02-L01-EXECUTOR-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-L01-TRANSPORT-1, T02-L01-CONTACT-ONSET-INTEGRATION-1 | 3 |
 | T02-L01-CONTACT-STATUS-1 | T02 | Reconcile contact contract and runner execution state | coordinator | T02-L01-CONTACT-CONTRACT-1 | 3 |
 | T02-L01-BROWSER-1-TSC-DIAG-1 | T02 | Capture remote TypeScript asset declaration resolution evidence | coordinator | None | 1 |
 | T02-L01-BROWSER-1-WEB-TSC-DIAG-1 | T02 | Trace the consuming web TypeScript project for Counterball asset declarations | coordinator | T02-L01-BROWSER-1-TSC-DIAG-1 | 1 |
@@ -40,6 +40,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-CANONICAL-GUARD-IDENTITY-1 | T02 | Require exact current canonical diagnostic guard version in the writer | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1 | 2 |
 | T02-L01-CONTACT-ONSET-CONTRACT-1 | T02 | Freeze versioned native onset evidence without relaxing motion or artifact guards | coordinator | T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-CANONICAL-GUARD-IDENTITY-1 | 2 |
 | T02-L01-CONTACT-ONSET-CONFIG-1 | T02 | Publish strict versioned onset policy config and fixture hashes | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-CONTACT-ONSET-CONTRACT-1 | 5 |
+| T02-L01-CONTACT-ONSET-INTEGRATION-1 | T02 | Prove native onset lifecycle and complete fixed24 artifact in one hostedwave | coordinator | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-CANONICAL-GUARD-IDENTITY-1, T02-L01-CONTACT-ONSET-CONFIG-1, T02-L01-CONTACT-ONSET-ADAPTER-1, T02-L01-START-SEPARATION-SEAM-1 | 1 |
 | T02-D01 | T02 | Measure direct-shot impulse response on the canonical fixture | worker | C00-B, C01, T02-B0, T02-A, C00 | 1 |
 | T02-F01 | T02 | Implement pure simulation facts from physics-step observations | worker | T02-C0, T02-C2, C00-A, C00 | 2 |
 | T02-F01-ROTATION-1 | T02 | Replace endpoint-axis travel with a conservative rotational support bound | worker | T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 2 |
@@ -73,7 +74,7 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T21-O01 | T21 | Bind online camera presentation to authoritative shared playback | worker | T21-P02, parent:T15, C01-H, O19 | 4 |
 | T21-P01 | T21 | Add persisted audio and accessibility preferences | worker | parent:T09, parent:T10, parent:T15, C01-H | 5 |
 | T21-P02 | T21 | Polish local scene materials and skippable camera presentation | worker | T21-P01, parent:T09, parent:T10, parent:T03, parent:T15, C01-H | 5 |
-| T02-E01 | T02 | Export the real WASM browser runner factory | worker | T02-R01, C00, C03, C01-H, T02-P01, T02-BR01 | 1 |
+| T02-E01 | T02 | Export the real WASM browser runner factory | worker | T02-R01, C00, C03, C01-H, T02-P01, T02-BR01, T02-L01-CONTACT-ONSET-NATIVE-1 | 1 |
 | T02-F01-ROTATION-1-FORMAT-ESCALATION-1 | T02 | Classify the hosted formatting failure before any source retry | coordinator | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00 | 0 |
 | T02-F01-ROTATION-1-FORMAT-REPAIR-1 | T02 | Apply only the independently approved F01 formatting artifact | worker | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00, T02-F01-ROTATION-1-FORMAT-ESCALATION-1, T02-F01-ROTATION-1 | 2 |
 | T02-F01-ROTATION-1-CI-FAIL-ESCALATION-1 | T02 | Classify seven exact-head fact failures before another source edit | coordinator | parent:T01, T02-F01-math-escalation-1, T02-C0, T02-C2, C00-A, C00, T02-F01-ROTATION-1-FORMAT-ESCALATION-1 | 0 |
@@ -104,6 +105,8 @@ Generated from the three JSON catalogues. This is a plan, not a status ledger. O
 | T02-L01-SUPPORT-DATUM-MATRIX-1 | T02 | Run full versioned native support-datum matrix with independently verifiable metadata | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-CANONICAL-GUARD-IDENTITY-1 | 5 |
 | T02-L01-CONTACT-ONSET-ADAPTER-1 | T02 | Implement public native onset mask adapter with exact all22 readbacks | worker | T02-L01-CONTACT-ONSET-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-ARTIFACT-1 | 2 |
 | T02-L01-START-SEPARATION-SEAM-1 | T02 | Extract shared native origin-radius and strict initial-separation math | worker | T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-SUPPORT-DATUM-CONTRACT-1 | 2 |
+| T02-L01-CONTACT-ONSET-NATIVE-1 | T02 | Implement controlled realbrowser onset lifecycle diagnostic | worker | T02-L01-CONTACT-ONSET-CONFIG-1, T02-L01-CONTACT-ONSET-ADAPTER-1, T02-L01-START-SEPARATION-SEAM-1, T02-L01-BROWSER-1-SUCCESSOR-3, T02-BR02 | 3 |
+| T02-L01-CONTACT-ONSET-CONSUMER-1 | T02 | Integrate versioned onset masks and shared separation math into fixed24 runner | worker | C00-B, C01, T02-B0, T02-C0, T02-C2, C00, T02-L01-GUARD-CONTRACT-1, T02-L01-GUARD-SCHEMA-1, T02-L01-PACKET-SPLIT-1, T02-L01-TRANSPORT-1, T02-L01-SUPPORT-PREFLIGHT-1, T02-L01-SUPPORT-F32-1, T02-L01-GEOMETRY-READBACK-1, T02-L01-GOALFRAME-READBACK-1, T02-L01-GOALFRAME-F32-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONTRACT-1, T02-L01-SUPPORT-DATUM-CONFIG-1, T02-L01-NATIVE-RADIUS-HELPER-1, T02-L01-CANONICAL-GUARD-IDENTITY-1, T02-L01-CONTACT-ONSET-CONFIG-1, T02-L01-CONTACT-ONSET-ADAPTER-1, T02-L01-START-SEPARATION-SEAM-1 | 3 |
 | O01 | T04 | Freeze missing online service and queue boundaries after C00 | coordinator | C00, C01, parent:T01 | 4 |
 | O02 | T04 | Build restricted real-WASM smoke Durable Object | coordinator | C00, O01, parent:T02, C01 | 5 |
 | O03 | T04 | Prove deployed staging WASM before online authority | coordinator | O02, C01 | 4 |

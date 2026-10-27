@@ -7,6 +7,8 @@ import {
   createCounterballScene,
   runBrowserDirectProbe,
   runLoftCoarseMatrix,
+  runNativeContactOnsetProbe,
+  type NativeContactOnsetProof,
   updateCounterballPresentation,
   type BodyState,
   type BrowserDirectProbeResult,
@@ -527,6 +529,14 @@ export default function CounterballDirectProbe({
   const [sceneFacts, setSceneFacts] = useState<SceneFacts | null>(null);
   const [trace, setTrace] = useState<ProbeTrace | null>(null);
   const [attempt, setAttempt] = useState(0);
+  const [nativePhase, setNativePhase] = useState<
+    "idle" | "running" | "complete" | "failed"
+  >("idle");
+  const [nativeResult, setNativeResult] =
+    useState<NativeContactOnsetProof | null>(null);
+  const [nativeError, setNativeError] = useState<string | null>(null);
+  const runNativeActionRef = useRef<(() => void) | null>(null);
+  const cancelNativeActionRef = useRef<(() => void) | null>(null);
   const [matrixPhase, setMatrixPhase] = useState<MatrixPhase>("idle");
   const [matrixProgress, setMatrixProgress] =
     useState<LoftCoarseProgress | null>(null);
@@ -557,6 +567,8 @@ export default function CounterballDirectProbe({
     let activeListeners = 0;
     let matrixController: AbortController | undefined;
     let matrixRunPromise: Promise<void> | undefined;
+    let nativeController: AbortController | undefined;
+    let nativeRunPromise: Promise<void> | undefined;
     let activeMatrixSession: OpfsExportSession | undefined;
     let pendingMatrixDownload: OpfsExportSession | undefined;
     const listenerDisposers: Array<() => void> = [];
@@ -658,6 +670,9 @@ export default function CounterballDirectProbe({
       if (disposed) return;
       disposed = true;
       abortController.abort();
+      nativeController?.abort(
+        new DOMException("The diagnostic page was unmounted.", "AbortError"),
+      );
       matrixController?.abort(
         new DOMException("The diagnostic page was unmounted.", "AbortError"),
       );
@@ -682,15 +697,17 @@ export default function CounterballDirectProbe({
       ) {
         delete browserWindow.__counterballLoftMatrixHostAck;
       }
+      runNativeActionRef.current = null;
+      cancelNativeActionRef.current = null;
       runMatrixActionRef.current = null;
       cancelMatrixActionRef.current = null;
       downloadMatrixActionRef.current = null;
       discardMatrixActionRef.current = null;
-      if (matrixRunPromise) {
-        void matrixRunPromise.then(
-          disposeRenderingResources,
-          disposeRenderingResources,
-        );
+      const pending = [matrixRunPromise, nativeRunPromise].filter(
+        (item): item is Promise<void> => item !== undefined,
+      );
+      if (pending.length > 0) {
+        void Promise.allSettled(pending).then(disposeRenderingResources);
       } else {
         disposeRenderingResources();
       }
@@ -714,6 +731,7 @@ export default function CounterballDirectProbe({
         disposed ||
         !engine ||
         matrixController ||
+        nativeController ||
         pendingMatrixDownload ||
         (currentPhase !== "ready" && currentPhase !== "complete")
       ) {
@@ -830,6 +848,51 @@ export default function CounterballDirectProbe({
       void operation.then(settle, settle);
     };
 
+    runNativeActionRef.current = () => {
+      if (
+        disposed ||
+        !engine ||
+        nativeController ||
+        matrixController ||
+        pendingMatrixDownload ||
+        (currentPhase !== "ready" && currentPhase !== "complete")
+      )
+        return;
+      const controller = new AbortController();
+      nativeController = controller;
+      const activeEngine = engine;
+      setNativeError(null);
+      setNativeResult(null);
+      setNativePhase("running");
+      const operation = (async (): Promise<void> => {
+        try {
+          const result = await runNativeContactOnsetProbe({
+            engine: activeEngine,
+            signal: controller.signal,
+          });
+          if (!disposed && !controller.signal.aborted) {
+            setNativeResult(result);
+            setNativePhase("complete");
+          }
+        } catch (error) {
+          if (!disposed) {
+            setNativeError(describeError(error));
+            setNativePhase("failed");
+          }
+        } finally {
+          if (nativeController === controller) nativeController = undefined;
+        }
+      })();
+      nativeRunPromise = operation;
+      void operation.then(() => {
+        if (nativeRunPromise === operation) nativeRunPromise = undefined;
+      });
+    };
+    cancelNativeActionRef.current = () =>
+      nativeController?.abort(
+        new DOMException("Native diagnostic cancelled.", "AbortError"),
+      );
+
     runMatrixActionRef.current = startMatrix;
     cancelMatrixActionRef.current = () => {
       matrixController?.abort(
@@ -893,6 +956,7 @@ export default function CounterballDirectProbe({
         disposed ||
         probeStarted ||
         matrixController !== undefined ||
+        nativeController !== undefined ||
         currentPhase !== "ready" ||
         !engine ||
         !scene ||
@@ -1008,6 +1072,7 @@ export default function CounterballDirectProbe({
         disposed ||
         currentPhase !== "ready" ||
         matrixController !== undefined ||
+        nativeController !== undefined ||
         (event.pointerType === "mouse" && event.button !== 0) ||
         pendingPointer
       ) {
@@ -1069,6 +1134,9 @@ export default function CounterballDirectProbe({
       setMatrixProgress(null);
       setMatrixExport(null);
       setMatrixError(null);
+      setNativePhase("idle");
+      setNativeResult(null);
+      setNativeError(null);
       setStatus("Preparing the real browser scene.");
       setCurrentPhase("starting");
 
@@ -1210,6 +1278,54 @@ export default function CounterballDirectProbe({
             real-Havok matrix. It is not a match or a gameplay control. The
             transport action writes a deterministic full-size test file.
           </p>
+          <h3>Controlled native contact diagnostic</h3>
+          <p>
+            Tests contact notifications in a controlled Havok world. This is not
+            gameplay or calibration.
+          </p>
+          <button
+            type="button"
+            data-testid="native-contact-run"
+            disabled={
+              (phase !== "ready" && phase !== "complete") ||
+              nativePhase === "running" ||
+              matrixPhase === "running" ||
+              matrixPhase === "ready"
+            }
+            onClick={() => runNativeActionRef.current?.()}
+          >
+            Run native contact diagnostic
+          </button>
+          {nativePhase === "running" ? (
+            <button
+              type="button"
+              onClick={() => cancelNativeActionRef.current?.()}
+            >
+              Cancel native diagnostic
+            </button>
+          ) : null}
+          <p role="status" data-testid="native-contact-status">
+            {nativePhase === "running"
+              ? "Native contact diagnostic running."
+              : nativePhase === "complete"
+                ? "Native contact diagnostic complete."
+                : nativePhase === "failed"
+                  ? "Native contact diagnostic failed."
+                  : "Ready for native contact diagnostic."}
+          </p>
+          {nativeError === null ? null : (
+            <p role="alert" data-testid="native-contact-error">
+              {nativeError}
+            </p>
+          )}
+          {nativeResult === null ? null : (
+            <output
+              data-testid="native-contact-result"
+              style={{ display: "block", overflowWrap: "anywhere" }}
+            >
+              {JSON.stringify(nativeResult)}
+            </output>
+          )}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button
               type="button"
@@ -1217,6 +1333,7 @@ export default function CounterballDirectProbe({
               disabled={
                 (phase !== "ready" && phase !== "complete") ||
                 matrixPhase === "running" ||
+                nativePhase === "running" ||
                 matrixPhase === "ready"
               }
               onClick={() => runMatrixActionRef.current?.("matrix")}
@@ -1229,6 +1346,7 @@ export default function CounterballDirectProbe({
               disabled={
                 (phase !== "ready" && phase !== "complete") ||
                 matrixPhase === "running" ||
+                nativePhase === "running" ||
                 matrixPhase === "ready"
               }
               onClick={() => runMatrixActionRef.current?.("synthetic")}

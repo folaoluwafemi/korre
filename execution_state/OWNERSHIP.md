@@ -811,3 +811,12 @@ Root released fivecanonicalcontact-onsetproducer sources to independentread-only
 Executor released nativeCollisionSubscription.ts/.test.ts and report. Runreviewer owns uniqueadapter-source-review plusscopeclarification ofitsownproposalreview. Allsourcefrozen; rootcommitafterbothreviewsPASS.
 
 Executor exclusively owns newloftStartSeparation.ts/.test.ts +uniqueimplementationreport forreadyaccepted-dependency puremathseam. Rootadapterlintrepair2files releasedSOURCEPASS toreviewer; configsourcefrozen. No overlaps.
+
+## Contact onset integrated wave — 2026-10-27
+
+- `/root/native` owns only `games/counterball/src/simulation/nativeContactOnsetProbe.ts`, `games/counterball/src/browser.ts`, `apps/web/src/CounterballDirectProbe.tsx`, and `execution_state/reports/T02-L01-CONTACT-ONSET-NATIVE-1-implementation.md`.
+- `/root/consumer` owns only `games/counterball/src/simulation/loftCoarseRunner.ts`, `games/counterball/src/simulation/loftCoarseProbe.ts`, `games/counterball/src/simulation/loftCoarseProbe.test.ts`, and `execution_state/reports/T02-L01-CONTACT-ONSET-CONSUMER-1-implementation.md`.
+- `/root` owns `tests/e2e/counterball-direct-probe.spec.ts`, shared state, integration and GitHub. Independent reviews follow source completion. No local application tests or builds.
+- Packet readiness review passed; completion gates are not authoring dependencies. No runtime acceptance is implied.
+
+Native, consumer and coordinator test source ownership released. Independent source reviews passed. Coordinator owns exact commit and hosted checks; runtime and artifact review remain pending. The coordinator applied announced Prettier formatting to the released native files and host spec.

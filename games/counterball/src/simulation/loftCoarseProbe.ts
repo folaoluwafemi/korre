@@ -2,6 +2,7 @@ import {
   COUNTERBALL_CONFIG_V1,
   hashCounterballConfig,
 } from "@korre/game-protocol";
+import type { LoftContactSubscription } from "./nativeCollisionSubscription.js";
 import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
 
 export type LoftCoarseTuple = readonly [
@@ -183,6 +184,7 @@ type LoftCoarseCaseMetadata = LoftCoarseMatrixIdentity & {
   supportPlane: LoftCoarseSupportPlane;
   materials: readonly LoftCoarseMaterialFact[];
   staticBodies: readonly LoftCoarseStaticBodyFacts[];
+  contactSubscription: LoftContactSubscription;
   preImpulseMeasuredShiftedEnergy: number;
   preImpulsePredictedShiftedEnergy: number;
   finalBodies: readonly LoftCoarseBodyState[];
@@ -349,6 +351,7 @@ const caseMetadataKeys = [
   "supportPlane",
   "materials",
   "staticBodies",
+  "contactSubscription",
   "preImpulseMeasuredShiftedEnergy",
   "preImpulsePredictedShiftedEnergy",
   "finalBodies",
@@ -918,6 +921,40 @@ function validateCaseMetadata(
     `Case ${expectedIndex} supportPlane`,
   );
 
+  const subscriptionLabel = `Case ${expectedIndex} contactSubscription`;
+  assertExactKeys(
+    metadata.contactSubscription,
+    ["eventType", "nativeMask", "bodies"],
+    subscriptionLabel,
+  );
+  const subscription = metadata.contactSubscription;
+  if (subscription.eventType !== guard.contactPolicy.eventType) {
+    invalid(`${subscriptionLabel}.eventType must be COLLISION_STARTED.`);
+  }
+  assertBoundedInteger(
+    subscription.nativeMask,
+    1,
+    0xffff_ffff,
+    `${subscriptionLabel}.nativeMask`,
+  );
+  if ((subscription.nativeMask & (subscription.nativeMask - 1)) !== 0) {
+    invalid(`${subscriptionLabel}.nativeMask must contain one bit.`);
+  }
+  assertArray(subscription.bodies, `${subscriptionLabel}.bodies`);
+  if (subscription.bodies.length !== canonicalContactBodyIds.length) {
+    invalid(`${subscriptionLabel}.bodies must contain exactly 22 bodies.`);
+  }
+  subscription.bodies.forEach((body, index) => {
+    const label = `${subscriptionLabel}.bodies[${index}]`;
+    assertExactKeys(body, ["bodyId", "requestedMask", "observedMask"], label);
+    if (
+      body.bodyId !== canonicalContactBodyIds[index] ||
+      body.requestedMask !== subscription.nativeMask ||
+      body.observedMask !== subscription.nativeMask
+    ) {
+      invalid(`${label} has an invalid body or mask.`);
+    }
+  });
   assertArray(metadata.dynamicBodies, `Case ${expectedIndex} dynamicBodies`);
   if (metadata.dynamicBodies.length !== canonicalEntityIds.length) {
     invalid(`Case ${expectedIndex} must record all 15 dynamic bodies.`);
@@ -1417,6 +1454,9 @@ function validateContactRow(
     invalid(
       `${label}.eventType exceeds ${artifactCaps.maximumEventTypeBytes} UTF-8 bytes.`,
     );
+  }
+  if (row.eventType !== guard.contactPolicy.eventType) {
+    invalid(`${label}.eventType must be COLLISION_STARTED.`);
   }
   if (row.point !== null) assertVector(row.point, `${label}.point`);
 }

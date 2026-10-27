@@ -35,3 +35,8 @@ export type {
 export type { LoftCoarseByteSink } from "./simulation/loftCoarseProbe.js";
 
 export const scaffoldPackage = "@korre/counterball/browser";
+
+export {
+  runNativeContactOnsetProbe,
+  type NativeContactOnsetProof,
+} from "./simulation/nativeContactOnsetProbe.js";

@@ -786,3 +786,7 @@ Independent exact-source review PASS is recorded at `execution_state/reports/T02
 2026-10-14: Contact-onset canonicalproducer andpureadapter independentlySOURCEPASS. Nativeeventproof/matrix stillunverified. Hostedsourcewave next; consumeroldrawpin intentionallyfailclosed.
 
 2026-10-14: Canonicalhash15/protocol/typechecks PASS inrun38647338857; Verify failedadapterarray-typewidening beforeunits/build/browser. Narrowbooleanhelperfix+nonarraynegative andexactformatterpatch independentlySOURCEPASS. Pureinitial-separation seam independentlySOURCEPASS; all3narrowcomponents joinnextfullhostedwave. Rootannounced only4filelocalformattransform(0.586sec), no appbuild/test/install. Nativeproof/matrixunaccepted.
+
+2026-10-14: Onset config, public mask adapter and pure initial-separation seam ACCEPTED in narrow scopes after independently reviewed exact run38648859339: Verify211/211, protocol15, integration1, preview4. Matrix fails old fixture check before motion; no native delivery/matrix/T02 acceptance. Next reviewed native-control/consumer/E2E wave.
+
+2026-10-27: Contact onset native, consumer and host sources implemented; independent source reviews passed. Runtime checks and full 24-case matrix remain pending. No T02 or playable-match acceptance.

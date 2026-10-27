@@ -58,12 +58,17 @@ import {
 } from "./worldFactory.js";
 import { nativeCylinderComRadius } from "./nativeCylinderRadius.js";
 import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
+import { configureNativeCollisionOnsets } from "./nativeCollisionSubscription.js";
+import {
+  isLoftStartSeparated,
+  nativeAabbOriginRadius,
+} from "./loftStartSeparation.js";
 
 const config = COUNTERBALL_CONFIG_V1;
 const guard = config.restartLoftDiagnosticGuard;
 const encoder = new TextEncoder();
 const expectedFixtureFileSha256 =
-  "beaa25d969b7e0c5e863538af13d54ba9b2f8b9547c4827ef220ea863aa1b092";
+  "b0d2987128b2bb486ae27a62255b16e899ebdd6419b9e8d9140351defb31e9a0";
 const staticNames = new Map<string, LoftCoarseStaticBodyId>([
   ["counterball-goal-post--1--1", "goal-frame-0"],
   ["counterball-goal-post--1-1", "goal-frame-1"],
@@ -469,17 +474,9 @@ function radiiFromBounds(
   const farthestPointRadius = resourceGuard(() =>
     nativeCylinderComRadius(bounds, centerOfMassLocal),
   );
-  let farthestOriginRadius = 0;
-  for (const x of [bounds.minimum.x, bounds.maximum.x]) {
-    for (const y of [bounds.minimum.y, bounds.maximum.y]) {
-      for (const z of [bounds.minimum.z, bounds.maximum.z]) {
-        farthestOriginRadius = Math.max(
-          farthestOriginRadius,
-          Math.hypot(x, y, z),
-        );
-      }
-    }
-  }
+  const farthestOriginRadius = resourceGuard(() =>
+    nativeAabbOriginRadius(bounds),
+  );
   if (
     !Number.isFinite(farthestPointRadius) ||
     farthestPointRadius <= 0 ||
@@ -1794,6 +1791,11 @@ async function runCase(
         }
         const pair = canonicalizeLoftCoarseContactPair(first, second);
         const eventType = String(event.type);
+        if (eventType !== "COLLISION_STARTED") {
+          throw resourceFailure(
+            "A native callback has an unexpected event type.",
+          );
+        }
         if (
           encoder.encode(eventType).byteLength >
           guard.artifact.maximumEventTypeBytes
@@ -1824,15 +1826,32 @@ async function runCase(
         callbackFailure ??= error;
       }
     };
-    for (const body of [
-      ...bodyFacts.metrics.map((metric) => metric.body),
-      ...bodyFacts.statics.map((item) => item.body),
-    ]) {
-      body.setCollisionCallbackEnabled(true);
+    const orderedBodies = [
+      ...ENTITY_IDS.map((bodyId) => {
+        const entry = bodyFacts.metrics.find((metric) => metric.id === bodyId);
+        if (entry === undefined)
+          throw resourceFailure("A canonical dynamic contact body is missing.");
+        return { bodyId, body: entry.body };
+      }),
+      ...staticIds.map((bodyId) => {
+        const entry = bodyFacts.statics.find((item) => item.id === bodyId);
+        if (entry === undefined)
+          throw resourceFailure("A canonical static contact body is missing.");
+        return { bodyId, body: entry.body };
+      }),
+    ];
+    for (const { body } of orderedBodies) {
       const observable = body.getCollisionObservable();
       const observer = observable.add(onContact);
       removeObservers.push(() => observable.remove(observer));
     }
+    const eventTypes = havok.EventType as unknown as Record<string, unknown>;
+    const contactSubscription = resourceGuard(() =>
+      configureNativeCollisionOnsets(
+        eventTypes["COLLISION_STARTED"],
+        orderedBodies,
+      ),
+    );
 
     const bodyRows: LoftCoarseCase["bodyRows"][number][] = [];
     const sweepRows: LoftCoarseCase["sweepRows"][number][] = [];
@@ -2375,8 +2394,14 @@ async function runCase(
     const startsBefore =
       buttonStart !== undefined &&
       obstacleStart !== undefined &&
-      buttonStart.state.position.z + buttonMetric.farthestOriginRadius <
-        obstacleStart.state.position.z - obstacleMetric.farthestOriginRadius;
+      resourceGuard(() =>
+        isLoftStartSeparated(
+          buttonStart.state.position.z,
+          buttonMetric.farthestOriginRadius,
+          obstacleStart.state.position.z,
+          obstacleMetric.farthestOriginRadius,
+        ),
+      );
     const finishesBeyond =
       buttonFinal.state.position.z - buttonMetric.farthestOriginRadius >
       obstacleFinal.state.position.z + obstacleMetric.farthestOriginRadius;
@@ -2436,6 +2461,7 @@ async function runCase(
         supportPlane: bodyFacts.supportPlane,
         materials: bodyFacts.materials,
         staticBodies: bodyFacts.staticFacts,
+        contactSubscription,
         preImpulseMeasuredShiftedEnergy: preEnergy,
         preImpulsePredictedShiftedEnergy: predictedEnergy,
         finalBodies,

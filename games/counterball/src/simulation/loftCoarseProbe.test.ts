@@ -249,6 +249,15 @@ function caseMetadata(
     },
     materials,
     staticBodies,
+    contactSubscription: {
+      eventType: "COLLISION_STARTED",
+      nativeMask: 1,
+      bodies: [...entityIds, ...staticIds].map((bodyId) => ({
+        bodyId,
+        requestedMask: 1,
+        observedMask: 1,
+      })),
+    },
     preImpulseMeasuredShiftedEnergy: 1,
     preImpulsePredictedShiftedEnergy: 1,
     finalBodies: entityIds.map(bodyState),
@@ -320,7 +329,7 @@ function contactRow(
     "button",
     "home-0",
   ],
-  eventType = "started",
+  eventType = "COLLISION_STARTED",
 ) {
   return {
     tuple,
@@ -1198,25 +1207,68 @@ describe("writeLoftCoarseMatrix", () => {
     }
   });
 
-  it("preserves duplicate contact callbacks and enforces the 64-byte event bound", async () => {
+  it("rejects malformed onset subscriptions before case output", async () => {
     const identity = matrixMetadata();
-    const boundary = await run({
-      metadata: identity,
-      change: (index, current) =>
-        index === 0
-          ? {
-              ...current,
-              contactRows: [
-                {
-                  ...contactRow(current.metadata.tuple),
-                  eventType: "x".repeat(64),
-                },
-              ],
-            }
-          : current,
-    });
-    expect(boundary.result.contactRows).toBe(1);
+    const base = caseMetadata(0, identity).contactSubscription;
+    const invalidSubscriptions: unknown[] = [
+      undefined,
+      { ...base, eventType: "COLLISION_CONTINUED" },
+      { ...base, nativeMask: 0 },
+      { ...base, nativeMask: Number.NaN },
+      { ...base, nativeMask: 3 },
+      { ...base, nativeMask: 0x1_0000_0000 },
+      { ...base, bodies: base.bodies.slice(1) },
+      { ...base, bodies: [...base.bodies].reverse() },
+      {
+        ...base,
+        bodies: base.bodies.map((body, i) =>
+          i === 0 ? { ...body, bodyId: "unknown" } : body,
+        ),
+      },
+      {
+        ...base,
+        bodies: base.bodies.map((body, i) =>
+          i === 0 ? { ...body, observedMask: 2 } : body,
+        ),
+      },
+      {
+        ...base,
+        bodies: base.bodies.map((body, i) =>
+          i === 0 ? { ...body, requestedMask: 2 } : body,
+        ),
+      },
+      {
+        ...base,
+        bodies: base.bodies.map((body, i) =>
+          i === 0 ? { ...body, extra: true } : body,
+        ),
+      },
+    ];
+    for (const contactSubscription of invalidSubscriptions) {
+      const collected = collectingSink();
+      await expect(
+        run({
+          metadata: identity,
+          sink: collected.sink,
+          change: (index, current) =>
+            index === 0
+              ? {
+                  ...current,
+                  metadata: {
+                    ...current.metadata,
+                    contactSubscription,
+                  } as never,
+                }
+              : current,
+        }),
+      ).rejects.toMatchObject({ code: "invalid" });
+      expect(collected.text()).not.toContain('"cases":[{');
+      expect(collected.aborted).toHaveLength(1);
+    }
+  });
 
+  it("preserves duplicate callbacks and rejects invalid event names", async () => {
+    const identity = matrixMetadata();
     const accepted = await run({
       metadata: identity,
       change: (index, current) =>
@@ -1232,23 +1284,26 @@ describe("writeLoftCoarseMatrix", () => {
     });
     expect(accepted.result.contactRows).toBe(2);
 
-    await expect(
-      run({
-        metadata: identity,
-        change: (index, current) =>
-          index === 0
-            ? {
-                ...current,
-                contactRows: [
-                  {
-                    ...contactRow(current.metadata.tuple),
-                    eventType: "x".repeat(65),
-                  },
-                ],
-              }
-            : current,
-      }),
-    ).rejects.toMatchObject({ code: "invalid" });
+    for (const eventType of [
+      "COLLISION_CONTINUED",
+      "x".repeat(64),
+      "x".repeat(65),
+    ]) {
+      await expect(
+        run({
+          metadata: identity,
+          change: (index, current) =>
+            index === 0
+              ? {
+                  ...current,
+                  contactRows: [
+                    { ...contactRow(current.metadata.tuple), eventType },
+                  ],
+                }
+              : current,
+        }),
+      ).rejects.toMatchObject({ code: "invalid" });
+    }
   });
 
   it("canonicalizes dynamic and static contact participants in total order", () => {
@@ -1276,32 +1331,35 @@ describe("writeLoftCoarseMatrix", () => {
   it("serializes all static IDs and retains symmetric callbacks in occurrence order", async () => {
     const identity = matrixMetadata();
     const tuple = requiredItem(LOFT_COARSE_TUPLES, 0, "tuple 0");
-    const staticRows = staticIds.map((staticId, index) =>
+    const staticRows = staticIds.map((staticId) =>
       contactRow(
         tuple,
         0,
         canonicalizeLoftCoarseContactPair("home-6", staticId),
-        `static-${index}`,
+        "COLLISION_STARTED",
       ),
     );
     const callbacks = [
-      contactRow(
-        tuple,
-        0,
-        canonicalizeLoftCoarseContactPair("support-apron", "button"),
-        "first-orientation",
-      ),
-      contactRow(
-        tuple,
-        0,
-        canonicalizeLoftCoarseContactPair("button", "support-apron"),
-        "second-orientation",
-      ),
+      {
+        ...contactRow(
+          tuple,
+          0,
+          canonicalizeLoftCoarseContactPair("support-apron", "button"),
+        ),
+        point: vec3(1, 0, 0),
+      },
+      {
+        ...contactRow(
+          tuple,
+          0,
+          canonicalizeLoftCoarseContactPair("button", "support-apron"),
+        ),
+        point: vec3(2, 0, 0),
+      },
       contactRow(
         tuple,
         0,
         canonicalizeLoftCoarseContactPair("support-apron", "goal-frame-5"),
-        "static-static",
       ),
     ];
     const result = await run({
@@ -1316,6 +1374,7 @@ describe("writeLoftCoarseMatrix", () => {
         contactRows: Array<{
           pair: readonly string[];
           eventType: string;
+          point: { x: number; y: number; z: number } | null;
         }>;
       }>;
     };
@@ -1329,10 +1388,14 @@ describe("writeLoftCoarseMatrix", () => {
       ["button", "support-apron"],
       ["goal-frame-5", "support-apron"],
     ]);
+    expect(firstCase.contactRows.slice(7, 9).map((row) => row.point)).toEqual([
+      vec3(1, 0, 0),
+      vec3(2, 0, 0),
+    ]);
     expect(firstCase.contactRows.slice(7).map((row) => row.eventType)).toEqual([
-      "first-orientation",
-      "second-orientation",
-      "static-static",
+      "COLLISION_STARTED",
+      "COLLISION_STARTED",
+      "COLLISION_STARTED",
     ]);
     expect(result.result.contactRows).toBe(10);
   });

@@ -1,0 +1,5 @@
+# T02-L01-CONTACT-ONSET-INTEGRATION-1 implementation
+
+Coordinator source work, 2026-10-27. The host validates the new raw fixture hash, strict 22-body onset subscription and Started events. The native lifecycle test saves raw proof, recomputes geometry and phase facts, checks cleanup, and compares its runtime mask with all 24 downloaded matrix cases in the same browser session. The existing streaming, bounds and acknowledgement remain in place. A downloaded matrix failing host validation is attached before cleanup.
+
+Changed: tests/e2e/counterball-direct-probe.spec.ts. Coordinator formatted this file and the three released native source files with the existing Prettier executable, as announced; this was a source formatting operation, not an app build or test. Scoped git diff --check passed. Plan checker passed before dispatch. Application checks, Chromium and 24-case matrix: NOT RUN locally; GitHub execution and independent review remain required. Native failure before returning a proof may only provide its error text; this is subject to independent review. No physics, match or deployment acceptance is claimed.
