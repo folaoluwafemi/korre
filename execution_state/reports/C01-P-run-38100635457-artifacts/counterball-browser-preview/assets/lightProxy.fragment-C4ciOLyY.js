@@ -1,0 +1,1 @@
+export{ri as lightProxyPixelShader}from"./CounterballPreview-F6cLF6hL.js";

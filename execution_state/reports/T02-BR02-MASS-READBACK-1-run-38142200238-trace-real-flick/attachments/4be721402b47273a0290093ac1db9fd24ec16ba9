@@ -1,0 +1,248 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: counterball-direct-probe.spec.ts >> a real pointer flick runs browser Havok and changes rendered WebGL pixels
+- Location: tests/e2e/counterball-direct-probe.spec.ts:167:1
+
+# Error details
+
+```
+Error: expect(locator).toBeVisible() failed
+
+Locator: getByTestId('probe-result')
+Expected: visible
+Timeout: 120000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" getByTestId('probe-result') with timeout 120000ms
+  - waiting for getByTestId('probe-result')
+
+```
+
+```yaml
+- main:
+  - paragraph: COUNTERBALL · DEVELOPMENT DIAGNOSTIC
+  - heading "One real browser flick" [level=1]
+  - button "Back to Counterball"
+  - region "Diagnostic instructions":
+    - strong: Diagnostic only · not playable
+    - paragraph: Drag across the pitch by 24–240 pixels. The gesture only starts the fixed, measured D01 impulse. Direction and distance do not set gameplay aim or power. There is no score, match, public play, or identity bypass here.
+  - status: The diagnostic stopped. Retry to rebuild WebGL and Havok.
+  - alert:
+    - paragraph: "Real browser Havok/WASM diagnostic failed: Body button native mass 0.15000000596046448 differs from canonical configured mass 0.15 (absolute difference 5.960464483090178e-9; tolerance 1.4210854715202004e-14)."
+    - button "Retry WebGL and Havok"
+  - status: "{\"pieceCount\":15,\"homeCaps\":7,\"awayCaps\":7,\"buttonCount\":1,\"visibleButtonHoles\":4,\"buttonBodyVertices\":81024,\"greenConcreteTexture\":\"counterball-green-concrete-grain\",\"enclosingWallCount\":0}"
+```
+
+# Test source
+
+```ts
+  10  |   baselineEngines: number;
+  11  |   engines: number;
+  12  |   activeListeners: number;
+  13  |   activeResizeObservers: number;
+  14  |   phase: string;
+  15  | };
+  16  | 
+  17  | type WindowWithDirectProbe = Window & {
+  18  |   __counterballDirectProbeLifecycle?: () => LifecycleSnapshot;
+  19  | };
+  20  | 
+  21  | type ProbeTrace = {
+  22  |   scope: string;
+  23  |   fixtureId: string;
+  24  |   termination: string;
+  25  |   capId: string;
+  26  |   impulse: { x: number; y: number; z: number };
+  27  |   applicationPoint: { x: number; y: number; z: number };
+  28  |   settledBodyCount: number;
+  29  |   contactPairs: string[][];
+  30  |   capMovement: number;
+  31  |   buttonMovement: number;
+  32  |   changedWebGlPixels: number;
+  33  |   pixelWidth: number;
+  34  |   pixelHeight: number;
+  35  | };
+  36  | 
+  37  | async function lifecycle(page: Page): Promise<LifecycleSnapshot> {
+  38  |   return page.evaluate(() => {
+  39  |     const read = (window as WindowWithDirectProbe)
+  40  |       .__counterballDirectProbeLifecycle;
+  41  |     if (!read) throw new Error("Direct-probe lifecycle evidence is missing.");
+  42  |     return read();
+  43  |   });
+  44  | }
+  45  | 
+  46  | async function openDiagnostic(page: Page): Promise<void> {
+  47  |   await page.goto("/");
+  48  |   await page
+  49  |     .getByRole("link", { name: "Try the browser flick diagnostic" })
+  50  |     .click();
+  51  |   await expect(page.getByTestId("counterball-direct-probe")).toHaveAttribute(
+  52  |     "data-phase",
+  53  |     "ready",
+  54  |     { timeout: 30_000 },
+  55  |   );
+  56  |   await expect(page.getByText("Diagnostic only · not playable")).toBeVisible();
+  57  | }
+  58  | 
+  59  | async function assertAcceptedSceneFacts(page: Page): Promise<void> {
+  60  |   const facts = await page.getByTestId("scene-facts").evaluate((element) => {
+  61  |     const parsed: unknown = JSON.parse(element.textContent ?? "null");
+  62  |     return parsed as {
+  63  |       pieceCount: number;
+  64  |       homeCaps: number;
+  65  |       awayCaps: number;
+  66  |       buttonCount: number;
+  67  |       visibleButtonHoles: number;
+  68  |       buttonBodyVertices: number;
+  69  |       greenConcreteTexture: string | null;
+  70  |       enclosingWallCount: number;
+  71  |     };
+  72  |   });
+  73  |   expect(facts).toEqual({
+  74  |     pieceCount: 15,
+  75  |     homeCaps: 7,
+  76  |     awayCaps: 7,
+  77  |     buttonCount: 1,
+  78  |     visibleButtonHoles: 4,
+  79  |     buttonBodyVertices: expect.any(Number),
+  80  |     greenConcreteTexture: "counterball-green-concrete-grain",
+  81  |     enclosingWallCount: 0,
+  82  |   });
+  83  |   expect(facts.buttonBodyVertices).toBeGreaterThan(0);
+  84  | }
+  85  | 
+  86  | async function flickAndReadTrace(
+  87  |   page: Page,
+  88  |   testInfo: TestInfo,
+  89  | ): Promise<ProbeTrace> {
+  90  |   const canvas = page.getByTestId("counterball-canvas");
+  91  |   const box = await canvas.boundingBox();
+  92  |   expect(box).not.toBeNull();
+  93  |   if (!box) throw new Error("The diagnostic WebGL canvas has no bounds.");
+  94  | 
+  95  |   const initialLifecycle = await lifecycle(page);
+  96  |   expect(initialLifecycle.activeListeners).toBeGreaterThan(0);
+  97  |   expect(initialLifecycle.activeResizeObservers).toBe(1);
+  98  |   await canvas.screenshot({
+  99  |     path: testInfo.outputPath("direct-probe-before.png"),
+  100 |   });
+  101 | 
+  102 |   const startX = box.x + box.width * 0.2;
+  103 |   const startY = box.y + box.height * 0.78;
+  104 |   await page.mouse.move(startX, startY);
+  105 |   await page.mouse.down();
+  106 |   await page.mouse.move(startX + 64, startY - 32, { steps: 8 });
+  107 |   await page.mouse.up();
+  108 | 
+  109 |   const result = page.getByTestId("probe-result");
+> 110 |   await expect(result).toBeVisible({ timeout: 120_000 });
+      |                        ^ Error: expect(locator).toBeVisible() failed
+  111 |   const traceText = await result.textContent();
+  112 |   if (!traceText) throw new Error("The direct-shot trace is empty.");
+  113 |   const trace = JSON.parse(traceText) as ProbeTrace;
+  114 | 
+  115 |   expect(trace.scope).toBe("browser-direct-impulse-v1");
+  116 |   expect(trace.termination).toBe("settled");
+  117 |   expect(trace.capId).toBe("home-6");
+  118 |   expect(trace.impulse).toEqual({ x: 0, y: 0, z: 8 });
+  119 |   expect(trace.applicationPoint).toEqual({ x: 0, y: 0.06, z: -4 });
+  120 |   expect(trace.settledBodyCount).toBe(15);
+  121 |   expect(trace.contactPairs).toContainEqual(
+  122 |     expect.arrayContaining(["home-6", "button"]),
+  123 |   );
+  124 |   expect(trace.capMovement).toBeGreaterThan(0.0001);
+  125 |   expect(trace.buttonMovement).toBeGreaterThan(0.0001);
+  126 |   expect(trace.changedWebGlPixels).toBeGreaterThan(0);
+  127 |   expect(trace.pixelWidth).toBeGreaterThan(0);
+  128 |   expect(trace.pixelHeight).toBeGreaterThan(0);
+  129 | 
+  130 |   await canvas.screenshot({
+  131 |     path: testInfo.outputPath("direct-probe-after.png"),
+  132 |   });
+  133 |   const sceneFactsText = await page.getByTestId("scene-facts").textContent();
+  134 |   const sceneFacts: unknown = JSON.parse(sceneFactsText ?? "null");
+  135 |   await testInfo.attach("counterball-direct-probe-trace.json", {
+  136 |     body: JSON.stringify(
+  137 |       {
+  138 |         trace,
+  139 |         sceneFacts,
+  140 |         lifecycleBeforeFlick: initialLifecycle,
+  141 |         lifecycleAfterFlick: await lifecycle(page),
+  142 |       },
+  143 |       null,
+  144 |       2,
+  145 |     ),
+  146 |     contentType: "application/json",
+  147 |   });
+  148 |   return trace;
+  149 | }
+  150 | 
+  151 | async function assertUnmountedAtBaseline(page: Page): Promise<void> {
+  152 |   await page.getByRole("button", { name: "Back to Counterball" }).click();
+  153 |   await expect(page.getByTestId("counterball-canvas")).toHaveCount(0);
+  154 |   await expect(page.getByTestId("counterball-direct-probe")).toHaveCount(0);
+  155 |   await expect
+  156 |     .poll(async () => {
+  157 |       const state = await lifecycle(page);
+  158 |       return [
+  159 |         state.engines === state.baselineEngines,
+  160 |         state.activeListeners === 0,
+  161 |         state.activeResizeObservers === 0,
+  162 |       ];
+  163 |     })
+  164 |     .toEqual([true, true, true]);
+  165 | }
+  166 | 
+  167 | test("a real pointer flick runs browser Havok and changes rendered WebGL pixels", async ({
+  168 |   page,
+  169 | }, testInfo) => {
+  170 |   test.setTimeout(150_000);
+  171 |   await openDiagnostic(page);
+  172 |   await assertAcceptedSceneFacts(page);
+  173 | 
+  174 |   await flickAndReadTrace(page, testInfo);
+  175 |   await assertUnmountedAtBaseline(page);
+  176 |   const finalLifecycle = await lifecycle(page);
+  177 |   await testInfo.attach("counterball-direct-probe-teardown.json", {
+  178 |     body: JSON.stringify(finalLifecycle, null, 2),
+  179 |     contentType: "application/json",
+  180 |   });
+  181 |   expect(finalLifecycle.engines).toBe(finalLifecycle.baselineEngines);
+  182 |   expect(finalLifecycle.activeListeners).toBe(0);
+  183 |   expect(finalLifecycle.activeResizeObservers).toBe(0);
+  184 | });
+  185 | 
+  186 | test("a blocked real WASM load is visible and retry cleans up before a real shot", async ({
+  187 |   page,
+  188 | }, testInfo) => {
+  189 |   test.setTimeout(180_000);
+  190 |   let blockedWasmRequests = 0;
+  191 |   const blockWasm = async (route: Route): Promise<void> => {
+  192 |     blockedWasmRequests += 1;
+  193 |     await route.abort("failed");
+  194 |   };
+  195 |   await page.route("**/*.wasm*", blockWasm);
+  196 |   await openDiagnostic(page);
+  197 |   await assertAcceptedSceneFacts(page);
+  198 | 
+  199 |   const box = await page.getByTestId("counterball-canvas").boundingBox();
+  200 |   expect(box).not.toBeNull();
+  201 |   if (!box) throw new Error("The diagnostic WebGL canvas has no bounds.");
+  202 |   const startX = box.x + box.width * 0.2;
+  203 |   const startY = box.y + box.height * 0.78;
+  204 |   await page.mouse.move(startX, startY);
+  205 |   await page.mouse.down();
+  206 |   await page.mouse.move(startX + 64, startY - 32, { steps: 8 });
+  207 |   await page.mouse.up();
+  208 | 
+  209 |   await expect(page.getByTestId("probe-error")).toContainText("Havok/WASM", {
+  210 |     timeout: 30_000,
+```

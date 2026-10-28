@@ -1,0 +1,1 @@
+export{lr as defaultPixelShader}from"./CounterballPreview-CQk3gtNa.js";

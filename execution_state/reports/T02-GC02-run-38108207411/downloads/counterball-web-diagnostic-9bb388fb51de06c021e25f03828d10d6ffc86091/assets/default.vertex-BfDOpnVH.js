@@ -1,0 +1,1 @@
+export{or as defaultVertexShaderWGSL}from"./CounterballPreview-CF2od-Td.js";

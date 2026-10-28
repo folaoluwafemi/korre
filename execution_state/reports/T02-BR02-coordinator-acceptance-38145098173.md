@@ -1,0 +1,9 @@
+# T02-BR02 coordinator acceptance
+
+**Verdict: ACCEPTED for the bounded diagnostic browser direct-shot/retry scope only.** This transition does not accept parent T02 or gameplay.
+
+The BR02 packet’s original dependency IDs are preserved without change: T02-BR01, T02-D01, T02-P01, parent:T03, C01, C01-H, and T02-BR02-FORMAT-REPAIR-1. The current task ledger records each as ACCEPTED. The exact hosted evidence is GitHub run [38145098173](https://github.com/folaoluwafemi/korre/actions/runs/38145098173), job 114486675740, source SHA `88c8302c8ce4b0d0217de33419efcb8145c11188`; full run report is `execution_state/reports/T02-BR02-OBSERVED-MASS-PROJECTION-1-run-38145098173.md`. Independent integrated-patch/dependency review passed at `execution_state/reports/T02-BR02-dependency-resolution-review-38145098173.md`, and the independent BR02 evidence integration review passed at `execution_state/reports/T02-BR02-parent-acceptance-review-38145098173.md`.
+
+The hosted run passed full verify (29 files/163 tests), protocol checks (12/12), Worker smoke (1/1), disposable PostgreSQL migration/recheck, integration (1/1), production preview (4/4), and focused real Chromium diagnostic (2/2). Application results had zero skips, retries, or flakes. The direct and retry traces contain real browser Havok/WASM contact and transform-derived movement, 15-body settling, changed WebGL pixels, and cleanup to baseline. Ordinary production exclusion passed. A successful retry HTTP status is not present as a separate artifact and is not claimed.
+
+Scope limits: this is a diagnostic browser flick, not a playable match. It does not prove deployed Cloudflare Havok, loft calibration, production physics, rules authority, restart play, AI, online play, social flows, or device compatibility. Local app checks were not run. The preview at `http://127.0.0.1:4173/preview` serves the GitHub-built diagnostic artifact only.

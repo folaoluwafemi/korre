@@ -1,0 +1,27 @@
+# T02-L01 guard contract proposal 3 review
+
+**Verdict: CHANGES_REQUIRED.** This is a source/document-contract review only. Runtime, browser, build, unit, physics, and Havok checks were **NOT RUN**.
+
+## Checks and scope
+
+- Ran `node scripts/check-completion-plan.mjs --packet T02-L01`: plan consistency **PASS**. It reports 87 packets, `initialReady: []`, and T02-L01 `ready: false`; it explicitly performs no implementation/runtime check.
+- Recomputed the canonical fixture payload digest from `tests/fixtures/counterball-v1.json` by recursively omitting `configHash`, recursively sorting object keys, and hashing compact UTF-8 JSON. It is the lowercase `6ce26e4203017e446687dfd8ad95106ba582f09420f8c623129c7d1bbe6b625d` recorded in proposal 3.
+- Reviewed proposal 3, review 2, the exact T02-L01 packet and current task states, and the relevant config/hash, test-runner, app-route, browser probe, and CI sources.
+
+## Findings requiring repair
+
+1. **The matrix card still does not define an executable real-browser check.** Proposal 3, line 84, adds only `games/counterball/src/simulation/loftCoarseProbe.test.ts` and `.github/workflows/ci.yml`; the inherited check is `pnpm verify`. The package script runs Vitest, and `vitest.config.ts` includes `games/**/src/**/*.test.{ts,tsx}` without a browser environment. That does not meet the packet's explicit prohibition on `NullEngine` or a Node-only substitute. The existing test route provides a viable path: `apps/web/src/App.tsx` routes to the diagnostic page, `CounterballDirectProbe.tsx:486-498` creates an actual Babylon `Engine` and scene, `games/counterball/src/simulation/browserDirectProbe.ts:1152` initializes Havok, and the existing CI diagnostic step at `.github/workflows/ci.yml:371-373` runs mapped Playwright specs under Chromium. Revise the card to specify the five exact source paths needed for the browser matrix, pure no-physics test, browser export, separate diagnostic action/result, and added Playwright case; specify the exact Chromium diagnostic command (for example, the existing mapped invocation for `tests/e2e/counterball-direct-probe.spec.ts`). `pnpm verify` may remain a supplementary check, but it cannot stand in for that real-browser matrix. The coordinator already identified this route; no new workflow/config path is needed.
+
+2. **The schema implementation card has no exact ID.** Proposal 3, line 82, says the packet amendment creates a schema implementation card and adds its ID to T02-L01, but gives only IDs for the contract and packet-amendment cards. The L01 dependency graph therefore cannot be materialized or independently checked exactly. Assign one exact schema-card ID and use it consistently in the packet amendment, task/catalogue records, and L01's added dependencies. Keep the original dependency IDs and order intact.
+
+3. **The hashed guard uses two spellings for three strict field names.** The JSON inventory at line 32 uses `maximumPointSweepPerCall`, `maximumRotationPerCall`, and `maximumCallsPerNominalTick`; the operative rule at line 62 instead freezes `maxPointSweepPerSubstep`, `maxRotationPerSubstep`, and `maxSubstepsPerNominalTick`. Because these are strict hashed config fields, state one literal name per value and use that name in the schema, contract, and runner.
+
+4. **Artifact-size limits mix inclusive values with strict prose.** The inventory at line 34 sets `maximumCaseBytes` to exactly 20 MiB and `maximumMatrixBytes` to exactly 481 MiB, while line 72 says complete case bytes must be `<20 MiB` and whole compact JSON `<481 MiB`. State whether each cap is inclusive or exclusive and align the numeric fields and enforcement comparison. The current arithmetic is below the limits; this is a contract-boundary ambiguity, not a claim that the proposed artifact will exceed them.
+
+## Requirements and earlier findings rechecked
+
+- Review 2's four findings are addressed: the fixture digest is lowercase and matches recomputation; proposal 3 distinguishes six goal-frame colliders plus the separate seventh support slab; line 70 enumerates serialized case identity, provenance, native readbacks, scene/material facts, and settling fields under the measured 64-KiB metadata cap; and the contract, amendment, schema, and matrix cards have proposed write sets of 2, 4, 5, and 2 paths respectively, each within the five-path bound. The listed dependency sets are deduplicated and contain no self-dependency.
+- Proposal 3 preserves T02-L01's original exact 24 tuples and original dependency list (`C00-B`, `C01`, `T02-B0`, `T02-C0`, `T02-C2`, `C00`). Current task records show those dependencies accepted, while T02-L01 itself remains BLOCKED. The proposed new contract/schema prerequisites are explicitly required before dispatch; the document authorizes no physics trial. The schema and shared contract/config work remains coordinator-owned.
+- The guard is a separate hashed L01 field and does not alter the accepted D01 direct-shot guard. The implementation remains gated on the proposed separate contract and schema prerequisites. Proposal 3 also treats its workload ceilings as unbenchmarked hard limits and makes failure without an artifact the outcome if a limit is reached.
+
+The proposal is not ready to materialize as written. Resolve the four exact specification findings above, then re-run the lightweight plan/document checks and independent review before authorizing any trial. No runtime or physics outcome is inferred here.

@@ -1,0 +1,1 @@
+export{Kr as colorVertexShader}from"./CounterballPreview-DWnstiKk.js";

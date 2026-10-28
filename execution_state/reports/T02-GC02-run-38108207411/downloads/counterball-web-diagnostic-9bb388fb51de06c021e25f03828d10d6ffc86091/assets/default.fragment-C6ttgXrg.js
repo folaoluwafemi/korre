@@ -1,0 +1,1 @@
+export{sr as defaultPixelShaderWGSL}from"./CounterballPreview-CF2od-Td.js";

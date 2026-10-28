@@ -1,0 +1,1 @@
+export{ei as lightProxyVertexShaderWGSL}from"./CounterballPreview-C5kcfdNe.js";

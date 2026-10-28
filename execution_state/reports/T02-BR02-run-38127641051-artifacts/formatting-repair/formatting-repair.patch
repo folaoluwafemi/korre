@@ -1,0 +1,101 @@
+diff --git a/apps/web/src/CounterballDirectProbe.tsx b/apps/web/src/CounterballDirectProbe.tsx
+index 39bea7b..eb6087c 100644
+--- a/apps/web/src/CounterballDirectProbe.tsx
++++ b/apps/web/src/CounterballDirectProbe.tsx
+@@ -140,11 +140,7 @@ function readDiffuseTextureName(material: unknown): string | null {
+   }
+   const texture = (material as { readonly diffuseTexture?: unknown })
+     .diffuseTexture;
+-  if (
+-    typeof texture !== "object" ||
+-    texture === null ||
+-    !("name" in texture)
+-  ) {
++  if (typeof texture !== "object" || texture === null || !("name" in texture)) {
+     return null;
+   }
+   const name = (texture as { readonly name?: unknown }).name;
+@@ -337,9 +333,7 @@ export default function CounterballDirectProbe({
+         const endCap = result.settledBodies.find(
+           (body) => body.id === result.capId,
+         );
+-        const startButton = initialBodies.find(
+-          (body) => body.id === "button",
+-        );
++        const startButton = initialBodies.find((body) => body.id === "button");
+         const endButton = result.settledBodies.find(
+           (body) => body.id === "button",
+         );
+@@ -347,7 +341,9 @@ export default function CounterballDirectProbe({
+           throw new Error("The diagnostic omitted a canonical shot body.");
+         }
+         if (result.settledBodies.length !== initialBodies.length) {
+-          throw new Error("The diagnostic did not return all 15 settled bodies.");
++          throw new Error(
++            "The diagnostic did not return all 15 settled bodies.",
++          );
+         }
+ 
+         const capMovement = distanceBetween(startCap, endCap);
+@@ -376,7 +372,8 @@ export default function CounterballDirectProbe({
+         );
+         activeScene.render();
+         const gl = canvas.getContext("webgl2");
+-        if (!gl) throw new Error("WebGL 2 was lost before final pixel capture.");
++        if (!gl)
++          throw new Error("WebGL 2 was lost before final pixel capture.");
+         const pixelsAfter = captureWebGlPixels(gl);
+         const changedWebGlPixels = countChangedPixels(
+           pixelsBefore,
+@@ -442,7 +439,10 @@ export default function CounterballDirectProbe({
+       const start = pendingPointer;
+       if (!start || event.pointerId !== start.pointerId) return;
+       pendingPointer = undefined;
+-      const flickLength = Math.hypot(event.clientX - start.x, event.clientY - start.y);
++      const flickLength = Math.hypot(
++        event.clientX - start.x,
++        event.clientY - start.y,
++      );
+       if (flickLength < MIN_FLICK_PIXELS || flickLength > MAX_FLICK_PIXELS) {
+         setStatus(
+           `Use one deliberate drag between ${MIN_FLICK_PIXELS} and ${MAX_FLICK_PIXELS} pixels. This only triggers the fixed measured shot.`,
+@@ -517,7 +517,9 @@ export default function CounterballDirectProbe({
+       );
+       setCurrentPhase("ready");
+     } catch (error) {
+-      fail(error instanceof Error ? error.message : "The scene could not start.");
++      fail(
++        error instanceof Error ? error.message : "The scene could not start.",
++      );
+     }
+ 
+     return () => {
+@@ -635,9 +637,10 @@ export default function CounterballDirectProbe({
+         <section aria-labelledby="probe-trace-title" style={{ marginTop: 16 }}>
+           <h2 id="probe-trace-title">Measured browser result</h2>
+           <p>
+-            {trace.settledBodyCount} settled bodies · {trace.contactPairs.length}{" "}
+-            recorded contacts · {trace.changedWebGlPixels.toLocaleString()} real
+-            WebGL pixels changed.
++            {trace.settledBodyCount} settled bodies ·{" "}
++            {trace.contactPairs.length} recorded contacts ·{" "}
++            {trace.changedWebGlPixels.toLocaleString()} real WebGL pixels
++            changed.
+           </p>
+           <pre
+             data-testid="probe-result"
+diff --git a/tests/e2e/counterball-direct-probe.spec.ts b/tests/e2e/counterball-direct-probe.spec.ts
+index bf3f145..b2cf36f 100644
+--- a/tests/e2e/counterball-direct-probe.spec.ts
++++ b/tests/e2e/counterball-direct-probe.spec.ts
+@@ -118,7 +118,9 @@ async function flickAndReadTrace(
+   expect(trace.impulse).toEqual({ x: 0, y: 0, z: 8 });
+   expect(trace.applicationPoint).toEqual({ x: 0, y: 0.06, z: -4 });
+   expect(trace.settledBodyCount).toBe(15);
+-  expect(trace.contactPairs).toContainEqual(expect.arrayContaining(["home-6", "button"]));
++  expect(trace.contactPairs).toContainEqual(
++    expect.arrayContaining(["home-6", "button"]),
++  );
+   expect(trace.capMovement).toBeGreaterThan(0.0001);
+   expect(trace.buttonMovement).toBeGreaterThan(0.0001);
+   expect(trace.changedWebGlPixels).toBeGreaterThan(0);

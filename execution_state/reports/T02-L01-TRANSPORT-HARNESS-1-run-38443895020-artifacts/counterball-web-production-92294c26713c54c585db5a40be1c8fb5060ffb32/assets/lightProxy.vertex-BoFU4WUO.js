@@ -1,0 +1,1 @@
+export{ni as lightProxyVertexShader}from"./CounterballPreview-DArZt9Xw.js";

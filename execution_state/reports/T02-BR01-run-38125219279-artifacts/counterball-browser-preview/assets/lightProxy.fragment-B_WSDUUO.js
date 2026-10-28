@@ -1,0 +1,1 @@
+export{ti as lightProxyPixelShaderWGSL}from"./CounterballPreview-J8k4_Ua0.js";

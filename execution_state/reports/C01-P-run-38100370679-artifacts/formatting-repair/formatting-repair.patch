@@ -1,0 +1,304 @@
+diff --git a/games/counterball/src/simulation/directImpulseProbe.test.ts b/games/counterball/src/simulation/directImpulseProbe.test.ts
+index de49a30..c79af01 100644
+--- a/games/counterball/src/simulation/directImpulseProbe.test.ts
++++ b/games/counterball/src/simulation/directImpulseProbe.test.ts
+@@ -133,8 +133,7 @@ const fixedStepSeconds = COUNTERBALL_CONFIG_V1.simulation.fixedStepSeconds;
+ const maximumProbeSeconds =
+   COUNTERBALL_CONFIG_V1.simulation.maxShotDurationSeconds;
+ const maximumSteps = Math.ceil(maximumProbeSeconds / fixedStepSeconds);
+-const quietWindowSeconds =
+-  COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds;
++const quietWindowSeconds = COUNTERBALL_CONFIG_V1.simulation.settleWindowSeconds;
+ const quietWindowSteps = Math.ceil(quietWindowSeconds / fixedStepSeconds);
+ const artifactWaitMilliseconds = 300_000;
+ const artifactPollMilliseconds = 1_000;
+@@ -158,7 +157,10 @@ async function readInitialState(): Promise<{
+     import.meta.url,
+   );
+   const fixture = JSON.parse(await readFile(fixtureUrl, "utf8")) as Fixture;
+-  return { fixtureId: fixture.id, state: parseMatchState(fixture.states.initial) };
++  return {
++    fixtureId: fixture.id,
++    state: parseMatchState(fixture.states.initial),
++  };
+ }
+ 
+ function plainVector(vector: { x: number; y: number; z: number }): Vec3 {
+@@ -312,9 +314,7 @@ function aimDirection(
+   aim: AimSpec,
+   state: MatchState,
+ ): { direction: Vector3; selectedStart: Vector3 } {
+-  const selectedState = state.bodies.find(
+-    ({ id }) => id === aim.selectedCapId,
+-  );
++  const selectedState = state.bodies.find(({ id }) => id === aim.selectedCapId);
+   const buttonState = state.bodies.find(({ id }) => id === "button");
+   if (selectedState === undefined || buttonState === undefined) {
+     throw new Error("Canonical fixture is missing the selected cap or button.");
+@@ -343,7 +343,9 @@ function aimDirection(
+     target.z - selectedStart.z,
+   );
+   if (!Number.isFinite(direction.length()) || direction.length() === 0) {
+-    throw new Error(`Aim ${aim.name} does not define a finite horizontal path.`);
++    throw new Error(
++      `Aim ${aim.name} does not define a finite horizontal path.`,
++    );
+   }
+   direction.normalize();
+   return { direction, selectedStart };
+@@ -449,8 +451,7 @@ function runTrial(
+   let world: CounterballWorld | undefined;
+   let runtimeError: string | null = null;
+   let initialWorldMatchesFixture = false;
+-  let immediateBodyVelocities: TrialObservation["immediateBodyVelocities"] =
+-    [];
++  let immediateBodyVelocities: TrialObservation["immediateBodyVelocities"] = [];
+   const tickMeasurements: TickObservation[] = [];
+   const contacts: ContactObservation[] = [];
+   const seenContacts = new Set<string>();
+@@ -617,10 +618,7 @@ function runTrial(
+           body.angularVelocity.y,
+           body.angularVelocity.z,
+         );
+-        pathDistance.set(
+-          body.id,
+-          (pathDistance.get(body.id) ?? 0) + traveled,
+-        );
++        pathDistance.set(body.id, (pathDistance.get(body.id) ?? 0) + traveled);
+         maximumLinearSpeed.set(
+           body.id,
+           Math.max(maximumLinearSpeed.get(body.id) ?? 0, linearSpeed),
+@@ -632,8 +630,7 @@ function runTrial(
+         if (
+           linearSpeed >
+             COUNTERBALL_CONFIG_V1.simulation.linearSettleThreshold ||
+-          angularSpeed >
+-            COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold
++          angularSpeed > COUNTERBALL_CONFIG_V1.simulation.angularSettleThreshold
+         ) {
+           allBodiesQuiet = false;
+         }
+@@ -753,7 +750,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
+   return value !== null && typeof value === "object" && !Array.isArray(value);
+ }
+ 
+-function equalsNumberArray(value: unknown, expected: readonly number[]): boolean {
++function equalsNumberArray(
++  value: unknown,
++  expected: readonly number[],
++): boolean {
+   return (
+     Array.isArray(value) &&
+     value.length === expected.length &&
+@@ -820,12 +820,14 @@ function completeIntendedShotArtifactIssue(value: unknown): string | null {
+       "buttonFinalSpeed",
+       "simulatedSeconds",
+     ];
+-    if (finiteNumbers.some((field) => {
+-      const measuredValue = observation[field];
+-      return (
+-        typeof measuredValue !== "number" || !Number.isFinite(measuredValue)
+-      );
+-    })) {
++    if (
++      finiteNumbers.some((field) => {
++        const measuredValue = observation[field];
++        return (
++          typeof measuredValue !== "number" || !Number.isFinite(measuredValue)
++        );
++      })
++    ) {
+       return "artifact contains an observation with missing or non-finite measurements";
+     }
+     if (!Array.isArray(observation["contacts"])) {
+@@ -842,15 +844,16 @@ function completeIntendedShotArtifactIssue(value: unknown): string | null {
+ }
+ 
+ function isMissingFileError(error: unknown): boolean {
+-  return (
+-    isRecord(error) &&
+-    error["code"] === "ENOENT"
+-  );
++  return isRecord(error) && error["code"] === "ENOENT";
+ }
+ 
+ async function waitForStableIntendedShotArtifact(
+   artifactPath: string,
+-): Promise<{ absolutePath: string; sourceText: string; value: IntendedShotArtifact }> {
++): Promise<{
++  absolutePath: string;
++  sourceText: string;
++  value: IntendedShotArtifact;
++}> {
+   const absolutePath = resolve(artifactPath);
+   const deadline = Date.now() + artifactWaitMilliseconds;
+   let previousCompleteText: string | null = null;
+@@ -1004,23 +1007,21 @@ async function mergeDirectImpulseArtifact(
+ }
+ 
+ function isFinitePlainBody(body: BodyStateValue): boolean {
+-  return (
+-    [
+-      body.position.x,
+-      body.position.y,
+-      body.position.z,
+-      body.rotation.x,
+-      body.rotation.y,
+-      body.rotation.z,
+-      body.rotation.w,
+-      body.linearVelocity.x,
+-      body.linearVelocity.y,
+-      body.linearVelocity.z,
+-      body.angularVelocity.x,
+-      body.angularVelocity.y,
+-      body.angularVelocity.z,
+-    ].every(Number.isFinite)
+-  );
++  return [
++    body.position.x,
++    body.position.y,
++    body.position.z,
++    body.rotation.x,
++    body.rotation.y,
++    body.rotation.z,
++    body.rotation.w,
++    body.linearVelocity.x,
++    body.linearVelocity.y,
++    body.linearVelocity.z,
++    body.angularVelocity.x,
++    body.angularVelocity.y,
++    body.angularVelocity.z,
++  ].every(Number.isFinite);
+ }
+ 
+ function failedTrialChecks(
+@@ -1071,7 +1072,9 @@ function failedTrialChecks(
+       observation.aim !== expectedAim.name ||
+       observation.selectedCapId !== expectedAim.selectedCapId
+     ) {
+-      failures.push(`${prefix}: impulse or selected aim differs from the fixed matrix`);
++      failures.push(
++        `${prefix}: impulse or selected aim differs from the fixed matrix`,
++      );
+     }
+     const selectedStart = observation.startingBodyStates.find(
+       ({ id }) => id === observation.selectedCapId,
+@@ -1099,7 +1102,9 @@ function failedTrialChecks(
+         observation.angularSettleThreshold,
+       ].every(Number.isFinite)
+     ) {
+-      failures.push(`${prefix}: input vector, application point, or config is invalid`);
++      failures.push(
++        `${prefix}: input vector, application point, or config is invalid`,
++      );
+     }
+     if (observation.runtimeError !== null) {
+       failures.push(`${prefix}: ${observation.runtimeError}`);
+@@ -1109,7 +1114,9 @@ function failedTrialChecks(
+       JSON.stringify(observation.startingBodyStates) !==
+         JSON.stringify(initialBodyStates)
+     ) {
+-      failures.push(`${prefix}: world did not start at the exact shared fixture state`);
++      failures.push(
++        `${prefix}: world did not start at the exact shared fixture state`,
++      );
+     }
+     if (
+       observation.bodyIds.length !== 15 ||
+@@ -1134,14 +1141,18 @@ function failedTrialChecks(
+         selectedImmediate.linearVelocity.z,
+       ) <= 0
+     ) {
+-      failures.push(`${prefix}: selected cap did not receive the direct impulse`);
++      failures.push(
++        `${prefix}: selected cap did not receive the direct impulse`,
++      );
+     } else {
+       const projectedResponse =
+         selectedImmediate.linearVelocity.x * observation.inputImpulseVector.x +
+         selectedImmediate.linearVelocity.y * observation.inputImpulseVector.y +
+         selectedImmediate.linearVelocity.z * observation.inputImpulseVector.z;
+       if (!(projectedResponse > 0)) {
+-        failures.push(`${prefix}: initial cap response opposes its requested aim`);
++        failures.push(
++          `${prefix}: initial cap response opposes its requested aim`,
++        );
+       }
+     }
+     if (
+@@ -1156,10 +1167,14 @@ function failedTrialChecks(
+             body.angularVelocity.z !== 0),
+       )
+     ) {
+-      failures.push(`${prefix}: an unrelated body received the initial impulse`);
++      failures.push(
++        `${prefix}: an unrelated body received the initial impulse`,
++      );
+     }
+     if (observation.tickMeasurements.length !== observation.totalSteps) {
+-      failures.push(`${prefix}: tick count does not match captured measurements`);
++      failures.push(
++        `${prefix}: tick count does not match captured measurements`,
++      );
+     }
+     if (
+       observation.tickMeasurements.some(
+@@ -1186,7 +1201,9 @@ function failedTrialChecks(
+           ].some((value) => !Number.isFinite(value)),
+       )
+     ) {
+-      failures.push(`${prefix}: per-tick body data is incomplete or non-finite`);
++      failures.push(
++        `${prefix}: per-tick body data is incomplete or non-finite`,
++      );
+     }
+     const selectedBodyIndex = observation.bodyIds.indexOf(
+       observation.selectedCapId,
+@@ -1216,7 +1233,9 @@ function failedTrialChecks(
+       observation.quietWindowStepsObserved < quietWindowSteps ||
+       observation.allBodiesSettledAtSeconds > observation.simulatedSeconds
+     ) {
+-      failures.push(`${prefix}: all fifteen bodies did not settle for the full quiet window`);
++      failures.push(
++        `${prefix}: all fifteen bodies did not settle for the full quiet window`,
++      );
+     }
+     if (
+       observation.finalBodyStates.length !== ENTITY_IDS.length ||
+@@ -1225,7 +1244,9 @@ function failedTrialChecks(
+           body.id !== ENTITY_IDS[bodyIndex] || !isFinitePlainBody(body),
+       )
+     ) {
+-      failures.push(`${prefix}: final transforms or velocities are incomplete/non-finite`);
++      failures.push(
++        `${prefix}: final transforms or velocities are incomplete/non-finite`,
++      );
+     }
+     if (
+       observation.bodyPathSummaries.length !== ENTITY_IDS.length ||
+@@ -1237,7 +1258,9 @@ function failedTrialChecks(
+           !Number.isFinite(body.maximumAngularSpeed),
+       )
+     ) {
+-      failures.push(`${prefix}: all-body path or speed summary is incomplete/non-finite`);
++      failures.push(
++        `${prefix}: all-body path or speed summary is incomplete/non-finite`,
++      );
+     }
+     if (
+       !Number.isFinite(observation.simulatedSeconds) ||
+@@ -1249,11 +1272,9 @@ function failedTrialChecks(
+           contact.pair.length !== 2 ||
+           contact.pair[0] === contact.pair[1] ||
+           (contact.point !== null &&
+-            ![
+-              contact.point.x,
+-              contact.point.y,
+-              contact.point.z,
+-            ].every(Number.isFinite)),
++            ![contact.point.x, contact.point.y, contact.point.z].every(
++              Number.isFinite,
++            )),
+       )
+     ) {
+       failures.push(`${prefix}: time or contact measurements are invalid`);

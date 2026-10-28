@@ -1,0 +1,248 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: counterball-direct-probe.spec.ts >> the full real-Havok loft matrix downloads and passes bounded host validation
+- Location: tests/e2e/counterball-direct-probe.spec.ts:2780:1
+
+# Error details
+
+```
+Error: The browser matrix failed before download: Native friction material readback differs from its setter.
+```
+
+# Page snapshot
+
+```yaml
+- main [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - paragraph [ref=e6]: COUNTERBALL · DEVELOPMENT DIAGNOSTIC
+      - heading "One real browser flick" [level=1] [ref=e7]
+    - button "Back to Counterball" [ref=e8]
+  - region "Diagnostic instructions" [ref=e9]:
+    - strong [ref=e10]: Diagnostic only · not playable
+    - paragraph [ref=e11]: Drag across the pitch by 24–240 pixels. The gesture only starts the fixed, measured D01 impulse. Direction and distance do not set gameplay aim or power. There is no score, match, public play, or identity bypass here.
+  - status [ref=e12]: Drag 24–240 pixels across the pitch to trigger one fixed diagnostic shot.
+  - region [ref=e13]:
+    - heading "Restart-loft diagnostic export" [level=2] [ref=e14]
+    - paragraph [ref=e15]: This separate development diagnostic runs the fixed 24-case real-Havok matrix. It is not a match or a gameplay control. The transport action writes a deterministic full-size test file.
+    - generic [ref=e16]:
+      - button "Run 24-case Havok matrix" [ref=e17]
+      - button "Write transport test file" [ref=e18]
+    - status [ref=e19]: The export failed and no successful download is available.
+    - alert [ref=e20]: Native friction material readback differs from its setter.
+  - generic "Open green concrete pitch with seven caps per side and a four-hole clothing button" [ref=e22]
+  - status [ref=e23]: "{\"pieceCount\":15,\"homeCaps\":7,\"awayCaps\":7,\"buttonCount\":1,\"visibleButtonHoles\":4,\"buttonBodyVertices\":81024,\"greenConcreteTexture\":\"counterball-green-concrete-grain\",\"enclosingWallCount\":0}"
+```
+
+# Test source
+
+```ts
+  2710 | 
+  2711 |     const downloadPromise = page.waitForEvent("download", {
+  2712 |       timeout: 60_000,
+  2713 |     });
+  2714 |     await page.getByRole("button", { name: "Download transport file" }).click();
+  2715 |     browserDownload = await downloadPromise;
+  2716 |     expect(browserDownload.suggestedFilename()).toBe(output.export.fileName);
+  2717 | 
+  2718 |     hostPath = testInfo.outputPath("counterball-transport-download.tmp");
+  2719 |     await browserDownload.saveAs(hostPath);
+  2720 |     const actual = await hashDownloadedFile(hostPath);
+  2721 |     expect(actual.byteLength).toBe(TRANSPORT_BYTES);
+  2722 |     expect(actual.sha256).toBe(expectedSha256);
+  2723 | 
+  2724 |     const attestation: LoftMatrixHostAttestation = {
+  2725 |       runId: output.export.runId,
+  2726 |       fileName: output.export.fileName,
+  2727 |       byteLength: actual.byteLength,
+  2728 |       sha256: actual.sha256,
+  2729 |     };
+  2730 |     const acknowledged = await page.evaluate(async (value) => {
+  2731 |       const acknowledge = (window as WindowWithDirectProbe)
+  2732 |         .__counterballLoftMatrixHostAck;
+  2733 |       return acknowledge ? acknowledge(value) : false;
+  2734 |     }, attestation);
+  2735 |     expect(acknowledged).toBe(true);
+  2736 |     await expect(status).toHaveText(
+  2737 |       "The host saved and verified the download; temporary storage was removed.",
+  2738 |     );
+  2739 |   } catch (error) {
+  2740 |     hasPrimaryError = true;
+  2741 |     primaryError = error;
+  2742 |   } finally {
+  2743 |     try {
+  2744 |       await cleanupBrowserTransport(page);
+  2745 |     } catch (error) {
+  2746 |       cleanupErrors.push(error);
+  2747 |     }
+  2748 |     try {
+  2749 |       await browserDownload?.delete();
+  2750 |     } catch (error) {
+  2751 |       cleanupErrors.push(error);
+  2752 |     }
+  2753 |     if (hostPath) {
+  2754 |       try {
+  2755 |         await rm(hostPath, { force: true });
+  2756 |       } catch (error) {
+  2757 |         cleanupErrors.push(error);
+  2758 |       }
+  2759 |     }
+  2760 |   }
+  2761 | 
+  2762 |   if (hasPrimaryError) {
+  2763 |     if (cleanupErrors.length > 0) {
+  2764 |       throw new AggregateError(
+  2765 |         [primaryError, ...cleanupErrors],
+  2766 |         "The transport test failed and cleanup was incomplete.",
+  2767 |         { cause: primaryError },
+  2768 |       );
+  2769 |     }
+  2770 |     throw primaryError;
+  2771 |   }
+  2772 |   if (cleanupErrors.length > 0) {
+  2773 |     throw new AggregateError(
+  2774 |       cleanupErrors,
+  2775 |       "The transport test failed to remove every temporary file.",
+  2776 |     );
+  2777 |   }
+  2778 | });
+  2779 | 
+  2780 | test("the full real-Havok loft matrix downloads and passes bounded host validation", async ({
+  2781 |   page,
+  2782 | }, testInfo) => {
+  2783 |   test.setTimeout(1_100_000);
+  2784 |   await openDiagnostic(page);
+  2785 |   await expect(page.getByTestId("loft-matrix-panel")).toBeVisible({
+  2786 |     timeout: 5_000,
+  2787 |   });
+  2788 | 
+  2789 |   const status = page.getByTestId("loft-matrix-status");
+  2790 |   let temporaryPath: string | undefined;
+  2791 |   let finalPath: string | undefined;
+  2792 |   let browserDownload: Download | undefined;
+  2793 |   let hasPrimaryError = false;
+  2794 |   let primaryError: unknown;
+  2795 |   let artifactAttached = false;
+  2796 |   const cleanupErrors: unknown[] = [];
+  2797 | 
+  2798 |   try {
+  2799 |     await page
+  2800 |       .getByRole("button", { name: "Run 24-case Havok matrix" })
+  2801 |       .click();
+  2802 |     await expect
+  2803 |       .poll(
+  2804 |         async () => {
+  2805 |           const text = await status.textContent();
+  2806 |           if (text === MATRIX_FAILED_STATUS) {
+  2807 |             const error = await page
+  2808 |               .getByTestId("loft-matrix-error")
+  2809 |               .textContent();
+> 2810 |             throw new Error(
+       |                   ^ Error: The browser matrix failed before download: Native friction material readback differs from its setter.
+  2811 |               `The browser matrix failed before download: ${error ?? "unknown reason"}`,
+  2812 |             );
+  2813 |           }
+  2814 |           return text;
+  2815 |         },
+  2816 |         { timeout: 780_000, intervals: [1_000, 3_000, 10_000] },
+  2817 |       )
+  2818 |       .toBe(MATRIX_READY_STATUS);
+  2819 | 
+  2820 |     const outputText = await page
+  2821 |       .getByTestId("loft-matrix-export")
+  2822 |       .textContent();
+  2823 |     if (
+  2824 |       !outputText ||
+  2825 |       Buffer.byteLength(outputText, "utf8") > MATRIX_METADATA_MAXIMUM_BYTES
+  2826 |     ) {
+  2827 |       throw new Error(
+  2828 |         "The compact browser matrix summary is missing or over its bound.",
+  2829 |       );
+  2830 |     }
+  2831 |     const output = asRecord(
+  2832 |       JSON.parse(outputText) as unknown,
+  2833 |       "Browser export output",
+  2834 |     );
+  2835 |     expect(output["phase"]).toBe("ready");
+  2836 |     const exportInfo = assertExactKeys(
+  2837 |       output["export"],
+  2838 |       ["runId", "fileName", "byteLength", "kind", "summary"],
+  2839 |       "Browser matrix export",
+  2840 |     );
+  2841 |     expect(exportInfo["kind"]).toBe("matrix");
+  2842 |     const runId = exportInfo["runId"];
+  2843 |     if (typeof runId !== "string" || !/^[0-9a-f-]{36}$/i.test(runId)) {
+  2844 |       throw new Error("The browser matrix run id is malformed.");
+  2845 |     }
+  2846 |     const fileName = `counterball-l01-${runId}.json`;
+  2847 |     expect(exportInfo["fileName"]).toBe(fileName);
+  2848 |     boundedInteger(
+  2849 |       exportInfo["byteLength"],
+  2850 |       1,
+  2851 |       MATRIX_MAXIMUM_BYTES,
+  2852 |       "Browser matrix byteLength",
+  2853 |     );
+  2854 |     const browserSummary = asRecord(
+  2855 |       exportInfo["summary"],
+  2856 |       "Browser matrix summary",
+  2857 |     );
+  2858 | 
+  2859 |     const downloadPromise = page.waitForEvent("download", { timeout: 60_000 });
+  2860 |     await page.getByRole("button", { name: "Download matrix" }).click();
+  2861 |     browserDownload = await downloadPromise;
+  2862 |     expect(browserDownload.suggestedFilename()).toBe(fileName);
+  2863 | 
+  2864 |     await mkdir(testInfo.outputPath(), { recursive: true });
+  2865 |     temporaryPath = testInfo.outputPath("counterball-l01-matrix.json.tmp");
+  2866 |     finalPath = testInfo.outputPath("counterball-l01-matrix.json");
+  2867 |     await browserDownload.saveAs(temporaryPath);
+  2868 |     const validated = await validateMatrixFile(temporaryPath);
+  2869 |     expect(validated.digest.byteLength).toBeLessThanOrEqual(
+  2870 |       MATRIX_MAXIMUM_BYTES,
+  2871 |     );
+  2872 |     expect(exportInfo["byteLength"]).toBe(validated.digest.byteLength);
+  2873 |     validateBrowserMatrixSummary(
+  2874 |       browserSummary,
+  2875 |       validated.totals,
+  2876 |       validated.identity,
+  2877 |     );
+  2878 | 
+  2879 |     const attestation: LoftMatrixHostAttestation = {
+  2880 |       runId,
+  2881 |       fileName,
+  2882 |       byteLength: validated.digest.byteLength,
+  2883 |       sha256: validated.digest.sha256,
+  2884 |     };
+  2885 |     const acknowledged = await page.evaluate(async (value) => {
+  2886 |       const acknowledge = (window as WindowWithDirectProbe)
+  2887 |         .__counterballLoftMatrixHostAck;
+  2888 |       return acknowledge ? acknowledge(value) : false;
+  2889 |     }, attestation);
+  2890 |     expect(acknowledged).toBe(true);
+  2891 |     await expect(status).toHaveText(MATRIX_READY_ACK_STATUS, {
+  2892 |       timeout: 60_000,
+  2893 |     });
+  2894 |     await cleanupBrowserTransport(page);
+  2895 |     await browserDownload.delete();
+  2896 |     browserDownload = undefined;
+  2897 | 
+  2898 |     await rename(temporaryPath, finalPath);
+  2899 |     temporaryPath = undefined;
+  2900 |     await testInfo.attach("counterball-l01-matrix-host-validation.json", {
+  2901 |       body: JSON.stringify(
+  2902 |         {
+  2903 |           sha256: validated.digest.sha256,
+  2904 |           byteLength: validated.digest.byteLength,
+  2905 |           totals: validated.totals,
+  2906 |           identity: validated.identity,
+  2907 |           matrixTupleCount: EXPECTED_MATRIX_TUPLES.length,
+  2908 |         },
+  2909 |         null,
+  2910 |         2,
+```

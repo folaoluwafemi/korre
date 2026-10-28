@@ -1,0 +1,81 @@
+
+> korre@0.1.0 test:e2e /home/runner/work/korre/korre
+> playwright test tests/e2e/counterball-direct-probe.spec.ts --workers=1
+
+
+Running 3 tests using 1 worker
+F
+::error file=tests/e2e/counterball-direct-probe.spec.ts,title=[chromium] › tests/e2e/counterball-direct-probe.spec.ts:284:1 › a real pointer flick runs browser Havok and changes rendered WebGL pixels,line=203,col=6::  1) [chromium] › tests/e2e/counterball-direct-probe.spec.ts:284:1 › a real pointer flick runs browser Havok and changes rendered WebGL pixels %0A    Error: expect(received).toBe(expected) // Object.is equality%0A%0A    Expected: true%0A    Received: false%0A%0A    Call Log:%0A    - Timeout 30000ms exceeded while waiting on the predicate%0A%0A      201 |       timeout: 30_000,%0A      202 |     })%0A    > 203 |     .toBe(true);%0A          |      ^%0A      204 |   if (await error.isVisible()) {%0A      205 |     const errorText = await error.textContent();%0A      206 |     if (!errorText) throw new Error("The direct-probe error is empty.");%0A        at flickAndReadTrace (/home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:203:6)%0A        at /home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:291:3
+F
+::error file=tests/e2e/counterball-direct-probe.spec.ts,title=[chromium] › tests/e2e/counterball-direct-probe.spec.ts:303:1 › a blocked real WASM load is visible and retry cleans up before a real shot,line=326,col=49::  2) [chromium] › tests/e2e/counterball-direct-probe.spec.ts:303:1 › a blocked real WASM load is visible and retry cleans up before a real shot %0A    Error: expect(locator).toContainText(expected) failed%0A%0A    Locator: getByTestId('probe-error')%0A    Expected substring: "Havok/WASM"%0A    Timeout: 30000ms%0A    Error: element(s) not found%0A%0A    Call log:%0A      - Expect "toContainText" getByTestId('probe-error') with timeout 30000ms%0A      - waiting for getByTestId('probe-error')%0A%0A%0A      324 |   await page.mouse.up();%0A      325 |%0A    > 326 |   await expect(page.getByTestId("probe-error")).toContainText("Havok/WASM", {%0A          |                                                 ^%0A      327 |     timeout: 30_000,%0A      328 |   });%0A      329 |   await expect.poll(() => blockedWasmRequests).toBeGreaterThan(0);%0A        at /home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:326:49
+·
+
+  1) [chromium] › tests/e2e/counterball-direct-probe.spec.ts:284:1 › a real pointer flick runs browser Havok and changes rendered WebGL pixels 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+    Call Log:
+    - Timeout 30000ms exceeded while waiting on the predicate
+
+      201 |       timeout: 30_000,
+      202 |     })
+    > 203 |     .toBe(true);
+          |      ^
+      204 |   if (await error.isVisible()) {
+      205 |     const errorText = await error.textContent();
+      206 |     if (!errorText) throw new Error("The direct-probe error is empty.");
+        at flickAndReadTrace (/home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:203:6)
+        at /home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:291:3
+
+    Error Context: test-results/counterball-direct-probe-a-5d5f3-anges-rendered-WebGL-pixels-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/counterball-direct-probe-a-5d5f3-anges-rendered-WebGL-pixels-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/counterball-direct-probe-a-5d5f3-anges-rendered-WebGL-pixels-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/e2e/counterball-direct-probe.spec.ts:303:1 › a blocked real WASM load is visible and retry cleans up before a real shot 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByTestId('probe-error')
+    Expected substring: "Havok/WASM"
+    Timeout: 30000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByTestId('probe-error') with timeout 30000ms
+      - waiting for getByTestId('probe-error')
+
+
+      324 |   await page.mouse.up();
+      325 |
+    > 326 |   await expect(page.getByTestId("probe-error")).toContainText("Havok/WASM", {
+          |                                                 ^
+      327 |     timeout: 30_000,
+      328 |   });
+      329 |   await expect.poll(() => blockedWasmRequests).toBeGreaterThan(0);
+        at /home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts:326:49
+
+    Error Context: test-results/counterball-direct-probe-a-427ff-leans-up-before-a-real-shot-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/counterball-direct-probe-a-427ff-leans-up-before-a-real-shot-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/counterball-direct-probe-a-427ff-leans-up-before-a-real-shot-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/e2e/counterball-direct-probe.spec.ts:284:1 › a real pointer flick runs browser Havok and changes rendered WebGL pixels 
+    [chromium] › tests/e2e/counterball-direct-probe.spec.ts:303:1 › a blocked real WASM load is visible and retry cleans up before a real shot 
+  1 passed (1.2m)
+::notice title=🎭 Playwright Run Summary::  2 failed%0A    [chromium] › tests/e2e/counterball-direct-probe.spec.ts:284:1 › a real pointer flick runs browser Havok and changes rendered WebGL pixels %0A    [chromium] › tests/e2e/counterball-direct-probe.spec.ts:303:1 › a blocked real WASM load is visible and retry cleans up before a real shot %0A  1 passed (1.2m)
+ ELIFECYCLE  Command failed with exit code 1.

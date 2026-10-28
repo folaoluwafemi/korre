@@ -1,0 +1,5 @@
+# Nativeonset completionwave packets
+
+Proposed3disjoint source scopes afterall3foundationACCEPTED: nativecontrol3files, matrixconsumer3files, rootE2Eacceptance1file. Sourceworkers independent; rootacceptancetests encodefrozenoutputs andexecutedonlyafteractualAPIs/source-review. Integration acceptance requiresbothsource/runtimechildrenACCEPTED plusfull24/native/archivePASS. required_acceptance_cards are explicit completiongates, not authoringdependencies (avoidtest-before-codecircularity). No productconsumer unblocks beforeintegrationACCEPTED.
+
+Replacedonly originalL01oldfailedfullmatrix prerequisite with newfullintegrationgate inbothcatalogue/runtime; allotheroriginaldeps/T01 preserved. Addednativeproducer asadditionalE01futurebarrel-write prerequisite toorderbrowser.ts; existingE01deps preserved. OldnativecardremainCHANGES_REQUIRED pendingindependentwave review, no acceptance. No source/runtimecheck. Documentchecker131next.

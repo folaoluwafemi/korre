@@ -1,0 +1,1 @@
+export{ri as lightProxyPixelShader}from"./CounterballPreview-CumcheVw.js";

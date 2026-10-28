@@ -1,0 +1,1 @@
+export{hr as gaussianSplattingFragmentDeclarationWGSL}from"./CounterballPreview-CF2od-Td.js";

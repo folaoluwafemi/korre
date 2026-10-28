@@ -1,0 +1,1 @@
+export{_n as volumetricLightScatteringPassVertexShaderWGSL}from"./CounterballPreview-DPky4api.js";

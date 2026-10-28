@@ -1,0 +1,127 @@
+diff --git a/apps/web/src/CounterballDirectProbe.tsx b/apps/web/src/CounterballDirectProbe.tsx
+index 7b0dc8b..8546485 100644
+--- a/apps/web/src/CounterballDirectProbe.tsx
++++ b/apps/web/src/CounterballDirectProbe.tsx
+@@ -157,12 +157,17 @@ const EXPORT_ACKNOWLEDGEMENT_TIMEOUT_MS = 15 * 60 * 1000;
+ 
+ function throwIfAborted(signal: AbortSignal): void {
+   if (signal.aborted) {
+-    throw signal.reason ?? new DOMException("The export was cancelled.", "AbortError");
++    throw (
++      signal.reason ??
++      new DOMException("The export was cancelled.", "AbortError")
++    );
+   }
+ }
+ 
+ function describeError(error: unknown): string {
+-  return error instanceof Error ? error.message : "Unknown browser export error.";
++  return error instanceof Error
++    ? error.message
++    : "Unknown browser export error.";
+ }
+ 
+ function isNotFoundError(error: unknown): boolean {
+@@ -282,10 +287,7 @@ async function openOpfsExport(
+       throw new Error("The browser returned an invalid storage estimate.");
+     }
+     const availableBytes = quota - usage;
+-    if (
+-      availableBytes <
+-      expectedBytes + OPFS_ESTIMATE_HEADROOM_BYTES
+-    ) {
++    if (availableBytes < expectedBytes + OPFS_ESTIMATE_HEADROOM_BYTES) {
+       throw new Error(
+         "Estimated OPFS space is below the export size plus safety headroom.",
+       );
+@@ -303,7 +305,8 @@ async function openOpfsExport(
+     const abortListener = (): void => {
+       void cleanupOpfsExport(
+         session,
+-        signal.reason ?? new DOMException("The export was cancelled.", "AbortError"),
++        signal.reason ??
++          new DOMException("The export was cancelled.", "AbortError"),
+       ).catch(() => undefined);
+     };
+     session.abortListener = abortListener;
+@@ -525,8 +528,9 @@ export default function CounterballDirectProbe({
+   const [matrixPhase, setMatrixPhase] = useState<MatrixPhase>("idle");
+   const [matrixProgress, setMatrixProgress] =
+     useState<LoftCoarseProgress | null>(null);
+-  const [matrixExport, setMatrixExport] =
+-    useState<MatrixExportInfo | null>(null);
++  const [matrixExport, setMatrixExport] = useState<MatrixExportInfo | null>(
++    null,
++  );
+   const [matrixError, setMatrixError] = useState<string | null>(null);
+   const runMatrixActionRef = useRef<((kind: MatrixKind) => void) | null>(null);
+   const cancelMatrixActionRef = useRef<(() => void) | null>(null);
+@@ -608,10 +612,9 @@ export default function CounterballDirectProbe({
+       }
+     };
+ 
+-    const hostAcknowledge = async (
+-      value: unknown,
+-    ): Promise<boolean> => {
+-      if (!import.meta.env.DEV || !isLoftMatrixHostAttestation(value)) return false;
++    const hostAcknowledge = async (value: unknown): Promise<boolean> => {
++      if (!import.meta.env.DEV || !isLoftMatrixHostAttestation(value))
++        return false;
+       const attestation = value;
+       const session = pendingMatrixDownload;
+       if (
+@@ -723,7 +726,10 @@ export default function CounterballDirectProbe({
+       setMatrixPhase("running");
+ 
+       try {
+-        if (kind === "synthetic" && MATRIX_MAXIMUM_BYTES !== SYNTHETIC_TRANSPORT_BYTES) {
++        if (
++          kind === "synthetic" &&
++          MATRIX_MAXIMUM_BYTES !== SYNTHETIC_TRANSPORT_BYTES
++        ) {
+           throw new Error(
+             "The synthetic transport size no longer matches the canonical matrix cap.",
+           );
+@@ -797,7 +803,8 @@ export default function CounterballDirectProbe({
+             );
+           }
+         }
+-        if (pendingMatrixDownload === session) pendingMatrixDownload = undefined;
++        if (pendingMatrixDownload === session)
++          pendingMatrixDownload = undefined;
+         if (activeMatrixSession === session) activeMatrixSession = undefined;
+         if (!disposed) {
+           setMatrixError(describeError(reportedError));
+@@ -821,7 +828,10 @@ export default function CounterballDirectProbe({
+     runMatrixActionRef.current = startMatrix;
+     cancelMatrixActionRef.current = () => {
+       matrixController?.abort(
+-        new DOMException("The export was cancelled by the operator.", "AbortError"),
++        new DOMException(
++          "The export was cancelled by the operator.",
++          "AbortError",
++        ),
+       );
+     };
+     downloadMatrixActionRef.current = downloadPendingMatrix;
+@@ -833,7 +843,9 @@ export default function CounterballDirectProbe({
+         new Error("The browser export was discarded by the operator."),
+       ).catch((error: unknown) => {
+         if (!disposed) {
+-          setMatrixError(`Temporary export cleanup failed: ${describeError(error)}`);
++          setMatrixError(
++            `Temporary export cleanup failed: ${describeError(error)}`,
++          );
+           setMatrixPhase("failed");
+         }
+       });
+@@ -1234,7 +1246,8 @@ export default function CounterballDirectProbe({
+                   data-testid="loft-matrix-download"
+                   onClick={() => downloadMatrixActionRef.current?.()}
+                 >
+-                  Download {matrixExport.kind === "matrix" ? "matrix" : "transport file"}
++                  Download{" "}
++                  {matrixExport.kind === "matrix" ? "matrix" : "transport file"}
+                 </button>
+                 <button
+                   type="button"

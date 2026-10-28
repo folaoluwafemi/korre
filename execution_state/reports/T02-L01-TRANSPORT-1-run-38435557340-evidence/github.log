@@ -1,0 +1,1174 @@
+verify	Set up job	﻿2026-10-13T17:03:33.2309779Z Current runner version: '2.337.0'
+verify	Set up job	2026-10-13T17:03:33.2325502Z ##[group]Runner Image Provisioner
+verify	Set up job	2026-10-13T17:03:33.2326076Z Hosted Compute Agent
+verify	Set up job	2026-10-13T17:03:33.2326545Z Version: 20261002.596
+verify	Set up job	2026-10-13T17:03:33.2326929Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+verify	Set up job	2026-10-13T17:03:33.2327357Z Build Date: 2026-10-02T22:28:27Z
+verify	Set up job	2026-10-13T17:03:33.2327823Z Worker ID: {1d37e3fc-9d5f-42bd-8895-f37fcd73d49c}
+verify	Set up job	2026-10-13T17:03:33.2328286Z Region: westus3
+verify	Set up job	2026-10-13T17:03:33.2328654Z Cloud: Azure
+verify	Set up job	2026-10-13T17:03:33.2328997Z ##[endgroup]
+verify	Set up job	2026-10-13T17:03:33.2329717Z ##[group]Operating System
+verify	Set up job	2026-10-13T17:03:33.2330128Z Ubuntu
+verify	Set up job	2026-10-13T17:03:33.2330479Z 24.04.5
+verify	Set up job	2026-10-13T17:03:33.2330849Z LTS
+verify	Set up job	2026-10-13T17:03:33.2331175Z ##[endgroup]
+verify	Set up job	2026-10-13T17:03:33.2331509Z ##[group]Runner Image
+verify	Set up job	2026-10-13T17:03:33.2331905Z Image: ubuntu-24.04
+verify	Set up job	2026-10-13T17:03:33.2332281Z Version: 20261004.327.1
+verify	Set up job	2026-10-13T17:03:33.2332892Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+verify	Set up job	2026-10-13T17:03:33.2333960Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+verify	Set up job	2026-10-13T17:03:33.2334604Z ##[endgroup]
+verify	Set up job	2026-10-13T17:03:33.2335370Z ##[group]GITHUB_TOKEN Permissions
+verify	Set up job	2026-10-13T17:03:33.2336539Z Contents: read
+verify	Set up job	2026-10-13T17:03:33.2336939Z Metadata: read
+verify	Set up job	2026-10-13T17:03:33.2337269Z ##[endgroup]
+verify	Set up job	2026-10-13T17:03:33.2338586Z Secret source: Actions
+verify	Set up job	2026-10-13T17:03:33.2339134Z Cache mode: write
+verify	Set up job	2026-10-13T17:03:33.2339608Z Prepare workflow directory
+verify	Set up job	2026-10-13T17:03:33.2599999Z Prepare all required actions
+verify	Set up job	2026-10-13T17:03:33.2629999Z Getting action download info
+verify	Set up job	2026-10-13T17:03:33.5829484Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+verify	Set up job	2026-10-13T17:03:33.6515087Z Download action repository 'pnpm/action-setup@v4' (SHA:b906affcce14559ad1aafd4ab0e942779e9f58b1)
+verify	Set up job	2026-10-13T17:03:34.4728676Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+verify	Set up job	2026-10-13T17:03:34.5640271Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+verify	Set up job	2026-10-13T17:03:34.7691212Z Complete job name: verify
+verify	Initialize containers	﻿2026-10-13T17:03:34.8160368Z ##[group]Checking docker version
+verify	Initialize containers	2026-10-13T17:03:34.8169729Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+verify	Initialize containers	2026-10-13T17:03:34.9017078Z '1.48'
+verify	Initialize containers	2026-10-13T17:03:34.9028994Z Docker daemon API version: '1.48'
+verify	Initialize containers	2026-10-13T17:03:34.9029465Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+verify	Initialize containers	2026-10-13T17:03:34.9152266Z '1.48'
+verify	Initialize containers	2026-10-13T17:03:34.9163410Z Docker client API version: '1.48'
+verify	Initialize containers	2026-10-13T17:03:34.9167467Z ##[endgroup]
+verify	Initialize containers	2026-10-13T17:03:34.9168747Z ##[group]Clean up resources from previous jobs
+verify	Initialize containers	2026-10-13T17:03:34.9172339Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=3f21f9"
+verify	Initialize containers	2026-10-13T17:03:34.9274672Z ##[command]/usr/bin/docker network prune --force --filter "label=3f21f9"
+verify	Initialize containers	2026-10-13T17:03:34.9366552Z ##[endgroup]
+verify	Initialize containers	2026-10-13T17:03:34.9366930Z ##[group]Create local container network
+verify	Initialize containers	2026-10-13T17:03:34.9372954Z ##[command]/usr/bin/docker network create --label 3f21f9 github_network_240c259e5b59496c9cd79f126296e8c4
+verify	Initialize containers	2026-10-13T17:03:34.9748386Z 6043ef99b122080c5c4341e4f70d41e8fd268f97971046a86d725c0e42bffd25
+verify	Initialize containers	2026-10-13T17:03:34.9763841Z ##[endgroup]
+verify	Initialize containers	2026-10-13T17:03:34.9780628Z ##[group]Starting postgres service container
+verify	Initialize containers	2026-10-13T17:03:34.9794527Z ##[command]/usr/bin/docker pull postgres:17
+verify	Initialize containers	2026-10-13T17:03:35.7778374Z 17: Pulling from library/postgres
+verify	Initialize containers	2026-10-13T17:03:36.0169323Z ecc510c1e359: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0171092Z fcdd3a481359: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0172037Z b86134c2eeb6: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0172851Z 57644501a07f: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0173737Z affbe3357b39: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0174647Z 3be737420556: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0175625Z e30751283c57: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0176362Z c5602f014e9e: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0177459Z c9432d362cca: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0178159Z dc30f2779c66: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0178943Z d43ee31e40df: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0179711Z 8aebe6431dc8: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0180505Z 52fc2be321a4: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0181315Z 99ce35cabaf9: Pulling fs layer
+verify	Initialize containers	2026-10-13T17:03:36.0182088Z c5602f014e9e: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0182795Z 3be737420556: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0183487Z d43ee31e40df: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0184234Z 8aebe6431dc8: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0185077Z 52fc2be321a4: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0185767Z 99ce35cabaf9: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0186378Z c9432d362cca: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0187016Z 57644501a07f: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0187646Z affbe3357b39: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0188282Z dc30f2779c66: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.0188894Z e30751283c57: Waiting
+verify	Initialize containers	2026-10-13T17:03:36.1878253Z fcdd3a481359: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.1879317Z fcdd3a481359: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.2098324Z b86134c2eeb6: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.2101791Z b86134c2eeb6: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.2605974Z ecc510c1e359: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.2607262Z ecc510c1e359: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.3789666Z 57644501a07f: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.3790794Z 57644501a07f: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.4180943Z affbe3357b39: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.4185286Z affbe3357b39: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.4542679Z 3be737420556: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.4543683Z 3be737420556: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.5729663Z e30751283c57: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.5730332Z e30751283c57: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.5969827Z c5602f014e9e: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.5970212Z c5602f014e9e: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.7477065Z dc30f2779c66: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.7477399Z dc30f2779c66: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.7845152Z d43ee31e40df: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.7845514Z d43ee31e40df: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.8745229Z c9432d362cca: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.9155046Z ecc510c1e359: Pull complete
+verify	Initialize containers	2026-10-13T17:03:36.9318265Z 8aebe6431dc8: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:36.9318631Z 8aebe6431dc8: Download complete
+verify	Initialize containers	2026-10-13T17:03:36.9537435Z 52fc2be321a4: Download complete
+verify	Initialize containers	2026-10-13T17:03:37.0463252Z 99ce35cabaf9: Verifying Checksum
+verify	Initialize containers	2026-10-13T17:03:37.0463430Z 99ce35cabaf9: Download complete
+verify	Initialize containers	2026-10-13T17:03:38.0916932Z fcdd3a481359: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.2901422Z b86134c2eeb6: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.3306625Z 57644501a07f: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.6390955Z affbe3357b39: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.6997543Z 3be737420556: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.7046818Z e30751283c57: Pull complete
+verify	Initialize containers	2026-10-13T17:03:38.7106609Z c5602f014e9e: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8381936Z c9432d362cca: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8468731Z dc30f2779c66: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8547802Z d43ee31e40df: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8607923Z 8aebe6431dc8: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8668619Z 52fc2be321a4: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8735701Z 99ce35cabaf9: Pull complete
+verify	Initialize containers	2026-10-13T17:03:41.8764696Z Digest: sha256:2d2b8998d31037bf721cfdf764d76ba74171b4fab3431b7f72c27c56ddbdf9e3
+verify	Initialize containers	2026-10-13T17:03:41.8778717Z Status: Downloaded newer image for postgres:17
+verify	Initialize containers	2026-10-13T17:03:41.8807196Z docker.io/library/postgres:17
+verify	Initialize containers	2026-10-13T17:03:41.8853058Z ##[command]/usr/bin/docker create --name 826bc915ada54444ac9f2dfc8c6e2ee6_postgres17_8950ea --label 3f21f9 --network github_network_240c259e5b59496c9cd79f126296e8c4 --network-alias postgres -p 5432:5432 --health-cmd "pg_isready -U korre -d korre_test" --health-interval 5s --health-timeout 5s --health-retries 12 -e "POSTGRES_USER=korre" -e "POSTGRES_PASSWORD=ci-disposable-only" -e "POSTGRES_DB=korre_test" -e GITHUB_ACTIONS=true -e CI=true postgres:17
+verify	Initialize containers	2026-10-13T17:03:41.9038800Z 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:41.9056996Z ##[command]/usr/bin/docker start 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:42.0632412Z 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:42.0650233Z ##[command]/usr/bin/docker ps --all --filter id=2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+verify	Initialize containers	2026-10-13T17:03:42.0756280Z 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec Up Less than a second (health: starting)
+verify	Initialize containers	2026-10-13T17:03:42.0779305Z ##[command]/usr/bin/docker port 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:42.0869004Z 5432/tcp -> 0.0.0.0:5432
+verify	Initialize containers	2026-10-13T17:03:42.0869456Z 5432/tcp -> [::]:5432
+verify	Initialize containers	2026-10-13T17:03:42.0907975Z ##[endgroup]
+verify	Initialize containers	2026-10-13T17:03:42.0916148Z ##[group]Waiting for all services to be ready
+verify	Initialize containers	2026-10-13T17:03:42.0927800Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:42.1018257Z starting
+verify	Initialize containers	2026-10-13T17:03:42.1034613Z postgres service is starting, waiting 2 seconds before checking again.
+verify	Initialize containers	2026-10-13T17:03:44.1039087Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:44.1125836Z starting
+verify	Initialize containers	2026-10-13T17:03:44.1136496Z postgres service is starting, waiting 4 seconds before checking again.
+verify	Initialize containers	2026-10-13T17:03:48.4997273Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Initialize containers	2026-10-13T17:03:48.5083299Z healthy
+verify	Initialize containers	2026-10-13T17:03:48.5096924Z postgres service is healthy.
+verify	Initialize containers	2026-10-13T17:03:48.5097424Z ##[endgroup]
+verify	Run actions/checkout@v4	﻿2026-10-13T17:03:48.5285262Z ##[group]Run actions/checkout@v4
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5285792Z with:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5285915Z   repository: folaoluwafemi/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5287469Z   token: ***
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5287577Z   ssh-strict: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5287686Z   ssh-user: git
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5287798Z   persist-credentials: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5287922Z   clean: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288036Z   sparse-checkout-cone-mode: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288172Z   fetch-depth: 1
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288281Z   fetch-tags: false
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288389Z   show-progress: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288500Z   lfs: false
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288598Z   submodules: false
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288711Z   set-safe-directory: true
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5288842Z   allow-unsafe-pr-checkout: false
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5289069Z env:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5289325Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5289496Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5289626Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5908848Z Syncing repository: folaoluwafemi/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5909874Z ##[group]Getting Git version info
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5910167Z Working directory is '/home/runner/work/korre/korre'
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5910612Z [command]/usr/bin/git version
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5953019Z git version 2.55.0
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5964399Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5973054Z Temporarily overriding HOME='/home/runner/work/_temp/834cf8fa-26ca-4677-8863-98d8a4b9ca14' before making global git config changes
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5973745Z Adding repository directory to the temporary git global config as a safe directory
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.5976226Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/korre/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6019207Z Deleting the contents of '/home/runner/work/korre/korre'
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6021832Z ##[group]Initializing the repository
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6025028Z [command]/usr/bin/git init /home/runner/work/korre/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6149900Z hint: Using 'master' as the name for the initial branch. This default branch name
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6150652Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6151142Z hint: to use in all of your new repositories, which will suppress this warning,
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6151566Z hint: call:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6151721Z hint:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6151964Z hint: 	git config --global init.defaultBranch <name>
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6152228Z hint:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6152480Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6152855Z hint: 'development'. The just-created branch can be renamed via this command:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6153047Z hint:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6153163Z hint: 	git branch -m <name>
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6153285Z hint:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6153465Z hint: Disable this message with "git config set advice.defaultBranchName false"
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6153737Z Initialized empty Git repository in /home/runner/work/korre/korre/.git/
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6154361Z [command]/usr/bin/git remote add origin https://github.com/folaoluwafemi/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6197321Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6197665Z ##[group]Disabling automatic garbage collection
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6198030Z [command]/usr/bin/git config --local gc.auto 0
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6218715Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6219105Z ##[group]Setting up auth
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6223819Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6248732Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6532750Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6560645Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6725496Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6751747Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6916162Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6946591Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6946822Z ##[group]Fetching the repository
+verify	Run actions/checkout@v4	2026-10-13T17:03:48.6953385Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +0d4084f202ee96743e15f6c950b724960a9a1fc7:refs/remotes/origin/codex/remote-ci-bootstrap
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0897908Z From https://github.com/folaoluwafemi/korre
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0898464Z  * [new ref]         0d4084f202ee96743e15f6c950b724960a9a1fc7 -> origin/codex/remote-ci-bootstrap
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0901863Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0902209Z ##[group]Determining the checkout info
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0904005Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0908330Z [command]/usr/bin/git sparse-checkout disable
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0950324Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0975100Z ##[group]Checking out the ref
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.0978554Z [command]/usr/bin/git checkout --progress --force -B codex/remote-ci-bootstrap refs/remotes/origin/codex/remote-ci-bootstrap
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.3817234Z Switched to a new branch 'codex/remote-ci-bootstrap'
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.3820578Z branch 'codex/remote-ci-bootstrap' set up to track 'origin/codex/remote-ci-bootstrap'.
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.3840322Z ##[endgroup]
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.3878375Z [command]/usr/bin/git log -1 --format=%H
+verify	Run actions/checkout@v4	2026-10-13T17:03:51.3899343Z 0d4084f202ee96743e15f6c950b724960a9a1fc7
+verify	Run pnpm/action-setup@v4	﻿2026-10-13T17:03:51.4054514Z ##[group]Run pnpm/action-setup@v4
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4054663Z with:
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4054769Z   version: 10.33.0
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055344Z   run_install: false
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055463Z   dest: ~/setup-pnpm
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055574Z   cache: false
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055691Z   cache_dependency_path: pnpm-lock.yaml
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055847Z   package_json_file: package.json
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4055979Z   standalone: false
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4056087Z env:
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4056471Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4056644Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4056775Z ##[endgroup]
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.4876716Z ##[group]Running self-installer...
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.7192649Z (node:2530) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.7193547Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.8892298Z Progress: resolved 1, reused 0, downloaded 0, added 0
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.8941555Z Packages: +1
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:51.8941915Z +
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2014521Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2252261Z 
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2252464Z dependencies:
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2252706Z + pnpm 10.33.0 (12.11.2 is available)
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2252876Z 
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2266590Z Done in 640ms
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2409044Z ##[endgroup]
+verify	Run pnpm/action-setup@v4	2026-10-13T17:03:52.2409281Z Installation Completed!
+verify	Run actions/setup-node@v4	﻿2026-10-13T17:03:52.2524119Z ##[group]Run actions/setup-node@v4
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2524268Z with:
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2524382Z   node-version-file: .node-version
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2524516Z   cache: pnpm
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2524626Z   always-auth: false
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2524743Z   check-latest: false
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2526463Z   token: ***
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2526566Z env:
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2526812Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2526988Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2527173Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.2527336Z ##[endgroup]
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3321361Z Node version file is not JSON file
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3321984Z Resolved .node-version as 24.21.0
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3339809Z Found in cache @ /opt/hostedtoolcache/node/24.21.0/x64
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3342879Z (node:2565) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3343428Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Run actions/setup-node@v4	2026-10-13T17:03:52.3344171Z ##[group]Environment details
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.6189860Z node: v24.21.0
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.6190238Z npm: 11.19.0
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.6190402Z yarn: 1.22.22
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.6190928Z ##[endgroup]
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.6205126Z [command]/home/runner/setup-pnpm/node_modules/.bin/pnpm store path --silent
+verify	Run actions/setup-node@v4	2026-10-13T17:03:54.9857164Z /home/runner/setup-pnpm/node_modules/.bin/store/v10
+verify	Run actions/setup-node@v4	2026-10-13T17:03:55.2098571Z Cache hit for: node-cache-Linux-x64-pnpm-1643297937c208e31d735238cff24a7dcd645df4b32b917891f35d0b18804f24
+verify	Run actions/setup-node@v4	2026-10-13T17:03:55.2189454Z (node:2565) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Run actions/setup-node@v4	2026-10-13T17:03:56.4343468Z Received 62914560 of 120869773 (52.1%), 59.9 MBs/sec
+verify	Run actions/setup-node@v4	2026-10-13T17:03:56.7504514Z Received 120869773 of 120869773 (100.0%), 87.5 MBs/sec
+verify	Run actions/setup-node@v4	2026-10-13T17:03:56.7505139Z Cache Size: ~115 MB (120869773 B)
+verify	Run actions/setup-node@v4	2026-10-13T17:03:56.7583782Z [command]/usr/bin/tar -xf /home/runner/work/_temp/69a739ce-dc93-419d-8e0d-b23b5c4c2c4f/cache.tzst -P -C /home/runner/work/korre/korre --use-compress-program unzstd
+verify	Run actions/setup-node@v4	2026-10-13T17:03:57.5765676Z Cache restored successfully
+verify	Run actions/setup-node@v4	2026-10-13T17:03:57.5817284Z Cache restored from key: node-cache-Linux-x64-pnpm-1643297937c208e31d735238cff24a7dcd645df4b32b917891f35d0b18804f24
+verify	Run pnpm install --frozen-lockfile	﻿2026-10-13T17:03:57.5947690Z ##[group]Run pnpm install --frozen-lockfile
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.5947946Z ^[[36;1mpnpm install --frozen-lockfile^[[0m
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6170710Z shell: /usr/bin/bash -e {0}
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6170860Z env:
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6171221Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6171399Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6171570Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.6171738Z ##[endgroup]
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.7806444Z Scope: all 9 workspace projects
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.7995803Z Lockfile is up to date, resolution step is skipped
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.8170929Z Progress: resolved 1, reused 0, downloaded 0, added 0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.8336038Z Packages: +230
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:57.8351934Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:03:58.3713570Z Progress: resolved 230, reused 230, downloaded 0, added 230, done
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9928607Z 
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9929278Z devDependencies:
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9929724Z + @cloudflare/vitest-plugin 1.4.0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9929996Z + @eslint/js 10.0.1
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9930289Z + @korre/counterball <- games/counterball
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9930627Z + @korre/game-protocol <- packages/game-protocol
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9930948Z + @korre/game-sdk <- packages/game-sdk
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9931305Z + @korre/identity-client <- packages/identity-client
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9931614Z + @korre/ui <- packages/ui
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9931874Z + @playwright/test 1.64.0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9932097Z + @types/node 24.19.2
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9932361Z + @typescript-eslint/eslint-plugin 8.71.1
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9932660Z + @typescript-eslint/parser 8.71.1
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9932907Z + concurrently 10.0.6
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9933120Z + eslint 10.11.0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9933318Z + globals 17.5.0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9933505Z + prettier 3.9.9
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9933701Z + typescript 5.9.3
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9933890Z + vitest 4.1.2
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9934087Z + wrangler 4.149.0
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:00.9934203Z 
+verify	Run pnpm install --frozen-lockfile	2026-10-13T17:04:01.0673463Z Done in 3.4s using pnpm v10.33.0
+verify	Create protected disposable identity test secrets	﻿2026-10-13T17:04:01.1009854Z ##[group]Run set +x
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1010039Z ^[[36;1mset +x^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1010161Z ^[[36;1mdeclare -A seen=()^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1010406Z ^[[36;1mfor name in IDENTITY_SERVICE_SECRET IDENTITY_CSRF_SECRET IDENTITY_RATE_LIMIT_SECRET; do^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1010670Z ^[[36;1m  value="$(openssl rand -hex 32)"^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1010856Z ^[[36;1m  while [[ -n "${seen[$value]+present}" ]]; do^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011041Z ^[[36;1m    value="$(openssl rand -hex 32)"^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011192Z ^[[36;1m  done^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011309Z ^[[36;1m  seen["$value"]=1^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011463Z ^[[36;1m  printf '::add-mask::%s\n' "$value"^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011654Z ^[[36;1m  printf '%s=%s\n' "$name" "$value" >> "$GITHUB_ENV"^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1011829Z ^[[36;1mdone^[[0m
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1063450Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1063655Z env:
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1064115Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1064329Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1064502Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Create protected disposable identity test secrets	2026-10-13T17:04:01.1064674Z ##[endgroup]
+verify	Smoke-test the dedicated Workers runtime	﻿2026-10-13T17:04:01.1229641Z ##[group]Run mkdir -p .artifacts apps/realtime/tests
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1230001Z ^[[36;1mmkdir -p .artifacts apps/realtime/tests^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1230353Z ^[[36;1mcat > apps/realtime/tests/ci-smoke.worker.test.mjs <<'EOF'^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1230712Z ^[[36;1mimport { env } from "cloudflare:workers";^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1231004Z ^[[36;1mimport { expect, it } from "vitest";^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1231253Z ^[[36;1m^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1231509Z ^[[36;1mit("runs in the Workers runtime and reads its binding", () => {^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1231942Z ^[[36;1m  expect(env.COUNTERBALL_CI_SMOKE).toBe("worker-runtime-smoke-ok");^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1232428Z ^[[36;1m});^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1232596Z ^[[36;1mEOF^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1232862Z ^[[36;1mtrap 'rm -f apps/realtime/tests/ci-smoke.worker.test.mjs' EXIT^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1233196Z ^[[36;1mset -o pipefail^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1233466Z ^[[36;1mpnpm test:workers 2>&1 | tee .artifacts/workers.log^[[0m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1286490Z shell: /usr/bin/bash -e {0}
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1286736Z env:
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1287178Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1287479Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1287761Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1288208Z   IDENTITY_SERVICE_SECRET: ***
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1288582Z   IDENTITY_CSRF_SECRET: ***
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1288971Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.1289197Z ##[endgroup]
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.2906756Z 
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.2907513Z > korre@0.1.0 test:workers /home/runner/work/korre/korre
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.2907987Z > vitest run --config vitest.workers.config.ts
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.2908215Z 
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.7637751Z 
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.7640096Z ^[[1m^[[46m RUN ^[[49m^[[22m ^[[36mv4.1.2 ^[[39m^[[90m/home/runner/work/korre/korre^[[39m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:01.7640453Z 
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4196855Z  ^[[32m✓^[[39m apps/realtime/tests/ci-smoke.worker.test.mjs ^[[2m(^[[22m^[[2m1 test^[[22m^[[2m)^[[22m^[[32m 2^[[2mms^[[22m^[[39m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4214999Z 
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4217321Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4218043Z ^[[2m      Tests ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4218667Z ^[[2m   Start at ^[[22m 17:04:01
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4219069Z ^[[2m   Duration ^[[22m 655ms^[[2m (transform 7ms, setup 0ms, import 13ms, tests 2ms, environment 0ms)^[[22m
+verify	Smoke-test the dedicated Workers runtime	2026-10-13T17:04:02.4219605Z 
+verify	Check workflow and root test config formatting	﻿2026-10-13T17:04:02.5472950Z ##[group]Run mkdir -p .artifacts
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5473177Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5473320Z ^[[36;1mset -o pipefail^[[0m
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5473820Z ^[[36;1mpnpm exec prettier --check .github/workflows/ci.yml playwright.config.ts vitest.config.ts vitest.integration.config.ts vitest.workers.config.ts apps/web/tsconfig.server.json package.json 2>&1 | tee .artifacts/tooling-format.log^[[0m
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5523847Z shell: /usr/bin/bash -e {0}
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5523998Z env:
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5524352Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5524540Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5524719Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5525238Z   IDENTITY_SERVICE_SECRET: ***
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5525476Z   IDENTITY_CSRF_SECRET: ***
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5525721Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.5525864Z ##[endgroup]
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.7649685Z Checking formatting...
+verify	Check workflow and root test config formatting	2026-10-13T17:04:02.8934486Z All matched files use Prettier code style!
+verify	Run pnpm exec playwright install --with-deps chromium	﻿2026-10-13T17:04:02.9537851Z ##[group]Run pnpm exec playwright install --with-deps chromium
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9538164Z ^[[36;1mpnpm exec playwright install --with-deps chromium^[[0m
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9591057Z shell: /usr/bin/bash -e {0}
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9591209Z env:
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9591570Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9591766Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9591952Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9592244Z   IDENTITY_SERVICE_SECRET: ***
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9592483Z   IDENTITY_CSRF_SECRET: ***
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9592722Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:02.9592873Z ##[endgroup]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.4980691Z Installing dependencies...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.5032667Z Switching to root user to install dependencies...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.5936305Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.6351511Z Get:6 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.6424356Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.6466467Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.6650187Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.6666676Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.7246067Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main all Packages [640 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.7313809Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [571 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.7385736Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [513 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.7546395Z Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [12.3 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8056863Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1397 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8156220Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [308 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8326752Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1702 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8436641Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [342 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8676021Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1805 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8716211Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [411 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.8733027Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [50.7 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9007688Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse Translation-en [14.0 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9022563Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Packages [748 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9035319Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1144 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9565326Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [230 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9615679Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1221 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9728347Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [246 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9829548Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1713 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:03.9930796Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [392 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:04.0034822Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [45.4 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:04.0038149Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse Translation-en [12.1 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:08.4512230Z Fetched 12.5 MB in 1s (12.7 MB/s)
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:08.9280967Z Reading package lists...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:08.9463094Z Reading package lists...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.0687742Z Building dependency tree...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.0693361Z Reading state information...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1672723Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1673296Z libasound2t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1673785Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1674275Z libatk-bridge2.0-0t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1674724Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1675359Z libatk1.0-0t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1675819Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1676259Z libatspi2.0-0t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1676593Z libcairo2 is already the newest version (1.18.0-3build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1676911Z libcairo2 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1677271Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1677839Z libcups2t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1678059Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1678272Z libdbus-1-3 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1678496Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1678715Z libdrm2 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1678936Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.4).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1679148Z libgbm1 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1679365Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.9).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1679590Z libglib2.0-0t64 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1679832Z libnspr4 is already the newest version (2:4.35-1.1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1680041Z libnspr4 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1680249Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1680453Z libnss3 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1680676Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1680985Z libpango-1.0-0 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1681267Z libxcb1 is already the newest version (1.15-1ubuntu2).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1681465Z libxcb1 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1681680Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1681903Z libxcomposite1 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1682119Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1682330Z libxdamage1 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1682537Z libxext6 is already the newest version (2:1.3.4-1build2).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1682736Z libxext6 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1682941Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1683146Z libxfixes3 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1683361Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1683576Z libxkbcommon0 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1683815Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1684085Z libxrandr2 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1684293Z xvfb is already the newest version (2:21.1.12-1ubuntu1.8).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1684578Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1685001Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1685225Z libfontconfig1 set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1685443Z fonts-liberation is already the newest version (1:2.1.5-3).
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1685661Z fonts-liberation set to manually installed.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1685873Z The following additional packages will be installed:
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1686104Z   libx11-data libx11-xcb1 xfonts-encodings xfonts-utils
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1686682Z Recommended packages:
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1686916Z   fonts-ipafont-mincho fonts-tlwg-loma
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1832794Z The following NEW packages will be installed:
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1833355Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1835750Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1835996Z   xfonts-utils
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1837729Z The following packages will be upgraded:
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1840037Z   libfreetype6 libx11-6 libx11-data libx11-xcb1
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1958047Z 4 upgraded, 9 newly installed, 0 to remove and 25 not upgraded.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1958437Z Need to get 22.3 MB of archives.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1958807Z After this operation, 79.6 MB of additional disk space will be used.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.1959259Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.2924253Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.4263790Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 libx11-6 amd64 2:1.8.7-1ubuntu0.1 [653 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.5038924Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 libx11-xcb1 amd64 2:1.8.7-1ubuntu0.1 [7796 B]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.5676537Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 libx11-data all 2:1.8.7-1ubuntu0.1 [116 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.6443834Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.8979882Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:09.9617702Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.0476164Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.2493223Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libfreetype6 amd64 2.13.2+dfsg-1ubuntu0.2 [403 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.3312225Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.4020238Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.4660697Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.5335334Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7006498Z Fetched 22.3 MB in 1s (16.5 MB/s)
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7181410Z Selecting previously unselected package fonts-ipafont-gothic.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7431039Z (Reading database ... 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7431395Z (Reading database ... 5%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7431546Z (Reading database ... 10%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7431723Z (Reading database ... 15%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7431868Z (Reading database ... 20%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432001Z (Reading database ... 25%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432133Z (Reading database ... 30%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432266Z (Reading database ... 35%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432398Z (Reading database ... 40%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432529Z (Reading database ... 45%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7432664Z (Reading database ... 50%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.7471131Z (Reading database ... 55%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:10.8419148Z (Reading database ... 60%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.0478516Z (Reading database ... 65%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.2550449Z (Reading database ... 70%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.4407576Z (Reading database ... 75%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.6011480Z (Reading database ... 80%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.7565724Z (Reading database ... 85%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:11.9482056Z (Reading database ... 90%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.0887310Z (Reading database ... 95%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.0887564Z (Reading database ... 100%
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.0887932Z (Reading database ... 203191 files and directories currently installed.)
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.0919759Z Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.0987941Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.3215649Z Preparing to unpack .../01-libx11-6_2%3a1.8.7-1ubuntu0.1_amd64.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.3285862Z Unpacking libx11-6:amd64 (2:1.8.7-1ubuntu0.1) over (2:1.8.7-1build1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.3629283Z Preparing to unpack .../02-libx11-xcb1_2%3a1.8.7-1ubuntu0.1_amd64.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.3685318Z Unpacking libx11-xcb1:amd64 (2:1.8.7-1ubuntu0.1) over (2:1.8.7-1build1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.3985544Z Preparing to unpack .../03-libx11-data_2%3a1.8.7-1ubuntu0.1_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.4002101Z Unpacking libx11-data (2:1.8.7-1ubuntu0.1) over (2:1.8.7-1build1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.5525558Z Selecting previously unselected package fonts-freefont-ttf.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.5617371Z Preparing to unpack .../04-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.5622713Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6608366Z Selecting previously unselected package fonts-tlwg-loma-otf.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6702744Z Preparing to unpack .../05-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6707992Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6861486Z Selecting previously unselected package fonts-unifont.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6951199Z Preparing to unpack .../06-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.6955862Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.8776111Z Selecting previously unselected package fonts-wqy-zenhei.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.8870054Z Preparing to unpack .../07-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:12.8945088Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3079125Z Preparing to unpack .../08-libfreetype6_2.13.2+dfsg-1ubuntu0.2_amd64.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3095446Z Unpacking libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.2) over (2.13.2+dfsg-1ubuntu0.1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3287772Z Selecting previously unselected package xfonts-encodings.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3382120Z Preparing to unpack .../09-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3387135Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3586768Z Selecting previously unselected package xfonts-utils.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3677761Z Preparing to unpack .../10-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3682322Z Unpacking xfonts-utils (1:7.7+6build3) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.3997785Z Selecting previously unselected package xfonts-cyrillic.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4088073Z Preparing to unpack .../11-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4092865Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4327947Z Selecting previously unselected package xfonts-scalable.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4416727Z Preparing to unpack .../12-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4421481Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4760806Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4852110Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4866418Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4880924Z Setting up libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4895214Z Setting up libx11-data (2:1.8.7-1ubuntu0.1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4907923Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4921988Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4968882Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4980876Z Setting up libx11-6:amd64 (2:1.8.7-1ubuntu0.1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.4995673Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.5009514Z Setting up libx11-xcb1:amd64 (2:1.8.7-1ubuntu0.1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.5023150Z Setting up xfonts-utils (1:7.7+6build3) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.5052653Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.5258465Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.5446123Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.7231083Z Processing triggers for man-db (2.12.0-4build2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.7248442Z Not building database; man-db/auto-update is not 'true'.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:13.7256318Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.2202761Z 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.2203414Z Running kernel seems to be up-to-date.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.2203667Z 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.2203768Z Restarting services...
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.2256279Z  systemctl restart php8.3-fpm.service
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3010983Z 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3012534Z No containers need to be restarted.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3012824Z 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3012999Z No user sessions are running outdated binaries.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3013428Z 
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.3013679Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:14.8753688Z Downloading Chrome for Testing 156.0.8078.4 (playwright chromium v1248) from https://cdn.playwright.dev/builds/cft/156.0.8078.4/linux64/chrome-linux64.zip
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.1931037Z |                                                                                |   0% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.4351623Z |■■■■■■■■                                                                        |  10% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.5609802Z |■■■■■■■■■■■■■■■■                                                                |  20% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.7410181Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.8279970Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:15.9514561Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:16.0880698Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:16.2094341Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:16.3185132Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:16.4536904Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:16.5757173Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 191.1 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.5985989Z Chrome for Testing 156.0.8078.4 (playwright chromium v1248) downloaded to /home/runner/.cache/ms-playwright/chromium-1248
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.5988751Z Downloading FFmpeg (playwright ffmpeg v1013) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1013/ffmpeg-linux.zip
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9601784Z |                                                                                |   0% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9626747Z |■■■■■■■■                                                                        |  10% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9646657Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9720468Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9777946Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9823794Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9831307Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9839116Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9844582Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9856420Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:18.9873036Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.2 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.0235589Z FFmpeg (playwright ffmpeg v1013) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1013
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.0237630Z Downloading Chrome Headless Shell 156.0.8078.4 (playwright chromium-headless-shell v1248) from https://cdn.playwright.dev/builds/cft/156.0.8078.4/linux64/chrome-headless-shell-linux64.zip
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.3226931Z |                                                                                |   0% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.4693975Z |■■■■■■■■                                                                        |  10% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.5293151Z |■■■■■■■■■■■■■■■■                                                                |  20% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.5973220Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.6609383Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.7076256Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.7538172Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.8460441Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.8953814Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.9242122Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:19.9718851Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 120 MiB
+verify	Run pnpm exec playwright install --with-deps chromium	2026-10-13T17:04:21.4453408Z Chrome Headless Shell 156.0.8078.4 (playwright chromium-headless-shell v1248) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1248
+verify	Apply and recheck migrations on disposable PostgreSQL	﻿2026-10-13T17:04:21.4710059Z ##[group]Run mkdir -p .artifacts
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4710270Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4710412Z ^[[36;1mset -o pipefail^[[0m
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4710619Z ^[[36;1mpnpm --filter @korre/api db:migrate 2>&1 | tee .artifacts/migrations.log^[[0m
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4710912Z ^[[36;1mpnpm --filter @korre/api db:migrate 2>&1 | tee -a .artifacts/migrations.log^[[0m
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4761797Z shell: /usr/bin/bash -e {0}
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4761936Z env:
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4762269Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4762459Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4762633Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4763046Z   IDENTITY_SERVICE_SECRET: ***
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4763272Z   IDENTITY_CSRF_SECRET: ***
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4763505Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4763734Z   DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.4763886Z ##[endgroup]
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6417707Z 
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6418215Z > @korre/api@ db:migrate /home/runner/work/korre/korre/apps/api
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6418582Z > node --env-file-if-exists=../../.env scripts/migrate.mjs
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6418724Z 
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6463034Z ../../.env not found. Continuing without it.
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.6940292Z Verified 1 forward-only migration(s).
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.8641965Z 
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.8642546Z > @korre/api@ db:migrate /home/runner/work/korre/korre/apps/api
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.8642881Z > node --env-file-if-exists=../../.env scripts/migrate.mjs
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.8643028Z 
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.8687113Z ../../.env not found. Continuing without it.
+verify	Apply and recheck migrations on disposable PostgreSQL	2026-10-13T17:04:21.9096593Z Verified 1 forward-only migration(s).
+verify	Run focused game protocol contract tests	﻿2026-10-13T17:04:21.9257736Z ##[group]Run mkdir -p .artifacts
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9257935Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9258074Z ^[[36;1mset -o pipefail^[[0m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9258335Z ^[[36;1mpnpm exec vitest run packages/game-protocol/src/protocol.test.ts 2>&1 | tee .artifacts/protocol.log^[[0m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9308944Z shell: /usr/bin/bash -e {0}
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9309096Z env:
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9309422Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9309611Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9309786Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9310086Z   IDENTITY_SERVICE_SECRET: ***
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9310314Z   IDENTITY_CSRF_SECRET: ***
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9310545Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Run focused game protocol contract tests	2026-10-13T17:04:21.9310689Z ##[endgroup]
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.2758256Z 
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.2760314Z ^[[1m^[[46m RUN ^[[49m^[[22m ^[[36mv4.1.2 ^[[39m^[[90m/home/runner/work/korre/korre^[[39m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.2760766Z 
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5924436Z  ^[[32m✓^[[39m packages/game-protocol/src/protocol.test.ts ^[[2m(^[[22m^[[2m13 tests^[[22m^[[2m)^[[22m^[[32m 109^[[2mms^[[22m^[[39m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5942243Z 
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5944613Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5945257Z ^[[2m      Tests ^[[22m ^[[1m^[[32m13 passed^[[39m^[[22m^[[90m (13)^[[39m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5945815Z ^[[2m   Start at ^[[22m 17:04:22
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5946383Z ^[[2m   Duration ^[[22m 311ms^[[2m (transform 75ms, setup 0ms, import 120ms, tests 109ms, environment 0ms)^[[22m
+verify	Run focused game protocol contract tests	2026-10-13T17:04:22.5947872Z 
+verify	Verify	﻿2026-10-13T17:04:22.6233747Z ##[group]Run mkdir -p .artifacts
+verify	Verify	2026-10-13T17:04:22.6233958Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Verify	2026-10-13T17:04:22.6234104Z ^[[36;1mset -o pipefail^[[0m
+verify	Verify	2026-10-13T17:04:22.6234260Z ^[[36;1mpnpm verify 2>&1 | tee .artifacts/verify.log^[[0m
+verify	Verify	2026-10-13T17:04:22.6285674Z shell: /usr/bin/bash -e {0}
+verify	Verify	2026-10-13T17:04:22.6285821Z env:
+verify	Verify	2026-10-13T17:04:22.6286157Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Verify	2026-10-13T17:04:22.6286342Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Verify	2026-10-13T17:04:22.6286516Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Verify	2026-10-13T17:04:22.6286796Z   IDENTITY_SERVICE_SECRET: ***
+verify	Verify	2026-10-13T17:04:22.6287022Z   IDENTITY_CSRF_SECRET: ***
+verify	Verify	2026-10-13T17:04:22.6287251Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Verify	2026-10-13T17:04:22.6287487Z   COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
+verify	Verify	2026-10-13T17:04:22.6287825Z   COUNTERBALL_INTENDED_SHOT_OUTPUT: .artifacts/counterball-intended-shot-observations.json
+verify	Verify	2026-10-13T17:04:22.6288071Z ##[endgroup]
+verify	Verify	2026-10-13T17:04:22.7824144Z 
+verify	Verify	2026-10-13T17:04:22.7824961Z > korre@0.1.0 verify /home/runner/work/korre/korre
+verify	Verify	2026-10-13T17:04:22.7825427Z > pnpm typecheck && pnpm lint && pnpm test && pnpm build
+verify	Verify	2026-10-13T17:04:22.7825639Z 
+verify	Verify	2026-10-13T17:04:22.9375978Z 
+verify	Verify	2026-10-13T17:04:22.9376621Z > korre@0.1.0 typecheck /home/runner/work/korre/korre
+verify	Verify	2026-10-13T17:04:22.9377396Z > pnpm -r --sort typecheck && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.server.json
+verify	Verify	2026-10-13T17:04:22.9377634Z 
+verify	Verify	2026-10-13T17:04:23.0967957Z Scope: 8 of 9 workspace projects
+verify	Verify	2026-10-13T17:04:23.0998347Z packages/game-protocol typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:23.1002627Z packages/identity-client typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:23.1004712Z packages/ui typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:24.1483566Z packages/identity-client typecheck: Done
+verify	Verify	2026-10-13T17:04:24.1515022Z packages/ui typecheck: Done
+verify	Verify	2026-10-13T17:04:24.5523926Z packages/game-protocol typecheck: Done
+verify	Verify	2026-10-13T17:04:24.5527094Z apps/api typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:24.5529454Z packages/game-sdk typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:25.9136304Z apps/api typecheck: Done
+verify	Verify	2026-10-13T17:04:26.0466389Z packages/game-sdk typecheck: Done
+verify	Verify	2026-10-13T17:04:26.0470310Z games/counterball typecheck$ node --input-type=module -e "for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:26.2224203Z games/counterball typecheck: > @korre/counterball@ check:headless-bundle /home/runner/work/korre/korre/games/counterball
+verify	Verify	2026-10-13T17:04:26.2239830Z games/counterball typecheck: > node --input-type=module -e "import { build } from 'esbuild'; import { fileURLToPath } from 'node:url'; import { relative, sep } from 'node:path'; const publicUrl = import.meta.resolve('@korre/counterball/headless'); const entry = fileURLToPath(publicUrl); const entryRelative = relative(process.cwd(), entry).split(sep).join('/'); if (!entryRelative.endsWith('/src/headless.ts') && entryRelative !== 'src/headless.ts') throw new Error('Unexpected public headless entry: ' + entryRelative); const result = await build({ entryPoints: [entry], absWorkingDir: process.cwd(), bundle: true, write: false, platform: 'browser', conditions: ['workerd', 'worker'], format: 'esm', target: 'es2022', metafile: true, treeShaking: false, minifyWhitespace: true }); const normalize = (value) => value.split(String.fromCharCode(92)).join('/'); const inputPaths = Object.keys(result.metafile.inputs).map(normalize); if (!inputPaths.some((value) => value === entryRelative || value.endsWith('/' + entryRelative))) throw new Error('Public headless entry is absent from the resolved bundle graph.'); const forbiddenPaths = inputPaths.filter((value) => (value === 'src/browser.ts' || value.endsWith('/src/browser.ts')) || value.includes('/apps/web/') || value.includes('/node_modules/react/') || value.includes('/node_modules/react-dom/') || value.includes('/@babylonjs/core/Engines/engine.js') || value.includes('/@babylonjs/core/Engines/webgpuEngine.js')); if (forbiddenPaths.length) throw new Error('Headless bundle reaches browser-only modules: ' + forbiddenPaths.join(', ')); const output = result.outputFiles.map((file) => file.text).join(' '); const isIdent = (value) => value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9') || value === '_' || value === '$'); const hasGlobal = (name) => { for (let at = output.indexOf(name); at !== -1; at = output.indexOf(name, at + 1)) if (!isIdent(output[at - 1]) && !isIdent(output[at + name.length])) return true; return false; }; const forbiddenGlobals = ['React', 'ReactDOM', 'window', 'document', 'HTMLElement', 'HTMLCanvasElement', 'DOMParser', 'localStorage', 'sessionStorage'].filter(hasGlobal); if (forbiddenGlobals.length) throw new Error('Headless bundle references browser globals: ' + forbiddenGlobals.join(', ')); const entryOutputs = Object.values(result.metafile.outputs).filter((item) => item.entryPoint && (normalize(item.entryPoint) === entryRelative || normalize(item.entryPoint).endsWith('/' + entryRelative))); if (entryOutputs.length !== 1 || result.outputFiles.length !== 1 || result.outputFiles[0].contents.length === 0) throw new Error('Expected one nonempty bundle emitted from the public headless entry.'); console.log('Public Counterball headless Worker-target bundle boundary passed.');"
+verify	Verify	2026-10-13T17:04:26.2544756Z games/counterball typecheck: Public Counterball headless Worker-target bundle boundary passed.
+verify	Verify	2026-10-13T17:04:28.4540284Z games/counterball typecheck: Done
+verify	Verify	2026-10-13T17:04:28.4543923Z apps/realtime typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:28.4545578Z apps/web typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-13T17:04:28.8961734Z apps/realtime typecheck: Done
+verify	Verify	2026-10-13T17:04:31.0734111Z apps/web typecheck: Done
+verify	Verify	2026-10-13T17:04:34.5611828Z 
+verify	Verify	2026-10-13T17:04:34.5612574Z > korre@0.1.0 lint /home/runner/work/korre/korre
+verify	Verify	2026-10-13T17:04:34.5613199Z > eslint apps games packages tests --max-warnings=0 && prettier --check apps games packages tests
+verify	Verify	2026-10-13T17:04:34.5613532Z 
+verify	Verify	2026-10-13T17:04:42.6417167Z 
+verify	Verify	2026-10-13T17:04:42.6418048Z /home/runner/work/korre/korre/tests/e2e/counterball-direct-probe.spec.ts
+verify	Verify	2026-10-13T17:04:42.6439276Z ##[error]   63:25  error  Unsafe member access .byteLength on an `any` value                          @typescript-eslint/no-unsafe-member-access
+verify	Verify	2026-10-13T17:04:42.6446673Z ##[error]   67:17  error  Unsafe argument of type `any` assigned to a parameter of type `BinaryLike`  @typescript-eslint/no-unsafe-argument
+verify	Verify	2026-10-13T17:04:42.6448177Z ##[error]  481:7   error  Unsafe usage of ThrowStatement                                              no-unsafe-finally
+verify	Verify	2026-10-13T17:04:42.6448832Z 
+verify	Verify	2026-10-13T17:04:42.6449259Z ✖ 3 problems (3 errors, 0 warnings)
+verify	Verify	2026-10-13T17:04:42.6449455Z 
+verify	Verify	2026-10-13T17:04:42.8397827Z  ELIFECYCLE  Command failed with exit code 1.
+verify	Verify	2026-10-13T17:04:42.8681984Z  ELIFECYCLE  Command failed with exit code 1.
+verify	Verify	2026-10-13T17:04:42.8831763Z ##[error]Process completed with exit code 1.
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	﻿2026-10-13T17:04:42.8878800Z ##[group]Run mkdir -p .artifacts
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8879022Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8879158Z ^[[36;1mset +e^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8879393Z ^[[36;1mpnpm exec tsc --noEmit -p games/counterball/tsconfig.json --listFiles --traceResolution \^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8879689Z ^[[36;1m  > .artifacts/counterball-tsc-resolution.log 2>&1^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8879881Z ^[[36;1mtsc_status=$?^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8880005Z ^[[36;1mset -e^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8880201Z ^[[36;1mprintf 'tsc_exit_code=%s\n' "$tsc_status" > .artifacts/counterball-tsc-status.log^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8880425Z ^[[36;1m{^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8880555Z ^[[36;1m  printf 'tsc_exit_code=%s\n' "$tsc_status"^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8880835Z ^[[36;1m  grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8881128Z ^[[36;1m    .artifacts/counterball-tsc-resolution.log || true^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8881337Z ^[[36;1m} > .artifacts/counterball-tsc-summary.log^[[0m
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8931952Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8932146Z env:
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8932466Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8932648Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8932822Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8933096Z   IDENTITY_SERVICE_SECRET: ***
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8933323Z   IDENTITY_CSRF_SECRET: ***
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8933555Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Diagnose Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:42.8933696Z ##[endgroup]
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	﻿2026-10-13T17:04:45.4724223Z ##[group]Run mkdir -p .artifacts
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4724443Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4724579Z ^[[36;1mset +e^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4724796Z ^[[36;1mpnpm exec tsc --noEmit -p apps/web/tsconfig.json --listFiles --traceResolution \^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4725267Z ^[[36;1m  > .artifacts/counterball-web-tsc-resolution.log 2>&1^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4725460Z ^[[36;1mtsc_status=$?^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4725584Z ^[[36;1mset -e^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4725914Z ^[[36;1mprintf 'tsc_exit_code=%s\n' "$tsc_status" > .artifacts/counterball-web-tsc-status.log^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4726140Z ^[[36;1m{^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4726274Z ^[[36;1m  printf 'tsc_exit_code=%s\n' "$tsc_status"^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4726544Z ^[[36;1m  grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4726837Z ^[[36;1m    .artifacts/counterball-web-tsc-resolution.log || true^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4727061Z ^[[36;1m} > .artifacts/counterball-web-tsc-summary.log^[[0m
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4777589Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4777779Z env:
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4778097Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4778281Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4778458Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4778736Z   IDENTITY_SERVICE_SECRET: ***
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4778965Z   IDENTITY_CSRF_SECRET: ***
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4779202Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Diagnose apps/web Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:45.4779351Z ##[endgroup]
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	﻿2026-10-13T17:04:48.2989842Z ##[group]Run mkdir -p .artifacts
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2990069Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2990209Z ^[[36;1mset +e^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2990431Z ^[[36;1mpnpm exec tsc --noEmit -p tests/tsconfig.json --listFiles --traceResolution \^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2990722Z ^[[36;1m  > .artifacts/counterball-tests-tsc-resolution.log 2>&1^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2990922Z ^[[36;1mtests_status=$?^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2991155Z ^[[36;1mpnpm exec tsc --noEmit -p apps/web/tsconfig.server.json --listFiles --traceResolution \^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2991451Z ^[[36;1m  > .artifacts/counterball-server-tsc-resolution.log 2>&1^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2991650Z ^[[36;1mserver_status=$?^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2991777Z ^[[36;1mset -e^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2992021Z ^[[36;1mprintf 'tsc_exit_code=%s\n' "$tests_status" > .artifacts/counterball-tests-tsc-status.log^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2992380Z ^[[36;1mprintf 'tsc_exit_code=%s\n' "$server_status" > .artifacts/counterball-server-tsc-status.log^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2992654Z ^[[36;1m{^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2992794Z ^[[36;1m  printf 'tsc_exit_code=%s\n' "$tests_status"^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2993077Z ^[[36;1m  grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2993381Z ^[[36;1m    .artifacts/counterball-tests-tsc-resolution.log || true^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2993614Z ^[[36;1m} > .artifacts/counterball-tests-tsc-summary.log^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2993788Z ^[[36;1m{^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2993925Z ^[[36;1m  printf 'tsc_exit_code=%s\n' "$server_status"^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2994193Z ^[[36;1m  grep -nE 'viteAssetModules\.d\.ts|HavokPhysics\.wasm\?url|counterball-v1\.json\?raw|TS2307' \^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2994494Z ^[[36;1m    .artifacts/counterball-server-tsc-resolution.log || true^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.2994728Z ^[[36;1m} > .artifacts/counterball-server-tsc-summary.log^[[0m
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3045459Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3045654Z env:
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3045981Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3046164Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3046339Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3046645Z   IDENTITY_SERVICE_SECRET: ***
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3046873Z   IDENTITY_CSRF_SECRET: ***
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3047109Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Diagnose root Counterball TypeScript asset resolution after failed verification	2026-10-13T17:04:48.3047253Z ##[endgroup]
+verify	Preserve full verification log	﻿2026-10-13T17:04:52.1790534Z ##[group]Run actions/upload-artifact@v4
+verify	Preserve full verification log	2026-10-13T17:04:52.1790710Z with:
+verify	Preserve full verification log	2026-10-13T17:04:52.1790834Z   name: counterball-verification-log
+verify	Preserve full verification log	2026-10-13T17:04:52.1790990Z   path: .artifacts/verify.log
+verify	Preserve full verification log	2026-10-13T17:04:52.1791133Z   if-no-files-found: ignore
+verify	Preserve full verification log	2026-10-13T17:04:52.1791271Z   compression-level: 6
+verify	Preserve full verification log	2026-10-13T17:04:52.1791394Z   overwrite: false
+verify	Preserve full verification log	2026-10-13T17:04:52.1791517Z   include-hidden-files: false
+verify	Preserve full verification log	2026-10-13T17:04:52.1791764Z env:
+verify	Preserve full verification log	2026-10-13T17:04:52.1792062Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Preserve full verification log	2026-10-13T17:04:52.1792243Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Preserve full verification log	2026-10-13T17:04:52.1792414Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Preserve full verification log	2026-10-13T17:04:52.1792683Z   IDENTITY_SERVICE_SECRET: ***
+verify	Preserve full verification log	2026-10-13T17:04:52.1792908Z   IDENTITY_CSRF_SECRET: ***
+verify	Preserve full verification log	2026-10-13T17:04:52.1793132Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Preserve full verification log	2026-10-13T17:04:52.1793272Z ##[endgroup]
+verify	Preserve full verification log	2026-10-13T17:04:52.2795349Z (node:4187) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Preserve full verification log	2026-10-13T17:04:52.2795916Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Preserve full verification log	2026-10-13T17:04:52.2822638Z With the provided path, there will be 1 file uploaded
+verify	Preserve full verification log	2026-10-13T17:04:52.2826146Z Artifact name is valid!
+verify	Preserve full verification log	2026-10-13T17:04:52.2826589Z Root directory input is valid!
+verify	Preserve full verification log	2026-10-13T17:04:52.6304955Z Beginning upload of artifact content to blob storage
+verify	Preserve full verification log	2026-10-13T17:04:52.6412002Z (node:4187) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Preserve full verification log	2026-10-13T17:04:52.8399187Z Uploaded bytes 1884
+verify	Preserve full verification log	2026-10-13T17:04:52.8951217Z Finished uploading artifact content to blob storage!
+verify	Preserve full verification log	2026-10-13T17:04:52.8951879Z SHA256 digest of uploaded artifact zip is 31d94326e8190ee6e8a2aa3ed21385016db3a7ddf4d57053627cb295c70fd2fb
+verify	Preserve full verification log	2026-10-13T17:04:52.8953027Z Finalizing artifact upload
+verify	Preserve full verification log	2026-10-13T17:04:53.1637095Z Artifact counterball-verification-log.zip successfully finalized. Artifact ID 11832452922
+verify	Preserve full verification log	2026-10-13T17:04:53.1637699Z Artifact counterball-verification-log has been successfully uploaded! Final size is 1884 bytes. Artifact ID is 11832452922
+verify	Preserve full verification log	2026-10-13T17:04:53.1641091Z Artifact download URL: https://github.com/folaoluwafemi/korre/actions/runs/38435557340/artifacts/11832452922
+verify	Upload calibration probe observations	﻿2026-10-13T17:04:53.1762294Z ##[group]Run actions/upload-artifact@v4
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1762574Z with:
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1762795Z   name: counterball-calibration-observations
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1763143Z   path: .artifacts/counterball-calibration-observations.json
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1763473Z   if-no-files-found: ignore
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1763703Z   compression-level: 6
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1763911Z   overwrite: false
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1764114Z   include-hidden-files: false
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1764339Z env:
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1764762Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1765228Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1765505Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1765962Z   IDENTITY_SERVICE_SECRET: ***
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1766316Z   IDENTITY_CSRF_SECRET: ***
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1766687Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Upload calibration probe observations	2026-10-13T17:04:53.1766916Z ##[endgroup]
+verify	Upload calibration probe observations	2026-10-13T17:04:53.2769319Z (node:4221) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Upload calibration probe observations	2026-10-13T17:04:53.2770164Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Upload calibration probe observations	2026-10-13T17:04:53.2778942Z No files were found with the provided path: .artifacts/counterball-calibration-observations.json. No artifacts will be uploaded.
+verify	Upload intended-shot probe observations	﻿2026-10-13T17:04:53.2926346Z ##[group]Run actions/upload-artifact@v4
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2926554Z with:
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2926694Z   name: counterball-intended-shot-observations
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2926920Z   path: .artifacts/counterball-intended-shot-observations.json
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2927123Z   if-no-files-found: ignore
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2927266Z   compression-level: 6
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2927392Z   overwrite: false
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2927522Z   include-hidden-files: false
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2938839Z env:
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2939300Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2939592Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2939938Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2940221Z   IDENTITY_SERVICE_SECRET: ***
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2940451Z   IDENTITY_CSRF_SECRET: ***
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2940729Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.2940877Z ##[endgroup]
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.3955416Z (node:4233) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.3955931Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Upload intended-shot probe observations	2026-10-13T17:04:53.3965359Z No files were found with the provided path: .artifacts/counterball-intended-shot-observations.json. No artifacts will be uploaded.
+verify	Upload browser review evidence	﻿2026-10-13T17:04:53.4127191Z ##[group]Run actions/upload-artifact@v4
+verify	Upload browser review evidence	2026-10-13T17:04:53.4127484Z with:
+verify	Upload browser review evidence	2026-10-13T17:04:53.4127679Z   name: counterball-browser-evidence
+verify	Upload browser review evidence	2026-10-13T17:04:53.4128088Z   path: execution_state/reports/T03-*.png
+verify	Upload browser review evidence	test-results/
+verify	Upload browser review evidence	.artifacts/browser-test-results*.json
+verify	Upload browser review evidence	
+verify	Upload browser review evidence	2026-10-13T17:04:53.4128529Z   include-hidden-files: true
+verify	Upload browser review evidence	2026-10-13T17:04:53.4128761Z   if-no-files-found: ignore
+verify	Upload browser review evidence	2026-10-13T17:04:53.4128983Z   compression-level: 6
+verify	Upload browser review evidence	2026-10-13T17:04:53.4129183Z   overwrite: false
+verify	Upload browser review evidence	2026-10-13T17:04:53.4129368Z env:
+verify	Upload browser review evidence	2026-10-13T17:04:53.4129868Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Upload browser review evidence	2026-10-13T17:04:53.4130165Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Upload browser review evidence	2026-10-13T17:04:53.4130443Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Upload browser review evidence	2026-10-13T17:04:53.4130902Z   IDENTITY_SERVICE_SECRET: ***
+verify	Upload browser review evidence	2026-10-13T17:04:53.4131270Z   IDENTITY_CSRF_SECRET: ***
+verify	Upload browser review evidence	2026-10-13T17:04:53.4131655Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Upload browser review evidence	2026-10-13T17:04:53.4131882Z ##[endgroup]
+verify	Upload browser review evidence	2026-10-13T17:04:53.5145205Z (node:4245) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Upload browser review evidence	2026-10-13T17:04:53.5145788Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Upload browser review evidence	2026-10-13T17:04:53.5316136Z Multiple search paths detected. Calculating the least common ancestor of all paths
+verify	Upload browser review evidence	2026-10-13T17:04:53.5316908Z The least common ancestor is /home/runner/work/korre/korre. This will be the root directory of the artifact
+verify	Upload browser review evidence	2026-10-13T17:04:53.5317249Z With the provided path, there will be 3 files uploaded
+verify	Upload browser review evidence	2026-10-13T17:04:53.5317540Z Artifact name is valid!
+verify	Upload browser review evidence	2026-10-13T17:04:53.5317703Z Root directory input is valid!
+verify	Upload browser review evidence	2026-10-13T17:04:53.8588594Z Beginning upload of artifact content to blob storage
+verify	Upload browser review evidence	2026-10-13T17:04:53.8815765Z (node:4245) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Upload browser review evidence	2026-10-13T17:04:54.2737944Z Uploaded bytes 437511
+verify	Upload browser review evidence	2026-10-13T17:04:54.3285811Z Finished uploading artifact content to blob storage!
+verify	Upload browser review evidence	2026-10-13T17:04:54.3286405Z SHA256 digest of uploaded artifact zip is 07b1fba964ba63e57164389277b848c52137d43c23c5918920a6d4bf384f6330
+verify	Upload browser review evidence	2026-10-13T17:04:54.3288230Z Finalizing artifact upload
+verify	Upload browser review evidence	2026-10-13T17:04:54.6035326Z Artifact counterball-browser-evidence.zip successfully finalized. Artifact ID 11832791879
+verify	Upload browser review evidence	2026-10-13T17:04:54.6036115Z Artifact counterball-browser-evidence has been successfully uploaded! Final size is 437511 bytes. Artifact ID is 11832791879
+verify	Upload browser review evidence	2026-10-13T17:04:54.6045944Z Artifact download URL: https://github.com/folaoluwafemi/korre/actions/runs/38435557340/artifacts/11832791879
+verify	Upload complete hosted check logs and structured browser results	﻿2026-10-13T17:04:54.6168692Z ##[group]Run actions/upload-artifact@v4
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6168867Z with:
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6169129Z   name: counterball-hosted-checks-0d4084f202ee96743e15f6c950b724960a9a1fc7-run-38435557340-attempt-1
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6169539Z   path: .artifacts/*.log
+verify	Upload complete hosted check logs and structured browser results	.artifacts/browser-test-results*.json
+verify	Upload complete hosted check logs and structured browser results	.artifacts/diagnostic-e2e-files.json
+verify	Upload complete hosted check logs and structured browser results	
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6169814Z   include-hidden-files: true
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6169961Z   retention-days: 14
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6170097Z   if-no-files-found: ignore
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6170241Z   compression-level: 6
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6170495Z   overwrite: false
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6170616Z env:
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6170905Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6171103Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6171288Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6171567Z   IDENTITY_SERVICE_SECRET: ***
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6171803Z   IDENTITY_CSRF_SECRET: ***
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6172042Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.6172208Z ##[endgroup]
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.7177922Z (node:4257) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.7178451Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.7231266Z With the provided path, there will be 17 files uploaded
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.7233936Z Artifact name is valid!
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:54.7234427Z Root directory input is valid!
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.0411225Z Beginning upload of artifact content to blob storage
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.2401445Z (node:4257) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.7297371Z Uploaded bytes 1326068
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.7848824Z Finished uploading artifact content to blob storage!
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.7849475Z SHA256 digest of uploaded artifact zip is 63c7ba0af4477766409bcecacc67dd5c4ff19f09b40a5ce7eab87997b240512c
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:55.7850752Z Finalizing artifact upload
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:56.0902726Z Artifact counterball-hosted-checks-0d4084f202ee96743e15f6c950b724960a9a1fc7-run-38435557340-attempt-1.zip successfully finalized. Artifact ID 11832462902
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:56.0903546Z Artifact counterball-hosted-checks-0d4084f202ee96743e15f6c950b724960a9a1fc7-run-38435557340-attempt-1 has been successfully uploaded! Final size is 1326068 bytes. Artifact ID is 11832462902
+verify	Upload complete hosted check logs and structured browser results	2026-10-13T17:04:56.0906509Z Artifact download URL: https://github.com/folaoluwafemi/korre/actions/runs/38435557340/artifacts/11832462902
+verify	Prepare formatting suggestion after a failed check	﻿2026-10-13T17:04:56.1024255Z ##[group]Run pnpm exec prettier --write apps games packages tests
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1024548Z ^[[36;1mpnpm exec prettier --write apps games packages tests^[[0m
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1024755Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1025219Z ^[[36;1mgit diff --binary -- apps games packages tests > .artifacts/formatting-repair.patch^[[0m
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1075800Z shell: /usr/bin/bash -e {0}
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1075964Z env:
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1076279Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1076480Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1076672Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1076954Z   IDENTITY_SERVICE_SECRET: ***
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1077192Z   IDENTITY_CSRF_SECRET: ***
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1077435Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.1077603Z ##[endgroup]
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.3288115Z ^[[90mapps/api/package.json^[[39m 9ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.3375062Z ^[[90mapps/api/scripts/clean-dist.mjs^[[39m 7ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.3596133Z ^[[90mapps/api/scripts/migrate.mjs^[[39m 21ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.3954358Z ^[[90mapps/api/src/app.test.ts^[[39m 32ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4076075Z ^[[90mapps/api/src/app.ts^[[39m 6ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4138274Z ^[[90mapps/api/src/config.test.ts^[[39m 6ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4240296Z ^[[90mapps/api/src/config.ts^[[39m 9ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4420576Z ^[[90mapps/api/src/features/identity/application/identityService.ts^[[39m 16ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4487148Z ^[[90mapps/api/src/features/identity/domain/username.ts^[[39m 5ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4664345Z ^[[90mapps/api/src/features/identity/http/identityRoutes.ts^[[39m 16ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.4864392Z ^[[90mapps/api/src/features/identity/identity.http-postgres.test.ts^[[39m 19ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5072987Z ^[[90mapps/api/src/features/identity/identity.repository.test.ts^[[39m 20ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5271848Z ^[[90mapps/api/src/features/identity/identity.routes.test.ts^[[39m 19ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5482691Z ^[[90mapps/api/src/features/identity/identity.service.test.ts^[[39m 20ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5675755Z ^[[90mapps/api/src/features/identity/infrastructure/postgresIdentityRepository.ts^[[39m 12ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5725839Z ^[[90mapps/api/src/index.ts^[[39m 3ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5877664Z ^[[90mapps/api/src/migrations.test.ts^[[39m 15ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5915241Z ^[[90mapps/api/tsconfig.build.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5939491Z ^[[90mapps/api/tsconfig.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5958213Z ^[[90mapps/realtime/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.5987325Z ^[[90mapps/realtime/src/index.test.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6008033Z ^[[90mapps/realtime/src/index.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6021808Z ^[[90mapps/realtime/tsconfig.json^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6214195Z ^[[90mapps/web/index.html^[[39m 17ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6227221Z ^[[90mapps/web/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6262249Z ^[[90mapps/web/src/App.test.tsx^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.6383399Z ^[[90mapps/web/src/App.tsx^[[39m 11ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7051030Z ^[[90mapps/web/src/CounterballDirectProbe.tsx^[[39m 63ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7466805Z ^[[90mapps/web/src/CounterballPreview.tsx^[[39m 30ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7656528Z ^[[90mapps/web/src/CounterballRendererDiagnostic.css^[[39m 17ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7681283Z ^[[90mapps/web/src/CounterballRendererDiagnostic.test.tsx^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7708502Z ^[[90mapps/web/src/CounterballRendererDiagnostic.tsx^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.7726966Z ^[[90mapps/web/src/main.tsx^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8023153Z ^[[90mapps/web/src/styles.css^[[39m 29ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8039301Z ^[[90mapps/web/src/vite-env.d.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8070081Z ^[[90mapps/web/tsconfig.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8078115Z ^[[90mapps/web/tsconfig.server.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8093312Z ^[[90mapps/web/vite.config.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8134473Z ^[[90mgames/counterball/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8161878Z ^[[90mgames/counterball/src/browser.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8268271Z ^[[90mgames/counterball/src/features/restarts/domain/placementPose.test.ts^[[39m 8ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8316902Z ^[[90mgames/counterball/src/features/restarts/domain/placementPose.ts^[[39m 4ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8353237Z ^[[90mgames/counterball/src/headless.ts^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8379726Z ^[[90mgames/counterball/src/scene/createScene.test.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8403725Z ^[[90mgames/counterball/src/scene/createScene.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8448327Z ^[[90mgames/counterball/src/scene/materials.ts^[[39m 4ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8592163Z ^[[90mgames/counterball/src/scene/pieces.test.ts^[[39m 12ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8756725Z ^[[90mgames/counterball/src/scene/pieces.ts^[[39m 16ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8858753Z ^[[90mgames/counterball/src/scene/pitch.test.ts^[[39m 7ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.8950384Z ^[[90mgames/counterball/src/scene/pitch.ts^[[39m 8ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.9095868Z ^[[90mgames/counterball/src/scene/presentation.test.ts^[[39m 12ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.9190334Z ^[[90mgames/counterball/src/scene/presentation.ts^[[39m 8ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.9355188Z ^[[90mgames/counterball/src/simulation/browserDirectProbe.test.ts^[[39m 10ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:56.9964141Z ^[[90mgames/counterball/src/simulation/browserDirectProbe.ts^[[39m 60ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.0211883Z ^[[90mgames/counterball/src/simulation/calibrationProbe.test.ts^[[39m 24ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.0756494Z ^[[90mgames/counterball/src/simulation/directImpulseProbe.test.ts^[[39m 53ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.0917102Z ^[[90mgames/counterball/src/simulation/dispose.ts^[[39m 3ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.1393010Z ^[[90mgames/counterball/src/simulation/facts.test.ts^[[39m 45ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.1779999Z ^[[90mgames/counterball/src/simulation/facts.ts^[[39m 38ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.1800354Z ^[[90mgames/counterball/src/simulation/havokRuntime.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.2076801Z ^[[90mgames/counterball/src/simulation/intendedShotProbe.test.ts^[[39m 27ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.2473883Z ^[[90mgames/counterball/src/simulation/loftCoarseProbe.test.ts^[[39m 39ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.3065600Z ^[[90mgames/counterball/src/simulation/loftCoarseProbe.ts^[[39m 50ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.3936788Z ^[[90mgames/counterball/src/simulation/loftCoarseRunner.ts^[[39m 86ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4037812Z ^[[90mgames/counterball/src/simulation/runtime.test.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4122310Z ^[[90mgames/counterball/src/simulation/sampling.test.ts^[[39m 8ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4208108Z ^[[90mgames/counterball/src/simulation/sampling.ts^[[39m 8ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4312186Z ^[[90mgames/counterball/src/simulation/worldFactory.test.ts^[[39m 9ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4404742Z ^[[90mgames/counterball/src/simulation/worldFactory.ts^[[39m 9ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4423487Z ^[[90mgames/counterball/src/viteAssetModules.d.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4438688Z ^[[90mgames/counterball/src/workspace.test.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4450045Z ^[[90mgames/counterball/tsconfig.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4482782Z ^[[90mpackages/game-protocol/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4591588Z ^[[90mpackages/game-protocol/src/config.ts^[[39m 10ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4602180Z ^[[90mpackages/game-protocol/src/index.ts^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.4937553Z ^[[90mpackages/game-protocol/src/protocol.test.ts^[[39m 33ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5321049Z ^[[90mpackages/game-protocol/src/schemas.ts^[[39m 37ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5449873Z ^[[90mpackages/game-protocol/src/types.ts^[[39m 12ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5533817Z ^[[90mpackages/game-protocol/tsconfig.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5551651Z ^[[90mpackages/game-sdk/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5568883Z ^[[90mpackages/game-sdk/src/index.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5593803Z ^[[90mpackages/game-sdk/src/lifecycle.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5609108Z ^[[90mpackages/game-sdk/src/manifest.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5661785Z ^[[90mpackages/game-sdk/src/sdk.test.ts^[[39m 5ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5678711Z ^[[90mpackages/game-sdk/src/transport.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5689837Z ^[[90mpackages/game-sdk/tsconfig.json^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5706613Z ^[[90mpackages/identity-client/package.json^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5723024Z ^[[90mpackages/identity-client/src/index.ts^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5736651Z ^[[90mpackages/identity-client/src/workspace.test.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5748356Z ^[[90mpackages/identity-client/tsconfig.json^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5767147Z ^[[90mpackages/ui/package.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5781857Z ^[[90mpackages/ui/src/index.ts^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5793523Z ^[[90mpackages/ui/src/workspace.test.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5803460Z ^[[90mpackages/ui/tsconfig.json^[[39m 0ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.5961154Z tests/e2e/counterball-direct-probe.spec.ts 13ms
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6152630Z ^[[90mtests/e2e/counterball-preview.spec.ts^[[39m 18ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6172847Z ^[[90mtests/e2e/home.spec.ts^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6286966Z ^[[90mtests/fixtures/counterball-v1.json^[[39m 9ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6381350Z ^[[90mtests/integration/health.test.ts^[[39m 2ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6428484Z ^[[90mtests/production/counterball-dev-match-absent.mjs^[[39m 3ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6440248Z ^[[90mtests/tsconfig.json^[[39m 1ms (unchanged)
+verify	Prepare formatting suggestion after a failed check	2026-10-13T17:04:57.6469296Z ^[[90mtests/unit/workspace.test.ts^[[39m 1ms (unchanged)
+verify	Upload formatting suggestion	﻿2026-10-13T17:04:57.6911309Z ##[group]Run actions/upload-artifact@v4
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6911496Z with:
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6911626Z   name: formatting-repair
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6911790Z   path: .artifacts/formatting-repair.patch
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6911969Z   if-no-files-found: ignore
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6912123Z   compression-level: 6
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6912259Z   overwrite: false
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6912398Z   include-hidden-files: false
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6912543Z env:
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6912859Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6913059Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6913262Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6913551Z   IDENTITY_SERVICE_SECRET: ***
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6913792Z   IDENTITY_CSRF_SECRET: ***
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6914040Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Upload formatting suggestion	2026-10-13T17:04:57.6914195Z ##[endgroup]
+verify	Upload formatting suggestion	2026-10-13T17:04:57.8006036Z (node:4308) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verify	Upload formatting suggestion	2026-10-13T17:04:57.8006896Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verify	Upload formatting suggestion	2026-10-13T17:04:57.8034139Z With the provided path, there will be 1 file uploaded
+verify	Upload formatting suggestion	2026-10-13T17:04:57.8043094Z Artifact name is valid!
+verify	Upload formatting suggestion	2026-10-13T17:04:57.8043455Z Root directory input is valid!
+verify	Upload formatting suggestion	2026-10-13T17:04:58.1791868Z Beginning upload of artifact content to blob storage
+verify	Upload formatting suggestion	2026-10-13T17:04:58.1893867Z (node:4308) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verify	Upload formatting suggestion	2026-10-13T17:04:58.3897465Z Uploaded bytes 658
+verify	Upload formatting suggestion	2026-10-13T17:04:58.4446677Z Finished uploading artifact content to blob storage!
+verify	Upload formatting suggestion	2026-10-13T17:04:58.4447335Z SHA256 digest of uploaded artifact zip is 255d621ab95648abffe04131564fb868290b9016d3b659d8770fb0180dbd1bea
+verify	Upload formatting suggestion	2026-10-13T17:04:58.4448356Z Finalizing artifact upload
+verify	Upload formatting suggestion	2026-10-13T17:04:58.7525131Z Artifact formatting-repair.zip successfully finalized. Artifact ID 11832941483
+verify	Upload formatting suggestion	2026-10-13T17:04:58.7525913Z Artifact formatting-repair has been successfully uploaded! Final size is 658 bytes. Artifact ID is 11832941483
+verify	Upload formatting suggestion	2026-10-13T17:04:58.7529516Z Artifact download URL: https://github.com/folaoluwafemi/korre/actions/runs/38435557340/artifacts/11832941483
+verify	Post Run pnpm/action-setup@v4	﻿2026-10-13T17:04:58.7650843Z Post job cleanup.
+verify	Post Run pnpm/action-setup@v4	2026-10-13T17:04:58.8482927Z Pruning is unnecessary.
+verify	Post Run actions/checkout@v4	﻿2026-10-13T17:04:58.8611765Z Post job cleanup.
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9161449Z [command]/usr/bin/git version
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9191224Z git version 2.55.0
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9212422Z Temporarily overriding HOME='/home/runner/work/_temp/38244b6b-0f27-4d32-af2d-8e62ab958e90' before making global git config changes
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9213228Z Adding repository directory to the temporary git global config as a safe directory
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9215118Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/korre/korre
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9246021Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9270278Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9465982Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9482112Z http.https://github.com/.extraheader
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9489953Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9520898Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9708388Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify	Post Run actions/checkout@v4	2026-10-13T17:04:58.9740752Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify	Stop containers	﻿2026-10-13T17:04:59.0044247Z Print service container logs: 826bc915ada54444ac9f2dfc8c6e2ee6_postgres17_8950ea
+verify	Stop containers	2026-10-13T17:04:59.0047177Z ##[command]/usr/bin/docker logs --details 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Stop containers	2026-10-13T17:04:59.0136375Z  The files belonging to this database system will be owned by user "postgres".
+verify	Stop containers	2026-10-13T17:04:59.0137708Z  initdb: warning: enabling "trust" authentication for local connections
+verify	Stop containers	2026-10-13T17:04:59.0150380Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+verify	Stop containers	2026-10-13T17:04:59.0151197Z  2026-10-13 17:03:43.026 UTC [1] LOG:  starting PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+verify	Stop containers	2026-10-13T17:04:59.0151729Z  2026-10-13 17:03:43.027 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+verify	Stop containers	2026-10-13T17:04:59.0152014Z  2026-10-13 17:03:43.027 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+verify	Stop containers	2026-10-13T17:04:59.0152338Z  2026-10-13 17:03:43.027 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+verify	Stop containers	2026-10-13T17:04:59.0152656Z  2026-10-13 17:03:43.029 UTC [64] LOG:  database system was shut down at 2026-10-13 17:03:42 UTC
+verify	Stop containers	2026-10-13T17:04:59.0152953Z  2026-10-13 17:03:43.032 UTC [1] LOG:  database system is ready to accept connections
+verify	Stop containers	2026-10-13T17:04:59.0153193Z  This user must also own the server process.
+verify	Stop containers	2026-10-13T17:04:59.0153559Z  
+verify	Stop containers	2026-10-13T17:04:59.0153914Z  The database cluster will be initialized with locale "en_US.utf8".
+verify	Stop containers	2026-10-13T17:04:59.0154351Z  The default database encoding has accordingly been set to "UTF8".
+verify	Stop containers	2026-10-13T17:04:59.0154715Z  The default text search configuration will be set to "english".
+verify	Stop containers	2026-10-13T17:04:59.0155046Z  
+verify	Stop containers	2026-10-13T17:04:59.0155177Z  Data page checksums are disabled.
+verify	Stop containers	2026-10-13T17:04:59.0155339Z  
+verify	Stop containers	2026-10-13T17:04:59.0155518Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+verify	Stop containers	2026-10-13T17:04:59.0155748Z  creating subdirectories ... ok
+verify	Stop containers	2026-10-13T17:04:59.0155949Z  selecting dynamic shared memory implementation ... posix
+verify	Stop containers	2026-10-13T17:04:59.0156159Z  selecting default "max_connections" ... 100
+verify	Stop containers	2026-10-13T17:04:59.0156346Z  selecting default "shared_buffers" ... 128MB
+verify	Stop containers	2026-10-13T17:04:59.0156525Z  selecting default time zone ... Etc/UTC
+verify	Stop containers	2026-10-13T17:04:59.0156696Z  creating configuration files ... ok
+verify	Stop containers	2026-10-13T17:04:59.0156865Z  running bootstrap script ... ok
+verify	Stop containers	2026-10-13T17:04:59.0157054Z  performing post-bootstrap initialization ... ok
+verify	Stop containers	2026-10-13T17:04:59.0157245Z  syncing data to disk ... ok
+verify	Stop containers	2026-10-13T17:04:59.0157392Z  
+verify	Stop containers	2026-10-13T17:04:59.0157503Z  
+verify	Stop containers	2026-10-13T17:04:59.0157647Z  Success. You can now start the database server using:
+verify	Stop containers	2026-10-13T17:04:59.0157827Z  
+verify	Stop containers	2026-10-13T17:04:59.0157978Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+verify	Stop containers	2026-10-13T17:04:59.0158159Z  
+verify	Stop containers	2026-10-13T17:04:59.0158517Z  waiting for server to start....2026-10-13 17:03:42.759 UTC [48] LOG:  starting PostgreSQL 17.11 (Debian 17.11-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+verify	Stop containers	2026-10-13T17:04:59.0159006Z  2026-10-13 17:03:42.761 UTC [48] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+verify	Stop containers	2026-10-13T17:04:59.0159329Z  2026-10-13 17:03:42.767 UTC [51] LOG:  database system was shut down at 2026-10-13 17:03:42 UTC
+verify	Stop containers	2026-10-13T17:04:59.0159624Z  2026-10-13 17:03:42.771 UTC [48] LOG:  database system is ready to accept connections
+verify	Stop containers	2026-10-13T17:04:59.0160013Z   done
+verify	Stop containers	2026-10-13T17:04:59.0160130Z  server started
+verify	Stop containers	2026-10-13T17:04:59.0160258Z  CREATE DATABASE
+verify	Stop containers	2026-10-13T17:04:59.0160384Z  
+verify	Stop containers	2026-10-13T17:04:59.0160492Z  
+verify	Stop containers	2026-10-13T17:04:59.0160682Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+verify	Stop containers	2026-10-13T17:04:59.0160913Z  
+verify	Stop containers	2026-10-13T17:04:59.0161123Z  waiting for server to shut down...2026-10-13 17:03:42.913 UTC [48] LOG:  received fast shutdown request
+verify	Stop containers	2026-10-13T17:04:59.0161430Z  .2026-10-13 17:03:42.913 UTC [48] LOG:  aborting any active transactions
+verify	Stop containers	2026-10-13T17:04:59.0161896Z  2026-10-13 17:03:42.914 UTC [48] LOG:  background worker "logical replication launcher" (PID 54) exited with exit code 1
+verify	Stop containers	2026-10-13T17:04:59.0162203Z  2026-10-13 17:03:42.915 UTC [49] LOG:  shutting down
+verify	Stop containers	2026-10-13T17:04:59.0162436Z  2026-10-13 17:03:42.916 UTC [49] LOG:  checkpoint starting: shutdown immediate
+verify	Stop containers	2026-10-13T17:04:59.0163029Z  2026-10-13 17:03:43.000 UTC [49] LOG:  checkpoint complete: wrote 925 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.073 s, sync=0.011 s, total=0.085 s; sync files=301, longest=0.009 s, average=0.001 s; distance=4256 kB, estimate=4256 kB; lsn=0/19179A8, redo lsn=0/19179A8
+verify	Stop containers	2026-10-13T17:04:59.0163615Z  2026-10-13 17:03:43.005 UTC [48] LOG:  database system is shut down
+verify	Stop containers	2026-10-13T17:04:59.0163820Z   done
+verify	Stop containers	2026-10-13T17:04:59.0163938Z  server stopped
+verify	Stop containers	2026-10-13T17:04:59.0164062Z  
+verify	Stop containers	2026-10-13T17:04:59.0164211Z  PostgreSQL init process complete; ready for start up.
+verify	Stop containers	2026-10-13T17:04:59.0164393Z  
+verify	Stop containers	2026-10-13T17:04:59.0168094Z Stop and remove container: 826bc915ada54444ac9f2dfc8c6e2ee6_postgres17_8950ea
+verify	Stop containers	2026-10-13T17:04:59.0170866Z ##[command]/usr/bin/docker rm --force 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Stop containers	2026-10-13T17:04:59.5581484Z 2e521c372339d43b35bd2010152b0d8046fb4d4f9567b0d672afa890bb6ad1ec
+verify	Stop containers	2026-10-13T17:04:59.5604122Z Remove container network: github_network_240c259e5b59496c9cd79f126296e8c4
+verify	Stop containers	2026-10-13T17:04:59.5606790Z ##[command]/usr/bin/docker network rm github_network_240c259e5b59496c9cd79f126296e8c4
+verify	Stop containers	2026-10-13T17:04:59.6519256Z github_network_240c259e5b59496c9cd79f126296e8c4
+verify	Complete job	﻿2026-10-13T17:04:59.6568850Z Cleaning up orphan processes
+verify	Complete job	2026-10-13T17:04:59.6807786Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

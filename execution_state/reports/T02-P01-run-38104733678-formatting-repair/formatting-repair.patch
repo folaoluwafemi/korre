@@ -1,0 +1,68 @@
+diff --git a/games/counterball/src/scene/presentation.test.ts b/games/counterball/src/scene/presentation.test.ts
+index bc8f2ed..da7909c 100644
+--- a/games/counterball/src/scene/presentation.test.ts
++++ b/games/counterball/src/scene/presentation.test.ts
+@@ -39,7 +39,10 @@ function withScene(run: (scene: Scene) => void): void {
+   }
+ }
+ 
+-function pick(mesh: PickingInfo["pickedMesh"], hit = mesh !== null): PickingInfo {
++function pick(
++  mesh: PickingInfo["pickedMesh"],
++  hit = mesh !== null,
++): PickingInfo {
+   const info = new PickingInfo();
+   info.hit = hit;
+   info.pickedMesh = mesh;
+@@ -60,9 +63,7 @@ function snapshotRoots(
+   );
+ }
+ 
+-function playbackTransforms(
+-  bodies: readonly BodyState[],
+-): PlaybackTransform[] {
++function playbackTransforms(bodies: readonly BodyState[]): PlaybackTransform[] {
+   return bodies.map((body, index) => ({
+     id: body.id,
+     position: {
+@@ -140,9 +141,14 @@ describe("Counterball presentation registry", () => {
+         new Vector3(firstHole.x, 0, firstHole.z),
+         worldMatrix,
+       );
+-      const worldUp = Vector3.TransformNormal(Vector3.Up(), worldMatrix).normalize();
++      const worldUp = Vector3.TransformNormal(
++        Vector3.Up(),
++        worldMatrix,
++      ).normalize();
+       const holeRay = new Ray(
+-        worldCenter.add(worldUp.scale(COUNTERBALL_CONFIG_V1.geometry.buttonThickness)),
++        worldCenter.add(
++          worldUp.scale(COUNTERBALL_CONFIG_V1.geometry.buttonThickness),
++        ),
+         worldUp.scale(-1),
+         COUNTERBALL_CONFIG_V1.geometry.buttonThickness * 3,
+       );
+diff --git a/games/counterball/src/scene/presentation.ts b/games/counterball/src/scene/presentation.ts
+index 577332f..5b1cbeb 100644
+--- a/games/counterball/src/scene/presentation.ts
++++ b/games/counterball/src/scene/presentation.ts
+@@ -93,13 +93,17 @@ function validateSnapshots(
+       );
+     }
+     if (transforms.has(snapshot.id)) {
+-      throw new TypeError("Presentation update contains a duplicate entity ID.");
++      throw new TypeError(
++        "Presentation update contains a duplicate entity ID.",
++      );
+     }
+     transforms.set(snapshot.id, snapshot);
+   }
+ 
+   if (ENTITY_IDS.some((id) => !transforms.has(id))) {
+-    throw new TypeError("Presentation update is missing a canonical entity ID.");
++    throw new TypeError(
++      "Presentation update is missing a canonical entity ID.",
++    );
+   }
+ 
+   return transforms;

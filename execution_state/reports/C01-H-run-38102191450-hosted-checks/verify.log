@@ -1,0 +1,40 @@
+
+> korre@0.1.0 verify /home/runner/work/korre/korre
+> pnpm typecheck && pnpm lint && pnpm test && pnpm build
+
+
+> korre@0.1.0 typecheck /home/runner/work/korre/korre
+> pnpm -r --sort typecheck && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.server.json
+
+Scope: 8 of 9 workspace projects
+packages/game-protocol typecheck$ tsc --noEmit -p tsconfig.json
+packages/identity-client typecheck$ tsc --noEmit -p tsconfig.json
+packages/ui typecheck$ tsc --noEmit -p tsconfig.json
+packages/identity-client typecheck: Done
+packages/ui typecheck: Done
+packages/game-protocol typecheck: Done
+apps/api typecheck$ tsc --noEmit -p tsconfig.json
+packages/game-sdk typecheck$ tsc --noEmit -p tsconfig.json
+apps/api typecheck: Done
+packages/game-sdk typecheck: Done
+games/counterball typecheck$ node --input-type=module -e "for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json
+games/counterball typecheck: > @korre/counterball@ check:headless-bundle /home/runner/work/korre/korre/games/counterball
+games/counterball typecheck: > node --input-type=module -e "import { build } from 'esbuild'; import { fileURLToPath } from 'node:url'; import { relative, sep } from 'node:path'; const publicUrl = import.meta.resolve('@korre/counterball/headless'); const entry = fileURLToPath(publicUrl); const entryRelative = relative(process.cwd(), entry).split(sep).join('/'); if (!entryRelative.endsWith('/src/headless.ts') && entryRelative !== 'src/headless.ts') throw new Error('Unexpected public headless entry: ' + entryRelative); const result = await build({ entryPoints: [entry], absWorkingDir: process.cwd(), bundle: true, write: false, platform: 'browser', conditions: ['workerd', 'worker'], format: 'esm', target: 'es2022', metafile: true, treeShaking: false, minifyWhitespace: true }); const normalize = (value) => value.split(String.fromCharCode(92)).join('/'); const inputPaths = Object.keys(result.metafile.inputs).map(normalize); if (!inputPaths.some((value) => value === entryRelative || value.endsWith('/' + entryRelative))) throw new Error('Public headless entry is absent from the resolved bundle graph.'); const forbiddenPaths = inputPaths.filter((value) => (value === 'src/browser.ts' || value.endsWith('/src/browser.ts')) || value.includes('/apps/web/') || value.includes('/node_modules/react/') || value.includes('/node_modules/react-dom/') || value.includes('/@babylonjs/core/Engines/engine.js') || value.includes('/@babylonjs/core/Engines/webgpuEngine.js')); if (forbiddenPaths.length) throw new Error('Headless bundle reaches browser-only modules: ' + forbiddenPaths.join(', ')); const output = result.outputFiles.map((file) => file.text).join(' '); const isIdent = (value) => value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9') || value === '_' || value === '$'); const hasGlobal = (name) => { for (let at = output.indexOf(name); at !== -1; at = output.indexOf(name, at + 1)) if (!isIdent(output[at - 1]) && !isIdent(output[at + name.length])) return true; return false; }; const forbiddenGlobals = ['React', 'ReactDOM', 'window', 'document', 'HTMLElement', 'HTMLCanvasElement', 'DOMParser', 'localStorage', 'sessionStorage'].filter(hasGlobal); if (forbiddenGlobals.length) throw new Error('Headless bundle references browser globals: ' + forbiddenGlobals.join(', ')); const entryOutputs = Object.values(result.metafile.outputs).filter((item) => item.entryPoint && (normalize(item.entryPoint) === entryRelative || normalize(item.entryPoint).endsWith('/' + entryRelative))); if (entryOutputs.length !== 1 || result.outputFiles.length !== 1 || result.outputFiles[0].contents.length === 0) throw new Error('Expected one nonempty bundle emitted from the public headless entry.'); console.log('Public Counterball headless Worker-target bundle boundary passed.');"
+games/counterball typecheck: Public Counterball headless Worker-target bundle boundary passed.
+games/counterball typecheck: Done
+apps/realtime typecheck$ tsc --noEmit -p tsconfig.json
+apps/web typecheck$ tsc --noEmit -p tsconfig.json
+apps/realtime typecheck: Done
+apps/web typecheck: Done
+playwright.config.ts(89,35): error TS4111: Property 'CI' comes from an index signature, so it must be accessed with ['CI'].
+playwright.config.ts(91,3): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type '"list" | (string | ["json", { outputFile: string; }])[]' is not assignable to type 'LiteralUnion<"list" | "dot" | "line" | "github" | "json" | "junit" | "null" | "html" | "blob" | "perfetto", string> | ReporterDescription[]'.
+      Type '(string | ["json", { outputFile: string; }])[]' is not assignable to type 'LiteralUnion<"list" | "dot" | "line" | "github" | "json" | "junit" | "null" | "html" | "blob" | "perfetto", string> | ReporterDescription[]'.
+        Type '(string | ["json", { outputFile: string; }])[]' is not assignable to type 'ReporterDescription[]'.
+          Type 'string | ["json", { outputFile: string; }]' is not assignable to type 'ReporterDescription'.
+            Type 'string' is not assignable to type 'ReporterDescription'.
+playwright.config.ts(91,25): error TS4111: Property 'CI' comes from an index signature, so it must be accessed with ['CI'].
+playwright.config.ts(103,20): error TS4111: Property 'CI' comes from an index signature, so it must be accessed with ['CI'].
+ ELIFECYCLE  Command failed with exit code 2.
+ ELIFECYCLE  Command failed with exit code 2.

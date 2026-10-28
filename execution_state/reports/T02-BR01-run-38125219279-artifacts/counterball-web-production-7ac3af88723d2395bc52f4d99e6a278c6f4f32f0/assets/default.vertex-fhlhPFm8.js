@@ -1,0 +1,1 @@
+export{or as defaultVertexShaderWGSL}from"./CounterballPreview-J8k4_Ua0.js";

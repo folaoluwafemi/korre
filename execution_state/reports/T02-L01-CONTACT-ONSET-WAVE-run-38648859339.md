@@ -1,0 +1,3 @@
+# Hostedonset foundation wave
+
+Exactrun38648859339/713853e4ffc910c0fb55f9cab5352d1f64910c81: Verify211/211 tests33files, complete type/lint/format/build, focusedprotocol15 inclcanonicalhash, integration1/1 andproductionpreview4/4 pass. Diagnostic3pass/1fail: oldnativeconsumerrawfixturepin failsbeforeWasm/motion/download. No skips/retries/flakes inactualbrowserreports; independentexactcountsreviewrequired. FullAPI/jobs/GitHublogs/artifacts andstreamingSHA256inventory retained. Thiscanacceptonlycanonicalproducer/purepublicmaskadapter/puremathseamafterindependentreview, not nativeeventdelivery/fullmatrix/T02. Nativecontrols+full24integration next, masks/budgets remainunverified. No localappbuild/test.

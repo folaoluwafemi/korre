@@ -1,0 +1,1 @@
+export{hr as gaussianSplattingFragmentDeclarationWGSL}from"./CounterballPreview-DPky4api.js";

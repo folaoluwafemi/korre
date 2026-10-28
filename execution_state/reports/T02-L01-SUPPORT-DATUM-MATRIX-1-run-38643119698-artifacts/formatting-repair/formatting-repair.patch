@@ -1,0 +1,159 @@
+diff --git a/games/counterball/src/simulation/loftCoarseProbe.test.ts b/games/counterball/src/simulation/loftCoarseProbe.test.ts
+index 5055d79..689de88 100644
+--- a/games/counterball/src/simulation/loftCoarseProbe.test.ts
++++ b/games/counterball/src/simulation/loftCoarseProbe.test.ts
+@@ -4,9 +4,7 @@ import {
+ } from "@korre/game-protocol";
+ import { beforeAll, describe, expect, it } from "vitest";
+ import { computeDiagnosticShiftedEnergy } from "./browserDirectProbe.js";
+-import {
+-  deriveNativeCylinderSupportDatum,
+-} from "./nativeCylinderSupportDatum.js";
++import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
+ import {
+   LOFT_COARSE_TUPLES,
+   canonicalizeLoftCoarseContactPair,
+@@ -236,18 +234,15 @@ function caseMetadata(
+     supportPlane: {
+       referenceY: geometry.surfaceY,
+       nativeTopY:
+-        geometry.surfaceY - geometry.surfaceThickness / 2 +
++        geometry.surfaceY -
++        geometry.surfaceThickness / 2 +
+         supportBounds.maximum.y,
+       nativeShapeType: 3 as const,
+       nativeLocalAabb: {
+         minimum: supportBounds.minimum,
+         maximum: supportBounds.maximum,
+       },
+-      position: vec3(
+-        0,
+-        geometry.surfaceY - geometry.surfaceThickness / 2,
+-        0,
+-      ),
++      position: vec3(0, geometry.surfaceY - geometry.surfaceThickness / 2, 0),
+       rotation: quaternion(),
+       scaling: vec3(1, 1, 1),
+       hasParent: false as const,
+@@ -694,17 +689,16 @@ describe("native cylinder support datum", () => {
+     const tiltedSupportExtent = radius * sine + halfHeight * cosine;
+     const tiltedRotatedCOMY = cosine * nativeCOM.y - sine * nativeCOM.z;
+     const tiltedCOMY =
+-      geometry.surfaceY +
+-      tiltedSupportExtent +
+-      tiltedRotatedCOMY;
++      geometry.surfaceY + tiltedSupportExtent + tiltedRotatedCOMY;
+ 
+     expect(flatCOMY - nativeCOM.y - halfHeight).toBeCloseTo(
+       geometry.surfaceY,
+       14,
+     );
+-    expect(
+-      tiltedCOMY - tiltedRotatedCOMY - tiltedSupportExtent,
+-    ).toBeCloseTo(geometry.surfaceY, 14);
++    expect(tiltedCOMY - tiltedRotatedCOMY - tiltedSupportExtent).toBeCloseTo(
++      geometry.surfaceY,
++      14,
++    );
+     expect(flatCOMY).toBeGreaterThanOrEqual(datum);
+     expect(tiltedCOMY).toBeGreaterThanOrEqual(datum);
+ 
+@@ -1179,15 +1173,13 @@ describe("writeLoftCoarseMatrix", () => {
+             maximum: vec3(331, 0.1, 335),
+           },
+         },
+-      ].map(
+-        (supportPatch) => (metadata: LoftCoarseCase["metadata"]) => ({
+-          ...metadata,
+-          supportPlane: {
+-            ...metadata.supportPlane,
+-            ...supportPatch,
+-          } as never,
+-        }),
+-      ),
++      ].map((supportPatch) => (metadata: LoftCoarseCase["metadata"]) => ({
++        ...metadata,
++        supportPlane: {
++          ...metadata.supportPlane,
++          ...supportPatch,
++        } as never,
++      })),
+     ];
+ 
+     for (const mutate of mutations) {
+diff --git a/games/counterball/src/simulation/loftCoarseProbe.ts b/games/counterball/src/simulation/loftCoarseProbe.ts
+index b620da9..be74e43 100644
+--- a/games/counterball/src/simulation/loftCoarseProbe.ts
++++ b/games/counterball/src/simulation/loftCoarseProbe.ts
+@@ -2,9 +2,7 @@ import {
+   COUNTERBALL_CONFIG_V1,
+   hashCounterballConfig,
+ } from "@korre/game-protocol";
+-import {
+-  deriveNativeCylinderSupportDatum,
+-} from "./nativeCylinderSupportDatum.js";
++import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
+ 
+ export type LoftCoarseTuple = readonly [
+   gapOffset: number,
+diff --git a/games/counterball/src/simulation/loftCoarseRunner.ts b/games/counterball/src/simulation/loftCoarseRunner.ts
+index aa6cd0d..5023d6a 100644
+--- a/games/counterball/src/simulation/loftCoarseRunner.ts
++++ b/games/counterball/src/simulation/loftCoarseRunner.ts
+@@ -57,9 +57,7 @@ import {
+   type CounterballWorld,
+ } from "./worldFactory.js";
+ import { nativeCylinderComRadius } from "./nativeCylinderRadius.js";
+-import {
+-  deriveNativeCylinderSupportDatum,
+-} from "./nativeCylinderSupportDatum.js";
++import { deriveNativeCylinderSupportDatum } from "./nativeCylinderSupportDatum.js";
+ 
+ const config = COUNTERBALL_CONFIG_V1;
+ const guard = config.restartLoftDiagnosticGuard;
+diff --git a/tests/e2e/counterball-direct-probe.spec.ts b/tests/e2e/counterball-direct-probe.spec.ts
+index 127baa7..04e222d 100644
+--- a/tests/e2e/counterball-direct-probe.spec.ts
++++ b/tests/e2e/counterball-direct-probe.spec.ts
+@@ -431,11 +431,14 @@ function assertNativeAabb(
+   assertVector(minimum, `${label}.minimum`);
+   assertVector(maximum, `${label}.maximum`);
+   const dimensions = {
+-    x: finiteNumber(maximum["x"], `${label}.maximum.x`) -
++    x:
++      finiteNumber(maximum["x"], `${label}.maximum.x`) -
+       finiteNumber(minimum["x"], `${label}.minimum.x`),
+-    y: finiteNumber(maximum["y"], `${label}.maximum.y`) -
++    y:
++      finiteNumber(maximum["y"], `${label}.maximum.y`) -
+       finiteNumber(minimum["y"], `${label}.minimum.y`),
+-    z: finiteNumber(maximum["z"], `${label}.maximum.z`) -
++    z:
++      finiteNumber(maximum["z"], `${label}.maximum.z`) -
+       finiteNumber(minimum["z"], `${label}.minimum.z`),
+   };
+   for (const axis of ["x", "y", "z"] as const) {
+@@ -1000,10 +1003,7 @@ function validateCaseMetadata(
+     ["w", 1],
+   ] as const) {
+     expect(
+-      finiteNumber(
+-        supportRotation[axis],
+-        `${supportLabel}.rotation.${axis}`,
+-      ),
++      finiteNumber(supportRotation[axis], `${supportLabel}.rotation.${axis}`),
+     ).toBe(expected);
+   }
+   expect(supportScaling).toEqual({ x: 1, y: 1, z: 1 });
+@@ -1096,10 +1096,7 @@ function validateCaseMetadata(
+     );
+     const derivedSupportDatum =
+       supportReferenceY +
+-      Math.min(
+-        dynamicBounds.dimensions.x / 2,
+-        dynamicBounds.dimensions.y / 2,
+-      ) -
++      Math.min(dynamicBounds.dimensions.x / 2, dynamicBounds.dimensions.y / 2) -
+       Math.hypot(
+         finiteNumber(centerOfMass["x"], `${label}.centerOfMassOffset.x`),
+         finiteNumber(centerOfMass["y"], `${label}.centerOfMassOffset.y`),

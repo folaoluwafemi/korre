@@ -1,0 +1,53 @@
+verify	Verify	﻿2026-10-14T15:56:49.6955746Z ##[group]Run mkdir -p .artifacts
+verify	Verify	2026-10-14T15:56:49.6956180Z ^[[36;1mmkdir -p .artifacts^[[0m
+verify	Verify	2026-10-14T15:56:49.6956506Z ^[[36;1mset -o pipefail^[[0m
+verify	Verify	2026-10-14T15:56:49.6956860Z ^[[36;1mpnpm verify 2>&1 | tee .artifacts/verify.log^[[0m
+verify	Verify	2026-10-14T15:56:49.7022470Z shell: /usr/bin/bash -e {0}
+verify	Verify	2026-10-14T15:56:49.7022827Z env:
+verify	Verify	2026-10-14T15:56:49.7023455Z   IDENTITY_TEST_DATABASE_URL: ***127.0.0.1:5432/korre_test
+verify	Verify	2026-10-14T15:56:49.7023941Z   IDENTITY_TEST_DATABASE_ALLOW: 1
+verify	Verify	2026-10-14T15:56:49.7024672Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Verify	2026-10-14T15:56:49.7025370Z   IDENTITY_SERVICE_SECRET: ***
+verify	Verify	2026-10-14T15:56:49.7025947Z   IDENTITY_CSRF_SECRET: ***
+verify	Verify	2026-10-14T15:56:49.7026532Z   IDENTITY_RATE_LIMIT_SECRET: ***
+verify	Verify	2026-10-14T15:56:49.7027119Z   COUNTERBALL_CALIBRATION_OUTPUT: .artifacts/counterball-calibration-observations.json
+verify	Verify	2026-10-14T15:56:49.7027979Z   COUNTERBALL_INTENDED_SHOT_OUTPUT: .artifacts/counterball-intended-shot-observations.json
+verify	Verify	2026-10-14T15:56:49.7028597Z ##[endgroup]
+verify	Verify	2026-10-14T15:56:50.0127563Z 
+verify	Verify	2026-10-14T15:56:50.0128571Z > korre@0.1.0 verify /home/runner/work/korre/korre
+verify	Verify	2026-10-14T15:56:50.0129493Z > pnpm typecheck && pnpm lint && pnpm test && pnpm build
+verify	Verify	2026-10-14T15:56:50.0129976Z 
+verify	Verify	2026-10-14T15:56:50.3230812Z 
+verify	Verify	2026-10-14T15:56:50.3231715Z > korre@0.1.0 typecheck /home/runner/work/korre/korre
+verify	Verify	2026-10-14T15:56:50.3233241Z > pnpm -r --sort typecheck && tsc --noEmit -p tests/tsconfig.json && tsc --noEmit -p apps/web/tsconfig.server.json
+verify	Verify	2026-10-14T15:56:50.3234807Z 
+verify	Verify	2026-10-14T15:56:50.6399514Z Scope: 8 of 9 workspace projects
+verify	Verify	2026-10-14T15:56:50.6457977Z packages/game-protocol typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:50.6465736Z packages/identity-client typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:50.6470422Z packages/ui typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:52.5836978Z packages/ui typecheck: Done
+verify	Verify	2026-10-14T15:56:52.6406542Z packages/identity-client typecheck: Done
+verify	Verify	2026-10-14T15:56:53.1789943Z packages/game-protocol typecheck: Done
+verify	Verify	2026-10-14T15:56:53.1795842Z apps/api typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:53.1799739Z packages/game-sdk typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:55.4610417Z apps/api typecheck: Done
+verify	Verify	2026-10-14T15:56:55.8346253Z packages/game-sdk typecheck: Done
+verify	Verify	2026-10-14T15:56:55.8354028Z games/counterball typecheck$ node --input-type=module -e "for (const entry of ['browser', 'headless']) { const url = import.meta.resolve('@korre/counterball/' + entry); if (!url.endsWith('/src/' + entry + '.ts')) throw new Error('Unexpected Counterball ' + entry + ' export: ' + url); }" && pnpm run check:headless-bundle && tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:56:56.1765800Z games/counterball typecheck: > @korre/counterball@ check:headless-bundle /home/runner/work/korre/korre/games/counterball
+verify	Verify	2026-10-14T15:56:56.1794068Z games/counterball typecheck: > node --input-type=module -e "import { build } from 'esbuild'; import { fileURLToPath } from 'node:url'; import { relative, sep } from 'node:path'; const publicUrl = import.meta.resolve('@korre/counterball/headless'); const entry = fileURLToPath(publicUrl); const entryRelative = relative(process.cwd(), entry).split(sep).join('/'); if (!entryRelative.endsWith('/src/headless.ts') && entryRelative !== 'src/headless.ts') throw new Error('Unexpected public headless entry: ' + entryRelative); const result = await build({ entryPoints: [entry], absWorkingDir: process.cwd(), bundle: true, write: false, platform: 'browser', conditions: ['workerd', 'worker'], format: 'esm', target: 'es2022', metafile: true, treeShaking: false, minifyWhitespace: true }); const normalize = (value) => value.split(String.fromCharCode(92)).join('/'); const inputPaths = Object.keys(result.metafile.inputs).map(normalize); if (!inputPaths.some((value) => value === entryRelative || value.endsWith('/' + entryRelative))) throw new Error('Public headless entry is absent from the resolved bundle graph.'); const forbiddenPaths = inputPaths.filter((value) => (value === 'src/browser.ts' || value.endsWith('/src/browser.ts')) || value.includes('/apps/web/') || value.includes('/node_modules/react/') || value.includes('/node_modules/react-dom/') || value.includes('/@babylonjs/core/Engines/engine.js') || value.includes('/@babylonjs/core/Engines/webgpuEngine.js')); if (forbiddenPaths.length) throw new Error('Headless bundle reaches browser-only modules: ' + forbiddenPaths.join(', ')); const output = result.outputFiles.map((file) => file.text).join(' '); const isIdent = (value) => value !== undefined && ((value >= 'a' && value <= 'z') || (value >= 'A' && value <= 'Z') || (value >= '0' && value <= '9') || value === '_' || value === '$'); const hasGlobal = (name) => { for (let at = output.indexOf(name); at !== -1; at = output.indexOf(name, at + 1)) if (!isIdent(output[at - 1]) && !isIdent(output[at + name.length])) return true; return false; }; const forbiddenGlobals = ['React', 'ReactDOM', 'window', 'document', 'HTMLElement', 'HTMLCanvasElement', 'DOMParser', 'localStorage', 'sessionStorage'].filter(hasGlobal); if (forbiddenGlobals.length) throw new Error('Headless bundle references browser globals: ' + forbiddenGlobals.join(', ')); const entryOutputs = Object.values(result.metafile.outputs).filter((item) => item.entryPoint && (normalize(item.entryPoint) === entryRelative || normalize(item.entryPoint).endsWith('/' + entryRelative))); if (entryOutputs.length !== 1 || result.outputFiles.length !== 1 || result.outputFiles[0].contents.length === 0) throw new Error('Expected one nonempty bundle emitted from the public headless entry.'); console.log('Public Counterball headless Worker-target bundle boundary passed.');"
+verify	Verify	2026-10-14T15:56:56.2263963Z games/counterball typecheck: Public Counterball headless Worker-target bundle boundary passed.
+verify	Verify	2026-10-14T15:57:00.3789288Z games/counterball typecheck: Done
+verify	Verify	2026-10-14T15:57:00.3794755Z apps/realtime typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:57:00.3797651Z apps/web typecheck$ tsc --noEmit -p tsconfig.json
+verify	Verify	2026-10-14T15:57:01.1471976Z apps/realtime typecheck: Done
+verify	Verify	2026-10-14T15:57:04.8720629Z apps/web typecheck: Done
+verify	Verify	2026-10-14T15:57:11.3945339Z 
+verify	Verify	2026-10-14T15:57:11.3946527Z > korre@0.1.0 lint /home/runner/work/korre/korre
+verify	Verify	2026-10-14T15:57:11.3947942Z > eslint apps games packages tests --max-warnings=0 && prettier --check apps games packages tests
+verify	Verify	2026-10-14T15:57:11.3948935Z 
+verify	Verify	2026-10-14T15:57:26.8292059Z Checking formatting...
+verify	Verify	2026-10-14T15:57:28.5601160Z [^[[33mwarn^[[39m] games/counterball/src/simulation/loftCoarseProbe.test.ts
+verify	Verify	2026-10-14T15:57:29.4046892Z [^[[33mwarn^[[39m] Code style issues found in the above file. Run Prettier with --write to fix.
+verify	Verify	2026-10-14T15:57:29.4579081Z  ELIFECYCLE  Command failed with exit code 1.
+verify	Verify	2026-10-14T15:57:29.5082521Z  ELIFECYCLE  Command failed with exit code 1.
+verify	Verify	2026-10-14T15:57:29.5292980Z ##[error]Process completed with exit code 1.

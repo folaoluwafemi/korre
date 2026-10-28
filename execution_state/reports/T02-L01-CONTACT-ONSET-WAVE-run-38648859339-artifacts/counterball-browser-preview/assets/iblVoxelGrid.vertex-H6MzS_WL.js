@@ -1,0 +1,1 @@
+export{c as iblVoxelGridVertexShaderWGSL}from"./CounterballPreview-BmVNTiHE.js";

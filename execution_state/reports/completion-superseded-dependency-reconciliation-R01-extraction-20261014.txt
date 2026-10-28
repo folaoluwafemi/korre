@@ -1,0 +1,86 @@
+{
+  "verdict": "PASS",
+  "packets": 116,
+  "remainingParents": 21,
+  "initialReady": [],
+  "note": "Plan consistency only; no implementation/runtime check ran."
+}
+{
+  "id": "T02-R01",
+  "parent": "T02",
+  "title": "Implement isolated asynchronous runner and host entrypoints",
+  "role": "worker",
+  "depends_on": [
+    "T02-F01-ROTATION-1",
+    "T02-W01",
+    "T02-C0",
+    "T02-C2",
+    "C00-A",
+    "C00-B",
+    "C03",
+    "C00"
+  ],
+  "read_paths": [
+    "knowledge_base/execution/CONTRACTS.md",
+    "games/counterball/src/simulation/facts.ts",
+    "games/counterball/src/simulation/worldFactory.ts",
+    "games/counterball/src/simulation/havokRuntime.ts",
+    "games/counterball/src/simulation/dispose.ts",
+    "packages/game-protocol/src/types.ts"
+  ],
+  "write_paths": [
+    "games/counterball/src/simulation/runner.ts",
+    "games/counterball/src/simulation/runner.test.ts",
+    "games/counterball/src/headless.ts"
+  ],
+  "outputs": [
+    "One isolated serializable SimulationRunner implementation with a host-injected private scheduler/clock and a headless runner export."
+  ],
+  "steps": [
+    "Validate input/config/hash and signal before allocating; create one world per run and return only canonical ShotSimulation or typed error.",
+    "Use a private injected monotonic clock and host scheduler; yield exactly after every 4 fixed 1/120-second physics ticks (about 33 ms), with browser/Node hosts supplying their own event-loop yield and no physics changes.",
+    "Check signal before allocation, before every 4-tick batch, immediately after each awaited yield, before finalization, before cleanup, and after cleanup before any result returns; always dispose in finally.",
+    "Define simulated-time exhaustion at configured max simulated duration without settlement as timeout; define monotonic wall-clock deadline, fact/frame/workload cap exhaustion, or displacement-guard exhaustion as resourceLimit; never conflate these outcomes.",
+    "Keep 120-Hz physics facts and bounded playback sampling; no partial success on error. Export only the headless factory here; the browser entry factory is the separate T02-E01 packet.",
+    "Test the exact 4-tick yield cadence, wall-clock and simulated-time error mapping using injected monotonic clock/scheduler, and abort checks before/after each batch and cleanup; never mock body motion.",
+    "Enforce the C00-frozen swept-displacement/angular-change guard; use verified Havok substeps or fail typed resourceLimit before a candidate can be called physically supported."
+  ],
+  "checks": [
+    {
+      "environment": "github",
+      "expected": "Runner validation, yield cadence, error mapping and headless exports pass; no browser globals enter the headless entry.",
+      "command": "pnpm --filter @korre/counterball test && pnpm --filter @korre/counterball typecheck && pnpm verify"
+    },
+    {
+      "environment": "source-review",
+      "expected": "One shared physics/rules path, signal checks at all boundaries, and reliable disposal.",
+      "command": "Independent review of runner lifecycle and host exports"
+    }
+  ],
+  "acceptance": [
+    "The headless entry invokes the shared simulation implementation; host-specific runtime/yield setup stays outside physics/rules.",
+    "Simulated timeout, wall-clock/resource limit and cancellation are distinct.",
+    "No step may exceed the config-hashed tunnelling guard; never report a candidate pass when the solver could skip the obstacle.",
+    "Runner yields after every 4 physics ticks and checks cancellation on both sides of every batch and cleanup.",
+    "Monotonic wall-clock/resource limits and simulated-time settling timeout remain separate typed errors."
+  ],
+  "negative_cases": [
+    "Synchronous 15-second loop blocks UI; cancellation checked only once or missed after final batch.",
+    "Wall-clock deadline reported as simulated timeout; partial result on any limit.",
+    "Headless entry imports React, DOM or browser UI; browser path runs a Node-only adapter."
+  ],
+  "review_questions": [
+    "Does each await boundary get a pre/post signal check?",
+    "Is cleanup guaranteed on success, timeout, resourceLimit and cancellation?",
+    "Are host yielding and physics stepping separate?"
+  ],
+  "stop_conditions": [
+    "If pinned Havok cannot be scheduled without blocking or the configured batch can exceed the host budget, stop and request a reviewed contract/limit adjustment.",
+    "If exact scheduler or timeout semantics differ from accepted C00 contracts, coordinator must update the contract before code proceeds."
+  ],
+  "catalogue": "LOCAL_PACKETS.json",
+  "ready": false,
+  "required_parent_acceptance": [
+    "T01"
+  ]
+}
